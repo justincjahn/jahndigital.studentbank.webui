@@ -1,0 +1,8 @@
+query allInstances {
+  instances {
+    nodes {
+      id
+      description
+    }
+  }
+}

@@ -1,4 +1,6 @@
-# jahndigital.studentbank.webui
+# StudentBank WebUI
+
+Administration and web interface for StudentBank.
 
 ## Project setup
 ```

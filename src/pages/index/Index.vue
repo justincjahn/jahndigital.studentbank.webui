@@ -3,6 +3,7 @@
     <router-link to="/">Home</router-link> |
     <router-link to="/about">About</router-link>
   </div>
+
   <router-view/>
 </template>
 
@@ -28,3 +29,27 @@
   }
 }
 </style>
+
+<script lang="ts">
+import { ref } from 'vue';
+import UserModule from '@/store/modules/user';
+
+export default {
+  props: {
+    msg: String,
+  },
+
+  setup() {
+    const count = ref(0);
+
+    function increment() {
+      count.value += 1;
+    }
+
+    return {
+      count,
+      increment,
+    };
+  },
+};
+</script>
