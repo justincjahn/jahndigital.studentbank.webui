@@ -4,9 +4,6 @@ export const API_ENDPOINT = process.env.VUE_APP_API_URL || '/graphql';
 // The localStorage key to use when storing the JWT token.
 export const AUTH_TOKEN = 'jwt-token';
 
-// The localStorage key to use when storing the refresh token.
-export const REFRESH_TOKEN = 'refresh-token';
-
 // Potential types of users in the system.
 export const USER_TYPES = {
   USER: 'user',
@@ -24,6 +21,5 @@ export const ERROR_CODES = {
 export default {
   API_ENDPOINT,
   AUTH_TOKEN,
-  REFRESH_TOKEN,
   ERROR_CODES,
 };

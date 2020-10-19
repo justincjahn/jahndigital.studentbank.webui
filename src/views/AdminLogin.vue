@@ -15,9 +15,9 @@
 <script>
 import { ref, watchEffect } from 'vue';
 import UserState from '@/store/modules/user';
-import AuthenticationService from '@/services/authentication.service';
+import AuthenticationService from '@/services/AuthenticationService';
 import { useRouter } from 'vue-router';
-import { defaultClient } from '@/services/apolloClient';
+import Apollo from '@/services/Apollo';
 
 export default {
   setup() {
@@ -27,7 +27,7 @@ export default {
     const error = ref('');
 
     async function login() {
-      const auth = new AuthenticationService(defaultClient);
+      const auth = new AuthenticationService(Apollo);
 
       try {
         await auth.login(username.value, password.value);

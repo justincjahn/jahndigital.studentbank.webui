@@ -1,17 +1,13 @@
-import { ApolloClient } from '@apollo/client';
 import { onLogin, onLogout } from '@/utils/login';
-import { persistRefreshToken } from '@/utils/tokenpersistence';
 import UserLoginResponse from '@/@types/graphql/UserLoginResponse';
 import UserStore from '@/store/modules/user';
+import ApolloServiceAbstract from './ApolloServiceAbstract';
 import query from '../graphql/userlogin.mutation.gql';
 
-export default class AuthenticationService {
-  protected client: ApolloClient<unknown>;
-
-  constructor(client: ApolloClient<unknown>) {
-    this.client = client;
-  }
-
+/**
+ * Perform login and logout operations against the API.
+ */
+export default class AuthenticationService extends ApolloServiceAbstract {
   /**
    * Attempt to log a user in.
    *
@@ -32,7 +28,6 @@ export default class AuthenticationService {
 
       if (res.data != null) {
         UserStore.setToken(res.data.userLogin.jwtToken);
-        persistRefreshToken(res.data.userLogin.refreshToken);
         await onLogin(this.client, res.data.userLogin.jwtToken);
       }
     } catch (e) {
@@ -47,7 +42,6 @@ export default class AuthenticationService {
    */
   async logout() {
     UserStore.setToken();
-    persistRefreshToken();
     await onLogout(this.client);
   }
 }

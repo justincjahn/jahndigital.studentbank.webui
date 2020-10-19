@@ -1,19 +1,17 @@
 import InstanceResponse from '@/@types/graphql/InstancesResponse';
 import InstanceStore from '@/store/modules/instance';
-import { authQuery } from '@/utils/request';
+import ApolloServiceAbstract from './ApolloServiceAbstract';
 import query from '../graphql/instances.query.gql';
 
-export default {
-  /**
-   * Get a list of instances.
-   */
-  getInstances: async () => {
+/**
+ * Service to perform CRUD operations on instances.
+ */
+export default class InstanceService extends ApolloServiceAbstract {
+  async getInstances() {
     InstanceStore.setLoading(true);
 
     try {
-      const res = await authQuery<InstanceResponse>({
-        query,
-      });
+      const res = await this.client.query<InstanceResponse>({ query });
 
       if (res.data) {
         const instances = [...res.data.instances.nodes]
@@ -26,5 +24,5 @@ export default {
     } finally {
       InstanceStore.setLoading(false);
     }
-  },
-};
+  }
+}

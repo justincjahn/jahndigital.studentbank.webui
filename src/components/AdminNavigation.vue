@@ -15,10 +15,10 @@
 
 <script>
 import UserState from '@/store/modules/user';
-import AuthenticationService from '@/services/authentication.service';
-import { defaultClient } from '@/services/apolloClient';
+import AuthenticationService from '@/services/AuthenticationService';
+import Apollo from '@/services/Apollo';
 
-const auth = new AuthenticationService(defaultClient);
+const auth = new AuthenticationService(Apollo);
 
 export default {
   setup() {

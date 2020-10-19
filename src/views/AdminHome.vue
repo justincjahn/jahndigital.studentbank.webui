@@ -10,7 +10,10 @@
 
 <script>
 import InstanceState from '@/store/modules/instance';
-import instanceService from '@/services/instance';
+import InstanceService from '@/services/InstanceService';
+import Apollo from '@/services/Apollo';
+
+const instanceService = new InstanceService(Apollo);
 
 export default {
   setup() {

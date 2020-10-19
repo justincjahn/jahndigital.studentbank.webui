@@ -1,5 +1,5 @@
 import { ApolloClient } from '@apollo/client';
-import { persistToken } from './tokenpersistence';
+import persistToken from './persistToken';
 
 /**
  * Persists a JWT token and resets the Apollo client so it will use it.
@@ -33,3 +33,8 @@ export async function onLogout(apolloClient: ApolloClient<unknown>) {
     console.log('%cError on cache reset (logout)', 'color: orange;', e.message);
   }
 }
+
+export default {
+  onLogin,
+  onLogout,
+};

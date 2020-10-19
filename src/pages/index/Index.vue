@@ -32,7 +32,6 @@
 
 <script lang="ts">
 import { ref } from 'vue';
-import UserModule from '@/store/modules/user';
 
 export default {
   props: {

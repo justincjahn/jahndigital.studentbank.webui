@@ -1,15 +1,9 @@
-import { createApp, h, provide } from 'vue';
+import { createApp, h } from 'vue';
 import router from '@/routers/index';
-import { DefaultApolloClient } from '@vue/apollo-composable';
-import { defaultClient } from '@/services/apolloClient';
+import store from '@/store';
 import Index from './Index.vue';
-import store from '../../store';
 
 createApp({
-  setup() {
-    provide(DefaultApolloClient, defaultClient);
-  },
-
   render() {
     return h(Index);
   },

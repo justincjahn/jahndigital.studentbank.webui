@@ -5,7 +5,7 @@ import JwtData from '@/@types/JwtData';
  *
  * @param token The JWT token to parse.
  */
-const parseJwt = (token: string): JwtData => {
+export default function parseJwt(token: string): JwtData {
   const base64Url = token.split('.')[1];
   const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
 
@@ -17,6 +17,4 @@ const parseJwt = (token: string): JwtData => {
   );
 
   return JSON.parse(jsonPayload) as JwtData;
-};
-
-export default parseJwt;
+}

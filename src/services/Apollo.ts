@@ -1,7 +1,6 @@
 import {
   ApolloClient,
   ApolloLink,
-  ApolloProvider,
   createHttpLink,
   InMemoryCache,
   Operation,
@@ -9,13 +8,7 @@ import {
   throwServerError,
 } from '@apollo/client';
 
-import {
-  persistRefreshToken,
-  persistToken,
-  jwtToken,
-  refreshToken,
-} from '@/utils/tokenpersistence';
-
+import persistToken from '@/utils/persistToken';
 import { TokenRefreshLink } from 'apollo-link-token-refresh';
 import UserStore from '@/store/modules/user';
 import { onError } from '@apollo/client/link/error';
@@ -77,7 +70,7 @@ const errorLink = onError(({ networkError, graphQLErrors }: any) => {
  * Inject authentication headers into every query sent to the server.
  */
 const authLink = setContext(async (_, { headers }) => {
-  const token = jwtToken();
+  const token = UserStore.jwtToken;
 
   return {
     headers: {
@@ -94,19 +87,14 @@ const tokenLink = new TokenRefreshLink({
   isTokenValidOrUndefined: () => !UserStore.isExpired || UserStore.jwtToken === null,
 
   fetchAccessToken: () => {
-    const token = refreshToken();
-    if (token == null) {
-      throw new Error('No refresh token available');
-    }
-
     // Instead of using Apollo to fetch the refresh tokens, we use the fetch API because
     // cyclic dependencies... and also the TokenRefreshLink doesn't support it.
+    // @note Refresh tokens are stored in an HttpOnly cookie.
     let body = `
       mutation userRefreshToken {
-        userRefreshToken(token: "${token}") {
+        userRefreshToken {
           id
           jwtToken
-          refreshToken
         }
       }
     `;
@@ -116,10 +104,9 @@ const tokenLink = new TokenRefreshLink({
     if (UserStore.isStudent) {
       body = `
         mutation studentRefreshToken {
-          studentRefreshToken(token: "${token}") {
+          studentRefreshToken {
             id
             jwtToken
-            refreshToken
           }
         }
       `;
@@ -185,9 +172,6 @@ const tokenLink = new TokenRefreshLink({
             );
           }
 
-          // Persist the new refresh token
-          persistRefreshToken(data.refreshToken);
-
           // Update the context to use the new JWT token
           const context = operation.getContext();
           context.headers = {
@@ -223,33 +207,18 @@ const tokenLink = new TokenRefreshLink({
     console.warn('Your refresh token is invalid. Try to re-login');
     console.error(err);
 
-    // Clearing these tokens will also trigger a state change in Vue
-    // because the user store module is also updated.
+    // Clearing the JWT token will also trigger a state change in Vue because the user store
+    // module is also updated.
     persistToken();
-    persistRefreshToken();
   },
 });
 
 /**
  * The default Apollo client used by services.
  */
-export const defaultClient = new ApolloClient({
+const defaultClient = new ApolloClient({
   link: ApolloLink.from([authLink, errorLink, tokenLink, httpLink]),
   cache: new InMemoryCache(),
 });
 
-/**
- * Used by Vue, I guess...
- */
-const apolloProvider = new ApolloProvider({
-  defaultClient,
-
-  defaultOptions: {
-    $query: {
-      loadingKey: 'loading',
-      fetchPolicy: 'cache-and-network',
-    },
-  },
-});
-
-export default apolloProvider;
+export default defaultClient;
