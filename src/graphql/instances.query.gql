@@ -3,6 +3,7 @@ query allInstances {
     nodes {
       id
       description
+      isActive
     }
   }
 }

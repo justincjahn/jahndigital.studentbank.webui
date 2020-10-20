@@ -7,6 +7,9 @@ type Instance = {
 
   // A descriptive name for the instance.
   description: string;
+
+  // If the instance is active
+  isActive: boolean;
 }
 
 export default Instance;

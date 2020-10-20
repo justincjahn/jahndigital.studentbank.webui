@@ -1,0 +1,58 @@
+* { padding: 0; margin: 0; }
+ul, ol { margin-left: 1.1em; }
+
+body {
+  font-size:               12pt;
+  color:                   map.get($theme, primary, font-color);
+  font-family:             Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing:  antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color:        map.get($theme, secondary, color);
+}
+
+#app {
+  min-height: 105vh;
+  max-width:  960px;
+  margin:     0 auto;
+  padding:    1.25em;
+
+  grid-template-areas:
+    "header header header"
+    "nav content content"
+    "footer footer footer";
+
+  display:               grid;
+  grid-template-columns: 150px 1fr 1fr;
+  grid-template-rows:    auto 1fr auto;
+  grid-gap:              1.25em;
+
+  $color:           darken(map.get($theme, primary, color), map.get($theme, primary, step) * 4%);
+  background-color: map.get($theme, primary, color);
+  border-left:      1px solid $color;
+  border-right:     1px solid $color;
+
+  & .navigation { grid-area: header; }
+  & .side-panel { grid-area: nav; }
+  & .main-panel { grid-area: content; }
+  & .main-panel.full { grid-column: 1 / 4; }
+  & .footer { grid-area: footer; }
+}
+
+@media only screen and (max-width: 600px) {
+  #app {
+    display: block;
+
+    & .side-panel {
+      margin: 1em 0;
+    }
+
+    & .main-panel {
+      margin: 1em 0;
+    }
+
+    & .navigation {
+      font-size: 0.9em;
+      display: block;
+    }
+  }
+}

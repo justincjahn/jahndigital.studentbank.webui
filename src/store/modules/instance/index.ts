@@ -12,7 +12,14 @@ import IInstanceState from './IInstanceState';
 class InstanceState extends VuexModule implements IInstanceState {
   public instances: Instance[] = [];
 
+  public selectedInstance: Instance|null = null;
+
   public loading = false;
+
+  @Mutation
+  setSelected(instance: Instance) {
+    this.selectedInstance = instance;
+  }
 
   @Mutation
   setInstances(instances: Instance[]) {

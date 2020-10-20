@@ -55,7 +55,8 @@
     "rules": {
       "no-console": "off",
       "@typescript-eslint/interface-name-prefix": "off",
-      "object-curly-newline": "off"
+      "object-curly-newline": "off",
+      "max-len": "off"
     }
   },
   "browserslist": [

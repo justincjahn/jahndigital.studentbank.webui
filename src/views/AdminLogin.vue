@@ -1,15 +1,17 @@
 <template>
-  <form class="admin-login" @submit.prevent="login">
-    <label for="username">Username</label>
-    <input type="text" name="username" v-model="username" />
+  <div class="main-panel full">
+    <form class="admin-login" @submit.prevent="login">
+      <label for="username">Username</label>
+      <input type="text" name="username" v-model="username" />
 
-    <label for="password">Password</label>
-    <input type="password" name="password" v-model="password" />
+      <label for="password">Password</label>
+      <input type="password" name="password" v-model="password" />
 
-    <p v-if="error.length > 0">{{error}}</p>
+      <p v-if="error.length > 0">{{error}}</p>
 
-    <input type="submit" value="Login" :disabled="UserState.loading" />
-  </form>
+      <input type="submit" value="Login" :disabled="UserState.loading" />
+    </form>
+  </div>
 </template>
 
 <script>

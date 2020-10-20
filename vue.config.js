@@ -35,6 +35,18 @@ module.exports = {
     },
   },
 
+  css: {
+    loaderOptions: {
+      sass: {
+        prependData: `
+          @use 'sass:map';
+          @import "@/scss/_variables.scss";
+          @import "@/scss/_mixins.scss";
+        `,
+      },
+    },
+  },
+
   chainWebpack: (config) => {
     config.module
       .rule('graphql')
