@@ -1,9 +1,10 @@
 <template>
-  <div class="select">
+  <div class="select" :class="{ 'select--open': open }">
     <div
       class="select__selected"
       @click="toggleOpen"
       :class="{ 'select__selected--open': open }"
+      ref="root"
     >
         {{value(selected)}}
     </div>
@@ -20,10 +21,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref, watchEffect } from 'vue';
+import { defineComponent, onMounted, onUnmounted, PropType, ref, watchEffect } from 'vue';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Item = Record<string, any>;
+type Item = Record<string, any>|null;
 type Search = <T extends Item>(obj: T) => string;
 
 export default defineComponent({
@@ -52,6 +53,15 @@ export default defineComponent({
   setup(props, { emit }) {
     const open = ref(false);
     const selected = ref<Item|null>(null);
+    const root = ref<HTMLDivElement|null>(null);
+
+    function toggleOpen(e: Event) {
+      if (e.target !== root.value) {
+        open.value = false;
+      } else {
+        open.value = true;
+      }
+    }
 
     watchEffect(() => {
       if (props.default !== null) {
@@ -62,13 +72,16 @@ export default defineComponent({
       }
     });
 
-    function toggleOpen() {
-      open.value = !open.value;
-    }
+    onMounted(() => {
+      document.addEventListener('click', toggleOpen);
+    });
+
+    onUnmounted(() => {
+      document.removeEventListener('click', toggleOpen);
+    });
 
     function select(item: Item) {
       selected.value = item;
-      toggleOpen();
       emit('select', item);
     }
 
@@ -77,6 +90,7 @@ export default defineComponent({
       selected,
       select,
       toggleOpen,
+      root,
     };
   },
 });

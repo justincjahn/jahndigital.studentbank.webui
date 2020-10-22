@@ -26,7 +26,7 @@ import InstanceState from '@/store/modules/instance';
 import InstanceService from '@/services/InstanceService';
 import Apollo from '@/services/Apollo';
 import Select from '@/components/Select.vue';
-import { watchEffect } from 'vue';
+import { ref, watchEffect } from 'vue';
 
 const instanceService = new InstanceService(Apollo);
 
@@ -35,6 +35,8 @@ export default {
     Select,
   },
   setup() {
+    const isModalOpen = ref(false);
+
     if (InstanceState.instances.length === 0) {
       instanceService.getInstances();
     }
@@ -53,6 +55,7 @@ export default {
     return {
       InstanceState,
       selectInstance,
+      isModalOpen,
     };
   },
 };
