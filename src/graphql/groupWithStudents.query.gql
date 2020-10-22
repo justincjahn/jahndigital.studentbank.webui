@@ -1,0 +1,15 @@
+query GroupWithShares($id: Long) {
+  groups(where: { id: $id }) {
+    nodes {
+      id
+      name
+      instanceId
+      students {
+        id
+        accountNumber
+        firstName
+        lastName
+      }
+    }
+  }
+}

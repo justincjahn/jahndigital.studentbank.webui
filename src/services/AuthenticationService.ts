@@ -15,7 +15,7 @@ export default class AuthenticationService extends ApolloServiceAbstract {
    * @param password The user's password.
    */
   async login(username: string, password: string): Promise<void> {
-    UserStore.setLoading(true);
+    UserStore.setUsersLoading(true);
 
     try {
       const res = await this.client.mutate<UserLoginResponse>({
@@ -33,7 +33,7 @@ export default class AuthenticationService extends ApolloServiceAbstract {
     } catch (e) {
       throw e.message;
     } finally {
-      UserStore.setLoading(false);
+      UserStore.setUsersLoading(false);
     }
   }
 

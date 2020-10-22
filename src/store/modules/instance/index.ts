@@ -17,7 +17,7 @@ class InstanceState extends VuexModule implements IInstanceState {
   public loading = false;
 
   @Mutation
-  setSelected(instance: Instance) {
+  setSelectedInstance(instance: Instance) {
     this.selectedInstance = instance;
   }
 
@@ -27,7 +27,7 @@ class InstanceState extends VuexModule implements IInstanceState {
   }
 
   @Mutation
-  setLoading(loading: boolean) {
+  setInstancesLoading(loading: boolean) {
     this.loading = loading;
   }
 }

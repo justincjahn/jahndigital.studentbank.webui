@@ -1,0 +1,9 @@
+query groupsByInstance($instanceId: Long) {
+  groups(where: { instanceId: $instanceId }) {
+    nodes {
+      id
+      name
+      instanceId
+    }
+  }
+}

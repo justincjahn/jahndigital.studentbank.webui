@@ -9,11 +9,21 @@ class GroupState extends VuexModule implements IGroupState {
 
   loading = false;
 
-  selectedGroup?: Group;
+  selectedGroup: Group|null = null;
 
   @Mutation
   setGroups(groups: Group[]) {
     this.groups = groups;
+  }
+
+  @Mutation
+  setSelectedGroup(group: Group|null) {
+    this.selectedGroup = group;
+  }
+
+  @Mutation
+  setGroupsLoading(loading: boolean) {
+    this.loading = loading;
   }
 }
 

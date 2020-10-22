@@ -9,30 +9,54 @@
     />
 
     <div v-if="InstanceState.selectedInstance">
-      <p>Groups...</p>
+      <GroupList />
     </div>
     <div v-else>
       <p>Please select an instance...</p>
     </div>
   </div>
   <div class="main-panel">
-    <p>Please select a group...</p>
+    <div v-if="GroupState.selectedGroup">
+      <table>
+        <thead>
+          <tr>
+            <th>Account Number</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="student in StudentState.students" :key="student.id">
+            <td>{{student.accountNumber}}</td>
+            <td>{{student.firstName}}</td>
+            <td>{{student.lastName}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p v-else>Please select a group...</p>
   </div>
 </template>
 
 <script lang="ts">
 import Instance from '@/@types/Instance';
 import InstanceState from '@/store/modules/instance';
+import GroupState from '@/store/modules/group';
+import StudentState from '@/store/modules/student';
 import InstanceService from '@/services/InstanceService';
+import StudentService from '@/services/StudentService';
 import Apollo from '@/services/Apollo';
 import Select from '@/components/Select.vue';
+import GroupList from '@/components/GroupList.vue';
 import { ref, watchEffect } from 'vue';
 
 const instanceService = new InstanceService(Apollo);
+const studentService = new StudentService(Apollo);
 
 export default {
   components: {
     Select,
+    GroupList,
   },
   setup() {
     const isModalOpen = ref(false);
@@ -44,16 +68,30 @@ export default {
     watchEffect(() => {
       if (InstanceState.instances.length > 0 && InstanceState.selectedInstance === null) {
         const selected = InstanceState.instances.find((x) => x.isActive);
-        if (selected) InstanceState.setSelected(selected);
+        if (selected) InstanceState.setSelectedInstance(selected);
+      }
+    });
+
+    watchEffect(() => {
+      if (GroupState.selectedGroup !== null) {
+        studentService.getStudents(GroupState.selectedGroup.id);
       }
     });
 
     function selectInstance(item: Instance) {
-      InstanceState.setSelected(item);
+      if (InstanceState.selectedInstance) {
+        if (InstanceState.selectedInstance.id !== item.id) {
+          GroupState.setSelectedGroup(null);
+        }
+      }
+
+      InstanceState.setSelectedInstance(item);
     }
 
     return {
       InstanceState,
+      StudentState,
+      GroupState,
       selectInstance,
       isModalOpen,
     };

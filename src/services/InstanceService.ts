@@ -8,7 +8,7 @@ import query from '../graphql/instances.query.gql';
  */
 export default class InstanceService extends ApolloServiceAbstract {
   async getInstances() {
-    InstanceStore.setLoading(true);
+    InstanceStore.setInstancesLoading(true);
 
     try {
       const res = await this.client.query<InstanceResponse>({ query });
@@ -22,7 +22,7 @@ export default class InstanceService extends ApolloServiceAbstract {
     } catch (e) {
       throw e.message;
     } finally {
-      InstanceStore.setLoading(false);
+      InstanceStore.setInstancesLoading(false);
     }
   }
 }

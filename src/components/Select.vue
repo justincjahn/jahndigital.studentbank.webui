@@ -105,10 +105,11 @@ div.select {
   line-height: 2em;
 
   & .select__selected {
-    padding-left: 1em;
+    padding-left: 0.25em;
     cursor: pointer;
     user-select: none;
     min-height: 2em;
+    font-weight: 600;
 
     border-radius: 3px;
     border: 1px solid darken(
@@ -123,7 +124,7 @@ div.select {
       position: absolute;
       content: "";
       top: 1rem;
-      right: 1rem;
+      right: 0.5rem;
       width: 0;
       height: 0;
       border: 5px solid transparent;
@@ -143,6 +144,7 @@ div.select {
     overflow: hidden;
     position: absolute;
     background-color: map.get($theme, button-primary, color);
+    box-shadow: 8px 8px 14px -6px rgba(0,0,0,0.5);
     left: 0;
     right: 0;
     z-index: 1;
@@ -155,7 +157,7 @@ div.select {
       display: block;
       cursor: pointer;
       user-select: none;
-      padding-left: 1em;
+      padding-left: 0.25em;
       width: 100%;
       border-top: 1px solid darken(
         map.get($theme, button-primary, color),

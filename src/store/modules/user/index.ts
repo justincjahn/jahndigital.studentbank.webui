@@ -33,7 +33,7 @@ class UserState extends VuexModule implements IUserState {
    * @param loading The loading state.
    */
   @Mutation
-  setLoading(loading: boolean) {
+  setUsersLoading(loading: boolean) {
     this.loading = loading;
   }
 
