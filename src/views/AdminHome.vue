@@ -16,25 +16,7 @@
     </div>
   </div>
   <div class="main-panel">
-    <div v-if="GroupState.selectedGroup">
-      <table>
-        <thead>
-          <tr>
-            <th>Account Number</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="student in StudentState.students" :key="student.id">
-            <td>{{student.accountNumber}}</td>
-            <td>{{student.firstName}}</td>
-            <td>{{student.lastName}}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <p v-else>Please select a group...</p>
+    <StudentList />
   </div>
 </template>
 
@@ -48,6 +30,7 @@ import StudentService from '@/services/StudentService';
 import Apollo from '@/services/Apollo';
 import Select from '@/components/Select.vue';
 import GroupList from '@/components/GroupList.vue';
+import StudentList from '@/components/StudentList.vue';
 import { ref, watchEffect } from 'vue';
 
 const instanceService = new InstanceService(Apollo);
@@ -57,6 +40,7 @@ export default {
   components: {
     Select,
     GroupList,
+    StudentList,
   },
   setup() {
     const isModalOpen = ref(false);

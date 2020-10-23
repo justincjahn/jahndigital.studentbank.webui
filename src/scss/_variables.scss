@@ -1,36 +1,105 @@
+@import '@/scss/_luminance.scss';
+
 $theme: (
   "primary": (
     "color": rgb(255, 255, 255),
     "step": 3%,
-    "font-color": #2c3e50
+    "font-color": #2c3e50,
+    "font-color-alt": #ABABAB
   ),
 
   "secondary": (
     "color": hsl(0, 0%, 96%),
-    "step": 4%
+    "step": 4%,
+    "font-color": #2c3e50,
+    "font-color-alt": #ABABAB
   ),
 
   "accent1": (
     "color": hsl(211, 100%, 46%),
     "step": 5.5%,
-    "font-color": #FFFFFF
+    "font-color": #FFFFFF,
+    "font-color-alt": #000000
   ),
 
   "button-primary": (
     "color": hsl(211, 100%, 43%),
     "step": 5.5%,
-    "font-color": #FFFFFF
+    "font-color": #FFFFFF,
+    "font-color-alt": #000000
   ),
 
   "button-secondary": (
     "color": hsl(0, 0%, 96%),
     "step": 8%,
-    "font-color": #000000
+    "font-color": #000000,
+    "font-color-alt": #FFFFFF
   ),
 
   "button-destructive": (
     "color": hsl(354, 70%, 54%),
     "step": 8%,
-    "font-color": #FFFFFF
+    "font-color": #FFFFFF,
+    "font-color-alt": #000000
   )
 );
+
+/**
+ * Lighten or darken a theme color by the step defined in the theme.
+ */
+@function colorStep($category, $step: 1, $darken: true, $colorMap: "color") {
+  @if ($darken) {
+    @return darken(
+      map.get($theme, $category, $colorMap),
+      map.get($theme, $category, step) * $step
+    );
+  } @else {
+    @return lighten(
+      map.get($theme, $category, $colorMap),
+      map.get($theme, $category, step) * $step
+    );
+  }
+}
+
+//
+// https://medium.com/dev-channel/using-sass-to-automatically-pick-text-colors-4ba7645d2796
+//
+
+/**
+ * Calculate the luminance for a color.
+ * See https://www.w3.org/TR/WCAG20-TECHS/G17.html#G17-tests
+ */
+ @function luminance($color) {
+  $red: nth($linear-channel-values, red($color) + 1);
+  $green: nth($linear-channel-values, green($color) + 1);
+  $blue: nth($linear-channel-values, blue($color) + 1);
+
+  @return .2126 * $red + .7152 * $green + .0722 * $blue;
+}
+
+/**
+ * Calculate the contrast ratio between two colors.
+ * See https://www.w3.org/TR/WCAG20-TECHS/G17.html#G17-tests
+ */
+@function contrast($back, $front) {
+  $backLum: luminance($back) + .05;
+  $foreLum: luminance($front) + .05;
+
+  @return max($backLum, $foreLum) / min($backLum, $foreLum);
+}
+
+/**
+ * Determine whether to use dark or light text on top of given color.
+ * Returns black for dark text and white for light text.
+ */
+@function chooseColor($backgroundColor, $fontColor1, $fontColor2) {
+  $contrast1: contrast($backgroundColor, $fontColor1);
+  $contrast2: contrast($backgroundColor, $fontColor2);
+
+  @if ($contrast1 > $contrast2) {
+    @return $fontColor1;
+  }
+  @else {
+    @return $fontColor2;
+  }
+}

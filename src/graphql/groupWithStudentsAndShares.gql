@@ -9,7 +9,7 @@ query GroupWithShares($id: Long) {
         accountNumber
         firstName
         lastName
-
+        groupId
       }
     }
   }

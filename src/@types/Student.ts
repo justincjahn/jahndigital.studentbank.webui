@@ -9,7 +9,11 @@ type Student = {
 
   lastName: string;
 
+  groupId: number;
+
   shares?: Share[];
+
+  email: string;
 }
 
 export default Student;
