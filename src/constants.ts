@@ -18,6 +18,11 @@ export const ERROR_CODES = {
   QUERY_FAILED: 'ERROR_QUERY_FAILED',
 };
 
+export const FETCH_OPTIONS = {
+  // The default amount of items to fetch when pagination is in use
+  DEFAULT_COUNT: 25,
+};
+
 export default {
   API_ENDPOINT,
   AUTH_TOKEN,

@@ -11,4 +11,6 @@ export default interface IStudentState {
   pageInfo: PageInfo|null;
 
   loading: boolean;
+
+  studentPageCount: number;
 }

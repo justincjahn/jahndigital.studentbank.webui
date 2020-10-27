@@ -1,5 +1,5 @@
 query allInstances {
-  instances {
+  instances(order_by: {description: ASC}) {
     nodes {
       id
       description

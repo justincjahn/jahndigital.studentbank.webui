@@ -1,5 +1,5 @@
 query groupsByInstance($instanceId: Long) {
-  groups(where: { instanceId: $instanceId }) {
+  groups(where: { instanceId: $instanceId }, order_by: { name: ASC }) {
     nodes {
       id
       name

@@ -23,17 +23,15 @@
 import Group from '@/@types/Group';
 import InstanceStore from '@/store/modules/instance';
 import GroupStore from '@/store/modules/group';
-import Apollo from '@/services/Apollo';
-import GroupService from '@/services/GroupService';
 import { watchEffect } from 'vue';
-
-const groupService = new GroupService(Apollo);
 
 export default {
   setup() {
     watchEffect(() => {
       if (InstanceStore.selectedInstance !== null) {
-        groupService.getGroups(InstanceStore.selectedInstance.id);
+        GroupStore.fetchGroups({
+          instanceId: InstanceStore.selectedInstance.id,
+        });
       }
     });
 

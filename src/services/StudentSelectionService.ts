@@ -1,7 +1,8 @@
 import StudentResponse from '@/@types/graphql/StudentResponse';
 import Group from '@/@types/Group';
 import Student from '@/@types/Student';
-import { ApolloClient, ApolloQueryResult, gql } from '@apollo/client';
+import { gql } from '@apollo/client';
+import Apollo from '@/services/Apollo';
 
 /**
  * Possible types for the IStudentSelection object.
@@ -279,7 +280,7 @@ export default class StudentSelection extends Array<IStudentSelection> {
   /**
    * Resolve the list of selections into an array of Student objects.
    */
-  async resolve(client: ApolloClient<unknown>): Promise<Student[]> {
+  async resolve(): Promise<Student[]> {
     let students: Student[] = [];
 
     const query = gql`
@@ -302,7 +303,7 @@ export default class StudentSelection extends Array<IStudentSelection> {
     try {
       await Promise.all(groups.map(async (group) => {
         try {
-          const studentList = await client.query<StudentResponse>({
+          const studentList = await Apollo.query<StudentResponse>({
             query,
             variables: {
               groupId: group.id,

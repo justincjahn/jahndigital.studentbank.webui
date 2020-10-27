@@ -3,6 +3,7 @@ query studentsWithShares($groupId: Long, $first: PaginationAmount, $after: Strin
     pageInfo {
       hasNextPage
       hasPreviousPage
+      startCursor
       endCursor
     }
     totalCount

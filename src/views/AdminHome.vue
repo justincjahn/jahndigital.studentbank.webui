@@ -25,16 +25,10 @@ import Instance from '@/@types/Instance';
 import InstanceState from '@/store/modules/instance';
 import GroupState from '@/store/modules/group';
 import StudentState from '@/store/modules/student';
-import InstanceService from '@/services/InstanceService';
-import StudentService from '@/services/StudentService';
-import Apollo from '@/services/Apollo';
 import Select from '@/components/Select.vue';
 import GroupList from '@/components/GroupList.vue';
 import StudentList from '@/components/StudentList.vue';
 import { ref, watchEffect } from 'vue';
-
-const instanceService = new InstanceService(Apollo);
-const studentService = new StudentService(Apollo);
 
 export default {
   components: {
@@ -46,19 +40,13 @@ export default {
     const isModalOpen = ref(false);
 
     if (InstanceState.instances.length === 0) {
-      instanceService.getInstances();
+      InstanceState.fetchInstances();
     }
 
     watchEffect(() => {
       if (InstanceState.instances.length > 0 && InstanceState.selectedInstance === null) {
         const selected = InstanceState.instances.find((x) => x.isActive);
         if (selected) InstanceState.setSelectedInstance(selected);
-      }
-    });
-
-    watchEffect(() => {
-      if (GroupState.selectedGroup !== null) {
-        studentService.getStudents(GroupState.selectedGroup.id);
       }
     });
 
