@@ -2,6 +2,14 @@
   <AdminNavigation />
   <router-view/>
   <div class="footer">&copy; 2020 Jahn Digital</div>
+
+  <Modal
+    :show="GlobalState.currentError !== null"
+    customClass="destructive"
+    @ok="GlobalState.setCurrentError(null)"
+  >
+    {{GlobalState.currentError}}
+  </Modal>
 </template>
 
 <style lang="scss">
@@ -10,24 +18,31 @@
 
 <script>
 import AdminNavigation from '@/components/AdminNavigation.vue';
+import Modal from '@/components/Modal.vue';
 import UserStore from '@/store/modules/user';
+import GlobalState from '@/store/modules/global';
 import { useRouter } from 'vue-router';
-import { watchEffect } from 'vue';
+import { watchEffect, ref } from 'vue';
 
 export default {
   components: {
     AdminNavigation,
+    Modal,
   },
 
   setup() {
     const router = useRouter();
 
     // Force users to the login page if they aren't authenticated
-    watchEffect(async () => {
+    watchEffect(() => {
       if (UserStore.isAuthenticated === false && !UserStore.jwtToken) {
         router.push({ name: 'login' });
       }
     });
+
+    return {
+      GlobalState,
+    };
   },
 };
 </script>

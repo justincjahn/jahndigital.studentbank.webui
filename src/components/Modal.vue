@@ -4,8 +4,21 @@
       <div v-if="title" class="modal__container__title"><h1>{{title}}</h1></div>
       <div class="modal__container__content"><slot /></div>
       <div class="modal__container__buttons">
-        <button tabindex="1" class="modal__container__buttons__cancel" v-if="cancelLabel" @click.prevent="cancel">{{cancelLabel}}</button>
-        <button tabindex="0" class="modal__container__buttons__ok" @click.prevent="ok">{{okLabel}}</button>
+        <button
+          tabindex="1"
+          class="modal__container__buttons__cancel"
+          v-if="cancelLabel"
+          @click.prevent="handleCancel"
+        >
+          {{cancelLabel}}
+        </button>
+        <button
+          tabindex="0"
+          class="modal__container__buttons__ok"
+          @click.prevent="handleOk" ref="okButton"
+        >
+          {{okLabel}}
+        </button>
       </div>
     </div>
   </div>
@@ -13,6 +26,8 @@
 
 <script lang="ts">
 import { defineComponent, onUnmounted, ref, watchEffect } from 'vue';
+import GlobalStore from '@/store/modules/global';
+import debounce from '@/utils/debounce';
 
 /**
  * Describes the possible event types that might be provided to the callback functions.
@@ -49,8 +64,8 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const root = ref<HTMLDivElement|null>(null);
+    const okButton = ref<HTMLButtonElement|null>(null);
     const closedBefore = ref(false);
-    console.log(props.customClass);
 
     function ok(e: ModalEvent) {
       emit('ok', e);
@@ -60,26 +75,50 @@ export default defineComponent({
       emit('cancel', e);
     }
 
+    // If the OK/Cancel button is focused and the enter key is pressed, prevent sending the event
+    // twice.
+    const handleOk = debounce(ok, 100);
+    const handleCancel = debounce(props.cancelLabel ? cancel : () => undefined, 100);
+
+    /**
+     * Watch for Escape and Enter keypresses and call the appropriate handler.
+     */
     function handleKeyPress(e: KeyboardEvent) {
+      if (root.value === null || GlobalStore.topModal !== root.value) {
+        return;
+      }
+
       if (e.key === 'Escape') {
         e.preventDefault();
 
         if (props.cancelLabel) {
-          cancel(e);
+          handleCancel(e);
         } else {
-          ok(e);
+          handleOk(e);
         }
       }
 
       if (e.key === 'Enter') {
         e.preventDefault();
-        ok(e);
+        handleOk(e);
       }
     }
 
     watchEffect(() => {
       if (props.show === true) {
         closedBefore.value = true;
+
+        if (root.value !== null) {
+          GlobalStore.openModal(root.value);
+        }
+      } else if (root.value !== null) {
+        GlobalStore.closeModal(root.value);
+      }
+    });
+
+    watchEffect(() => {
+      if (root.value !== null && GlobalStore.topModal === root.value) {
+        emit('focus', root.value);
       }
     });
 
@@ -95,12 +134,17 @@ export default defineComponent({
 
     onUnmounted(() => {
       document.removeEventListener('keyup', handleKeyPress);
+
+      if (root.value !== null) {
+        GlobalStore.closeModal(root.value);
+      }
     });
 
     return {
-      ok,
-      cancel,
+      handleOk,
+      handleCancel,
       root,
+      okButton,
       closedBefore,
     };
   },

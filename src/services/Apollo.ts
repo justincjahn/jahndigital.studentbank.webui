@@ -52,7 +52,8 @@ const errorLink = onError(({ networkError, graphQLErrors }: any) => {
       }
 
       return console.error(
-        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}, Code: ${extensions.code}`,
+        `[GraphQL error]: Message: ${message ?? 'unknown error'}, Path: ${path ?? 'N/A'}, Code: ${extensions?.code ?? 'N/A'}`,
+        locations,
       );
     });
 
