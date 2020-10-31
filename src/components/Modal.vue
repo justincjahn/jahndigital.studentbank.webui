@@ -1,24 +1,28 @@
 <template>
   <div class="modal" ref="root" :class="[{ 'modal--open': show, 'modal--hidden': !show && closedBefore }, customClass]">
     <div class="modal__container">
-      <div v-if="title" class="modal__container__title"><h1>{{title}}</h1></div>
+      <div v-if="title" class="modal__container__title">
+        <slot name="title"><h1>{{title}}</h1></slot>
+      </div>
       <div class="modal__container__content"><slot /></div>
       <div class="modal__container__buttons">
-        <button
-          tabindex="1"
-          class="modal__container__buttons__cancel"
-          v-if="cancelLabel"
-          @click.prevent="handleCancel"
-        >
-          {{cancelLabel}}
-        </button>
-        <button
-          tabindex="0"
-          class="modal__container__buttons__ok"
-          @click.prevent="handleOk" ref="okButton"
-        >
-          {{okLabel}}
-        </button>
+        <slot name="buttons">
+          <button
+            tabindex="1"
+            class="modal__container__buttons__cancel"
+            v-if="cancelLabel"
+            @click.prevent="handleCancel"
+          >
+            {{cancelLabel}}
+          </button>
+          <button
+            tabindex="0"
+            class="modal__container__buttons__ok"
+            @click.prevent="handleOk" ref="okButton"
+          >
+            {{okLabel}}
+          </button>
+        </slot>
       </div>
     </div>
   </div>
@@ -152,16 +156,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-div.modal {
-  $clrBtnPrimary: map.get($theme, button-primary, color);
-  $stpBtnPrimary: map.get($theme, button-primary, step);
-  $clrBtnSecondary: map.get($theme, button-secondary, color);
-  $stpBtnSecondary: map.get($theme, button-secondary, step);
-  $clrBtnDestructive: map.get($theme, button-destructive, color);
-  $stpBtnDestructive: map.get($theme, button-destructive, step);
-  $clrPrimary: map.get($theme, primary, color);
-  $clrSecondary: map.get($theme, secondary, color);
+@import '@/scss/mixins/button';
 
+.modal {
   position: fixed;
   z-index: 1;
   left: 0;
@@ -184,141 +181,49 @@ div.modal {
   }
 
   .modal__container {
-    background-color: $clrPrimary;
+    background-color: map.get($theme, primary, color);
     margin: 10% auto;
     border-radius: 6px;
     width: 500px;
 
-    .modal__container__title {
-      background-color: $clrSecondary;
+    &__title {
+      background-color: map.get($theme, secondary, color);
       border-radius: 6px 6px 0 0;
-      border-bottom: 1px solid darken(
-        $clrSecondary,
-        map.get($theme, secondary, step)
-      );
+      border-bottom: 1px solid colorStep(secondary, $step: 2);
 
-      & h1 {
-        font-size: 1.75rem;
-      }
+      & h1 { font-size: 1.75rem; }
     }
 
-    .modal__container__title, .modal__container__buttons {
+    &__title, &__buttons {
       padding: 1em;
     }
 
-    .modal__container__content {
+    &__content {
       padding: 1em;
       min-height: 0px;
     }
 
-    .modal__container__buttons {
+    &__buttons {
       display: flex;
       justify-content: flex-end;
 
-      & button {
-        outline: 0;
-        margin: 0.25em;
-        padding: 0.5em;
-        min-width: 100px;
+      &__cancel {
+        @include button(button-secondary);
+      }
 
-        border: 1px solid darken(
-          $clrBtnSecondary,
-          map.get($theme, button-secondary, step)
-        );
-
-        color: map.get($theme, button-secondary, font-color);
-        background-color: $clrBtnSecondary;
-        border-radius: 3px;
-        transition-property: background-color;
-        transition-duration: 0.15s;
-        transition-delay: 0;
-
-        &:hover, &:focus {
-          background-color: darken(
-            $clrBtnSecondary,
-            $stpBtnSecondary
-          );
-
-          border-color: darken(
-            $clrBtnSecondary,
-            $stpBtnSecondary + $stpBtnSecondary
-          );
-        }
-
-        &:active {
-          background-color: darken(
-            $clrBtnSecondary,
-            $stpBtnSecondary + $stpBtnSecondary
-          );
-
-          border-color: darken(
-            $clrBtnSecondary,
-            $stpBtnSecondary + $stpBtnSecondary + $stpBtnSecondary
-          );
-        }
-
-        .modal__container__buttons__ok {
-          font-weight: bold;
-          color: map.get($theme, button-primary, font-color);
-          background-color: $clrBtnPrimary;
-          border-color: darken(
-            $clrBtnPrimary,
-            $stpBtnPrimary
-          );
-
-          &:hover, &:focus {
-            background-color: darken(
-              $clrBtnPrimary,
-              $stpBtnPrimary
-            );
-
-            border-color: darken(
-              $clrBtnPrimary,
-              $stpBtnPrimary + $stpBtnPrimary
-            );
-          }
-        }
+      &__ok {
+        @include button(button-primary);
       }
     }
   }
 
   &.destructive .modal__container__title {
     color: map.get($theme, button-destructive, font-color);
-    background-color: $clrBtnDestructive;
+    background-color: map.get($theme, button-destructive, color);
   }
 
   &.destructive .modal__container__buttons .modal__container__buttons__ok {
-    color: map.get($theme, button-destructive, font-color);
-    background-color: $clrBtnDestructive;
-
-    border-color: darken(
-      $clrBtnDestructive,
-      $stpBtnDestructive
-    );
-
-    &:hover, &:focus {
-      background-color: darken(
-        $clrBtnDestructive,
-        $stpBtnDestructive
-      );
-
-      border-color: darken(
-        $clrBtnDestructive,
-        $stpBtnDestructive + $stpBtnDestructive
-      );
-    }
-
-    &:active {
-      background-color: darken(
-        $clrBtnDestructive,
-        $stpBtnDestructive + $stpBtnDestructive
-      );
-
-      border-color: darken(
-        $clrBtnDestructive,
-        $stpBtnDestructive + $stpBtnDestructive + $stpBtnDestructive
-      );
-    }
+    @include button(button-destructive);
   }
 }
 
