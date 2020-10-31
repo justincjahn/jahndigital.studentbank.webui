@@ -1,0 +1,7 @@
+mutation newGroup($instanceId: Long!, $name: String!) {
+  newGroup(input: { instanceId: $instanceId, name: $name }) {
+    id
+    instanceId
+    name
+  }
+}

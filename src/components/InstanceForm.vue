@@ -1,6 +1,9 @@
 <template>
   <Modal :show="show" :title="title" cancelLabel="Cancel" @ok.prevent="ok" @focus.self="onFocus">
-    <input ref="elDescription" name="instance-description" type="text" v-model="input" placeholder="Instance Name"/>
+    <div class="instance-form">
+      <label for="instance-form__description">Name</label>
+      <input type="text" ref="elDescription" id="instance-form__description" v-model="input" />
+    </div>
   </Modal>
 </template>
 

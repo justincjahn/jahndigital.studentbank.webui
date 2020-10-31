@@ -6,6 +6,7 @@
   <Modal
     :show="GlobalState.currentError !== null"
     customClass="destructive"
+    title="Error"
     @ok="GlobalState.setCurrentError(null)"
   >
     {{GlobalState.currentError}}
@@ -22,7 +23,7 @@ import Modal from '@/components/Modal.vue';
 import UserStore from '@/store/modules/user';
 import GlobalState from '@/store/modules/global';
 import { useRouter } from 'vue-router';
-import { watchEffect, ref } from 'vue';
+import { watchEffect } from 'vue';
 
 export default {
   components: {

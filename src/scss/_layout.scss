@@ -10,6 +10,16 @@ body {
   background-color:        map.get($theme, secondary, color);
 }
 
+label {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+input[type=text] {
+  line-height: 2em;
+  font-size: 1rem;
+}
+
 #app {
   min-height: 100vh;
   max-width:  960px;
