@@ -1,6 +1,5 @@
 <template>
-  <div class="navigation navigation--admin">
-    <h1>Student Bank Admin</h1>
+  <nav class="navigation">
     <div class="navigation__user-info">
       <template v-if="UserState.isAuthenticated">
         {{UserState.username}}
@@ -10,7 +9,7 @@
         <router-link to="/admin/login">Login</router-link>
       </template>
     </div>
-  </div>
+  </nav>
 </template>
 
 <script>
@@ -33,9 +32,9 @@ export default {
 </script>
 
 <style lang="scss">
-  .navigation {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-  }
+  // .navigation {
+  //   display: flex;
+  //   justify-content: space-between;
+  //   align-items: baseline;
+  // }
 </style>

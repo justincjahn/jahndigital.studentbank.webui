@@ -1,7 +1,12 @@
 <template>
-  <AdminNavigation />
-  <router-view/>
-  <div class="footer">&copy; 2020 Jahn Digital</div>
+  <header>
+    <h1>Student Bank Admin</h1>
+    <AdminNavigation />
+  </header>
+
+  <main><router-view/></main>
+
+  <footer>&copy; 2020 Jahn Digital</footer>
 
   <Modal
     :show="GlobalState.currentError !== null"
@@ -14,7 +19,7 @@
 </template>
 
 <style lang="scss">
-@import '@/scss/_layout.scss';
+@import '@/scss/admin.scss';
 </style>
 
 <script>

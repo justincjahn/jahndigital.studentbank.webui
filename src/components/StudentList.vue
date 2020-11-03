@@ -128,11 +128,11 @@ export default {
 </script>
 
 <style lang="scss">
-table.student-list {
+.student-list {
   width: 100%;
   border-spacing: 0;
 
-  &.student-list--loading {
+  &--loading {
     opacity: 0.4;
   }
 
@@ -180,10 +180,6 @@ table.student-list {
       );
     }
 
-    & .student-list__select-group {
-      text-align: left;
-    }
-
     &.student-list__student--selected {
       $bgcolor: colorStep(accent1, $step: 6, $darken: false);
       background-color: $bgcolor;
@@ -219,6 +215,79 @@ div.student-list__pagination {
     margin: 1em;
     text-decoration: underline;
     overflow: visible;
+  }
+}
+
+// Collapse the table into rows instead of columns for small screens
+@media screen and (max-width: 800px) {
+  .student-list {
+    & thead, & tbody, & th, & td, & tr {
+      display: block;
+    }
+
+    & tr {
+      border: 1px solid colorStep(secondary, $step: 6);
+    }
+
+    & thead th {
+      display: none;
+
+      &:first-child {
+        display: block;
+        position: relative;
+        padding-left: 95px;
+
+        &::before {
+          position: absolute;
+          content: 'Select All';
+          left: 0.25em;
+          top: 0.2em;
+        }
+      }
+    }
+
+    & tbody tr td {
+      position: relative;
+      padding-left: 95px;
+      border: none;
+      border-bottom: 1px solid colorStep(secondary, $step: 2);
+
+      word-break: break-all;
+
+      &::before {
+        position: absolute;
+        top: 0.5em;
+        left: 0.25em;
+        width: 95px;
+        white-space: nowrap;
+      }
+
+      &:nth-of-type(1)::before {
+        content: 'Select';
+      }
+
+      &:nth-of-type(2)::before {
+        content: 'Account #';
+      }
+
+      &:nth-of-type(3)::before {
+        content: 'First Name';
+      }
+
+      &:nth-of-type(4)::before {
+        content: 'Last Name';
+      }
+
+      &:nth-of-type(5)::before {
+        content: 'Email';
+      }
+    }
+
+    & th:last-child,
+    & td:last-child
+    {
+      text-align: left;
+    }
   }
 }
 </style>

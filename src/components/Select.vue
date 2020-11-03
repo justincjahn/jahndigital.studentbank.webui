@@ -1,6 +1,6 @@
 <template>
   <div class="select" :class="{ 'select--open': open }">
-    <div
+    <button
       class="select__selected"
       @click="toggleOpen"
       :class="{ 'select__selected--open': open }"
@@ -9,7 +9,7 @@
       <slot name="selected" v-bind="selected ?? {}">
         {{selected ? value(selected) : msg}}
       </slot>
-    </div>
+    </button>
     <ul class="select__items" :class="{ 'select__items--hidden': !open }" v-if="options && options.length > 0">
       <slot name="list" v-bind="slotProps()">
         <li
@@ -115,76 +115,79 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.select {
-  position: relative;
-  text-align: left;
-  outline: none;
-  height: 2em;
-  line-height: 2em;
-}
-
-.select__items {
-  color: map.get($theme, button-primary, font-color);
-  border-radius: 0px 0px 3px 3px;
-  overflow: hidden;
-  position: absolute;
-  background-color: map.get($theme, button-primary, color);
-  box-shadow: 8px 8px 14px -6px rgba(0,0,0,0.2);
-  position: sticky;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 1;
-  margin: 0;
-
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.select__items--hidden {
-  display: none;
-}
-
-.select__selected {
-  padding-left: 0.25em;
-  cursor: pointer;
-  user-select: none;
-  min-height: 2em;
-  font-weight: 600;
-
-  border-radius: 3px;
-  border: 1px solid colorStep(button-primary);
-  color: map.get($theme, button-primary, font-color);
-  background-color: map.get($theme, button-primary, color);
-
-  &:after {
-    position: absolute;
-    content: "";
-    top: 1rem;
-    right: 0.5rem;
-    width: 0;
-    height: 0;
-    border: 5px solid transparent;
-    border-color:
-      map.get($theme, button-primary, font-color)
-      transparent transparent transparent;
+@keyframes menuOpen {
+  0% {
+    transform: scaleY(0)
+  }
+  80% {
+    transform: scaleY(1.1)
+  }
+  100% {
+    transform: scaleY(1)
   }
 }
 
-.select__selected--open {
-  border-radius: 3px 3px 0px 0px;
-}
+.select {
+  position: relative;
+  display: inline-block;
 
-.select__items__item {
-  display: block;
-  cursor: pointer;
-  user-select: none;
-  padding-left: 0.25em;
-  width: 100%;
-  border-top: 1px solid colorStep(button-primary);
+  &__selected {
+    position: relative;
+    min-width: 10rem;
+    text-align: left;
+    padding: 0.5em 2em 0.5em 0.5em;
+    outline: 0;
+    border: 1px solid colorStep(button-secondary, $step: 2);
+    border-radius: 0.25rem;
+    color: map.get($theme, button-secondary, font-color);
+    background-color: map.get($theme, button-secondary, color);
+    transform: border-radius;
 
-  &:hover {
-    background-color: colorStep(button-primary, $step: 1, $darken: false);
+    &:after {
+      position: absolute;
+      content: "";
+      top: 0.8rem;
+      right: 0.5rem;
+      width: 0;
+      height: 0;
+      border: 5px solid transparent;
+      border-color:
+        map.get($theme, button-secondary, font-color)
+        transparent
+        transparent
+        transparent;
+    }
+  }
+
+  &__items {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    list-style: none;
+    margin: 0;
+    width: 100%;
+
+    background-color: map.get($theme, button-secondary, color);
+    border: 1px solid colorStep(button-secondary, $step: 2);
+
+    &__item {
+      padding: 0.25em;
+      cursor: pointer;
+
+      &:hover {
+        background-color: colorStep(button-secondary);
+      }
+    }
+  }
+
+  &--open &__selected {
+    border-radius: 0.25rem 0.25rem 0px 0px;
+  }
+
+  &--open &__items {
+    display: block;
+    animation: menuOpen 300ms ease-in-out forwards;
+    transform-origin: top center;
   }
 }
 </style>
