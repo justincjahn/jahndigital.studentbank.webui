@@ -17,7 +17,7 @@
           </button>
           <button
             tabindex="0"
-            class="modal__container__buttons__ok"
+            class="modal__container__buttons__ok primary"
             @click.prevent="handleOk" ref="okButton"
           >
             {{okLabel}}
@@ -156,8 +156,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/scss/mixins/button';
-
 .modal {
   position: fixed;
   z-index: 1;
@@ -206,14 +204,6 @@ export default defineComponent({
     &__buttons {
       display: flex;
       justify-content: flex-end;
-
-      &__cancel {
-        @include button(button-secondary);
-      }
-
-      &__ok {
-        @include button(button-primary);
-      }
     }
   }
 

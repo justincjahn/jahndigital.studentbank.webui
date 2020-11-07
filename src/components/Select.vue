@@ -141,7 +141,6 @@ export default defineComponent({
     border-radius: 0.25rem;
     color: map.get($theme, button-secondary, font-color);
     background-color: map.get($theme, button-secondary, color);
-    transform: border-radius;
 
     &:after {
       position: absolute;

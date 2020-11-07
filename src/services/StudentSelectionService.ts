@@ -3,6 +3,7 @@ import Group from '@/@types/Group';
 import Student from '@/@types/Student';
 import { gql } from '@apollo/client';
 import Apollo from '@/services/Apollo';
+import { reactive } from 'vue';
 
 /**
  * Possible types for the IStudentSelection object.
@@ -25,7 +26,7 @@ interface IStudentSelection {
  * Manage the selection and deselection of students, including entire groups
  * and exclusions to those groups.
  */
-export default class StudentSelection extends Array<IStudentSelection> {
+export class StudentSelection extends Array<IStudentSelection> {
   /**
    * Clear the selection completely
    */
@@ -337,3 +338,6 @@ export default class StudentSelection extends Array<IStudentSelection> {
     return students;
   }
 }
+
+const selection = reactive(new StudentSelection());
+export default selection;

@@ -4,7 +4,8 @@
     :key="(x) => x ? x.id : null"
     :value="(x) => x ? x.name : null"
     :default="GroupState.selectedGroup"
-    @select="(x) => GroupState.setSelectedGroup(x)"
+    msg="Select a group..."
+    @select="handleSelection"
   >
     <template v-slot:list="props">
       <li
@@ -54,6 +55,8 @@ import InstanceState from '@/store/modules/instance';
 import GroupState from '@/store/modules/group';
 import { computed, defineComponent, ref, watchEffect } from 'vue';
 import Modal from '@/components/Modal.vue';
+import Group from '@/@types/Group';
+import { useRoute, useRouter } from 'vue-router';
 
 enum ModalState {
   ADD,
@@ -71,6 +74,8 @@ export default defineComponent({
     const showModal = ref(false);
     const inputElement = ref<HTMLInputElement|null>(null);
     const input = ref('');
+    const router = useRouter();
+    const route = useRoute();
 
     // The title of the modal window
     const modalTitle = computed(() => {
@@ -103,6 +108,22 @@ export default defineComponent({
       }
     });
 
+    // Rehydrate the selected group
+    watchEffect(() => {
+      if (
+        GroupState.groups.length > 0
+        && GroupState.selectedGroup === null
+        && route.params.groupId
+      ) {
+        const gid = parseInt(route.params.groupId as string, 10) ?? -1;
+        const group = GroupState.groups.find((x) => x.id === gid);
+
+        if (group && (InstanceState.selectedInstance?.id === group.id ?? false)) {
+          GroupState.setSelectedGroup(group);
+        }
+      }
+    });
+
     // Focus the input element when the modal is shown
     watchEffect(() => {
       if (showModal.value && modalState.value !== ModalState.DELETE) {
@@ -113,6 +134,17 @@ export default defineComponent({
         }, 10);
       }
     });
+
+    function handleSelection(item: Group) {
+      GroupState.setSelectedGroup(item);
+
+      router.replace({
+        name: 'Groups',
+        params: {
+          groupId: item.id,
+        },
+      });
+    }
 
     // Toggle the modal
     function toggle() {
@@ -209,6 +241,7 @@ export default defineComponent({
       handleCancel,
       input,
       inputElement,
+      handleSelection,
     };
   },
 });

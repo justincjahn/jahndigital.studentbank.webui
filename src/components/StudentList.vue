@@ -1,46 +1,46 @@
 <template>
-  <button @click.prevent="resolve">Resolve</button>
-  <button @click.prevent="selection.clear">Clear</button>
-  <table class="student-list" :class="{ 'student-list--loading': StudentStore.loading }">
-    <thead>
-      <tr>
-        <th>
-          <input
-            type="checkbox"
-            :checked="selection.hasGroup(GroupStore.selectedGroup)"
-            @click="selection.toggleGroup(GroupStore.selectedGroup)"
-          />
-        </th>
-        <th>Account Number</th>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Email Address</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-if="GroupStore.selectedGroup === null">
-        <td class="student-list__select-group" colspan="5">Please select a group...</td>
-      </tr>
-      <template v-else>
-        <tr
-          v-for="student in StudentStore.students"
-          :key="student.id"
-          @click="studentClick(student)"
-          class="student-list__student"
-          :class="{ 'student-list__student--selected': selection.hasStudent(student) }"
-        >
-          <td><input type="checkbox" :checked="selection.hasStudent(student)" /></td>
-          <td>{{student.accountNumber}}</td>
-          <td>{{student.firstName}}</td>
-          <td>{{student.lastName}}</td>
-          <td>{{student.email}}</td>
+  <div class="student-list" :class="{ 'student-list--loading': StudentStore.loading }">
+    <table class="student-list__list">
+      <thead>
+        <tr>
+          <th>
+            <input
+              type="checkbox"
+              :checked="selection.hasGroup(GroupStore.selectedGroup)"
+              @click="selection.toggleGroup(GroupStore.selectedGroup)"
+            />
+          </th>
+          <th>Account Number</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Email Address</th>
         </tr>
-      </template>
-    </tbody>
-  </table>
-  <div class="student-list__pagination" v-if="StudentStore.pageInfo != null">
-    <button :disabled="!StudentStore.pageInfo.hasPreviousPage" @click.passive="StudentStore.fetchPrevious">Previous</button>
-    <button :disabled="!StudentStore.pageInfo.hasNextPage" @click.passive="StudentStore.fetchNext">Next</button>
+      </thead>
+      <tbody>
+        <tr v-if="GroupStore.selectedGroup === null">
+          <td class="student-list__select-group" colspan="5">Please select a group...</td>
+        </tr>
+        <template v-else>
+          <tr
+            v-for="student in StudentStore.students"
+            :key="student.id"
+            @click="studentClick(student)"
+            class="student-list__student"
+            :class="{ 'student-list__student--selected': selection.hasStudent(student) }"
+          >
+            <td><input type="checkbox" :checked="selection.hasStudent(student)" /></td>
+            <td>{{student.accountNumber}}</td>
+            <td>{{student.firstName}}</td>
+            <td>{{student.lastName}}</td>
+            <td>{{student.email}}</td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+    <div class="student-list__pagination" v-if="StudentStore.pageInfo != null">
+      <button :disabled="!StudentStore.pageInfo.hasPreviousPage" @click.passive="StudentStore.fetchPrevious">Previous</button>
+      <button :disabled="!StudentStore.pageInfo.hasNextPage" @click.passive="StudentStore.fetchNext">Next</button>
+    </div>
   </div>
 </template>
 
@@ -48,17 +48,18 @@
 import StudentStore from '@/store/modules/student';
 import GroupStore from '@/store/modules/group';
 import InstanceStore from '@/store/modules/instance';
-import StudentSelection from '@/services/StudentSelectionService';
-import { reactive, ref, watchEffect } from 'vue';
+import selection from '@/services/StudentSelectionService';
+import { ref, watchEffect } from 'vue';
 import Student from '@/@types/Student';
 import Instance from '@/@types/Instance';
+import { useRouter } from 'vue-router';
 
 const delay = 300;
 let timer: NodeJS.Timeout|null = null;
 
 export default {
   setup() {
-    const selection = reactive(new StudentSelection());
+    const router = useRouter();
     const prevInstance = ref<Instance|null>(null);
     const clicks = ref(0);
 
@@ -84,19 +85,6 @@ export default {
     });
 
     /**
-     * Resolve the selection into a list of students.
-     */
-    async function resolve() {
-      try {
-        const data = await selection.resolve();
-        console.log(data);
-      } catch (error) {
-        // eslint-disable-next-line no-alert
-        alert(error?.message ?? error);
-      }
-    }
-
-    /**
      * Single or double-click on a student.
      */
     function studentClick(student: Student) {
@@ -110,18 +98,22 @@ export default {
       } else {
         if (timer === null) return;
         clearTimeout(timer);
-        console.log('double-click!');
         selection.toggleStudent(student);
         clicks.value = 0;
+        router.push({
+          name: 'Students',
+          params: {
+            studentId: student.id,
+          },
+        });
       }
     }
 
     return {
       GroupStore,
       StudentStore,
-      selection,
-      resolve,
       studentClick,
+      selection,
     };
   },
 };
@@ -129,6 +121,10 @@ export default {
 
 <style lang="scss">
 .student-list {
+  width: 100%;
+}
+
+.student-list__list {
   width: 100%;
   border-spacing: 0;
 
@@ -156,6 +152,10 @@ export default {
     & td {
       padding: 0.5em 0.25em;
       user-select: none;
+
+      &.student-list__select-group {
+        text-align: left;
+      }
     }
 
     &:nth-child(even) {
@@ -204,7 +204,7 @@ export default {
   }
 }
 
-div.student-list__pagination {
+.student-list__pagination {
   text-align: center;
 
   & button {
@@ -220,7 +220,7 @@ div.student-list__pagination {
 
 // Collapse the table into rows instead of columns for small screens
 @media screen and (max-width: 800px) {
-  .student-list {
+  .student-list__list {
     & thead, & tbody, & th, & td, & tr {
       display: block;
     }

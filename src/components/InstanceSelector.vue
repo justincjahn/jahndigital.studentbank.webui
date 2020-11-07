@@ -4,6 +4,7 @@
     :key="(x) => x ? x.id : null"
     :value="(x) => x ? x.description : null"
     :default="InstanceState.selectedInstance"
+    msg="Select an instance..."
     @select="selectInstance"
   >
     <template v-slot:selected="option">

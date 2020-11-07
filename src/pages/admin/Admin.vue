@@ -1,7 +1,24 @@
 <template>
   <header>
-    <h1>Student Bank Admin</h1>
-    <AdminNavigation />
+    <section class="main-nav">
+      <h1>Student Bank Admin</h1>
+
+      <div class="main-nav__instances">
+        <InstanceSelector />
+      </div>
+
+      <div class="main-nav__login">
+        <LoginWidget />
+      </div>
+    </section>
+
+    <section class="sub-nav">
+      <router-link :to="{name: 'Home'}">Students</router-link>
+      <router-link :to="{name: 'Groups'}">Groups</router-link>
+      <router-link :to="{name: 'Stocks'}">Stocks</router-link>
+      <router-link :to="{name: 'Purchases'}">Purchases</router-link>
+      <router-link :to="{name: 'Settings'}">Settings</router-link>
+    </section>
   </header>
 
   <main><router-view/></main>
@@ -23,7 +40,8 @@
 </style>
 
 <script>
-import AdminNavigation from '@/components/AdminNavigation.vue';
+import LoginWidget from '@/components/LoginWidget.vue';
+import InstanceSelector from '@/components/InstanceSelector.vue';
 import Modal from '@/components/Modal.vue';
 import UserStore from '@/store/modules/user';
 import GlobalState from '@/store/modules/global';
@@ -32,7 +50,8 @@ import { watchEffect } from 'vue';
 
 export default {
   components: {
-    AdminNavigation,
+    LoginWidget,
+    InstanceSelector,
     Modal,
   },
 

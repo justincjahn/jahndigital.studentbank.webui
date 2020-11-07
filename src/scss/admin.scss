@@ -1,9 +1,9 @@
 * { padding: 0; margin: 0; }
 *, *::before, *::after { box-sizing: border-box; }
-ul, ol { margin-left: 1.1em; }
 
 body {
   font-size:               12pt;
+  line-height:             1.5;
   color:                   map.get($theme, primary, font-color);
   font-family:             Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing:  antialiased;
@@ -19,38 +19,105 @@ label {
 }
 
 input[type=text] {
-  line-height: 2em;
-  font-size: 1rem;
+  padding: 0.5em 2em 0.5em 0.5em;
+  border: 1px solid colorStep(button-secondary, $step: 2);
+  border-radius: 3px;
+}
+
+button {
+  @include button(button-secondary);
+}
+
+button.primary {
+  @include button(button-primary);
+}
+
+button.destructive {
+  @include button(button-destructive);
 }
 
 #app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 0 1.5em;
   background-color: map.get($theme, primary, color);
   border-left: 1px solid colorStep(primary, $step: 3);
   border-right: 1px solid colorStep(primary, $step: 3);
 }
 
-header {
+header { margin: 0 1.5em; }
+
+.main-nav {
   display: flex;
-  justify-content: space-between;
   align-items: baseline;
-  
-  h1 {
-    font-size: clamp(0.7rem, 3vw, 2rem);
+  margin-top: 1em;
+
+  & h1 {
+    font-size: clamp(1.2rem, 3vw, 2rem);
+  }
+
+  &__instances {
+    margin-left: 1em;
+    align-self: center;
+  }
+
+  &__login {
+    text-align: right;
+    flex-grow: 1;
+  }
+}
+
+.sub-nav {
+  display: flex;
+  margin: 2em 0;
+  width: clamp(27em, 50vw, 35em);
+  justify-content: space-between;
+
+  a {
+    color: map.get($theme, primary, font-color);
+    text-decoration: none;
+    font-size: 1.2em;
+    font-weight: 100;
+
+    &:hover {
+      color: colorStep(primary, $darken: false, $step: 10, $colorMap: font-color);
+    }
+
+    &.router-link-active {
+      color: map.get($theme, accent1, color);
+    }
   }
 }
 
 main { flex-grow: 1; }
 
 footer {
-  grid-area: footer;
   font-size: 0.8em;
   font-weight: lighter;
   font-style: italic;
   text-align: center;
   color: rgba(0,0,0,0.5);
   user-select: none;
+}
+
+@media only screen and (max-width: 650px) {
+  .main-nav {
+    display: grid;
+    align-items: center;
+    grid-template-rows: 1fr 1fr 1fr;
+
+    &__instances {
+      margin: 0;
+      width: 100%;
+
+      & .select, & .select button {
+        width: 100%;
+      }
+    }
+
+    &__login {
+      grid-row: 2 / 3;
+      text-align: left;
+    }
+  }
 }
