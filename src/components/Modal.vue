@@ -158,7 +158,7 @@ export default defineComponent({
 <style lang="scss">
 .modal {
   position: fixed;
-  z-index: 1;
+  z-index: 500;
   left: 0;
   top: 0;
   width: 100%;

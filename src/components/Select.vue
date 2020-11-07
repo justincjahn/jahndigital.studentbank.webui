@@ -135,7 +135,9 @@ export default defineComponent({
     position: relative;
     min-width: 10rem;
     text-align: left;
-    padding: 0.5em 2em 0.5em 0.5em;
+    vertical-align: middle;
+    margin: 0;
+    padding-right: 2em;
     outline: 0;
     border: 1px solid colorStep(button-secondary, $step: 2);
     border-radius: 0.25rem;
@@ -161,10 +163,12 @@ export default defineComponent({
   &__items {
     display: none;
     position: absolute;
-    z-index: 1;
+    z-index: 100;
     list-style: none;
     margin: 0;
     width: 100%;
+    max-height: clamp(150px, 30vh, 350px);
+    overflow-y: auto;
 
     background-color: map.get($theme, button-secondary, color);
     border: 1px solid colorStep(button-secondary, $step: 2);

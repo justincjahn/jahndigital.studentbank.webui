@@ -50,3 +50,16 @@
     border-color: colorStep($class, $step: 3);
   }
 }
+
+@mixin input-reset() {
+  color: rgba(0,0,0,0.4);
+  position: absolute;
+  width: 25px;
+  top: 0px;
+  right: 0px;
+  outline: none;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  height: 100%;
+}

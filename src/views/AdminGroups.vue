@@ -83,15 +83,7 @@ export default {
       }
 
       &__reset {
-        color: rgba(0,0,0,0.4);
-        position: absolute;
-        width: 25px;
-        right: 0px;
-        outline: none;
-        border: none;
-        background-color: transparent;
-        cursor: pointer;
-        height: 100%;
+        @include input-reset;
       }
     }
 

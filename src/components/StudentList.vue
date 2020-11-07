@@ -122,15 +122,15 @@ export default {
 <style lang="scss">
 .student-list {
   width: 100%;
+
+  &--loading {
+    opacity: 0.4;
+  }
 }
 
 .student-list__list {
   width: 100%;
   border-spacing: 0;
-
-  &--loading {
-    opacity: 0.4;
-  }
 
   & tr {
     text-align: left;

@@ -15,7 +15,6 @@ body {
 
 label {
   font-weight: bold;
-  font-size: 1.2em;
 }
 
 input[type=text] {
@@ -24,15 +23,15 @@ input[type=text] {
   border-radius: 3px;
 }
 
-button {
+button, input[type=submit] {
   @include button(button-secondary);
 }
 
-button.primary {
+button.primary, input[type=submit].primary {
   @include button(button-primary);
 }
 
-button.destructive {
+button.destructive, input[type=submit].destructive {
   @include button(button-destructive);
 }
 
@@ -70,8 +69,7 @@ header { margin: 0 1.5em; }
 .sub-nav {
   display: flex;
   margin: 2em 0;
-  width: clamp(27em, 50vw, 35em);
-  justify-content: space-between;
+  gap: clamp(1.5em, 5vw, 3em);
 
   a {
     color: map.get($theme, primary, font-color);
@@ -86,6 +84,10 @@ header { margin: 0 1.5em; }
     &.router-link-active {
       color: map.get($theme, accent1, color);
     }
+  }
+
+  &--padded {
+    padding: 0 1.5em;
   }
 }
 

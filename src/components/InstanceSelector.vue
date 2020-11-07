@@ -258,5 +258,6 @@ export default defineComponent({
 
   span.active {
     font-size: 0.7em;
+    vertical-align: middle;
   }
 </style>
