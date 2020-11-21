@@ -4,8 +4,7 @@ type Share = {
   id: number;
   typeId: number;
   balance: number;
-
-  type?: ShareType;
+  shareType?: ShareType;
 }
 
 export default Share;

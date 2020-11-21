@@ -1,28 +1,11 @@
 <template>
-  <div class="student-search">
-    <form>
-      <label for="student-search__input__input">Search</label>
-
-      <div class="student-search__input">
-        <span class="student-search__input__reset-wrapper">
-          <input type="text" id="student-search__input__input" />
-          <input type="reset" value="X" />
-        </span>
-
-        <ul class="student-search__input__results">
-          <li class="student-search__input__results__item">Hello</li>
-          <li class="student-search__input__results__item">World</li>
-          <li class="student-search__input__results__item">Yeah</li>
-        </ul>
-      </div>
-    </form>
-  </div>
+  <StudentSelector @select="handleSelection" @clear="handleClear"/>
 
   <div class="student-info">
     <form @submit.prevent>
       <div class="student-info--form-group">
         <label for="student-info__account-number">Account Number</label>
-        <input type="text" id="student-info__account-number" />
+        <input type="text" id="student-info__account-number" :value="StudentStore.selectedStudent?.accountNumber ?? ''"/>
       </div>
       <div class="student-info--form-group">
         <label for="student-info__email">Email</label>
@@ -53,70 +36,32 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Student from '@/@types/Student';
+import StudentSelector from '@/components/StudentSelector.vue';
+import StudentStore from '@/store/modules/student';
 
+export default {
+  setup() {
+    function handleSelection(student: Student) {
+      StudentStore.setSelectedStudent(student);
+    }
+
+    function handleClear() {
+      StudentStore.setSelectedStudent(null);
+    }
+
+    return {
+      StudentSelector,
+      StudentStore,
+      handleSelection,
+      handleClear,
+    };
+  },
 };
 </script>
 
 <style lang="scss">
-  .student-search {
-    margin: 0 1.5em;
-
-    label[for=student-search__input__input] {
-      padding-right: 1em;
-      margin: auto 0;
-    }
-
-    & form {
-      display: flex;
-      flex-direction: column;
-    }
-
-    &__input {
-      position: relative;
-
-      &__reset-wrapper {
-        width: 100%;
-        display: inline-block;
-
-        input[type=reset] {
-          @include input-reset;
-        }
-      }
-
-      &__results {
-        display: none;
-        position: absolute;
-        z-index: 1;
-        list-style: none;
-        margin: 0;
-        width: 100%;
-
-        background-color: map.get($theme, button-secondary, color);
-        border: 1px solid colorStep(button-secondary, $step: 2);
-
-        &__item {
-          padding: 0.25em;
-          cursor: pointer;
-
-          &:hover {
-            background-color: colorStep(button-secondary);
-          }
-        }
-      }
-    }
-  }
-
-  #student-search__input__input {
-    width: 100%;
-    border-radius: 0.25em;
-
-    &.open {
-      border-radius: 0.25rem 0.25rem 0px 0px;
-    }
-  }
-
   .student-info {
     margin-top: 1.5em;
     padding: 1em;
@@ -145,18 +90,6 @@ export default {
   }
 
   @media only screen and (min-width: 760px) {
-    .student-search {
-      & form {
-        flex-direction: row;
-      }
-
-      &__input {
-        &__reset-wrapper {
-          width: clamp(300px, 30vw, 400px);
-        }
-      }
-    }
-
     .student-info {
       & form {
         flex-direction: row;

@@ -1,3 +1,5 @@
+/* eslint-disable import/no-cycle */
+import Instance from './Instance';
 import Student from './Student';
 
 type Group = {
@@ -8,6 +10,8 @@ type Group = {
   name: string;
 
   students?: Student[];
+
+  instance?: Instance;
 }
 
 export default Group;

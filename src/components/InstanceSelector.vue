@@ -67,6 +67,7 @@ import InstanceForm from '@/components/InstanceForm.vue';
 import GlobalState from '@/store/modules/global';
 import InstanceState from '@/store/modules/instance';
 import GroupState from '@/store/modules/group';
+import UserState from '@/store/modules/user';
 import { defineComponent, ref, watchEffect } from 'vue';
 
 export default defineComponent({
@@ -85,10 +86,11 @@ export default defineComponent({
     // If the current operation is a rename
     const isRename = ref(false);
 
-    // Fetch instances if they haven't been fetched yet
-    if (InstanceState.instances.length === 0) {
-      InstanceState.fetchInstances();
-    }
+    watchEffect(() => {
+      if (UserState.isAuthenticated || InstanceState.instances.length === 0) {
+        InstanceState.fetchInstances();
+      }
+    });
 
     // If there is no selected instance, try to select the active one.
     watchEffect(() => {

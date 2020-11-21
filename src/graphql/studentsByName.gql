@@ -1,0 +1,42 @@
+query studentsByName($name: String!) {
+  students(
+    where: {
+      firstName_starts_with: $name
+      OR: {lastName_not_ends_with: $name}},
+    first: 25,
+    order_by: {accountNumber: ASC}
+  ) {
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    totalCount
+    nodes {
+      id
+      groupId
+      accountNumber
+      firstName
+      lastName
+      email
+      group {
+        id
+        name
+        instanceId
+        instance {
+          id
+          description
+        }
+      }
+      shares {
+        id
+        balance
+        shareType {
+          name
+          dividendRate
+        }
+      }
+    }
+  }
+}

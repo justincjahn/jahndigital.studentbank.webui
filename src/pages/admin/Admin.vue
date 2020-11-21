@@ -4,7 +4,9 @@
       <h1>Student Bank Admin</h1>
 
       <div class="main-nav__instances">
-        <InstanceSelector />
+        <template v-if="UserStore.isAuthenticated">
+          <InstanceSelector />
+        </template>
       </div>
 
       <div class="main-nav__login">
@@ -67,6 +69,7 @@ export default {
 
     return {
       GlobalState,
+      UserStore,
     };
   },
 };

@@ -9,13 +9,6 @@ import persistToken from './persistToken';
  */
 export async function onLogin(apolloClient: ApolloClient<unknown>, token: string) {
   persistToken(token);
-
-  try {
-    await apolloClient.resetStore();
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('%cError on cache reset (login)', 'color: orange;', e.message);
-  }
 }
 
 /**

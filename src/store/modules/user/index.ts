@@ -67,11 +67,15 @@ class UserState extends VuexModule implements IUserState {
    * Gets if the user is authenticated.
    */
   get isAuthenticated() {
+    return this.token != null;
+
+    /*
     if (this.token) {
       return !this.isExpired;
     }
 
     return false;
+    */
   }
 
   /**

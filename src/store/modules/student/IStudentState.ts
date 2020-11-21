@@ -4,7 +4,7 @@ import Student from '@/@types/Student';
 export default interface IStudentState {
   students: Student[];
 
-  selectedStudent?: Student;
+  selectedStudent: Student|null;
 
   totalCount: number;
 

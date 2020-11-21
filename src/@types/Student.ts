@@ -1,4 +1,7 @@
+/* eslint-disable import/no-cycle */
+
 import Share from './Share';
+import Group from './Group';
 
 type Student = {
   id: number;
@@ -12,6 +15,8 @@ type Student = {
   groupId: number;
 
   shares?: Share[];
+
+  group?: Group;
 
   email: string;
 }

@@ -1,0 +1,40 @@
+query studentsByAcccountNumber($accountNumber: String!) {
+  students(
+    where: { accountNumber_contains: $accountNumber },
+    first: 25,
+    order_by: {accountNumber: ASC}
+  ) {
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    totalCount
+    nodes {
+      id
+      groupId
+      accountNumber
+      firstName
+      lastName
+      email
+      group {
+        id
+        name
+        instanceId
+        instance {
+          id
+          description
+        }
+      }
+      shares {
+        id
+        balance
+        shareType {
+          name
+          dividendRate
+        }
+      }
+    }
+  }
+}

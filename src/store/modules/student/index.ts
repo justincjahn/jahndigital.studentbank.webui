@@ -23,7 +23,7 @@ class StudentState extends VuexModule implements IStudentState {
 
   students: Student[] = [];
 
-  selectedStudent?: Student;
+  selectedStudent: Student|null = null;
 
   studentPageCount = FETCH_OPTIONS.DEFAULT_COUNT;
 
@@ -178,7 +178,7 @@ class StudentState extends VuexModule implements IStudentState {
    * @param student The student to select.
    */
   @Mutation
-  setSelectedStudent(student: Student) {
+  setSelectedStudent(student: Student|null) {
     this.selectedStudent = student;
   }
 
