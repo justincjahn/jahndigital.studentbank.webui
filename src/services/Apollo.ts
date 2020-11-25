@@ -6,7 +6,7 @@ import {
   Operation,
   ServerParseError,
   throwServerError,
-} from '@apollo/client';
+} from '@apollo/client/core';
 
 import persistToken from '@/utils/persistToken';
 import { TokenRefreshLink } from 'apollo-link-token-refresh';
@@ -84,7 +84,7 @@ const authLink = setContext(async (_, { headers }) => {
 /**
  * Automatically attempt to refresh the user's JWT token using the stored refresh token.
  */
-const tokenLink = new TokenRefreshLink({
+const tokenLink = new TokenRefreshLink<string>({
   isTokenValidOrUndefined: () => !UserStore.isExpired || UserStore.jwtToken === null,
 
   fetchAccessToken: () => {
@@ -218,7 +218,7 @@ const tokenLink = new TokenRefreshLink({
  * The default Apollo client used by services.
  */
 const defaultClient = new ApolloClient({
-  link: ApolloLink.from([authLink, errorLink, tokenLink, httpLink]),
+  link: ApolloLink.from([authLink, errorLink, tokenLink as unknown as ApolloLink, httpLink]),
   cache: new InMemoryCache(),
 });
 

@@ -1,4 +1,4 @@
-import { ApolloClient } from '@apollo/client';
+import { ApolloClient } from '@apollo/client/core';
 
 /**
  * Abstract object that requires an ApolloClient object to be passed into the constructor.
