@@ -84,8 +84,13 @@ const authLink = setContext(async (_, { headers }) => {
 /**
  * Automatically attempt to refresh the user's JWT token using the stored refresh token.
  */
-const tokenLink = new TokenRefreshLink<string>({
-  isTokenValidOrUndefined: () => !UserStore.isExpired || UserStore.jwtToken === null,
+const tokenLink = new TokenRefreshLink({
+  isTokenValidOrUndefined: () => {
+    if (UserStore.jwtToken === null) return true;
+    if (!UserStore.isAuthenticated) return false;
+    if (UserStore.tokenExpiration < Date.now()) return false;
+    return true;
+  },
 
   fetchAccessToken: () => {
     // Instead of using Apollo to fetch the refresh tokens, we use the fetch API because
@@ -149,7 +154,6 @@ const tokenLink = new TokenRefreshLink<string>({
           parseError.bodyText = bodyText;
           return Promise.reject(parseError);
         }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .then((parsedBody: Record<string, any>) => {
@@ -218,7 +222,7 @@ const tokenLink = new TokenRefreshLink<string>({
  * The default Apollo client used by services.
  */
 const defaultClient = new ApolloClient({
-  link: ApolloLink.from([authLink, errorLink, tokenLink as unknown as ApolloLink, httpLink]),
+  link: ApolloLink.from([authLink, errorLink, tokenLink, httpLink]),
   cache: new InMemoryCache(),
 });
 

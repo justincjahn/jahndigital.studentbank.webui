@@ -67,30 +67,7 @@ class UserState extends VuexModule implements IUserState {
    * Gets if the user is authenticated.
    */
   get isAuthenticated() {
-    return this.token != null;
-
-    /*
-    if (this.token) {
-      return !this.isExpired;
-    }
-
-    return false;
-    */
-  }
-
-  /**
-   * Gets if the user's JWT token has expired.
-   */
-  get isExpired() {
-    if (!this.token || !this.expiration) {
-      return true;
-    }
-
-    if (Date.now() >= this.expiration * 1000) {
-      return true;
-    }
-
-    return false;
+    return this.jwtToken !== null;
   }
 
   /**
@@ -98,6 +75,13 @@ class UserState extends VuexModule implements IUserState {
    */
   get jwtToken() {
     return this.token ?? null;
+  }
+
+  /**
+   * Gets the expiration timestamp of the token
+   */
+  get tokenExpiration() {
+    return (this.expiration ?? 0) * 1000;
   }
 }
 
