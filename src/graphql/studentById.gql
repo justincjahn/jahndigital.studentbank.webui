@@ -1,21 +1,7 @@
-query studentsByName($name: String!) {
+query studentsById($id: Long!) {
   students(
-    where: {
-      OR: [
-        {firstName_starts_with: $name},
-        {lastName_starts_with: $name}
-      ]
-    },
-    first: 25,
-    order_by: {accountNumber: ASC}
+    where: { id: $id },
   ) {
-    pageInfo {
-      hasNextPage
-      hasPreviousPage
-      startCursor
-      endCursor
-    }
-    totalCount
     nodes {
       id
       groupId

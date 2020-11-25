@@ -81,6 +81,10 @@ header { margin: 0 1.5em; }
       color: colorStep(primary, $darken: false, $step: 10, $colorMap: font-color);
     }
 
+    &:visited {
+      color: map.get($theme, primary, font-color);
+    }
+
     &.router-link-active {
       color: map.get($theme, accent1, color);
     }

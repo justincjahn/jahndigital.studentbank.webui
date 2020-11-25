@@ -5,13 +5,14 @@
 
       <div class="student-search__input">
         <span class="student-search__input__reset-wrapper">
-          <input type="text"
-                 id="student-search__input__input"
-                 autocomplete="off"
-                 v-model="searchCriteria"
-                 @keyup="handleKeypress"
-                 @blur="handleClose"
-                 @focus="handleOpen"
+          <input
+            type="text"
+            id="student-search__input__input"
+            autocomplete="off"
+            v-model="searchCriteria"
+            @keyup="handleKeypress"
+            @blur="handleClose"
+            @focus="handleOpen"
           />
           <input type="reset" value="X" />
         </span>

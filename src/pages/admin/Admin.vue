@@ -15,7 +15,7 @@
     </section>
 
     <section class="sub-nav">
-      <router-link :to="{name: 'Home'}">Students</router-link>
+      <router-link :to="{name: 'Students'}">Students</router-link>
       <router-link :to="{name: 'Groups'}">Groups</router-link>
       <router-link :to="{name: 'Stocks'}">Stocks</router-link>
       <router-link :to="{name: 'Purchases'}">Purchases</router-link>

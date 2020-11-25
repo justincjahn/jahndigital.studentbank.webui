@@ -7,7 +7,9 @@ import store from '@/store';
 import Student from '@/@types/Student';
 import Apollo from '@/services/Apollo';
 import StudentsWithShares from '@/graphql/studentsWithShares.query.gql';
+import UpdateStudent from '@/graphql/updateStudent.mutation.gql';
 import { FETCH_OPTIONS } from '@/constants';
+import UpdateStudentResponse from '@/@types/graphql/UpdateStudentResponse';
 import IStudentState from './IStudentState';
 
 type FetchOptions = {
@@ -75,6 +77,44 @@ class StudentState extends VuexModule implements IStudentState {
       studentPageCount: pageCount,
       studentCursorStack: [] as string[],
     };
+  }
+
+  /**
+   * Update a student on the GraphQL API and the local store.
+   *
+   * @param student The student to update.
+   */
+  @Mutation
+  async updateStudent(student: Student) {
+    try {
+      const res = await Apollo.mutate<UpdateStudentResponse>({
+        mutation: UpdateStudent,
+        variables: {
+          id: student.id,
+          groupId: student.groupId,
+          accountNumber: student.accountNumber.padStart(10, '0'),
+          firstName: student.firstName,
+          lastName: student.lastName,
+          email: student.email,
+        },
+      });
+
+      if (res.data) {
+        if (this.selectedStudent && this.selectedStudent.id === student.id) {
+          [this.selectedStudent] = res.data.updateStudent;
+
+          const index = this.students.findIndex((x) => x.id === student.id);
+          if (index >= 0) {
+            const students = this.students.splice(index, 1, student);
+            this.students = students;
+          }
+        }
+
+        await Apollo.clearStore();
+      }
+    } catch (e) {
+      throw e?.message ?? e;
+    }
   }
 
   /**
