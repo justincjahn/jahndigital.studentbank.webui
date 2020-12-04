@@ -63,3 +63,102 @@
   cursor: pointer;
   height: 100%;
 }
+
+@mixin table($selectable: true) {
+  width: 100%;
+  border-spacing: 0;
+  border: 1px solid colorStep(primary, $step: 8);
+  border-radius: 0.25rem;
+
+  & tr {
+    text-align: left;
+  }
+
+  & tr :first-child{
+    padding-left: 0.5em;
+  }
+
+  & th:last-child,
+  & td:last-child
+  {
+    text-align: right;
+    padding-right: 0.5em;
+  }
+
+  & thead th {
+    padding: 0.25em 0.25em;
+
+    &.right {
+      text-align: right;
+    }
+
+    &.center {
+      text-align: center;
+    }
+  }
+
+  & tbody tr {
+    @if $selectable {
+      cursor: pointer;
+
+      &.selected {
+        $bgcolor: colorStep(accent1, $step: 6, $darken: false);
+        background-color: $bgcolor;
+
+        color: chooseColor(
+          $bgcolor,
+          map.get($theme, accent1, font-color),
+          map.get($theme, accent1, font-color-alt)
+        );
+
+        &:hover {
+          $bgcolor: colorStep(accent1, $step: 4, $darken: false);
+          background-color: $bgcolor;
+
+          color: chooseColor(
+            $bgcolor,
+            map.get($theme, accent1, font-color),
+            map.get($theme, accent1, font-color-alt)
+          );
+        }
+      }
+    }
+
+    td {
+      padding: 0.5em 0.25em;
+      @if $selectable { user-select: none; }
+
+      &.right {
+        text-align: right;
+      }
+
+      &.center {
+        text-align: center;
+      }
+    }
+
+    &:nth-child(even) {
+      $bgcolor: colorStep(secondary, $step: 0, $darken: false);
+      background-color: $bgcolor;
+
+      color: chooseColor(
+        $bgcolor,
+        map.get($theme, secondary, font-color),
+        map.get($theme, secondary, font-color-alt)
+      );
+    }
+
+    @if $selectable {
+      &:hover {
+        $bgcolor: colorStep(secondary, $step: 3, $darken: true);
+        background-color: $bgcolor;
+
+        color: chooseColor(
+          $bgcolor,
+          map.get($theme, secondary, font-color),
+          map.get($theme, secondary, font-color-alt)
+        );
+      }
+    }
+  }
+}

@@ -101,7 +101,7 @@ export default {
         selection.toggleStudent(student);
         clicks.value = 0;
         router.push({
-          name: 'Students',
+          name: 'StudentsTransactions',
           params: {
             studentId: student.id,
           },

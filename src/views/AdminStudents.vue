@@ -62,13 +62,16 @@ import StudentSelector from '@/components/StudentSelector.vue';
 import StudentStore from '@/store/modules/student';
 import GlobalStore from '@/store/modules/global';
 import { useRouter, useRoute } from 'vue-router';
-import { defineComponent, onMounted, ref, watch, watchEffect } from 'vue';
+import { defineComponent, onMounted, computed } from 'vue';
 import { useField, useForm } from 'vee-validate';
 import Apollo from '@/services/Apollo';
 import gqlSearchAccounts from '@/graphql/studentsByAccountNumber.gql';
 import gqlStudentById from '@/graphql/studentById.gql';
 import PagedStudentResponse from '@/@types/graphql/PagedStudentResponse';
 
+/**
+ * Handles high-level selection of students and routing to sub-routes.
+ */
 export default defineComponent({
   components: {
     StudentSelector,
@@ -163,6 +166,50 @@ export default defineComponent({
     const { value: firstName } = useField('firstName', validateName);
     const { value: lastName } = useField('lastName', validateName);
 
+    /**
+     * Fire off an update when the user submits the form.
+     */
+    const handleSubmit = form.handleSubmit(async (values) => {
+      if (!StudentStore.selectedStudent) return;
+      const merged = { ...StudentStore.selectedStudent, ...values } as Student;
+
+      try {
+        await StudentStore.updateStudent(merged);
+      } catch (e) {
+        GlobalStore.setCurrentError(e?.message ?? e);
+      }
+    });
+
+    /**
+     * Set the selected student, update the route, and update the form.
+     */
+    function setSelectedStudent(student: Student|null) {
+      if (student !== null) {
+        router.replace({
+          name: 'StudentsTransactions',
+          params: {
+            ...route.params,
+            studentId: student.id,
+          },
+        });
+
+        form.setValues(student);
+      } else {
+        router.replace({
+          name: 'Students',
+        });
+
+        form.resetForm();
+      }
+
+      if (StudentStore.selectedStudent !== student) {
+        StudentStore.setSelectedStudent(student);
+      }
+    }
+
+    /**
+     * Fetch a student by ID number and set it as the selectedStudent.
+     */
     async function fetchStudentById(id: number) {
       try {
         const res = await Apollo.query<PagedStudentResponse>({
@@ -174,7 +221,7 @@ export default defineComponent({
 
         if (res.data && res.data.students.nodes.length > 0) {
           const [student] = res.data.students.nodes;
-          StudentStore.setSelectedStudent(student);
+          setSelectedStudent(student);
         }
       } catch (e) {
         console.log(e);
@@ -182,16 +229,17 @@ export default defineComponent({
     }
 
     /**
-     * Set the route using the student id provided.
+     * Handle when the user makes a selection in the search widget.
      */
-    function setRoute(id: number) {
-      router.push({
-        name: route.name ?? 'Students',
-        params: {
-          ...route.params,
-          studentId: id,
-        },
-      });
+    function handleSelection(student: Student) {
+      setSelectedStudent(student);
+    }
+
+    /**
+     * Handle clearing the student search box.
+     */
+    function handleClear() {
+      setSelectedStudent(null);
     }
 
     /**
@@ -208,48 +256,11 @@ export default defineComponent({
 
         if (Number.isNaN(studentId)) return;
         fetchStudentById(studentId);
-      } else if (!route.params.studentId && StudentStore.selectedStudent !== null) {
-        setRoute(StudentStore.selectedStudent.id);
       }
     });
 
-    /**
-     * Update the form values when the selected student changes
-     */
-    watchEffect(() => {
-      if (!StudentStore.selectedStudent) return;
-      form.setValues(StudentStore.selectedStudent);
-    });
-
-    /**
-     * Handle when the user makes a selection in the search widget.
-     */
-    function handleSelection(student: Student) {
-      setRoute(student.id);
-      StudentStore.setSelectedStudent(student);
-    }
-
-    /**
-     * Handle clearing the student search box.
-     */
-    function handleClear() {
-      StudentStore.setSelectedStudent(null);
-      form.resetForm();
-    }
-
-    /**
-     * Fire off an update when the user submits the form.
-     */
-    const handleSubmit = form.handleSubmit(async (values) => {
-      if (!StudentStore.selectedStudent) return;
-      const merged = { ...StudentStore.selectedStudent, ...values } as Student;
-
-      try {
-        await StudentStore.updateStudent(merged);
-      } catch (e) {
-        GlobalStore.setCurrentError(e?.message ?? e);
-      }
-    });
+    // Make params reactive so our links work
+    const params = computed(() => route.params);
 
     return {
       StudentSelector,
@@ -262,7 +273,7 @@ export default defineComponent({
       lastName,
       errors: form.errors,
       handleSubmit,
-      params: route.params,
+      params,
     };
   },
 });
