@@ -55,7 +55,6 @@ import InstanceState from '@/store/modules/instance';
 import GroupState from '@/store/modules/group';
 import { computed, defineComponent, ref, watchEffect } from 'vue';
 import Modal from '@/components/Modal.vue';
-import Group from '@/@types/Group';
 import { useRoute, useRouter } from 'vue-router';
 
 enum ModalState {

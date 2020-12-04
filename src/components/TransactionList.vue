@@ -45,8 +45,6 @@
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue';
 import Apollo from '@/services/Apollo';
-import Share from '@/@types/Share';
-import PagedTransactionResponse from '@/@types/graphql/PagedTransactionResponse';
 import gqlTransactions from '@/graphql/transactions.query.gql';
 
 export default defineComponent({
@@ -72,7 +70,6 @@ export default defineComponent({
 
       if (res.data) {
         transactions.value = res.data.transactions.nodes;
-        console.log(transactions.value);
       }
     });
 

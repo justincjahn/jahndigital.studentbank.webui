@@ -85,8 +85,6 @@ import gqlStudentsWithName from '@/graphql/studentsByName.gql';
 import gqlStudentsWithEmail from '@/graphql/studentsByEmail.gql';
 import gqlStudentsWithAccountNumber from '@/graphql/studentsByAccountNumber.gql';
 import { ref, defineComponent } from 'vue';
-import PagedStudentResponse from '@/@types/graphql/PagedStudentResponse';
-import Student from '@/@types/Student';
 
 export default defineComponent({
   setup(_, { emit }) {

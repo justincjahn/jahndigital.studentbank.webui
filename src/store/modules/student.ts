@@ -1,16 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable class-methods-use-this */
-import PageInfo from '@/@types/PageInfo';
-import PagedStudentResponse from '@/@types/graphql/PagedStudentResponse';
 import { getModule, Module, Mutation, MutationAction, VuexModule } from 'vuex-module-decorators';
 import store from '@/store';
-import Student from '@/@types/Student';
 import Apollo from '@/services/Apollo';
 import StudentsWithShares from '@/graphql/studentsWithShares.query.gql';
 import UpdateStudent from '@/graphql/updateStudent.mutation.gql';
 import { FETCH_OPTIONS } from '@/constants';
-import UpdateStudentResponse from '@/@types/graphql/UpdateStudentResponse';
-import IStudentState from './IStudentState';
 
 type FetchOptions = {
   groupId: number;
@@ -18,7 +13,7 @@ type FetchOptions = {
 }
 
 @Module({ dynamic: true, store, name: 'student' })
-class StudentState extends VuexModule implements IStudentState {
+class StudentState extends VuexModule implements State.IStudentState {
   totalCount = 0;
 
   pageInfo: PageInfo|null = null;

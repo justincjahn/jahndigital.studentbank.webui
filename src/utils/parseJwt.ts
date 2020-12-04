@@ -1,5 +1,3 @@
-import JwtData from '@/@types/JwtData';
-
 /**
  * Parse a JWT string into an object.
  *

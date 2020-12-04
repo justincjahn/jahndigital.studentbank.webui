@@ -6,13 +6,12 @@ import {
 } from 'vuex-module-decorators';
 import store from '@/store';
 import parseJwt from '@/utils/parseJwt';
-import IUserState from './IUserState';
 
 /**
  * User state information, such as username, password, ID number, etc.
  */
 @Module({ dynamic: true, store, name: 'user' })
-class UserState extends VuexModule implements IUserState {
+class UserState extends VuexModule implements State.IUserState {
   id = -1;
 
   username = '';

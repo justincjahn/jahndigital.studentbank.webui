@@ -12,17 +12,9 @@ import InstanceQuery from '@/graphql/instances.query.gql';
 import InstanceDelete from '@/graphql/deleteInstance.mutation.gql';
 import InstanceNew from '@/graphql/newInstance.mutation.gql';
 import InstanceUpdate from '@/graphql/updateInstance.mutation.gql';
-import DeleteInstanceResponse from '@/@types/graphql/DeleteInstanceResponse';
-import InstanceResponse from '@/@types/graphql/InstancesResponse';
-import NewInstanceRequest from '@/@types/graphql/NewInstanceRequest';
-import NewInstanceResponse from '@/@types/graphql/NewInstanceResponse';
-import UpdateInstanceRequest from '@/@types/graphql/UpdateInstanceRequest';
-import UpdateInstanceResponse from '@/@types/graphql/UpdateInstanceResponse';
-import Instance from '@/@types/Instance';
-import IInstanceState from './IInstanceState';
 
 @Module({ dynamic: true, store, name: 'instance' })
-class InstanceState extends VuexModule implements IInstanceState {
+class InstanceState extends VuexModule implements State.IInstanceState {
   public instances: Instance[] = [];
 
   public selectedInstance: Instance|null = null;

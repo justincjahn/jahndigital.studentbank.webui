@@ -6,10 +6,9 @@ import {
   getModule,
 } from 'vuex-module-decorators';
 import store from '@/store';
-import IGlobalState from './IGlobalState';
 
 @Module({ dynamic: true, store, name: 'global' })
-class GlobalState extends VuexModule implements IGlobalState {
+class GlobalState extends VuexModule implements State.IGlobalState {
   topmostModal: HTMLElement | null = null;
 
   openModals: HTMLElement[] = [];

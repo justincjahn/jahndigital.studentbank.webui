@@ -60,7 +60,6 @@
 </template>
 
 <script lang="ts">
-import Instance from '@/@types/Instance';
 import Select from '@/components/Select.vue';
 import Modal from '@/components/Modal.vue';
 import InstanceForm from '@/components/InstanceForm.vue';

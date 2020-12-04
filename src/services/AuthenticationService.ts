@@ -1,5 +1,4 @@
 import { onLogin, onLogout } from '@/utils/login';
-import UserLoginResponse from '@/@types/graphql/UserLoginResponse';
 import UserStore from '@/store/modules/user';
 import ApolloServiceAbstract from './ApolloServiceAbstract';
 import query from '../graphql/userlogin.mutation.gql';

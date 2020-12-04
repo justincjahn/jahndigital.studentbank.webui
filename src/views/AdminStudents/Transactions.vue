@@ -15,7 +15,6 @@ import StudentStore from '@/store/modules/student';
 import ShareList from '@/components/ShareList.vue';
 import TransactionList from '@/components/TransactionList.vue';
 import { defineComponent, ref } from 'vue';
-import Share from '@/@types/Share';
 
 export default defineComponent({
   components: {

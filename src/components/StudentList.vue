@@ -50,8 +50,6 @@ import GroupStore from '@/store/modules/group';
 import InstanceStore from '@/store/modules/instance';
 import selection from '@/services/StudentSelectionService';
 import { ref, watchEffect } from 'vue';
-import Student from '@/@types/Student';
-import Instance from '@/@types/Instance';
 import { useRouter } from 'vue-router';
 
 const delay = 300;

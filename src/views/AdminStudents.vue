@@ -57,7 +57,6 @@
 </template>
 
 <script lang="ts">
-import Student from '@/@types/Student';
 import StudentSelector from '@/components/StudentSelector.vue';
 import StudentStore from '@/store/modules/student';
 import GlobalStore from '@/store/modules/global';
@@ -67,7 +66,6 @@ import { useField, useForm } from 'vee-validate';
 import Apollo from '@/services/Apollo';
 import gqlSearchAccounts from '@/graphql/studentsByAccountNumber.gql';
 import gqlStudentById from '@/graphql/studentById.gql';
-import PagedStudentResponse from '@/@types/graphql/PagedStudentResponse';
 
 /**
  * Handles high-level selection of students and routing to sub-routes.

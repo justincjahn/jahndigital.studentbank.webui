@@ -2,24 +2,16 @@
 /* eslint-disable class-methods-use-this */
 import { getModule, Module, Mutation, MutationAction, VuexModule } from 'vuex-module-decorators';
 import store from '@/store';
-import Group from '@/@types/Group';
 import Apollo from '@/services/Apollo';
 import GroupsQuery from '@/graphql/groups.query.gql';
 import GroupNew from '@/graphql/newGroup.mutation.gql';
 import GroupUpdate from '@/graphql/updateGroup.mutation.gql';
 import GroupDelete from '@/graphql/deleteGroup.mutation.gql';
-import GroupResponse from '@/@types/graphql/GroupResponse';
-import NewGroupRequest from '@/@types/graphql/NewGroupRequest';
-import NewGroupResponse from '@/@types/graphql/NewGroupResponse';
-import UpdateGroupRequest from '@/@types/graphql/UpdateGroupRequest';
-import UpdateGroupResponse from '@/@types/graphql/UpdateGroupResponse';
-import DeleteGroupResponse from '@/@types/graphql/DeleteGroupResponse';
-import IGroupState from './IGroupState';
 
 type fetchOptions = { instanceId: number };
 
 @Module({ dynamic: true, store, name: 'group' })
-class GroupState extends VuexModule implements IGroupState {
+class GroupState extends VuexModule implements State.IGroupState {
   groups: Group[] = [];
 
   loading = false;

@@ -1,6 +1,3 @@
-import StudentResponse from '@/@types/graphql/StudentResponse';
-import Group from '@/@types/Group';
-import Student from '@/@types/Student';
 import { gql } from '@apollo/client/core';
 import Apollo from '@/services/Apollo';
 import { reactive } from 'vue';
