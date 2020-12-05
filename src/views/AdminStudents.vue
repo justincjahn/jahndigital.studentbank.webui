@@ -5,37 +5,37 @@
     <form @submit.prevent="handleSubmit" autocomplete="off">
       <div class="student-info--form-group">
         <label for="student-info__account-number">Account Number</label>
-        <input
+        <Field
+          name="accountNumber"
           type="text"
           id="student-info__account-number"
-          v-model="accountNumber"
         />
         <p class="error" v-if="errors.accountNumber">{{errors.accountNumber}}</p>
       </div>
       <div class="student-info--form-group">
         <label for="student-info__email">Email</label>
-        <input
+        <Field
+          name="email"
           type="text"
           id="student-info__email"
-          v-model="email"
         />
         <p class="error" v-if="errors.email">{{errors.email}}</p>
       </div>
       <div class="student-info--form-group">
         <label for="student-info__first-name">First Name</label>
-        <input
+        <Field
+          name="firstName"
           type="text"
           id="student-info__first-name"
-          v-model="firstName"
         />
         <p class="error" v-if="errors.firstName">{{errors.firstName}}</p>
       </div>
       <div class="student-info--form-group">
         <label for="student-info__last-name">Last Name</label>
-        <input
+        <Field
+          name="lastName"
           type="text"
           id="student-info__last-name"
-          v-model="lastName"
         />
         <p class="error" v-if="errors.lastName">{{errors.lastName}}</p>
       </div>
@@ -62,7 +62,7 @@ import StudentStore from '@/store/modules/student';
 import GlobalStore from '@/store/modules/global';
 import { useRouter, useRoute } from 'vue-router';
 import { defineComponent, onMounted, computed } from 'vue';
-import { useField, useForm } from 'vee-validate';
+import { Field, useField, useForm } from 'vee-validate';
 import Apollo from '@/services/Apollo';
 import gqlSearchAccounts from '@/graphql/studentsByAccountNumber.gql';
 import gqlStudentById from '@/graphql/studentById.gql';
@@ -73,6 +73,7 @@ import gqlStudentById from '@/graphql/studentById.gql';
 export default defineComponent({
   components: {
     StudentSelector,
+    Field,
   },
   setup() {
     const router = useRouter();
@@ -158,11 +159,14 @@ export default defineComponent({
       return true;
     }
 
-    const form = useForm();
-    const { value: accountNumber } = useField('accountNumber', validateAccountUnique);
-    const { value: email } = useField('email', validateEmail);
-    const { value: firstName } = useField('firstName', validateName);
-    const { value: lastName } = useField('lastName', validateName);
+    const form = useForm({
+      validationSchema: {
+        accountNumber: validateAccount,
+        email: validateEmail,
+        firstName: validateName,
+        lastName: validateName,
+      },
+    });
 
     /**
      * Fire off an update when the user submits the form.
@@ -265,10 +269,6 @@ export default defineComponent({
       StudentStore,
       handleSelection,
       handleClear,
-      accountNumber,
-      email,
-      firstName,
-      lastName,
       errors: form.errors,
       handleSubmit,
       params,

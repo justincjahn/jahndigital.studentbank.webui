@@ -64,11 +64,16 @@
   height: 100%;
 }
 
-@mixin table($selectable: true) {
-  width: 100%;
-  border-spacing: 0;
+@mixin round-border() {
   border: 1px solid colorStep(primary, $step: 8);
   border-radius: 0.25rem;
+}
+
+@mixin table($selectable: true) {
+  @include round-border();
+
+  width: 100%;
+  border-spacing: 0;
 
   & tr {
     text-align: left;
