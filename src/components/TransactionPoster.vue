@@ -27,6 +27,7 @@
           type="submit"
           class="primary"
           value="Post"
+          :disabled="loading"
         />
       </div>
     </form>
@@ -36,6 +37,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { useForm, Field } from 'vee-validate';
+import Money from '@/utils/money';
 
 export default defineComponent({
   props: {
@@ -43,11 +45,16 @@ export default defineComponent({
       type: Object as () => Share|null,
       required: false,
     },
+    loading: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   components: {
     Field,
   },
-  setup(props) {
+  setup(_, { emit }) {
     const { errors, resetForm, handleSubmit } = useForm({
       validationSchema: {
         amount: (value: string) => {
@@ -55,7 +62,7 @@ export default defineComponent({
 
           const num = +value;
           if (Number.isNaN(num)) return 'Amount must be a number.';
-          if (num === 0) return 'Amount cannot be zero.';
+          if (Money.round(num) === 0) return 'Amount cannot be zero.';
 
           return true;
         },
@@ -74,7 +81,8 @@ export default defineComponent({
      * Fire off an update when the user submits the form.
      */
     const onSubmit = handleSubmit(async (values) => {
-      console.log(values);
+      const amount = Money.fromNumber(+values.amount);
+      emit('submit', amount, values.comment);
       resetForm();
     });
 

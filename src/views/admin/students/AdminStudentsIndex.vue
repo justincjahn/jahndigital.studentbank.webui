@@ -59,10 +59,11 @@
 <script lang="ts">
 import StudentSelector from '@/components/StudentSelector.vue';
 import StudentStore from '@/store/modules/student';
+import ShareStore from '@/store/modules/share';
 import GlobalStore from '@/store/modules/global';
 import { useRouter, useRoute } from 'vue-router';
-import { defineComponent, onMounted, computed } from 'vue';
-import { Field, useField, useForm } from 'vee-validate';
+import { defineComponent, onMounted, computed, watch } from 'vue';
+import { Field, useForm } from 'vee-validate';
 import Apollo from '@/services/Apollo';
 import gqlSearchAccounts from '@/graphql/studentsByAccountNumber.gql';
 import gqlStudentById from '@/graphql/studentById.gql';
@@ -161,7 +162,7 @@ export default defineComponent({
 
     const form = useForm({
       validationSchema: {
-        accountNumber: validateAccount,
+        accountNumber: validateAccountUnique,
         email: validateEmail,
         firstName: validateName,
         lastName: validateName,

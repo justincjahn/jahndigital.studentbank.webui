@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, watchEffect } from 'vue';
-import Modal from './Modal.vue';
+import Modal from '@/components/Modal.vue';
 
 /**
  * This modal enables users to provide information about an instance.

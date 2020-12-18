@@ -1,7 +1,7 @@
 <template>
   <div class="sub-menu">
     <template v-if="InstanceState.selectedInstance">
-      <GroupSelector />
+      <group-selector />
     </template>
     <template v-else>
       <p>Please select an instance...</p>
@@ -27,8 +27,8 @@
 </template>
 
 <script lang="ts">
-import StudentList from '@/components/StudentList.vue';
-import GroupSelector from '@/components/GroupSelector.vue';
+import StudentList from '@/components/admin/groups/TheStudentList.vue';
+import GroupSelector from '@/components/admin/groups/TheGroupSelector.vue';
 
 import InstanceState from '@/store/modules/instance';
 import GroupState from '@/store/modules/group';

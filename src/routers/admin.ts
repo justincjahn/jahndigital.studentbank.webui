@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import AdminStudents from '@/views/AdminStudents.vue';
-import AdminStudentTransactions from '@/views/AdminStudents/Transactions.vue';
-import AdminStudentStocks from '@/views/AdminStudents/Stocks.vue';
-import AdminStudentPurchases from '@/views/AdminStudents/Purchases.vue';
-import AdminGroups from '@/views/AdminGroups.vue';
-import AdminLogin from '@/views/AdminLogin.vue';
+import AdminStudentsIndex from '@/views/admin/students/AdminStudentsIndex.vue';
+import AdminStudentTransactions from '@/views/admin/students/AdminStudentsTransactions.vue';
+import AdminStudentStocks from '@/views/admin/students/AdminStudentsStocks.vue';
+import AdminStudentPurchases from '@/views/admin/students/AdminStudentsPurchases.vue';
+import AdminGroupsIndex from '@/views/admin/groups/AdminGroupsIndex.vue';
+import AdminLogin from '@/views/admin/AdminLogin.vue';
 import About from '@/views/About.vue';
 
 const routes: Array<RouteRecordRaw> = [
@@ -17,7 +17,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/admin/students/:studentId?',
     name: 'Students',
-    component: AdminStudents,
+    component: AdminStudentsIndex,
     children: [
       {
         path: 'transactions',
@@ -42,7 +42,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/admin/groups/:groupId?',
     name: 'Groups',
-    component: AdminGroups,
+    component: AdminGroupsIndex,
   },
 
   {

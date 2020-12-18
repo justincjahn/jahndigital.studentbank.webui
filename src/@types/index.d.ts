@@ -6,6 +6,7 @@ interface Instance {
 
 interface Transaction {
   id: number;
+  targetShareId: number;
   transactionType: string;
   effectiveDate: string;
   comment?: string;

@@ -5,12 +5,12 @@
 
       <div class="main-nav__instances">
         <template v-if="UserStore.isAuthenticated">
-          <InstanceSelector />
+          <instance-selector />
         </template>
       </div>
 
       <div class="main-nav__login">
-        <LoginWidget />
+        <login-widget />
       </div>
     </section>
 
@@ -42,8 +42,8 @@
 </style>
 
 <script>
-import LoginWidget from '@/components/LoginWidget.vue';
-import InstanceSelector from '@/components/InstanceSelector.vue';
+import LoginWidget from '@/components/admin/navigation/TheLoginWidget.vue';
+import InstanceSelector from '@/components/admin/navigation/TheInstanceSelector.vue';
 import Modal from '@/components/Modal.vue';
 import UserStore from '@/store/modules/user';
 import GlobalState from '@/store/modules/global';

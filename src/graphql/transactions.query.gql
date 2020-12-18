@@ -18,6 +18,7 @@ query transactions(
     totalCount
     nodes {
       id
+      targetShareId
       transactionType
       effectiveDate
       comment

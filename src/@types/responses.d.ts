@@ -93,3 +93,7 @@ interface UpdateStudentResponse {
 interface UserLoginResponse {
   userLogin: AuthenticateResponse;
 }
+
+interface NewTransactionResponse {
+  newTransaction: Transaction;
+}

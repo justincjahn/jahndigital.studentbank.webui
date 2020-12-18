@@ -1,5 +1,5 @@
 <template>
-  <Select
+  <selector
     :options="InstanceState.instances"
     :key="(x) => x ? x.id : null"
     :value="(x) => x ? x.description : null"
@@ -32,9 +32,9 @@
         Delete...
       </li>
     </template>
-  </Select>
+  </selector>
 
-  <InstanceForm
+  <instance-form
     :show="isNewInstanceOpen"
     :description="
       isRename ? (
@@ -46,7 +46,7 @@
     @ok.self="handleInstanceInput"
     @cancel="toggleInstanceForm" />
 
-  <Modal
+  <modal
     :show="isModalOpen"
     title="Are you sure?"
     customClass="destructive"
@@ -56,13 +56,13 @@
     @cancel="toggleConfirmDelete"
   >
     This cannot be undone!
-  </Modal>
+  </modal>
 </template>
 
 <script lang="ts">
-import Select from '@/components/Select.vue';
+import Selector from '@/components/Select.vue';
 import Modal from '@/components/Modal.vue';
-import InstanceForm from '@/components/InstanceForm.vue';
+import InstanceForm from '@/components/admin/navigation/TheInstanceForm.vue';
 import GlobalState from '@/store/modules/global';
 import InstanceState from '@/store/modules/instance';
 import GroupState from '@/store/modules/group';
@@ -71,7 +71,7 @@ import { defineComponent, ref, watchEffect } from 'vue';
 
 export default defineComponent({
   components: {
-    Select,
+    Selector,
     Modal,
     InstanceForm,
   },

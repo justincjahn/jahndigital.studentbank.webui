@@ -13,7 +13,7 @@
         @click="selectShare(share)"
         :class="{ selected: share.id === selected?.id ?? false }"
       >
-        <th>{{share.shareType.name}}</th>
+        <th>{{share.shareType?.name ?? 'Unknown'}}</th>
         <td>{{
           new Intl.NumberFormat(
             'en-US',

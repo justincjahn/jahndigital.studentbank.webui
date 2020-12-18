@@ -5,6 +5,7 @@ import store from '@/store';
 import Apollo from '@/services/Apollo';
 import StudentsWithShares from '@/graphql/studentsWithShares.query.gql';
 import UpdateStudent from '@/graphql/updateStudent.mutation.gql';
+import gqlStudentById from '@/graphql/studentById.gql';
 import { FETCH_OPTIONS } from '@/constants';
 
 type FetchOptions = {
@@ -110,6 +111,35 @@ class StudentState extends VuexModule implements State.IStudentState {
     } catch (e) {
       throw e?.message ?? e;
     }
+  }
+
+  /**
+   * Refresh the currently selected student from the API.
+   */
+  @MutationAction
+  async refreshSelectedStudent() {
+    const self = this as Record<string, any>;
+
+    if (self.state.selectedStudent === null) return {};
+
+    try {
+      const res = await Apollo.query<StudentResponse>({
+        query: gqlStudentById,
+        variables: {
+          id: self.state.selectedStudent.id,
+        },
+      });
+
+      if (res.data) {
+        return {
+          selectedStudent: res.data.students.nodes[0],
+        };
+      }
+    } catch (e) {
+      throw e?.message ?? e;
+    }
+
+    return {};
   }
 
   /**

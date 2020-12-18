@@ -13,3 +13,10 @@ interface UpdateGroupRequest {
   name?: string;
   instanceId?: number;
 }
+
+interface NewTransactionRequest {
+  shareId: number;
+  amount: number;
+  comment?: string;
+  takeNegative?: boolean = false;
+}

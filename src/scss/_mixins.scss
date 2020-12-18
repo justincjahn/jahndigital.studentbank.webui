@@ -75,6 +75,10 @@
   width: 100%;
   border-spacing: 0;
 
+  &.loading {
+    opacity: 0.5;
+  }
+
   & tr {
     text-align: left;
   }

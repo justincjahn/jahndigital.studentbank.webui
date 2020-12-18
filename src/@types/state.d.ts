@@ -33,7 +33,17 @@ declare namespace State {
     loading: boolean;
   }
 
+  interface IShareState {
+    id?: number;
+    selectedShare: Share|null;
+    transactions: Transaction[];
+    totalCount: number;
+    pageInfo: PageInfo|null;
+    loading: boolean;
+  }
+
   interface IRootState {
+    share: IShareState;
     user: IUserState;
     instance: IInstanceState;
     group: IGroupState;
