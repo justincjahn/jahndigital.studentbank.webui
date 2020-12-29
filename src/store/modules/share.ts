@@ -94,8 +94,6 @@ class ShareState extends VuexModule implements State.IShareState {
     const { targetShareId } = self.state.transactions[0] ?? { targetShareId: -1 };
     const { endCursor } = self.state.pageInfo;
 
-    console.log(self.state.pageInfo.endCursor);
-
     try {
       const res = await Apollo.query<PagedTransactionResponse>({
         query: gqlTransactions,
@@ -134,6 +132,7 @@ class ShareState extends VuexModule implements State.IShareState {
    */
   @MutationAction
   async fetchPreviousTransactions() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const self = this as Record<string, any>;
     self.commit('setShareLoading', true);
 

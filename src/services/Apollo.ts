@@ -16,13 +16,6 @@ import { setContext } from '@apollo/client/link/context';
 import { ERROR_CODES, API_ENDPOINT } from '@/constants';
 
 /**
- * The Apollo HTTP Link to use when querying the server.
- */
-const httpLink = createHttpLink({
-  uri: API_ENDPOINT,
-});
-
-/**
  * Extra logging for failed requests.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -68,23 +61,11 @@ const errorLink = onError(({ networkError, graphQLErrors }: any) => {
 });
 
 /**
- * Inject authentication headers into every query sent to the server.
- */
-const authLink = setContext(async (_, { headers }) => {
-  const token = UserStore.jwtToken;
-
-  return {
-    headers: {
-      ...headers,
-      Authorization: token ? `Bearer ${token}` : '',
-    },
-  };
-});
-
-/**
  * Automatically attempt to refresh the user's JWT token using the stored refresh token.
  */
 const tokenLink = new TokenRefreshLink({
+  accessTokenField: 'jwtToken',
+
   isTokenValidOrUndefined: () => {
     if (UserStore.jwtToken === null) return true;
     if (!UserStore.isAuthenticated) return false;
@@ -92,7 +73,7 @@ const tokenLink = new TokenRefreshLink({
     return true;
   },
 
-  fetchAccessToken: () => {
+  fetchAccessToken: (): Promise<Response> => {
     // Instead of using Apollo to fetch the refresh tokens, we use the fetch API because
     // cyclic dependencies... and also the TokenRefreshLink doesn't support it.
     // @note Refresh tokens are stored in an HttpOnly cookie.
@@ -136,9 +117,9 @@ const tokenLink = new TokenRefreshLink({
     });
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, arrow-body-style
   handleResponse: (operation: Operation, accessTokenField: string) => (response: Response) => {
-    const r = response
+    return response
       .text()
       .then((bodyText) => {
         if (typeof bodyText !== 'string' || !bodyText.length) {
@@ -177,21 +158,7 @@ const tokenLink = new TokenRefreshLink({
             );
           }
 
-          // Update the context to use the new JWT token
-          const context = operation.getContext();
-          context.headers = {
-            ...context.headers,
-            Authorization: `Bearer ${data.jwtToken}`,
-          };
-
-          operation.setContext(context);
-
-          return {
-            data: {
-              // eslint-disable-next-line @typescript-eslint/camelcase
-              access_token: data.jwtToken,
-            },
-          };
+          return data;
         }
 
         return throwServerError(
@@ -200,8 +167,6 @@ const tokenLink = new TokenRefreshLink({
           'Response not successful: no token returned.',
         );
       });
-
-    return r;
   },
 
   handleFetch: (accessToken) => {
@@ -219,10 +184,32 @@ const tokenLink = new TokenRefreshLink({
 });
 
 /**
+ * Inject authentication headers into every query sent to the server.
+ */
+const authLink = setContext((_, { headers }) => {
+  const token = UserStore.jwtToken;
+
+  return {
+    headers: {
+      ...headers,
+      Authorization: token ? `Bearer ${token}` : '',
+    },
+  };
+});
+
+/**
+ * The Apollo HTTP Link to use when querying the server.
+ */
+const httpLink = createHttpLink({
+  uri: API_ENDPOINT,
+});
+
+/**
  * The default Apollo client used by services.
  */
 const defaultClient = new ApolloClient({
-  link: ApolloLink.from([authLink, errorLink, tokenLink, httpLink]),
+  // @note Ordering is important here
+  link: ApolloLink.from([errorLink, tokenLink, authLink, httpLink]),
   cache: new InMemoryCache(),
 });
 
