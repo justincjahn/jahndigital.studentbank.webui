@@ -68,6 +68,11 @@ export default defineComponent({
       default: null,
     },
   },
+  emits: [
+    'ok',
+    'cancel',
+    'focus',
+  ],
   setup(props, { emit }) {
     const root = ref<HTMLDivElement|null>(null);
     const okButton = ref<HTMLButtonElement|null>(null);
