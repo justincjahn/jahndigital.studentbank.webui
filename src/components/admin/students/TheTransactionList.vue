@@ -11,7 +11,10 @@
     </thead>
     <tbody v-if="ShareStore.transactions.length > 0">
       <tr v-for="transaction in ShareStore.transactions" :key="transaction.id">
-        <td>{{new Date(transaction.effectiveDate).toLocaleDateString("en-US")}}</td>
+        <td>
+          {{new Date(transaction.effectiveDate).toLocaleDateString('en-US')}}
+          {{new Date(transaction.effectiveDate).toLocaleTimeString('en-US')}}
+        </td>
         <td class="center">{{transaction.transactionType}}</td>
         <td>{{transaction.comment}}</td>
         <td class="right">{{

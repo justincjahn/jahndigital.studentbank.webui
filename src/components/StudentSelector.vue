@@ -42,8 +42,20 @@
                 v-for="share in student.shares ?? []"
                 :key="share.id"
               >
-                <span class="student-search__input__results__item__shares__item--name">{{share.shareType.name.substring(0, 3).toUpperCase()}}</span>
-                <span class="student-search__input__results__item__shares__item--balance">${{share.balance}}</span>
+                <span class="student-search__input__results__item__shares__item--name">
+                  {{share.shareType.name.substring(0, 3).toUpperCase()}}
+                </span>
+                <span class="student-search__input__results__item__shares__item--balance">
+                  {{
+                    new Intl.NumberFormat(
+                      'en-US',
+                      {
+                        style: 'currency',
+                        currency: 'USD',
+                      }
+                    ).format(share.balance)
+                  }}
+                </span>
               </li>
             </ul>
           </li>
@@ -67,8 +79,20 @@
                 v-for="share in student.shares ?? []"
                 :key="share.id"
               >
-                <span class="student-search__input__results__item__shares__item--name">{{share.shareType.name.substring(0, 3).toUpperCase()}}</span>
-                <span class="student-search__input__results__item__shares__item--balance">${{share.balance}}</span>
+                <span class="student-search__input__results__item__shares__item--name">
+                  {{share.shareType.name.substring(0, 3).toUpperCase()}}
+                </span>
+                <span class="student-search__input__results__item__shares__item--balance">
+                  {{
+                    new Intl.NumberFormat(
+                      'en-US',
+                      {
+                        style: 'currency',
+                        currency: 'USD',
+                      }
+                    ).format(share.balance)
+                  }}
+                </span>
               </li>
             </ul>
           </li>
