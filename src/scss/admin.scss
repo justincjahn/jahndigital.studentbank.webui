@@ -11,6 +11,7 @@ body {
   background-color:        map.get($theme, secondary, color);
   margin:                  0px auto;
   max-width:               1200px;
+  overflow-y:              scroll; /* Show vertical scrollbar to prevent shifting of elements */
 }
 
 label {

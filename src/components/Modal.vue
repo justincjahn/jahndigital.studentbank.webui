@@ -1,31 +1,33 @@
 <template>
-  <div class="modal" ref="root" :class="[{ 'modal--open': show, 'modal--hidden': !show && closedBefore }, customClass]">
-    <div class="modal__container">
-      <div v-if="title" class="modal__container__title">
-        <slot name="title"><h1>{{title}}</h1></slot>
-      </div>
-      <div class="modal__container__content"><slot /></div>
-      <div class="modal__container__buttons">
-        <slot name="buttons">
-          <button
-            tabindex="1"
-            class="modal__container__buttons__cancel"
-            v-if="cancelLabel"
-            @click.prevent="handleCancel"
-          >
-            {{cancelLabel}}
-          </button>
-          <button
-            tabindex="0"
-            class="modal__container__buttons__ok primary"
-            @click.prevent="handleOk" ref="okButton"
-          >
-            {{okLabel}}
-          </button>
-        </slot>
+  <Teleport to="#modal">
+    <div class="modal" ref="root" :class="[{ 'modal--open': show, 'modal--hidden': !show && closedBefore }, customClass]">
+      <div class="modal__container">
+        <div v-if="title" class="modal__container__title">
+          <slot name="title"><h1>{{title}}</h1></slot>
+        </div>
+        <div class="modal__container__content"><slot /></div>
+        <div class="modal__container__buttons">
+          <slot name="buttons">
+            <button
+              tabindex="1"
+              class="modal__container__buttons__cancel"
+              v-if="cancelLabel"
+              @click.prevent="handleCancel"
+            >
+              {{cancelLabel}}
+            </button>
+            <button
+              tabindex="0"
+              class="modal__container__buttons__ok primary"
+              @click.prevent="handleOk" ref="okButton"
+            >
+              {{okLabel}}
+            </button>
+          </slot>
+        </div>
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <script lang="ts">
