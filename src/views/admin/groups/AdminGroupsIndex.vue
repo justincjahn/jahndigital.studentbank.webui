@@ -20,6 +20,12 @@
     <div class="sub-menu__bulk-buttons">
       <button @click.prevent="resolve">Resolve</button>
       <button @click.prevent="selection.clear">Clear Selection</button>
+      <button @click.prevent="handleShowBulkTransactionModal()">Bulk Transaction</button>
+      <bulk-post-modal
+        :show="showBulkTransactionModal"
+        @ok="handleBulkTransactionModalOk()"
+        @cancel="handleBulkTransactionModalCancel()"
+      />
     </div>
   </div>
 
@@ -29,18 +35,21 @@
 <script lang="ts">
 import StudentList from '@/components/admin/groups/TheStudentList.vue';
 import GroupSelector from '@/components/admin/groups/TheGroupSelector.vue';
-
+import BulkPostModal from '@/components/admin/groups/BulkPostModal.vue';
 import InstanceState from '@/store/modules/instance';
 import GroupState from '@/store/modules/group';
-
 import selection from '@/services/StudentSelectionService';
+import { ref } from 'vue';
 
 export default {
   components: {
     StudentList,
     GroupSelector,
+    BulkPostModal,
   },
   setup() {
+    const showBulkTransactionModal = ref(false);
+
     /**
      * Resolve the selection into a list of students.
      */
@@ -54,11 +63,27 @@ export default {
       }
     }
 
+    function handleShowBulkTransactionModal() {
+      showBulkTransactionModal.value = true;
+    }
+
+    function handleBulkTransactionModalOk() {
+      showBulkTransactionModal.value = false;
+    }
+
+    function handleBulkTransactionModalCancel() {
+      showBulkTransactionModal.value = false;
+    }
+
     return {
       InstanceState,
       GroupState,
       resolve,
       selection,
+      showBulkTransactionModal,
+      handleShowBulkTransactionModal,
+      handleBulkTransactionModalOk,
+      handleBulkTransactionModalCancel,
     };
   },
 };

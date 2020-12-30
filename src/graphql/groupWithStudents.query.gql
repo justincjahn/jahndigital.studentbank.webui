@@ -10,6 +10,15 @@ query GroupWithShares($id: Long) {
         firstName
         lastName
         groupId
+        shares {
+          id
+          balance
+          shareTypeId
+          shareType {
+            name
+            dividendRate
+          }
+        }
       }
     }
   }

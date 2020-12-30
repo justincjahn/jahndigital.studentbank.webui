@@ -35,6 +35,7 @@ query studentsByName($name: String!) {
       shares {
         id
         balance
+        shareTypeId
         shareType {
           name
           dividendRate

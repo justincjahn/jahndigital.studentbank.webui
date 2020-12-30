@@ -15,7 +15,9 @@ query studentsWithShares($groupId: Long, $first: PaginationAmount, $after: Strin
       lastName
       email
       shares {
+        id
         balance
+        shareTypeId
         shareType {
           name
           dividendRate

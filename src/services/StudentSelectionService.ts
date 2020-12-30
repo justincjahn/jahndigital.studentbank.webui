@@ -1,6 +1,6 @@
-import { gql } from '@apollo/client/core';
 import Apollo from '@/services/Apollo';
 import { reactive } from 'vue';
+import gqlStudentsWithShares from '@/graphql/studentsWithShares.query.gql';
 
 /**
  * Possible types for the IStudentSelection object.
@@ -281,28 +281,13 @@ export class StudentSelection extends Array<IStudentSelection> {
   async resolve(): Promise<Student[]> {
     let students: Student[] = [];
 
-    const query = gql`
-      query students($groupId: Long) {
-        students(where: {groupId: $groupId}, order_by: {accountNumber: ASC}) {
-          nodes {
-            id
-            groupId
-            accountNumber
-            firstName
-            lastName
-            email
-          }
-        }
-      }
-    `;
-
     // Resolve the groups first (will need to fetch from server)
     const groups = this.getGroups();
     try {
       await Promise.all(groups.map(async (group) => {
         try {
           const studentList = await Apollo.query<StudentResponse>({
-            query,
+            query: gqlStudentsWithShares,
             variables: {
               groupId: group.id,
             },

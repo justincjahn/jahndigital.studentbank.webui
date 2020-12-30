@@ -16,11 +16,14 @@
 
   &:disabled {
     cursor: inherit;
-    color: colorStep($class, $darken: false, $step: 10, $colorMap: font-color);
+    color: rgba(colorStep($class, $colorMap: 'font-color'), 0.5);
+    background-color: colorStep($class);
+    border-color: colorStep($class, $darken: false, $step: 1);
 
     &:hover, &:focus, &:active {
-      color: colorStep($class, $darken: false, $step: 10, $colorMap: font-color);
-      background-color: inherit;
+      color: rgba(colorStep($class, $colorMap: 'font-color'), 0.5);
+      background-color: colorStep($class, $darken: true);
+      border-color: colorStep($class, $darken: false, $step: 1);
     }
   }
 

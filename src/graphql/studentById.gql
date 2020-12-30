@@ -21,6 +21,7 @@ query studentsById($id: Long!) {
       shares {
         id
         balance
+        shareTypeId
         shareType {
           name
           dividendRate

@@ -7,7 +7,12 @@
         </div>
         <div class="modal__container__content"><slot /></div>
         <div class="modal__container__buttons">
-          <slot name="buttons">
+          <slot name="buttons"
+            :cancelLabel="cancelLabel"
+            :okLabel="okLabel"
+            :handleCancel="handleCancel"
+            :handleOk="handleOk"
+          >
             <button
               tabindex="1"
               class="modal__container__buttons__cancel"

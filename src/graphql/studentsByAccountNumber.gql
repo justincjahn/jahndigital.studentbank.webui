@@ -30,6 +30,7 @@ query studentsByAcccountNumber($accountNumber: String!) {
       shares {
         id
         balance
+        shareTypeId
         shareType {
           name
           dividendRate
