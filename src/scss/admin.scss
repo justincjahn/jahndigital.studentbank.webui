@@ -36,6 +36,10 @@ button.destructive, input[type=submit].destructive {
   @include button(button-destructive);
 }
 
+p.error, span.error, strong.error {
+  color: map.get($theme, button-destructive, color);
+}
+
 #app {
   min-height: 100vh;
   display: flex;

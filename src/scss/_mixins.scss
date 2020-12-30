@@ -18,12 +18,12 @@
     cursor: inherit;
     color: rgba(colorStep($class, $colorMap: 'font-color'), 0.5);
     background-color: colorStep($class);
-    border-color: colorStep($class, $darken: false, $step: 1);
+    border-color: colorStep($class, $darken: true);
 
     &:hover, &:focus, &:active {
       color: rgba(colorStep($class, $colorMap: 'font-color'), 0.5);
       background-color: colorStep($class, $darken: true);
-      border-color: colorStep($class, $darken: false, $step: 1);
+      border-color: colorStep($class, $darken: true);
     }
   }
 

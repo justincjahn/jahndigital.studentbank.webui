@@ -18,9 +18,8 @@
     </div>
 
     <div class="sub-menu__bulk-buttons">
-      <button @click.prevent="resolve">Resolve</button>
-      <button @click.prevent="selection.clear">Clear Selection</button>
-      <button @click.prevent="handleShowBulkTransactionModal()">Bulk Transaction</button>
+      <button :disabled="!hasSelection" @click.prevent="selection.clear">Clear Selection</button>
+      <button :disabled="!hasSelection" @click.prevent="handleShowBulkTransactionModal()">Bulk Transaction</button>
       <bulk-post-modal
         :show="showBulkTransactionModal"
         @ok="handleBulkTransactionModalOk()"
@@ -39,7 +38,7 @@ import BulkPostModal from '@/components/admin/groups/BulkPostModal.vue';
 import InstanceState from '@/store/modules/instance';
 import GroupState from '@/store/modules/group';
 import selection from '@/services/StudentSelectionService';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 export default {
   components: {
@@ -50,18 +49,11 @@ export default {
   setup() {
     const showBulkTransactionModal = ref(false);
 
-    /**
-     * Resolve the selection into a list of students.
-     */
-    async function resolve() {
-      try {
-        const data = await selection.resolve();
-        console.log(data);
-      } catch (error) {
-        // eslint-disable-next-line no-alert
-        alert(error?.message ?? error);
-      }
-    }
+    const hasSelection = computed(() => {
+      if (selection.getGroups().length > 0) return true;
+      if (selection.getStudents().length > 0) return true;
+      return false;
+    });
 
     function handleShowBulkTransactionModal() {
       showBulkTransactionModal.value = true;
@@ -78,8 +70,8 @@ export default {
     return {
       InstanceState,
       GroupState,
-      resolve,
       selection,
+      hasSelection,
       showBulkTransactionModal,
       handleShowBulkTransactionModal,
       handleBulkTransactionModalOk,

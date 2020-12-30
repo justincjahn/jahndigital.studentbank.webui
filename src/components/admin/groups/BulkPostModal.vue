@@ -6,16 +6,26 @@
     @ok="handleOk"
     @cancel="handleCancel"
     title="Bulk Transaction"
+    customClass="bulk-post-modal"
   >
     <template #default>
       <p>
-        You have {{selection.getStudents().length}} student(s) selected,
-        {{selection.getGroups().length}} group(s) selected, and
-        {{selection.getExcludedStudents().length}} exclusion(s).
-      </p>
+        You have {{selection.getStudents().length}}
+        {{selection.getStudents().length == 1 ? 'student' : 'students'}} selected,
 
-      <p v-if="loading">Please wait...</p>
-      <p v-else>This transaction will post to a total of {{students.length}} students.</p>
+        {{selection.getGroups().length}}
+        {{selection.getGroups().length == 1 ? 'group' : 'groups'}} selected, and
+
+        {{selection.getExcludedStudents().length}}
+        {{selection.getExcludedStudents().length == 1 ? 'exclusion' : 'exclusions'}}.
+
+        <template v-if="loading">Please wait...</template>
+        <strong v-else-if="students.length <= 0" class="error">Please select some students to begin!</strong>
+        <template v-else>
+          This transaction will post to a total of {{students.length}}
+          {{students.length > 1 ? 'students' : 'student'}}.
+        </template>
+      </p>
     </template>
     <template #buttons="{ okLabel, handleOk, cancelLabel, handleCancel }">
       <button @click.prevent="handleCancel">{{cancelLabel}}</button>
@@ -25,7 +35,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watchEffect } from 'vue';
+import { defineComponent, ref, watchEffect, computed } from 'vue';
 import selection from '@/services/StudentSelectionService';
 import Modal from '@/components/Modal.vue';
 
@@ -44,9 +54,14 @@ export default defineComponent({
     'cancel',
   ],
   setup(props, { emit }) {
-    const isValid = ref(false);
     const loading = ref(false);
     const students = ref<Student[]>([]);
+
+    const isValid = computed(() => {
+      if (loading.value) return false;
+      if (students.value.length === 0) return false;
+      return true;
+    });
 
     /**
      * Fired when the user clicks 'OK', or hits Enter.
@@ -69,7 +84,6 @@ export default defineComponent({
         loading.value = true;
         students.value = await selection.resolve();
         loading.value = false;
-        isValid.value = true;
       }
     });
 
@@ -86,5 +100,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-
+.bulk-post-modal {
+  p + p {
+    margin-top: 1em;
+  }
+}
 </style>
