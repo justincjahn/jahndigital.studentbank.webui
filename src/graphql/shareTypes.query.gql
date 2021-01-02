@@ -1,0 +1,19 @@
+query ShareTypes {
+  shareTypes {
+    pageInfo {
+      startCursor
+      endCursor
+      hasNextPage
+      hasPreviousPage
+    }
+    totalCount
+    nodes {
+      id
+      name
+      dividendRate
+      shareTypeInstances {
+        instanceId
+      }
+    }
+  }
+}

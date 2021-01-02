@@ -14,7 +14,7 @@ interface DeleteInstanceResponse {
   deleteInstance: boolean;
 }
 
-type GroupResponse = {
+interface GroupResponse {
   groups: {
     nodes: Group[];
   };
@@ -96,4 +96,10 @@ interface UserLoginResponse {
 
 interface NewTransactionResponse {
   newTransaction: Transaction;
+}
+
+interface ShareTypeResponse {
+  shareTypes: {
+    nodes: ShareType[];
+  };
 }

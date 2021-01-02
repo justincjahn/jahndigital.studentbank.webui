@@ -22,7 +22,7 @@ interface ShareType {
 
 interface Share {
   id: number;
-  typeId: number;
+  shareTypeId: number;
   balance: number;
   shareType?: ShareType;
 }
@@ -80,6 +80,14 @@ interface PageInfo {
   hasPreviousPage: boolean;
   startCursor: string;
   endCursor: string;
+}
+
+type ShareTypeInstances = { instanceId: number }
+interface ShareType {
+  id: number;
+  name: string;
+  dividendRate: number;
+  shareTypeInstances: ShareTypeInstances[];
 }
 
 /// <reference path="./requests.d.ts" />
