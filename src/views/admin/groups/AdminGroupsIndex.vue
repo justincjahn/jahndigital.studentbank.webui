@@ -20,11 +20,19 @@
     <div class="sub-menu__bulk-buttons">
       <button :disabled="!hasSelection" @click.prevent="selection.clear">Clear Selection</button>
       <button :disabled="!hasSelection" @click.prevent="handleShowBulkTransactionModal()">Bulk Transaction</button>
-      <bulk-post-modal
-        :show="showBulkTransactionModal"
-        @ok="handleBulkTransactionModalOk()"
-        @cancel="handleBulkTransactionModalCancel()"
-      />
+
+      <Suspense>
+        <template #default>
+          <bulk-post-modal
+            :show="showBulkTransactionModal"
+            @ok="handleBulkTransactionModalOk()"
+            @cancel="handleBulkTransactionModalCancel()"
+          />
+        </template>
+        <template #fallback>
+          <!-- Show nothing! -->
+        </template>
+      </Suspense>
     </div>
   </div>
 
@@ -34,11 +42,15 @@
 <script lang="ts">
 import StudentList from '@/components/admin/groups/TheStudentList.vue';
 import GroupSelector from '@/components/admin/groups/TheGroupSelector.vue';
-import BulkPostModal from '@/components/admin/groups/BulkPostModal.vue';
 import InstanceState from '@/store/modules/instance';
 import GroupState from '@/store/modules/group';
 import selection from '@/services/StudentSelectionService';
-import { ref, computed } from 'vue';
+import { ref, computed, defineAsyncComponent } from 'vue';
+
+// This is a big boi
+const BulkPostModal = defineAsyncComponent(
+  () => import('@/components/admin/groups/BulkPostModal.vue'),
+);
 
 export default {
   components: {

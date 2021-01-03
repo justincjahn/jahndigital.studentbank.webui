@@ -163,7 +163,7 @@ export default defineComponent({
   &__items {
     display: none;
     position: absolute;
-    z-index: 100;
+    z-index: 999;
     list-style: none;
     margin: 0;
     width: 100%;

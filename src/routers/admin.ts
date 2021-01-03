@@ -3,7 +3,6 @@ import AdminStudentsIndex from '@/views/admin/students/AdminStudentsIndex.vue';
 import AdminStudentTransactions from '@/views/admin/students/AdminStudentsTransactions.vue';
 import AdminStudentStocks from '@/views/admin/students/AdminStudentsStocks.vue';
 import AdminStudentPurchases from '@/views/admin/students/AdminStudentsPurchases.vue';
-import AdminGroupsIndex from '@/views/admin/groups/AdminGroupsIndex.vue';
 import AdminLogin from '@/views/admin/AdminLogin.vue';
 import About from '@/views/About.vue';
 
@@ -42,7 +41,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/admin/groups/:groupId?',
     name: 'Groups',
-    component: AdminGroupsIndex,
+    component: () => import('@/views/admin/groups/AdminGroupsIndex.vue'),
   },
 
   {

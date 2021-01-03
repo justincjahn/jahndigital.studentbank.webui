@@ -55,7 +55,8 @@
       "no-console": "off",
       "@typescript-eslint/interface-name-prefix": "off",
       "object-curly-newline": "off",
-      "max-len": "off"
+      "max-len": "off",
+      "no-underscore-dangle": ["error", { "allowAfterThis": true }]
     }
   },
   "browserslist": [

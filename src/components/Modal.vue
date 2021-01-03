@@ -1,6 +1,10 @@
 <template>
   <Teleport to="#modal">
-    <div class="modal" ref="root" :class="[{ 'modal--open': show, 'modal--hidden': !show && closedBefore }, customClass]">
+    <div
+      class="modal"
+      ref="root"
+      :class="[{ 'modal--open': show, 'modal--hidden': !show && closedBefore }, customClass]"
+    >
       <div class="modal__container">
         <div v-if="title" class="modal__container__title">
           <slot name="title"><h1>{{title}}</h1></slot>
@@ -226,6 +230,19 @@ export default defineComponent({
 
   &.destructive .modal__container__buttons .modal__container__buttons__ok {
     @include button(button-destructive);
+  }
+
+  // Large modal container is attached to the top of the window and spans the page
+  &.large {
+    .modal__container {
+      margin: 0 auto;
+      width: 90%;
+      max-width: 1080px;
+      max-height: 90vh;
+      overflow: auto;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
   }
 }
 
