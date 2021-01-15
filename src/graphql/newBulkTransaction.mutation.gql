@@ -1,0 +1,14 @@
+mutation newBulkTransaction($shares: [NewTransactionRequestInput!]!, $skipNegative: Boolean!) {
+  newBulkTransaction(
+    input: $shares,
+    skipBelowNegative: $skipNegative
+  ) {
+    id
+    targetShareId
+    transactionType
+    effectiveDate
+    comment
+    amount
+    newBalance
+  }
+}

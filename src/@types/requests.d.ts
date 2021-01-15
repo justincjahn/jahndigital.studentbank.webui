@@ -20,3 +20,8 @@ interface NewTransactionRequest {
   comment?: string;
   takeNegative?: boolean = false;
 }
+
+interface NewBulkTransactionRequest {
+  shares: NewTransactionRequest[];
+  skipNegative: boolean;
+}

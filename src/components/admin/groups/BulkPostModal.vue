@@ -146,7 +146,10 @@
       <button @click.prevent="handleCancel">{{cancelLabel}}</button>
       <button @click.prevent="state.decrementStep()" v-if="state.hasPreviousStep()">Previous</button>
       <button :disabled="!isValid" @click.prevent="state.incrementStep()" v-if="state.hasNextStep()">Next</button>
-      <button class="primary" :disabled="!isValid" @click.prevent="handleOk" v-if="!state.hasNextStep()">{{okLabel}}</button>
+      <button class="primary" :disabled="!isValid" @click.prevent="handleOk" v-if="!state.hasNextStep()">
+        <template v-if="!state.isLoading">{{okLabel}}</template>
+        <template v-else><loading-icon>Posting...</loading-icon></template>
+      </button>
     </template>
   </modal>
 </template>
@@ -159,11 +162,14 @@ import Modal from '@/components/Modal.vue';
 import ShareTypeSelector from '@/components/ShareTypeSelector.vue';
 import Money from '@/utils/money';
 import GroupState from '@/store/modules/group';
+import LoadingIcon from '@/components/LoadingIcon.vue';
+import GlobalState from '@/store/modules/global';
 
 export default defineComponent({
   components: {
     Modal,
     ShareTypeSelector,
+    LoadingIcon,
   },
   props: {
     show: {
@@ -288,9 +294,10 @@ export default defineComponent({
     }
 
     /**
-     * Fired when the user clicks 'OK', or hits Enter.
+     * Fired when the user clicks 'OK', or hits Enter.  Either moves to the next step
+     * or attempts to post the transactions and emits an 'ok' event.
      */
-    function handleOk() {
+    async function handleOk() {
       // Only allow the posting logic to run if there is a valid state.
       if (!isValid.value) return;
 
@@ -299,7 +306,13 @@ export default defineComponent({
         return;
       }
 
-      emit('ok');
+      // We're on the last step
+      try {
+        const data = await bulkPostState.post();
+        emit('ok', data);
+      } catch (e) {
+        GlobalState.setCurrentError(e?.message ?? e);
+      }
     }
 
     /**

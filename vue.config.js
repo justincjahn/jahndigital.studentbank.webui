@@ -40,6 +40,7 @@ module.exports = {
       sass: {
         prependData: `
           @use 'sass:map';
+          @use 'sass:math';
           @import "@/scss/_variables.scss";
           @import "@/scss/_mixins.scss";
         `,

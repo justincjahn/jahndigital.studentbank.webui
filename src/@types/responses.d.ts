@@ -98,6 +98,10 @@ interface NewTransactionResponse {
   newTransaction: Transaction;
 }
 
+interface NewBulkTransactionResponse {
+  newBulkTransaction: Transaction[];
+}
+
 interface ShareTypeResponse {
   shareTypes: {
     nodes: ShareType[];

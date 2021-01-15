@@ -1,5 +1,7 @@
 import Money from '@/utils/money';
 import { useField } from 'vee-validate';
+import Apollo from '@/services/Apollo';
+import gqlNewBulkTransaction from '@/graphql/newBulkTransaction.mutation.gql';
 import studentSelection from './StudentSelectionService';
 
 const PostingPolicy = ['none', 'skip', 'take'];
@@ -146,6 +148,43 @@ export default class BulkPostService {
     }
 
     this._loading = false;
+  }
+
+  // Post the selected transactions
+  async post(): Promise<Transaction[]> {
+    this._loading = true;
+
+    const req: NewBulkTransactionRequest = {
+      shares: [],
+      skipNegative: this.postingPolicyField.value === 'skip',
+    };
+
+    const takeNegative = this.postingPolicyField.value === 'take';
+    this.selectedShares.forEach((share) => {
+      req.shares.push({
+        amount: this.amountField.value,
+        shareId: share.id,
+        comment: this.commentField.value.length > 0 ? this.commentField.value : undefined,
+        takeNegative,
+      });
+    });
+
+    try {
+      const res = await Apollo.mutate<NewBulkTransactionResponse>({
+        mutation: gqlNewBulkTransaction,
+        variables: req,
+      });
+
+      if (res.data) {
+        return res.data.newBulkTransaction;
+      }
+
+      throw new Error('Unable post transaction: unknown error.');
+    } catch (e) {
+      throw e?.message ?? e;
+    } finally {
+      this._loading = false;
+    }
   }
 
   /**
