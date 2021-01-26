@@ -111,6 +111,10 @@ import gqlStudentsWithAccountNumber from '@/graphql/studentsByAccountNumber.gql'
 import { ref, defineComponent } from 'vue';
 
 export default defineComponent({
+  emits: [
+    'select',
+    'clear',
+  ],
   setup(_, { emit }) {
     const searchCriteria = ref('');
     const timerFunc = ref<number>(-1);

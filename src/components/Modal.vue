@@ -3,6 +3,7 @@
     <div
       class="modal"
       ref="root"
+      :style="modalStyle"
       :class="[{ 'modal--open': show, 'modal--hidden': !show && closedBefore }, customClass]"
     >
       <div class="modal__container">
@@ -16,21 +17,25 @@
             :okLabel="okLabel"
             :handleCancel="handleCancel"
             :handleOk="handleOk"
+            :canSubmit="canSubmit"
+            :canCancel="canCancel"
           >
             <button
               tabindex="1"
               class="modal__container__buttons__cancel"
               v-if="cancelLabel"
               @click.prevent="handleCancel"
+              :disabled="!canCancel"
             >
-              {{cancelLabel}}
+              <slot name="cancelLabel" :cancelLabel="cancelLabel" :canCancel="canCancel">{{cancelLabel}}</slot>
             </button>
             <button
               tabindex="0"
               class="modal__container__buttons__ok primary"
               @click.prevent="handleOk" ref="okButton"
+              :disabled="!canSubmit"
             >
-              {{okLabel}}
+              <slot name="okLabel" :okLabel="okLabel" :canSubmit="canSubmit">{{okLabel}}</slot>
             </button>
           </slot>
         </div>
@@ -40,7 +45,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onUnmounted, ref, watchEffect } from 'vue';
+import { computed, defineComponent, onUnmounted, ref, watchEffect } from 'vue';
 import GlobalStore from '@/store/modules/global';
 import debounce from '@/utils/debounce';
 
@@ -76,6 +81,16 @@ export default defineComponent({
       required: false,
       default: null,
     },
+    canSubmit: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    canCancel: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   emits: [
     'ok',
@@ -95,15 +110,13 @@ export default defineComponent({
       emit('cancel', e);
     }
 
-    // If the OK/Cancel button is focused and the enter key is pressed, prevent sending the event
-    // twice.
+    // If the OK/Cancel button is focused and the enter key is pressed, prevent sending the event twice.
     const handleOk = debounce(ok, 100);
     const handleCancel = debounce(props.cancelLabel ? cancel : () => undefined, 100);
 
-    /**
-     * Watch for Escape and Enter keypresses and call the appropriate handler.
-     */
+    // Watch for Escape and Enter keypresses and call the appropriate handler.
     function handleKeyPress(e: KeyboardEvent) {
+      // Ignore keypress if we're not the top modal
       if (root.value === null || GlobalStore.topModal !== root.value) {
         return;
       }
@@ -124,9 +137,11 @@ export default defineComponent({
       }
     }
 
+    // Fired when the modal is shown or hidden.
     watchEffect(() => {
       if (props.show === true) {
         closedBefore.value = true;
+        document.addEventListener('keyup', handleKeyPress);
 
         if (root.value !== null) {
           GlobalStore.openModal(root.value);
@@ -134,21 +149,16 @@ export default defineComponent({
       } else if (root.value !== null) {
         GlobalStore.closeModal(root.value);
       }
-    });
-
-    watchEffect(() => {
-      if (root.value !== null && GlobalStore.topModal === root.value) {
-        emit('focus', root.value);
-      }
-    });
-
-    watchEffect(() => {
-      if (props.show === true) {
-        document.addEventListener('keyup', handleKeyPress);
-      }
 
       if (props.show === false) {
         document.removeEventListener('keyup', handleKeyPress);
+      }
+    });
+
+    // When the modal is at the top level, emit a focus event.
+    watchEffect(() => {
+      if (root.value !== null && GlobalStore.topModal === root.value) {
+        emit('focus', root.value);
       }
     });
 
@@ -160,12 +170,17 @@ export default defineComponent({
       }
     });
 
+    const modalStyle = computed(() => ({
+      zIndex: (root.value !== null && GlobalStore.topModal === root.value) ? 100 : 50,
+    }));
+
     return {
       handleOk,
       handleCancel,
       root,
       okButton,
       closedBefore,
+      modalStyle,
     };
   },
 });

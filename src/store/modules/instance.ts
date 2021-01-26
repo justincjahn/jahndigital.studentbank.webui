@@ -61,6 +61,17 @@ class InstanceState extends VuexModule implements State.IInstanceState {
       const res = await Apollo.mutate<NewInstanceResponse>({
         mutation: InstanceNew,
         variables: input,
+        update(cache, data) {
+          const newInstance = data.data?.newInstance;
+          cache.writeQuery<InstanceResponse>({
+            query: InstanceQuery,
+            data: {
+              instances: {
+                nodes: [...self.state.instances, newInstance],
+              },
+            },
+          });
+        },
       });
 
       if (res.data) {

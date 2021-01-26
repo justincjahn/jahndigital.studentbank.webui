@@ -7,14 +7,14 @@
     msg="Select a group..."
     @select="handleSelection"
   >
-    <template v-slot:list="props">
+    <template #list="props">
       <li
         v-for="option in props.options"
         :key="option.id"
         :class="props.class"
         @click="props.select(option)"
       >
-        {{ option.name }}
+        {{option.name}}
       </li>
       <li class="select__items__divider"><hr /></li>
       <li :class="props.class" @click.prevent="startAdd">
@@ -53,9 +53,8 @@ import Select from '@/components/Select.vue';
 import GlobalState from '@/store/modules/global';
 import InstanceState from '@/store/modules/instance';
 import GroupState from '@/store/modules/group';
-import { computed, defineComponent, ref, watchEffect } from 'vue';
+import { computed, defineComponent, ref, watch, watchEffect } from 'vue';
 import Modal from '@/components/Modal.vue';
-import { useRoute, useRouter } from 'vue-router';
 
 enum ModalState {
   ADD,
@@ -63,18 +62,31 @@ enum ModalState {
   DELETE,
 }
 
+// TODO: Decouple selectedGroup, selection, and GroupState.selectedGroup
 export default defineComponent({
   components: {
     Select,
     Modal,
   },
-  setup() {
+  props: {
+    selectedGroup: {
+      type: Object as () => Group|null,
+      required: false,
+      default: null,
+    },
+  },
+  emits: [
+    'select',
+    'added',
+    'updated',
+    'deleted',
+  ],
+  setup(props, { emit }) {
     const modalState = ref<ModalState>(ModalState.ADD);
     const showModal = ref(false);
     const inputElement = ref<HTMLInputElement|null>(null);
     const input = ref('');
-    const router = useRouter();
-    const route = useRoute();
+    const selection = ref<Group|null>(props.selectedGroup);
 
     // The title of the modal window
     const modalTitle = computed(() => {
@@ -107,22 +119,6 @@ export default defineComponent({
       }
     });
 
-    // Rehydrate the selected group
-    watchEffect(() => {
-      if (
-        GroupState.groups.length > 0
-        && GroupState.selectedGroup === null
-        && route.params.groupId
-      ) {
-        const gid = parseInt(route.params.groupId as string, 10) ?? -1;
-        const group = GroupState.groups.find((x) => x.id === gid);
-
-        if (group && (InstanceState.selectedInstance?.id === group.id ?? false)) {
-          GroupState.setSelectedGroup(group);
-        }
-      }
-    });
-
     // Focus the input element when the modal is shown
     watchEffect(() => {
       if (showModal.value && modalState.value !== ModalState.DELETE) {
@@ -134,15 +130,17 @@ export default defineComponent({
       }
     });
 
-    function handleSelection(item: Group) {
-      GroupState.setSelectedGroup(item);
+    // If the group list changes elsewhere, update the selection as the name may have changed.
+    watch(() => GroupState.groups, () => {
+      if (selection.value === null) return;
+      const selectedGroup = GroupState.groups.find((x) => x.id === selection.value?.id ?? -1) ?? null;
+      selection.value = selectedGroup;
+    });
 
-      router.replace({
-        name: 'Groups',
-        params: {
-          groupId: item.id,
-        },
-      });
+    // Emit a selection event and set the selected item
+    function handleSelection(item: Group) {
+      selection.value = item;
+      emit('select', item);
     }
 
     // Toggle the modal
@@ -159,8 +157,8 @@ export default defineComponent({
 
     // Set the modal state to 'EDIT' and show it
     function startEdit() {
-      if (GroupState.selectedGroup !== null) {
-        input.value = GroupState.selectedGroup.name;
+      if (selection.value !== null) {
+        input.value = selection.value.name;
         modalState.value = ModalState.EDIT;
         toggle();
       }
@@ -168,7 +166,7 @@ export default defineComponent({
 
     // Set the modal state to 'DELETE' and show it
     function startDelete() {
-      if (GroupState.selectedGroup !== null) {
+      if (selection.value !== null) {
         modalState.value = ModalState.DELETE;
         toggle();
       }
@@ -178,6 +176,12 @@ export default defineComponent({
     function handleCancel() {
       input.value = '';
       toggle();
+    }
+
+    // Find a group by its name
+    function findByName(name: string): Group|null {
+      const group = GroupState.groups.find((x) => x.name === name) ?? null;
+      return group;
     }
 
     // Add, edit, or delete the group
@@ -190,6 +194,10 @@ export default defineComponent({
             instanceId: InstanceState.selectedInstance.id,
             name: input.value,
           });
+
+          const group = findByName(input.value);
+          selection.value = group;
+          emit('added', group);
         } catch (e) {
           GlobalState.setCurrentError(e?.message ?? e);
         } finally {
@@ -198,13 +206,17 @@ export default defineComponent({
       }
 
       if (modalState.value === ModalState.EDIT) {
-        if (GroupState.selectedGroup === null) return;
+        if (selection.value === null) return;
 
         try {
           await GroupState.updateGroup({
-            id: GroupState.selectedGroup.id,
+            id: selection.value.id,
             name: input.value,
           });
+
+          const group = findByName(input.value);
+          selection.value = group;
+          emit('updated', group);
         } catch (e) {
           GlobalState.setCurrentError(e?.message ?? e);
         } finally {
@@ -213,10 +225,12 @@ export default defineComponent({
       }
 
       if (modalState.value === ModalState.DELETE) {
-        if (GroupState.selectedGroup === null) return;
+        if (selection.value === null) return;
 
         try {
-          await GroupState.deleteGroup(GroupState.selectedGroup);
+          await GroupState.deleteGroup(selection.value);
+          selection.value = null;
+          emit('deleted', selection);
         } catch (e) {
           GlobalState.setCurrentError(e?.message ?? e);
         } finally {
@@ -241,6 +255,7 @@ export default defineComponent({
       input,
       inputElement,
       handleSelection,
+      selection,
     };
   },
 });

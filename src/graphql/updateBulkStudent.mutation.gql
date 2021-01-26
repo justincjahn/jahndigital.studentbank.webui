@@ -1,0 +1,29 @@
+mutation updateBulkStudent($students: [UpdateStudentRequestInput!]!) {
+  updateBulkStudent(input: $students) {
+    id
+    accountNumber
+    firstName
+    lastName
+    groupId
+    shares {
+      id
+      shareTypeId
+      balance
+      shareType {
+        id
+        name
+        dividendRate
+      }
+    }
+    group {
+      id
+      instanceId
+      name
+      instance {
+        id
+        description
+      }
+    }
+    email
+  }
+}

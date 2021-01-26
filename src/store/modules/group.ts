@@ -61,11 +61,22 @@ class GroupState extends VuexModule implements State.IGroupState {
       const res = await Apollo.mutate<NewGroupResponse>({
         mutation: GroupNew,
         variables: input,
+        update(cache, data) {
+          const newGroup = data.data?.newGroup;
+          cache.writeQuery<GroupResponse>({
+            query: GroupsQuery,
+            data: {
+              groups: {
+                nodes: [...self.state.groups, newGroup],
+              },
+            },
+          });
+        },
       });
 
       if (res.data) {
         const groups = [...self.state.groups, ...res.data.newGroup];
-        return { groups, selectedGroup: res.data.newGroup[0] };
+        return { groups: groups as Group[] };
       }
 
       throw new Error('Unable to create group: unknown error.');
@@ -95,7 +106,7 @@ class GroupState extends VuexModule implements State.IGroupState {
           ...res.data.updateGroup,
         ];
 
-        return { groups, selectedGroup: res.data.updateGroup[0] };
+        return { groups: groups as Group[] };
       }
 
       throw new Error('Unable to create instance: unknown error.');
@@ -123,7 +134,8 @@ class GroupState extends VuexModule implements State.IGroupState {
 
       if (res.data && res.data.deleteGroup === true) {
         const groups = self.state.groups.filter((x: Group) => x.id !== group.id);
-        return { groups, selectedGroup: null as Group|null };
+        const selectedGroup = (self.state.selectedGroup === group) ? null as Group|null : self.state.selectedGroup;
+        return { groups: groups as Group[], selectedGroup: selectedGroup as Group };
       }
 
       throw new Error('Unable to delete instance: unknown error.');

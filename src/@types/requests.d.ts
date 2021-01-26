@@ -25,3 +25,15 @@ interface NewBulkTransactionRequest {
   shares: NewTransactionRequest[];
   skipNegative: boolean;
 }
+
+interface UpdateStudentRequest {
+  id: number;
+  groupId?: number;
+  accountNumber?: number;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  password?: string;
+}
+
+type UpdateBulkStudentRequest = UpdateStudentRequest[];

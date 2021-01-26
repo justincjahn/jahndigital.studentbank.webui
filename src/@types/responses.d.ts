@@ -102,6 +102,10 @@ interface NewBulkTransactionResponse {
   newBulkTransaction: Transaction[];
 }
 
+interface UpdateBulkStudentResponse {
+  updateBulkStudent: Student[];
+}
+
 interface ShareTypeResponse {
   shareTypes: {
     nodes: ShareType[];

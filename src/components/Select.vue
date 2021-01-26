@@ -11,7 +11,7 @@
       </slot>
     </button>
     <ul class="select__items" :class="{ 'select__items--hidden': !open }" v-if="options && options.length > 0">
-      <slot name="list" v-bind="slotProps()">
+      <slot name="list" v-bind="slotProps">
         <li
           v-for="option in options"
           :key="key(option)"
@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUnmounted, PropType, ref, watchEffect } from 'vue';
+import { computed, defineComponent, onMounted, onUnmounted, PropType, ref, watchEffect } from 'vue';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Item = Record<string, any>|null;
@@ -41,7 +41,7 @@ export default defineComponent({
     default: {
       type: Object as PropType<Item>,
       required: false,
-      default: null,
+      default: undefined,
     },
     value: {
       type: Function as PropType<Search>,
@@ -64,6 +64,11 @@ export default defineComponent({
     const selected = ref<Item|null>(null);
     const root = ref<HTMLDivElement|null>(null);
 
+    watchEffect(() => {
+      if (selected.value !== null) return;
+      selected.value = props.default;
+    });
+
     function toggleOpen(e: Event) {
       if (e.target !== root.value) {
         open.value = false;
@@ -71,12 +76,6 @@ export default defineComponent({
         open.value = true;
       }
     }
-
-    watchEffect(() => {
-      if (props.default !== null) {
-        selected.value = props.default;
-      }
-    });
 
     onMounted(() => {
       document.addEventListener('click', toggleOpen);
@@ -91,16 +90,12 @@ export default defineComponent({
       emit('select', item);
     }
 
-    function slotProps() {
-      const ops = props.options;
-
-      return {
-        selected,
-        options: ops,
-        select,
-        class: 'select__items__item',
-      };
-    }
+    const slotProps = computed(() => ({
+      selected,
+      options: props.options,
+      select,
+      class: 'select__items__item',
+    }));
 
     return {
       open,
