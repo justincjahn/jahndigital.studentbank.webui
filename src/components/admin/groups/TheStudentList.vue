@@ -6,8 +6,8 @@
           <th>
             <input
               type="checkbox"
-              :checked="selection.hasGroup(GroupStore.selectedGroup)"
-              @click="selection.toggleGroup(GroupStore.selectedGroup)"
+              :checked="selection.hasGroup(selectedGroup)"
+              @click="selection.toggleGroup(selectedGroup)"
             />
           </th>
           <th>Account Number</th>
@@ -17,7 +17,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-if="GroupStore.selectedGroup === null">
+        <tr v-if="selectedGroup === null">
           <td class="student-list__select-group" colspan="5">Please select a group...</td>
         </tr>
         <template v-else>
@@ -46,8 +46,8 @@
 
 <script lang="ts">
 import StudentStore from '@/store/modules/student';
-import GroupStore from '@/store/modules/group';
-import InstanceStore from '@/store/modules/instance';
+import instanceStore from '@/store/InstanceStore';
+import groupStore from '@/store/GroupStore';
 import selection from '@/services/StudentSelectionService';
 import { ref, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
@@ -63,9 +63,9 @@ export default {
 
     // When the group changes, fetch students for the new group
     watchEffect(() => {
-      if (GroupStore.selectedGroup !== null) {
+      if (groupStore.selected.value !== null) {
         StudentStore.fetchStudents({
-          groupId: GroupStore.selectedGroup.id,
+          groupId: groupStore.selected.value.id,
         });
       } else {
         StudentStore.clearStudents();
@@ -74,9 +74,9 @@ export default {
 
     // When the instance changes, clear the selection
     watchEffect(() => {
-      if (InstanceStore.selectedInstance !== null) {
-        if (InstanceStore.selectedInstance.id !== prevInstance.value?.id ?? true) {
-          prevInstance.value = InstanceStore.selectedInstance;
+      if (instanceStore.selected.value !== null) {
+        if (instanceStore.selected.value.id !== prevInstance.value?.id ?? true) {
+          prevInstance.value = instanceStore.selected.value;
           selection.clear();
         }
       }
@@ -108,7 +108,7 @@ export default {
     }
 
     return {
-      GroupStore,
+      selectedGroup: groupStore.selected,
       StudentStore,
       studentClick,
       selection,

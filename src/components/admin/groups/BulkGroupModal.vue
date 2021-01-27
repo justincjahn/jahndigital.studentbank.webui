@@ -9,7 +9,7 @@
     title="Bulk Move"
   >
     <template #default>
-      <group-selector @select="handleSelection" />
+      <group-selector v-model="selectedGroup" />
     </template>
     <template #okLabel="{ okLabel, canSubmit }">
       <template v-if="canSubmit || !loading">{{okLabel}}</template>
@@ -96,10 +96,6 @@ export default defineComponent({
       emit('cancel');
     }
 
-    function handleSelection(item: Group) {
-      selectedGroup.value = item;
-    }
-
     watchEffect(async () => {
       if (props.show === true) {
         try {
@@ -118,7 +114,7 @@ export default defineComponent({
       okLabel,
       handleOk,
       handleCancel,
-      handleSelection,
+      selectedGroup,
       canSubmit,
       loading,
     };

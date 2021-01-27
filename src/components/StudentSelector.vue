@@ -103,7 +103,7 @@
 </template>
 
 <script lang="ts">
-import InstanceStore from '@/store/modules/instance';
+import instanceStore from '@/store/InstanceStore';
 import apolloClient from '@/services/Apollo';
 import gqlStudentsWithName from '@/graphql/studentsByName.gql';
 import gqlStudentsWithEmail from '@/graphql/studentsByEmail.gql';
@@ -129,7 +129,7 @@ export default defineComponent({
      * Split the student list into two arrays for our template.
      */
     function processStudents(students: Student[]) {
-      const iid = InstanceStore.selectedInstance?.id || -1;
+      const iid = instanceStore.selected.value?.id || -1;
       instanceStudents.value = students.filter((x) => x.group?.instanceId === iid ?? false);
       otherStudents.value = students.filter((x) => x.group?.instanceId !== iid ?? true);
 

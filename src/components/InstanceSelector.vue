@@ -1,0 +1,239 @@
+<template>
+  <base-select
+    :options="options"
+    :value="value"
+    :modelValue="modelValue"
+    @update:modelValue="update"
+    prompt="Select an instance..."
+  >
+    <template v-slot:selected="{ option, prompt }">
+      <template v-if="option?.isActive ?? false"><span class="active">(Active)</span> {{option.description}}</template>
+      <template v-else>{{option?.description ?? prompt}}</template>
+    </template>
+    <template v-slot:list="{ options, className, select }">
+      <li v-for="option in options" :key="option.id" :class="className" @click="select(option)">
+        <template v-if="option?.isActive ?? false"><span class="active">(Active)</span> {{option.description}}</template>
+        <template v-else>{{option?.description ?? option}}</template>
+      </li>
+      <li class="select__items__divider"><hr /></li>
+      <li :class="className" @click.prevent="startAdd">Add...</li>
+      <li :class="className" @click.prevent="startEdit">Rename...</li>
+      <li :class="className" @click.prevent="startDelete">Delete...</li>
+    </template>
+  </base-select>
+
+  <Modal
+    :title="modalTitle"
+    :customClass="modalClass"
+    :show="showModal"
+    cancelLabel="Cancel"
+    @ok.prevent="handleOk"
+    @cancel.prevent="handleCancel"
+  >
+      <template v-if="modalState === ModalState.DELETE">
+        This action cannot be undone!
+      </template>
+      <template v-else>
+        <div class="instance-form">
+          <label for="instance-form__instance-name">Name</label>
+          <input type="text" ref="inputElement" id="instance-form__instance-name" v-model="input" />
+        </div>
+      </template>
+  </Modal>
+</template>
+
+<script lang="ts">
+import BaseSelect, { Search } from '@/components/BaseSelect.vue';
+import Modal from '@/components/Modal.vue';
+import GlobalState from '@/store/modules/global';
+import InstanceStore from '@/store/InstanceStore';
+import UserState from '@/store/modules/user';
+import { computed, defineComponent, PropType, ref, watchEffect } from 'vue';
+
+export enum ModalState {
+  ADD,
+  EDIT,
+  DELETE,
+}
+
+export default defineComponent({
+  components: {
+    BaseSelect,
+    Modal,
+  },
+  props: {
+    modelValue: {
+      type: Object as PropType<Instance>,
+    },
+  },
+  setup(props, { emit }) {
+    // If the modal is open.
+    const showModal = ref(false);
+
+    // The input to add/rename an instance
+    const input = ref('');
+
+    // The current state of the modal
+    const modalState = ref<ModalState>(ModalState.ADD);
+
+    // The title of the modal window
+    const modalTitle = computed(() => {
+      if (modalState.value === ModalState.ADD) {
+        return 'Create an Instance';
+      }
+
+      if (modalState.value === ModalState.EDIT) {
+        return 'Rename Instance';
+      }
+
+      return 'Are you sure?';
+    });
+
+    // The class of the modal window
+    const modalClass = computed(() => {
+      if (modalState.value === ModalState.DELETE) {
+        return 'destructive';
+      }
+
+      return null;
+    });
+
+    // Return the name of the group as the value
+    const value: Search = (x) => (typeof x === 'object' ? x?.description ?? x : x);
+
+    // Cascade the model update
+    function update(item: Instance|null) { emit('update:modelValue', item); }
+
+    // Open or close the New Instance form.
+    function toggle() { showModal.value = !showModal.value; }
+
+    // Begin the new instance process and open the modal.
+    function startAdd() {
+      modalState.value = ModalState.ADD;
+      input.value = '';
+      toggle();
+    }
+
+    // Begin the rename process and open the modal.
+    function startEdit() {
+      if (props.modelValue === null) return;
+      modalState.value = ModalState.EDIT;
+      input.value = props.modelValue?.description ?? 'ERROR';
+      toggle();
+    }
+
+    // Open the delete confirmation dialog when the user wishes to delete an instance.
+    function startDelete() {
+      if (props.modelValue === null) return;
+      modalState.value = ModalState.DELETE;
+      toggle();
+    }
+
+    // Add a new instance and Update or Delete the selected instance.
+    async function handleOk() {
+      if (modalState.value === ModalState.ADD) {
+        if (input.value.length < 3) {
+          GlobalState.setCurrentError('Instance must have a description!');
+          return;
+        }
+
+        try {
+          const instance = await InstanceStore.newInstance({ description: input.value });
+          update(instance);
+          toggle();
+        } catch (e) {
+          GlobalState.setCurrentError(e?.message ?? e);
+        }
+      }
+
+      if (modalState.value === ModalState.EDIT) {
+        if (input.value.length < 3) {
+          GlobalState.setCurrentError('Instance must have a description!');
+          return;
+        }
+
+        if (props.modelValue === null) return;
+
+        try {
+          const instance = await InstanceStore.updateInstance({
+            id: props.modelValue?.id ?? -1,
+            description: input.value,
+          });
+
+          update(instance);
+          toggle();
+        } catch (e) {
+          GlobalState.setCurrentError(e?.message ?? e);
+        }
+      }
+
+      if (modalState.value === ModalState.DELETE) {
+        if (props.modelValue === null) return;
+
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          await InstanceStore.deleteInstance(props.modelValue!);
+          update(null);
+        } catch (e) {
+          GlobalState.setCurrentError(e.message ?? e);
+        } finally {
+          toggle();
+        }
+      }
+    }
+
+    // Reset the input and close the modal.
+    function handleCancel() {
+      input.value = '';
+      toggle();
+    }
+
+    // Fetch instances if there are none, or the user just authenticated
+    watchEffect(() => {
+      if (UserState.isAuthenticated || InstanceStore.instances.value.length === 0) {
+        InstanceStore.fetchInstances();
+      }
+    });
+
+    return {
+      ModalState,
+      options: InstanceStore.instances,
+      modalTitle,
+      modalClass,
+      modalState,
+      showModal,
+      startAdd,
+      startEdit,
+      startDelete,
+      handleOk,
+      handleCancel,
+      input,
+      update,
+      value,
+    };
+  },
+});
+</script>
+
+<style lang="scss" scoped>
+  .select__items__divider {
+    height: auto;
+    line-height: 0;
+
+    & hr {
+      border: none;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  span.active {
+    font-size: 0.7em;
+    vertical-align: middle;
+  }
+
+  .instance-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+  }
+</style>

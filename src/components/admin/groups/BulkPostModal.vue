@@ -161,7 +161,7 @@ import BulkPostService from '@/services/BulkPostService';
 import Modal from '@/components/Modal.vue';
 import ShareTypeSelector from '@/components/ShareTypeSelector.vue';
 import Money from '@/utils/money';
-import GroupState from '@/store/modules/group';
+import groupStore from '@/store/GroupStore';
 import LoadingIcon from '@/components/LoadingIcon.vue';
 import GlobalState from '@/store/modules/global';
 
@@ -267,7 +267,7 @@ export default defineComponent({
       const student = sampleStudents.value.get(share.id);
 
       if (student) {
-        const group = GroupState.groups.find((x) => x.id === student.groupId);
+        const group = groupStore.groups.value.find((x) => x.id === student.groupId);
         if (group) return group.name;
       }
 

@@ -13,7 +13,7 @@
 import { defineComponent, ref, watchEffect } from 'vue';
 import Select from '@/components/Select.vue';
 import gqlShareTypes from '@/graphql/shareTypes.query.gql';
-import InstanceStore from '@/store/modules/instance';
+import instanceStore from '@/store/InstanceStore';
 import GlobalStore from '@/store/modules/global';
 import Apollo from '@/services/Apollo';
 
@@ -34,7 +34,7 @@ export default defineComponent({
 
     // Fetch share types mapped to the currently selected instance
     watchEffect(async () => {
-      if (InstanceStore.selectedInstance !== null) {
+      if (instanceStore.selected.value !== null) {
         try {
           const res = await Apollo.query<ShareTypeResponse>({
             query: gqlShareTypes,
@@ -42,7 +42,7 @@ export default defineComponent({
 
           if (res && res.data) {
             const filtered = res.data.shareTypes.nodes.filter(
-              (x) => x.shareTypeInstances.findIndex((y) => y.instanceId === InstanceStore.selectedInstance?.id) >= 0,
+              (x) => x.shareTypeInstances.findIndex((y) => y.instanceId === instanceStore.selected.value?.id) >= 0,
             );
 
             shareTypes.value = filtered;

@@ -1,7 +1,7 @@
 <template>
   <div class="sub-menu">
-    <template v-if="InstanceState.selectedInstance">
-      <group-selector @select="handleGroupSelection" :selectedGroup="GroupState.selectedGroup" />
+    <template v-if="selectedInstance">
+      <group-selector v-model="selectedGroup"/>
     </template>
     <template v-else>
       <p>Please select an instance...</p>
@@ -56,8 +56,8 @@
 <script lang="ts">
 import StudentList from '@/components/admin/groups/TheStudentList.vue';
 import GroupSelector from '@/components/GroupSelector.vue';
-import InstanceState from '@/store/modules/instance';
-import GroupState from '@/store/modules/group';
+import instanceStore from '@/store/InstanceStore';
+import groupStore from '@/store/GroupStore';
 import selection from '@/services/StudentSelectionService';
 import { ref, computed, watchEffect, defineAsyncComponent } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -94,21 +94,21 @@ export default {
     // Rehydrate the selected group
     watchEffect(() => {
       if (
-        GroupState.groups.length > 0
-        && GroupState.selectedGroup === null
+        groupStore.groups.value.length > 0
+        && groupStore.selected.value === null
         && route.params.groupId
       ) {
         const gid = parseInt(route.params.groupId as string, 10) ?? -1;
-        const group = GroupState.groups.find((x) => x.id === gid);
+        const group = groupStore.groups.value.find((x) => x.id === gid);
 
-        if (group && (InstanceState.selectedInstance?.id === group.id ?? false)) {
-          GroupState.setSelectedGroup(group);
+        if (group && (instanceStore.selected.value?.id === group.id ?? false)) {
+          groupStore.setSelected(group);
         }
       }
     });
 
     function handleGroupSelection(item: Group|null) {
-      GroupState.setSelectedGroup(item);
+      groupStore.setSelected(item);
 
       router.replace({
         name: 'Groups',
@@ -136,7 +136,7 @@ export default {
 
     function handleBulkGroupModalOk(movedGroup: Group) {
       showBulkGroupModal.value = false;
-      const group = GroupState.groups.find((x) => x.id === movedGroup.id) ?? null;
+      const group = groupStore.groups.value.find((x) => x.id === movedGroup.id) ?? null;
       handleGroupSelection(group);
       selection.clear();
     }
@@ -146,8 +146,6 @@ export default {
     }
 
     return {
-      InstanceState,
-      GroupState,
       selection,
       hasSelection,
       handleGroupSelection,
@@ -159,6 +157,8 @@ export default {
       handleShowBulkGroupModal,
       handleBulkGroupModalOk,
       handleBulkGroupModalCancel,
+      selectedInstance: instanceStore.selected,
+      selectedGroup: groupStore.selected,
     };
   },
 };

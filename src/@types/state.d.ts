@@ -4,18 +4,6 @@ declare namespace State {
     topmostModal: HTMLElement|null;
   }
 
-  interface IGroupState {
-    groups: Group[];
-    selectedGroup: Group|null;
-    loading: boolean;
-  }
-
-  interface IInstanceState {
-    instances: Instance[];
-    selectedInstance: Instance | null;
-    loading: boolean;
-  }
-
   interface IStudentState {
     students: Student[];
     selectedStudent: Student|null;

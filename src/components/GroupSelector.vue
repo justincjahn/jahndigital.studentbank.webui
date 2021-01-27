@@ -1,33 +1,25 @@
 <template>
-  <Select
-    :options="GroupState.groups"
-    :key="(x) => x ? x.id : null"
-    :value="(x) => x ? x.name : null"
-    :default="GroupState.selectedGroup"
-    msg="Select a group..."
-    @select="handleSelection"
+  <base-select
+    :options="options"
+    :value="value"
+    :modelValue="modelValue"
+    @update:modelValue="update"
   >
-    <template #list="props">
+    <template #list="{ options, className, select }">
       <li
-        v-for="option in props.options"
+        v-for="option in options"
         :key="option.id"
-        :class="props.class"
-        @click="props.select(option)"
+        :class="className"
+        @click="select(option)"
       >
         {{option.name}}
       </li>
       <li class="select__items__divider"><hr /></li>
-      <li :class="props.class" @click.prevent="startAdd">
-        Add...
-      </li>
-      <li :class="props.class" @click.prevent="startEdit">
-        Rename...
-      </li>
-      <li :class="props.class" @click.prevent="startDelete">
-        Delete...
-      </li>
+      <li :class="className" @click.prevent="startAdd">Add...</li>
+      <li :class="className" @click.prevent="startEdit">Rename...</li>
+      <li :class="className" @click.prevent="startDelete">Delete...</li>
     </template>
-  </Select>
+  </base-select>
   <Modal
     :title="modalTitle"
     :customClass="modalClass"
@@ -49,12 +41,12 @@
 </template>
 
 <script lang="ts">
-import Select from '@/components/Select.vue';
-import GlobalState from '@/store/modules/global';
-import InstanceState from '@/store/modules/instance';
-import GroupState from '@/store/modules/group';
-import { computed, defineComponent, ref, watch, watchEffect } from 'vue';
+import { defineComponent, ref, watch, computed, PropType } from 'vue';
+import BaseSelect, { Search } from '@/components/BaseSelect.vue';
 import Modal from '@/components/Modal.vue';
+import GlobalState from '@/store/modules/global';
+import instanceStore from '@/store/InstanceStore';
+import groupStore from '@/store/GroupStore';
 
 enum ModalState {
   ADD,
@@ -62,31 +54,28 @@ enum ModalState {
   DELETE,
 }
 
-// TODO: Decouple selectedGroup, selection, and GroupState.selectedGroup
 export default defineComponent({
   components: {
-    Select,
+    BaseSelect,
     Modal,
   },
   props: {
-    selectedGroup: {
-      type: Object as () => Group|null,
-      required: false,
-      default: null,
+    modelValue: {
+      type: Object as PropType<Group|null>,
     },
   },
-  emits: [
-    'select',
-    'added',
-    'updated',
-    'deleted',
-  ],
   setup(props, { emit }) {
     const modalState = ref<ModalState>(ModalState.ADD);
+
     const showModal = ref(false);
-    const inputElement = ref<HTMLInputElement|null>(null);
+
     const input = ref('');
-    const selection = ref<Group|null>(props.selectedGroup);
+
+    // Return the name of the group as the value
+    const value: Search = (x) => (typeof x === 'object' ? x?.name ?? x : x);
+
+    // Cascade the model update
+    function update(item: Group|null) { emit('update:modelValue', item); }
 
     // The title of the modal window
     const modalTitle = computed(() => {
@@ -110,39 +99,6 @@ export default defineComponent({
       return null;
     });
 
-    // Get groups when the instance changes
-    watchEffect(() => {
-      if (InstanceState.selectedInstance !== null) {
-        GroupState.fetchGroups({
-          instanceId: InstanceState.selectedInstance.id,
-        });
-      }
-    });
-
-    // Focus the input element when the modal is shown
-    watchEffect(() => {
-      if (showModal.value && modalState.value !== ModalState.DELETE) {
-        setTimeout(() => {
-          if (inputElement.value !== null) {
-            inputElement.value.select();
-          }
-        }, 10);
-      }
-    });
-
-    // If the group list changes elsewhere, update the selection as the name may have changed.
-    watch(() => GroupState.groups, () => {
-      if (selection.value === null) return;
-      const selectedGroup = GroupState.groups.find((x) => x.id === selection.value?.id ?? -1) ?? null;
-      selection.value = selectedGroup;
-    });
-
-    // Emit a selection event and set the selected item
-    function handleSelection(item: Group) {
-      selection.value = item;
-      emit('select', item);
-    }
-
     // Toggle the modal
     function toggle() {
       showModal.value = !showModal.value;
@@ -157,18 +113,66 @@ export default defineComponent({
 
     // Set the modal state to 'EDIT' and show it
     function startEdit() {
-      if (selection.value !== null) {
-        input.value = selection.value.name;
-        modalState.value = ModalState.EDIT;
-        toggle();
-      }
+      if (!props.modelValue) return;
+      input.value = props.modelValue.name;
+      modalState.value = ModalState.EDIT;
+      toggle();
     }
 
     // Set the modal state to 'DELETE' and show it
     function startDelete() {
-      if (selection.value !== null) {
-        modalState.value = ModalState.DELETE;
-        toggle();
+      if (!props.modelValue) return;
+      modalState.value = ModalState.DELETE;
+      toggle();
+    }
+
+    // Add a group or update and delete the selected group.
+    async function handleOk() {
+      if (modalState.value === ModalState.ADD) {
+        if (!instanceStore.selected.value) return;
+
+        try {
+          const group = await groupStore.newGroup({
+            instanceId: instanceStore.selected.value.id,
+            name: input.value,
+          });
+
+          update(group);
+        } catch (e) {
+          GlobalState.setCurrentError(e?.message ?? e);
+        } finally {
+          toggle();
+        }
+      }
+
+      if (modalState.value === ModalState.EDIT) {
+        if (!props.modelValue) return;
+
+        try {
+          const group = await groupStore.updateGroup({
+            id: props.modelValue.id,
+            name: input.value,
+          });
+
+          update(group);
+        } catch (e) {
+          GlobalState.setCurrentError(e?.message ?? e);
+        } finally {
+          toggle();
+        }
+      }
+
+      if (modalState.value === ModalState.DELETE) {
+        if (!props.modelValue) return;
+
+        try {
+          await groupStore.deleteGroup(props.modelValue);
+          update(null);
+        } catch (e) {
+          GlobalState.setCurrentError(e?.message ?? e);
+        } finally {
+          toggle();
+        }
       }
     }
 
@@ -178,102 +182,25 @@ export default defineComponent({
       toggle();
     }
 
-    // Find a group by its name
-    function findByName(name: string): Group|null {
-      const group = GroupState.groups.find((x) => x.name === name) ?? null;
-      return group;
-    }
-
-    // Add, edit, or delete the group
-    async function handleOk() {
-      if (InstanceState.selectedInstance === null) return;
-
-      if (modalState.value === ModalState.ADD) {
-        try {
-          await GroupState.newGroup({
-            instanceId: InstanceState.selectedInstance.id,
-            name: input.value,
-          });
-
-          const group = findByName(input.value);
-          selection.value = group;
-          emit('added', group);
-        } catch (e) {
-          GlobalState.setCurrentError(e?.message ?? e);
-        } finally {
-          toggle();
-        }
-      }
-
-      if (modalState.value === ModalState.EDIT) {
-        if (selection.value === null) return;
-
-        try {
-          await GroupState.updateGroup({
-            id: selection.value.id,
-            name: input.value,
-          });
-
-          const group = findByName(input.value);
-          selection.value = group;
-          emit('updated', group);
-        } catch (e) {
-          GlobalState.setCurrentError(e?.message ?? e);
-        } finally {
-          toggle();
-        }
-      }
-
-      if (modalState.value === ModalState.DELETE) {
-        if (selection.value === null) return;
-
-        try {
-          await GroupState.deleteGroup(selection.value);
-          selection.value = null;
-          emit('deleted', selection);
-        } catch (e) {
-          GlobalState.setCurrentError(e?.message ?? e);
-        } finally {
-          toggle();
-        }
-      }
-    }
+    // Clear the group selection when the groups change
+    watch(() => groupStore.groups.value, () => update(null), { immediate: true });
 
     return {
-      GroupState,
       ModalState,
+      options: groupStore.groups,
+      value,
+      update,
+      input,
       showModal,
       modalState,
       modalTitle,
       modalClass,
-      toggle,
       startAdd,
       startEdit,
       startDelete,
       handleOk,
       handleCancel,
-      input,
-      inputElement,
-      handleSelection,
-      selection,
     };
   },
 });
 </script>
-
-<style lang="scss" scoped>
-  .select__items__divider {
-    height: auto;
-    line-height: 0;
-
-    & hr {
-      border: none;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-    }
-  }
-
-  .group-form {
-    display: flex;
-    flex-direction: column;
-  }
-</style>
