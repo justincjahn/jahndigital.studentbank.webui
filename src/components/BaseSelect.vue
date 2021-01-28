@@ -139,6 +139,16 @@ export default defineComponent({
     background-color: map.get($theme, button-secondary, color);
     border: 1px solid colorStep(button-secondary, $step: 2);
 
+    &__divider {
+      height: auto;
+      line-height: 0;
+
+      & hr {
+        border: none;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+      }
+    }
+
     &__item {
       padding: 0.25em;
       cursor: pointer;

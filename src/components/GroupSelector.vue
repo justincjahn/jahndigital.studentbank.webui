@@ -203,3 +203,11 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+  .group-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+  }
+</style>
