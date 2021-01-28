@@ -10,7 +10,7 @@ type FetchOptions = {
 }
 
 /**
- * Stores information about errors encountered in the system.
+ * Stores information about shares in the system.
  */
 export function setup() {
   const store = reactive({
