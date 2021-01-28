@@ -1,5 +1,5 @@
 <template>
-  <table class="transaction-list" v-if="ShareStore.selectedShare !== null" :class="{ loading: ShareStore.loading }">
+  <table class="transaction-list" v-if="shareStore.selected.value !== null" :class="{ loading: shareStore.loading.value }">
     <thead>
       <tr>
         <th>Date</th>
@@ -9,8 +9,8 @@
         <th class="right">New Balance</th>
       </tr>
     </thead>
-    <tbody v-if="ShareStore.transactions.length > 0">
-      <tr v-for="transaction in ShareStore.transactions" :key="transaction.id">
+    <tbody v-if="shareStore.transactions.value.length > 0">
+      <tr v-for="transaction in shareStore.transactions.value" :key="transaction.id">
         <td>
           {{new Date(transaction.effectiveDate).toLocaleDateString('en-US')}}
           {{new Date(transaction.effectiveDate).toLocaleTimeString('en-US')}}
@@ -43,16 +43,16 @@
       </tr>
     </tbody>
   </table>
-  <div class="transaction-list__pagination" v-if="ShareStore.pageInfo != null">
-    <button :disabled="!ShareStore.pageInfo.hasPreviousPage" @click.passive="ShareStore.fetchPreviousTransactions()">Previous</button>
-    <button :disabled="!ShareStore.pageInfo.hasNextPage" @click.passive="ShareStore.fetchNextTransactions()">Next</button>
+  <div class="transaction-list__pagination" v-if="shareStore.pageInfo.value != null">
+    <button :disabled="!shareStore.pageInfo.value.hasPreviousPage" @click.passive="shareStore.fetchPreviousTransactions">Previous</button>
+    <button :disabled="!shareStore.pageInfo.value.hasNextPage" @click.passive="shareStore.fetchNextTransactions">Next</button>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, watchEffect } from 'vue';
-import StudentStore from '@/store/modules/student';
-import ShareStore from '@/store/modules/share';
+import studentStore from '@/store/student';
+import shareStore from '@/store/share';
 
 export default defineComponent({
   setup() {
@@ -60,27 +60,27 @@ export default defineComponent({
 
     // When the share selection changes, load transactions
     watchEffect(() => {
-      if (ShareStore.selectedShare !== null) {
-        ShareStore.fetchShareTransactions({
-          shareId: ShareStore.selectedShare.id,
+      if (shareStore.selected.value !== null) {
+        shareStore.fetchShareTransactions({
+          shareId: shareStore.selected.value.id,
         });
       } else {
-        ShareStore.clearTransactions();
+        shareStore.clearTransactions();
       }
     });
 
     // When the student changes, clear the selection
     watchEffect(() => {
-      if (StudentStore.selectedStudent !== null) {
-        if (StudentStore.selectedStudent.id !== prevStudent.value?.id ?? true) {
-          prevStudent.value = StudentStore.selectedStudent;
-          ShareStore.setSelectedShare(null);
+      if (studentStore.selected.value !== null) {
+        if (studentStore.selected.value.id !== prevStudent.value?.id ?? true) {
+          prevStudent.value = studentStore.selected.value;
+          shareStore.setSelected(null);
         }
       }
     });
 
     return {
-      ShareStore,
+      shareStore,
     };
   },
 });

@@ -4,7 +4,7 @@
       <h1>Student Bank Admin</h1>
 
       <div class="main-nav__instances">
-        <template v-if="UserStore.isAuthenticated">
+        <template v-if="userStore.isAuthenticated.value">
           <instance-selector />
         </template>
       </div>
@@ -28,12 +28,12 @@
   <footer>&copy; 2020 Jahn Digital</footer>
 
   <Modal
-    :show="GlobalState.currentError !== null"
+    :show="errorStore.error.value !== null"
     customClass="destructive"
     title="Error"
-    @ok="GlobalState.setCurrentError(null)"
+    @ok="errorStore.setCurrentError(null)"
   >
-    {{GlobalState.currentError}}
+    {{errorStore.error.value}}
   </Modal>
 </template>
 
@@ -45,8 +45,8 @@
 import LoginWidget from '@/components/admin/navigation/TheLoginWidget.vue';
 import InstanceSelector from '@/components/admin/navigation/TheInstanceSelector.vue';
 import Modal from '@/components/Modal.vue';
-import UserStore from '@/store/modules/user';
-import GlobalState from '@/store/modules/global';
+import userStore from '@/store/user';
+import errorStore from '@/store/error';
 import { useRouter } from 'vue-router';
 import { watchEffect } from 'vue';
 
@@ -62,14 +62,14 @@ export default {
 
     // Force users to the login page if they aren't authenticated
     watchEffect(() => {
-      if (UserStore.isAuthenticated === false && !UserStore.jwtToken) {
+      if (userStore.isAuthenticated.value === false && !userStore.jwtToken.value) {
         router.push({ name: 'login' });
       }
     });
 
     return {
-      GlobalState,
-      UserStore,
+      errorStore,
+      userStore,
     };
   },
 };

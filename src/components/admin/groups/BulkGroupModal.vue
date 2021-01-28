@@ -22,7 +22,7 @@
 import { defineComponent, ref, computed, watchEffect } from 'vue';
 import Modal from '@/components/Modal.vue';
 import GroupSelector from '@/components/GroupSelector.vue';
-import GlobalState from '@/store/modules/global';
+import errorStore from '@/store/error';
 import StudentSelectionService from '@/services/StudentSelectionService';
 import LoadingIcon from '@/components/LoadingIcon.vue';
 import Apollo from '@/services/Apollo';
@@ -84,7 +84,7 @@ export default defineComponent({
 
         if (!res.data) throw new Error('Unable post transaction: unknown error.');
       } catch (e) {
-        throw GlobalState.setCurrentError(e?.message ?? e);
+        errorStore.setCurrentError(e?.message ?? e);
       } finally {
         posting.value = false;
       }
@@ -103,7 +103,7 @@ export default defineComponent({
           selectedGroup.value = null;
           selectedStudents.value = await StudentSelectionService.resolve();
         } catch (e) {
-          GlobalState.setCurrentError(e?.message ?? e);
+          errorStore.setCurrentError(e?.message ?? e);
         } finally {
           loading.value = false;
         }

@@ -52,17 +52,16 @@
   </section>
 
   <div class="student-details">
-    <router-view v-if="StudentStore.selectedStudent !== null" />
+    <router-view v-if="studentStore.selected.value !== null" />
   </div>
 </template>
 
 <script lang="ts">
 import StudentSelector from '@/components/StudentSelector.vue';
-import StudentStore from '@/store/modules/student';
-import ShareStore from '@/store/modules/share';
-import GlobalStore from '@/store/modules/global';
+import studentStore from '@/store/student';
+import errorStore from '@/store/error';
 import { useRouter, useRoute } from 'vue-router';
-import { defineComponent, onMounted, computed, watch } from 'vue';
+import { defineComponent, onMounted, computed } from 'vue';
 import { Field, useForm } from 'vee-validate';
 import Apollo from '@/services/Apollo';
 import gqlSearchAccounts from '@/graphql/studentsByAccountNumber.gql';
@@ -119,11 +118,11 @@ export default defineComponent({
         let i = 0;
         res.data.students.nodes.forEach((x) => {
           // Skip accounts not in the student's instance
-          if (x.group?.instanceId !== StudentStore.selectedStudent?.group?.instanceId ?? false) {
+          if (x.group?.instanceId !== studentStore.selected.value?.group?.instanceId ?? false) {
             return;
           }
 
-          if (x.id !== StudentStore.selectedStudent?.id ?? true) i += 1;
+          if (x.id !== studentStore.selected.value?.id ?? true) i += 1;
         });
 
         if (i > 0) return 'A student with the same account number already exists.';
@@ -173,13 +172,13 @@ export default defineComponent({
      * Fire off an update when the user submits the form.
      */
     const handleSubmit = form.handleSubmit(async (values) => {
-      if (!StudentStore.selectedStudent) return;
-      const merged = { ...StudentStore.selectedStudent, ...values } as Student;
+      if (!studentStore.selected.value) return;
+      const merged = { ...studentStore.selected.value, ...values } as Student;
 
       try {
-        await StudentStore.updateStudent(merged);
+        await studentStore.updateStudent(merged);
       } catch (e) {
-        GlobalStore.setCurrentError(e?.message ?? e);
+        errorStore.setCurrentError(e?.message ?? e);
       }
     });
 
@@ -205,8 +204,8 @@ export default defineComponent({
         form.resetForm();
       }
 
-      if (StudentStore.selectedStudent !== student) {
-        StudentStore.setSelectedStudent(student);
+      if (studentStore.selected.value !== student) {
+        studentStore.setSelected(student);
       }
     }
 
@@ -267,7 +266,7 @@ export default defineComponent({
 
     return {
       StudentSelector,
-      StudentStore,
+      studentStore,
       handleSelection,
       handleClear,
       errors: form.errors,

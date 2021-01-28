@@ -1,5 +1,5 @@
 import { AUTH_TOKEN } from '@/constants';
-import UserStore from '@/store/modules/user';
+import userStore from '@/store/user';
 
 /**
  * Persist a JWT token to localStorage.
@@ -13,5 +13,5 @@ export default function persistToken(token?: string) {
     localStorage.removeItem(AUTH_TOKEN);
   }
 
-  UserStore.setToken(token);
+  userStore.setToken(token ?? null);
 }

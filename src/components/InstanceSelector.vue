@@ -45,9 +45,9 @@
 <script lang="ts">
 import BaseSelect, { Search } from '@/components/BaseSelect.vue';
 import Modal from '@/components/Modal.vue';
-import GlobalState from '@/store/modules/global';
-import InstanceStore from '@/store/InstanceStore';
-import UserState from '@/store/modules/user';
+import errorStore from '@/store/error';
+import instanceStore from '@/store/instance';
+import userStore from '@/store/user';
 import { computed, defineComponent, PropType, ref, watchEffect } from 'vue';
 import uuid4 from '@/utils/uuid4';
 
@@ -137,29 +137,29 @@ export default defineComponent({
     async function handleOk() {
       if (modalState.value === ModalState.ADD) {
         if (input.value.length < 3) {
-          GlobalState.setCurrentError('Instance must have a description!');
+          errorStore.setCurrentError('Instance must have a description!');
           return;
         }
 
         try {
-          const instance = await InstanceStore.newInstance({ description: input.value });
+          const instance = await instanceStore.newInstance({ description: input.value });
           update(instance);
           toggle();
         } catch (e) {
-          GlobalState.setCurrentError(e?.message ?? e);
+          errorStore.setCurrentError(e?.message ?? e);
         }
       }
 
       if (modalState.value === ModalState.EDIT) {
         if (input.value.length < 3) {
-          GlobalState.setCurrentError('Instance must have a description!');
+          errorStore.setCurrentError('Instance must have a description!');
           return;
         }
 
         if (props.modelValue === null) return;
 
         try {
-          const instance = await InstanceStore.updateInstance({
+          const instance = await instanceStore.updateInstance({
             id: props.modelValue?.id ?? -1,
             description: input.value,
           });
@@ -167,7 +167,7 @@ export default defineComponent({
           update(instance);
           toggle();
         } catch (e) {
-          GlobalState.setCurrentError(e?.message ?? e);
+          errorStore.setCurrentError(e?.message ?? e);
         }
       }
 
@@ -176,10 +176,10 @@ export default defineComponent({
 
         try {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          await InstanceStore.deleteInstance(props.modelValue!);
+          await instanceStore.deleteInstance(props.modelValue!);
           update(null);
         } catch (e) {
-          GlobalState.setCurrentError(e.message ?? e);
+          errorStore.setCurrentError(e.message ?? e);
         } finally {
           toggle();
         }
@@ -194,14 +194,14 @@ export default defineComponent({
 
     // Fetch instances if there are none, or the user just authenticated
     watchEffect(() => {
-      if (UserState.isAuthenticated || InstanceStore.instances.value.length === 0) {
-        InstanceStore.fetchInstances();
+      if (userStore.isAuthenticated.value || instanceStore.instances.value.length === 0) {
+        instanceStore.fetchInstances();
       }
     });
 
     return {
       ModalState,
-      options: InstanceStore.instances,
+      options: instanceStore.instances,
       modalTitle,
       modalClass,
       modalState,

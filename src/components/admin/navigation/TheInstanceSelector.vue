@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import instanceStore from '@/store/InstanceStore';
+import instanceStore from '@/store/instance';
 import InstanceSelector from '@/components/InstanceSelector.vue';
 import { defineComponent, ref, watchEffect } from 'vue';
 

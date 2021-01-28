@@ -10,7 +10,7 @@ import {
 
 import persistToken from '@/utils/persistToken';
 import { TokenRefreshLink } from 'apollo-link-token-refresh';
-import UserStore from '@/store/modules/user';
+import userStore from '@/store/user';
 import { onError } from '@apollo/client/link/error';
 import { setContext } from '@apollo/client/link/context';
 import { ERROR_CODES, API_ENDPOINT } from '@/constants';
@@ -67,9 +67,9 @@ const tokenLink = new TokenRefreshLink({
   accessTokenField: 'jwtToken',
 
   isTokenValidOrUndefined: () => {
-    if (UserStore.jwtToken === null) return true;
-    if (!UserStore.isAuthenticated) return false;
-    if (UserStore.tokenExpiration < Date.now()) return false;
+    if (userStore.jwtToken.value === null) return true;
+    if (!userStore.isAuthenticated.value) return false;
+    if (userStore.tokenExpiration.value < Date.now()) return false;
     return true;
   },
 
@@ -88,7 +88,7 @@ const tokenLink = new TokenRefreshLink({
 
     let operation = 'userRefreshToken';
 
-    if (UserStore.isStudent) {
+    if (userStore.isStudent.value) {
       body = `
         mutation studentRefreshToken {
           studentRefreshToken {
@@ -187,7 +187,7 @@ const tokenLink = new TokenRefreshLink({
  * Inject authentication headers into every query sent to the server.
  */
 const authLink = setContext((_, { headers }) => {
-  const token = UserStore.jwtToken;
+  const token = userStore.jwtToken.value;
 
   return {
     headers: {

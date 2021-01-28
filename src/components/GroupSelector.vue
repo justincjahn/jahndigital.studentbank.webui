@@ -41,9 +41,9 @@ import { defineComponent, ref, computed, PropType, watchEffect } from 'vue';
 import uuid4 from '@/utils/uuid4';
 import BaseSelect, { Search } from '@/components/BaseSelect.vue';
 import Modal from '@/components/Modal.vue';
-import GlobalState from '@/store/modules/global';
-import instanceStore from '@/store/InstanceStore';
-import groupStore from '@/store/GroupStore';
+import errorStore from '@/store/error';
+import instanceStore from '@/store/instance';
+import groupStore from '@/store/group';
 
 enum ModalState {
   ADD,
@@ -137,7 +137,7 @@ export default defineComponent({
           update(group);
           toggle();
         } catch (e) {
-          GlobalState.setCurrentError(e?.message ?? e);
+          errorStore.setCurrentError(e?.message ?? e);
         }
       }
 
@@ -153,7 +153,7 @@ export default defineComponent({
           update(group);
           toggle();
         } catch (e) {
-          GlobalState.setCurrentError(e?.message ?? e);
+          errorStore.setCurrentError(e?.message ?? e);
         }
       }
 
@@ -164,7 +164,7 @@ export default defineComponent({
           await groupStore.deleteGroup(props.modelValue);
           update(null);
         } catch (e) {
-          GlobalState.setCurrentError(e?.message ?? e);
+          errorStore.setCurrentError(e?.message ?? e);
         } finally {
           toggle();
         }

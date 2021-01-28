@@ -1,5 +1,5 @@
 import { onLogin, onLogout } from '@/utils/login';
-import UserStore from '@/store/modules/user';
+import userStore from '@/store/user';
 import ApolloServiceAbstract from './ApolloServiceAbstract';
 import query from '../graphql/userlogin.mutation.gql';
 
@@ -14,7 +14,7 @@ export default class AuthenticationService extends ApolloServiceAbstract {
    * @param password The user's password.
    */
   async login(username: string, password: string): Promise<void> {
-    UserStore.setUsersLoading(true);
+    userStore.setLoading(true);
 
     try {
       const res = await this.client.mutate<UserLoginResponse>({
@@ -26,13 +26,13 @@ export default class AuthenticationService extends ApolloServiceAbstract {
       });
 
       if (res.data != null) {
-        UserStore.setToken(res.data.userLogin.jwtToken);
+        userStore.setToken(res.data.userLogin.jwtToken);
         await onLogin(this.client, res.data.userLogin.jwtToken);
       }
     } catch (e) {
       throw e.message;
     } finally {
-      UserStore.setUsersLoading(false);
+      userStore.setLoading(false);
     }
   }
 
@@ -40,7 +40,7 @@ export default class AuthenticationService extends ApolloServiceAbstract {
    * Log the user out.
    */
   async logout() {
-    UserStore.setToken();
+    userStore.setToken(null);
     await onLogout(this.client);
   }
 }

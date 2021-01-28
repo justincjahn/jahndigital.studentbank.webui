@@ -1,5 +1,5 @@
 <template>
-  <div class="student-list" :class="{ 'student-list--loading': StudentStore.loading }">
+  <div class="student-list" :class="{ 'student-list--loading': studentStore.loading.value }">
     <table class="student-list__list">
       <thead>
         <tr>
@@ -22,7 +22,7 @@
         </tr>
         <template v-else>
           <tr
-            v-for="student in StudentStore.students"
+            v-for="student in studentStore.students.value"
             :key="student.id"
             @click="studentClick(student)"
             class="student-list__student"
@@ -37,17 +37,16 @@
         </template>
       </tbody>
     </table>
-    <div class="student-list__pagination" v-if="StudentStore.pageInfo != null">
-      <button :disabled="!StudentStore.pageInfo.hasPreviousPage" @click.passive="StudentStore.fetchPrevious">Previous</button>
-      <button :disabled="!StudentStore.pageInfo.hasNextPage" @click.passive="StudentStore.fetchNext">Next</button>
+    <div class="student-list__pagination" v-if="studentStore.pageInfo.value != null">
+      <button :disabled="!studentStore.pageInfo.value.hasPreviousPage" @click.passive="studentStore.fetchPrevious">Previous</button>
+      <button :disabled="!studentStore.pageInfo.value.hasNextPage" @click.passive="studentStore.fetchNext">Next</button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import StudentStore from '@/store/modules/student';
-import instanceStore from '@/store/InstanceStore';
-import groupStore from '@/store/GroupStore';
+import studentStore from '@/store/student';
+import groupStore from '@/store/group';
 import selection from '@/services/StudentSelectionService';
 import { ref, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
@@ -64,19 +63,17 @@ export default {
     // When the group changes, fetch students for the new group
     watchEffect(() => {
       if (groupStore.selected.value !== null) {
-        StudentStore.fetchStudents({
-          groupId: groupStore.selected.value.id,
-        });
+        studentStore.fetch({ groupId: groupStore.selected.value.id });
       } else {
-        StudentStore.clearStudents();
+        studentStore.clear();
       }
     });
 
     // When the instance changes, clear the selection
     watchEffect(() => {
-      if (instanceStore.selected.value !== null) {
-        if (instanceStore.selected.value.id !== prevInstance.value?.id ?? true) {
-          prevInstance.value = instanceStore.selected.value;
+      if (groupStore.instanceStore.selected.value !== null) {
+        if (groupStore.instanceStore.selected.value.id !== prevInstance.value?.id ?? true) {
+          prevInstance.value = groupStore.instanceStore.selected.value;
           selection.clear();
         }
       }
@@ -109,7 +106,7 @@ export default {
 
     return {
       selectedGroup: groupStore.selected,
-      StudentStore,
+      studentStore,
       studentClick,
       selection,
     };

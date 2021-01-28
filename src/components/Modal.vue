@@ -46,7 +46,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, onUnmounted, ref, watchEffect } from 'vue';
-import GlobalStore from '@/store/modules/global';
+import modalStore from '@/store/modal';
 import debounce from '@/utils/debounce';
 
 /**
@@ -117,7 +117,7 @@ export default defineComponent({
     // Watch for Escape and Enter keypresses and call the appropriate handler.
     function handleKeyPress(e: KeyboardEvent) {
       // Ignore keypress if we're not the top modal
-      if (root.value === null || GlobalStore.topModal !== root.value) {
+      if (root.value === null || modalStore.topmost.value !== root.value) {
         return;
       }
 
@@ -144,10 +144,10 @@ export default defineComponent({
         document.addEventListener('keyup', handleKeyPress);
 
         if (root.value !== null) {
-          GlobalStore.openModal(root.value);
+          modalStore.open(root.value);
         }
       } else if (root.value !== null) {
-        GlobalStore.closeModal(root.value);
+        modalStore.close(root.value);
       }
 
       if (props.show === false) {
@@ -157,7 +157,7 @@ export default defineComponent({
 
     // When the modal is at the top level, emit a focus event.
     watchEffect(() => {
-      if (root.value !== null && GlobalStore.topModal === root.value) {
+      if (root.value !== null && modalStore.topmost.value === root.value) {
         emit('focus', root.value);
       }
     });
@@ -166,12 +166,12 @@ export default defineComponent({
       document.removeEventListener('keyup', handleKeyPress);
 
       if (root.value !== null) {
-        GlobalStore.closeModal(root.value);
+        modalStore.close(root.value);
       }
     });
 
     const modalStyle = computed(() => ({
-      zIndex: (root.value !== null && GlobalStore.topModal === root.value) ? 100 : 50,
+      zIndex: (root.value !== null && modalStore.topmost.value === root.value) ? 100 : 50,
     }));
 
     return {

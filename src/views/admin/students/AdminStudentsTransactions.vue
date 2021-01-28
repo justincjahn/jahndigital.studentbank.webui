@@ -2,13 +2,13 @@
 <div class="student-transactions">
   <div class="student-transactions__sidebar">
     <share-selector
-      :shares="StudentStore.selectedStudent?.shares"
-      :selected="ShareStore.selectedShare"
+      :shares="studentStore.selected.value?.shares"
+      :selected="shareStore.selected.value"
       @select="selectShare"
     />
 
     <transaction-poster
-      :share="ShareStore.selectedShare"
+      :share="shareStore.selected"
       @submit="postTransaction"
       :loading="isPosting"
     />
@@ -21,9 +21,9 @@
 </template>
 
 <script lang="ts">
-import StudentStore from '@/store/modules/student';
-import ShareStore from '@/store/modules/share';
-import GlobalStore from '@/store/modules/global';
+import studentStore from '@/store/student';
+import shareStore from '@/store/share';
+import errorStore from '@/store/error';
 import ShareSelector from '@/components/ShareSelector.vue';
 import TransactionList from '@/components/admin/students/TheTransactionList.vue';
 import TransactionPoster from '@/components/TransactionPoster.vue';
@@ -43,8 +43,8 @@ export default defineComponent({
      * Set the selected share when the use clicks a button.
      */
     function selectShare(share: Share) {
-      if (ShareStore.selectedShare === share) return;
-      ShareStore.setSelectedShare(share);
+      if (shareStore.selected.value === share) return;
+      shareStore.setSelected(share);
     }
 
     /**
@@ -57,26 +57,26 @@ export default defineComponent({
     async function postTransaction(amount: Money, comment?: string) {
       isPosting.value = true;
 
-      const shareId = ShareStore.selectedShare?.id ?? -1;
+      const shareId = shareStore.selected.value?.id ?? -1;
       try {
-        await ShareStore.postTransaction({
+        await shareStore.postTransaction({
           shareId,
           amount: amount.round(),
           comment,
           takeNegative: true,
         });
 
-        await StudentStore.refreshSelectedStudent();
+        await studentStore.refreshSelected();
       } catch (e) {
-        GlobalStore.setCurrentError(e?.message ?? e);
+        errorStore.setCurrentError(e?.message ?? e);
       } finally {
         isPosting.value = false;
       }
     }
 
     return {
-      StudentStore,
-      ShareStore,
+      studentStore,
+      shareStore,
       selectShare,
       postTransaction,
       isPosting,

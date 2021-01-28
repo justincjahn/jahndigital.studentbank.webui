@@ -9,14 +9,14 @@
 
       <p v-if="error.length > 0">{{error}}</p>
 
-      <input type="submit" value="Login" :disabled="UserState.loading" />
+      <input type="submit" value="Login" :disabled="userStore.loading.value" />
     </form>
   </div>
 </template>
 
 <script>
 import { ref, watchEffect } from 'vue';
-import UserState from '@/store/modules/user';
+import userStore from '@/store/user';
 import AuthenticationService from '@/services/AuthenticationService';
 import { useRouter } from 'vue-router';
 import Apollo from '@/services/Apollo';
@@ -40,7 +40,7 @@ export default {
     }
 
     watchEffect(() => {
-      if (UserState.isAuthenticated === true) {
+      if (userStore.isAuthenticated.value) {
         router.push({ name: 'Home' });
       }
     });
@@ -50,7 +50,7 @@ export default {
       password,
       error,
       login,
-      UserState,
+      userStore,
     };
   },
 };

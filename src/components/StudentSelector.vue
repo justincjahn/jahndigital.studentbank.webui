@@ -103,7 +103,7 @@
 </template>
 
 <script lang="ts">
-import instanceStore from '@/store/InstanceStore';
+import instanceStore from '@/store/instance';
 import apolloClient from '@/services/Apollo';
 import gqlStudentsWithName from '@/graphql/studentsByName.gql';
 import gqlStudentsWithEmail from '@/graphql/studentsByEmail.gql';

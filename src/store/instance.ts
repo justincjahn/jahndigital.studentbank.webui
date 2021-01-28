@@ -3,36 +3,34 @@ import gqlInstances from '@/graphql/instances.query.gql';
 import gqlNewInstance from '@/graphql/newInstance.mutation.gql';
 import gqlUpdateInstance from '@/graphql/updateInstance.mutation.gql';
 import gqlDeleteInstance from '@/graphql/deleteInstance.mutation.gql';
-import { ref } from 'vue';
+import { computed, reactive } from 'vue';
 
 /**
- * Stores global information for instances.
+ * Stores information regarding the database instances and which one is currently active and
+ * enables CRUD operations for instances.
  */
-class InstanceStore {
-  // The currently selected instances (if any).
-  protected _selected = ref<Instance|null>(null);
-
-  // The list of available instances.
-  protected _instances = ref<Instance[]>([]);
-
-  // If the store is currently loading/submitting data
-  protected _loading = ref(false);
-
-  // On instantiation, fetch instances
-  // constructor() { this.fetchInstances(); }
+export function setup() {
+  const store = reactive({
+    selected: null as Instance|null,
+    instances: [] as Instance[],
+    loading: false,
+  });
 
   // GETs the selected instance
-  public get selected() { return this._selected; }
+  const selected = computed(() => store.selected);
+
+  // GETs a list of instances
+  const instances = computed(() => store.instances);
+
+  // GETs the loading state of fetch requests
+  const loading = computed(() => store.loading);
 
   // SETs (or clears) the selected instance.
-  public setSelected(item: Instance|null) { this._selected.value = item; }
-
-  // GETS a list of instances
-  public get instances() { return this._instances; }
+  function setSelected(item: Instance|null) { store.selected = item; }
 
   // Fetch instances from the server
-  public async fetchInstances() {
-    this._loading.value = true;
+  async function fetchInstances() {
+    store.loading = true;
 
     try {
       const res = await Apollo.query<InstanceResponse>({
@@ -40,33 +38,32 @@ class InstanceStore {
       });
 
       if (res.data) {
-        this._instances.value = res.data.instances.nodes;
-        const active = this._instances.value.findIndex((x) => x.isActive === true);
-        this.setSelected(this._instances.value[active > -1 ? active : 0]);
+        store.instances = res.data.instances.nodes;
+        const active = store.instances.findIndex((x) => x.isActive === true);
+        setSelected(store.instances[active > -1 ? active : 0]);
       }
     } catch (e) {
       throw e.message ?? e;
     } finally {
-      this._loading.value = false;
+      store.loading = false;
     }
   }
 
   // Create a new instance
-  async newInstance(input: NewInstanceRequest) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const self = this as Record<string, any>;
-
+  async function newInstance(input: NewInstanceRequest) {
     try {
       const res = await Apollo.mutate<NewInstanceResponse>({
         mutation: gqlNewInstance,
         variables: input,
         update(cache, data) {
-          const newInstance = data.data?.newInstance;
+          const instance = data.data?.newInstance;
+          if (!instance) return;
+
           cache.writeQuery<InstanceResponse>({
             query: gqlInstances,
             data: {
               instances: {
-                nodes: [...self.instances.value, newInstance],
+                nodes: [...store.instances, instance],
               },
             },
           });
@@ -74,7 +71,7 @@ class InstanceStore {
       });
 
       if (res.data) {
-        this._instances.value = [...this._instances.value, res.data.newInstance];
+        store.instances = [...store.instances, res.data.newInstance];
         return res.data.newInstance;
       }
 
@@ -85,7 +82,7 @@ class InstanceStore {
   }
 
   // Update an instance
-  async updateInstance(input: UpdateInstanceRequest) {
+  async function updateInstance(input: UpdateInstanceRequest) {
     try {
       const res = await Apollo.mutate<UpdateInstanceResponse>({
         mutation: gqlUpdateInstance,
@@ -93,12 +90,12 @@ class InstanceStore {
       });
 
       if (res.data) {
-        const instances = [
-          ...this._instances.value.filter((x: Instance) => x.id !== res.data?.updateInstance[0].id),
+        const instanceList = [
+          ...store.instances.filter((x: Instance) => x.id !== res.data?.updateInstance[0].id),
           ...res.data.updateInstance,
         ];
 
-        this._instances.value = instances;
+        store.instances = instanceList;
         return res.data.updateInstance[0];
       }
 
@@ -109,7 +106,7 @@ class InstanceStore {
   }
 
   // Delete an instance
-  async deleteInstance(instance: Instance) {
+  async function deleteInstance(instance: Instance) {
     try {
       const res = await Apollo.mutate<DeleteInstanceResponse>({
         mutation: gqlDeleteInstance,
@@ -119,7 +116,7 @@ class InstanceStore {
       });
 
       if (res.data && res.data.deleteInstance === true) {
-        this._instances.value = this._instances.value.filter((x) => x.id !== instance.id);
+        store.instances = store.instances.filter((x) => x.id !== instance.id);
         return;
       }
 
@@ -128,7 +125,19 @@ class InstanceStore {
       throw e?.message ?? e;
     }
   }
+
+  return {
+    selected,
+    instances,
+    loading,
+    setSelected,
+    fetchInstances,
+    newInstance,
+    updateInstance,
+    deleteInstance,
+  };
 }
 
-const instanceStore = new InstanceStore();
-export default instanceStore;
+const store = setup();
+export type InstanceStore = ReturnType<typeof setup>;
+export default store;

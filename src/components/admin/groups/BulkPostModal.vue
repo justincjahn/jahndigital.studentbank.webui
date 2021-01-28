@@ -161,9 +161,9 @@ import BulkPostService from '@/services/BulkPostService';
 import Modal from '@/components/Modal.vue';
 import ShareTypeSelector from '@/components/ShareTypeSelector.vue';
 import Money from '@/utils/money';
-import groupStore from '@/store/GroupStore';
+import groupStore from '@/store/group';
 import LoadingIcon from '@/components/LoadingIcon.vue';
-import GlobalState from '@/store/modules/global';
+import errorStore from '@/store/error';
 
 export default defineComponent({
   components: {
@@ -311,7 +311,7 @@ export default defineComponent({
         const data = await bulkPostState.post();
         emit('ok', data);
       } catch (e) {
-        GlobalState.setCurrentError(e?.message ?? e);
+        errorStore.setCurrentError(e?.message ?? e);
       }
     }
 

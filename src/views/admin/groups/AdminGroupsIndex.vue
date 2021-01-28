@@ -56,8 +56,7 @@
 <script lang="ts">
 import StudentList from '@/components/admin/groups/TheStudentList.vue';
 import GroupSelector from '@/components/GroupSelector.vue';
-import instanceStore from '@/store/InstanceStore';
-import groupStore from '@/store/GroupStore';
+import groupStore from '@/store/group';
 import selection from '@/services/StudentSelectionService';
 import { ref, computed, watchEffect, defineAsyncComponent } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -84,27 +83,12 @@ export default {
     const route = useRoute();
     const showBulkTransactionModal = ref(false);
     const showBulkGroupModal = ref(false);
+    const selectedGroup = ref<Group|null>(null);
 
     const hasSelection = computed(() => {
       if (selection.getGroups().length > 0) return true;
       if (selection.getStudents().length > 0) return true;
       return false;
-    });
-
-    // Rehydrate the selected group
-    watchEffect(() => {
-      if (
-        groupStore.groups.value.length > 0
-        && groupStore.selected.value === null
-        && route.params.groupId
-      ) {
-        const gid = parseInt(route.params.groupId as string, 10) ?? -1;
-        const group = groupStore.groups.value.find((x) => x.id === gid);
-
-        if (group && (instanceStore.selected.value?.id === group.id ?? false)) {
-          groupStore.setSelected(group);
-        }
-      }
     });
 
     function handleGroupSelection(item: Group|null) {
@@ -145,6 +129,25 @@ export default {
       showBulkGroupModal.value = false;
     }
 
+    // Rehydrate the selected group
+    watchEffect(() => {
+      if (
+        groupStore.groups.value.length > 0
+        && groupStore.selected.value === null
+        && route.params.groupId
+      ) {
+        const gid = parseInt(route.params.groupId as string, 10) ?? -1;
+        const group = groupStore.groups.value.find((x) => x.id === gid);
+
+        if (group && (groupStore.instanceStore.selected.value?.id === group.id ?? false)) {
+          groupStore.setSelected(group);
+        }
+      }
+    });
+
+    // Sync the selected group with the store
+    watchEffect(() => groupStore.setSelected(selectedGroup.value));
+
     return {
       selection,
       hasSelection,
@@ -157,8 +160,8 @@ export default {
       handleShowBulkGroupModal,
       handleBulkGroupModalOk,
       handleBulkGroupModalCancel,
-      selectedInstance: instanceStore.selected,
-      selectedGroup: groupStore.selected,
+      selectedInstance: groupStore.instanceStore.selected,
+      selectedGroup,
     };
   },
 };

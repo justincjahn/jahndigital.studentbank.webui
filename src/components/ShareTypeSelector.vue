@@ -13,8 +13,8 @@
 import { defineComponent, ref, watchEffect } from 'vue';
 import Select from '@/components/Select.vue';
 import gqlShareTypes from '@/graphql/shareTypes.query.gql';
-import instanceStore from '@/store/InstanceStore';
-import GlobalStore from '@/store/modules/global';
+import instanceStore from '@/store/instance';
+import errorStore from '@/store/error';
 import Apollo from '@/services/Apollo';
 
 export default defineComponent({
@@ -48,7 +48,7 @@ export default defineComponent({
             shareTypes.value = filtered;
           }
         } catch (e) {
-          GlobalStore.setCurrentError(e?.Message ?? e);
+          errorStore.setCurrentError(e?.Message ?? e);
         }
       } else {
         shareTypes.value = [];
