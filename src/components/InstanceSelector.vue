@@ -35,8 +35,8 @@
       </template>
       <template v-else>
         <div class="instance-form">
-          <label for="instance-form__instance-name">Name</label>
-          <input type="text" ref="inputElement" id="instance-form__instance-name" v-model="input" />
+          <label :for="`instance-form__instance-name--${id}`">Name</label>
+          <input type="text" ref="inputElement" :id="`instance-form__instance-name--${id}`" v-model="input" />
         </div>
       </template>
   </Modal>
@@ -49,6 +49,7 @@ import GlobalState from '@/store/modules/global';
 import InstanceStore from '@/store/InstanceStore';
 import UserState from '@/store/modules/user';
 import { computed, defineComponent, PropType, ref, watchEffect } from 'vue';
+import uuid4 from '@/utils/uuid4';
 
 export enum ModalState {
   ADD,
@@ -72,6 +73,9 @@ export default defineComponent({
 
     // The input to add/rename an instance
     const input = ref('');
+
+    // A unique ID for the form
+    const id = uuid4();
 
     // The current state of the modal
     const modalState = ref<ModalState>(ModalState.ADD);
@@ -210,6 +214,7 @@ export default defineComponent({
       input,
       update,
       value,
+      id,
     };
   },
 });

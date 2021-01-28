@@ -4,14 +4,10 @@
     :value="value"
     :modelValue="modelValue"
     @update:modelValue="update"
+    prompt="Select a group..."
   >
     <template #list="{ options, className, select }">
-      <li
-        v-for="option in options"
-        :key="option.id"
-        :class="className"
-        @click="select(option)"
-      >
+      <li v-for="option in options" :key="option.id" :class="className" @click="select(option)">
         {{option.name}}
       </li>
       <li class="select__items__divider"><hr /></li>
@@ -33,15 +29,16 @@
       </template>
       <template v-else>
         <div class="group-form">
-          <label for="group-form__group-name">Name</label>
-          <input type="text" ref="inputElement" id="group-form__group-name" v-model="input" />
+          <label :for="`group-form__group-name--${id}`">Name</label>
+          <input type="text" ref="inputElement" :id="`group-form__group-name--${id}`" v-model="input" />
         </div>
       </template>
   </Modal>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, computed, PropType } from 'vue';
+import { defineComponent, ref, computed, PropType, watchEffect } from 'vue';
+import uuid4 from '@/utils/uuid4';
 import BaseSelect, { Search } from '@/components/BaseSelect.vue';
 import Modal from '@/components/Modal.vue';
 import GlobalState from '@/store/modules/global';
@@ -71,11 +68,7 @@ export default defineComponent({
 
     const input = ref('');
 
-    // Return the name of the group as the value
-    const value: Search = (x) => (typeof x === 'object' ? x?.name ?? x : x);
-
-    // Cascade the model update
-    function update(item: Group|null) { emit('update:modelValue', item); }
+    const id = uuid4();
 
     // The title of the modal window
     const modalTitle = computed(() => {
@@ -99,10 +92,14 @@ export default defineComponent({
       return null;
     });
 
+    // Return the name of the group as the value
+    const value: Search = (x) => (typeof x === 'object' ? x?.name ?? x : x);
+
+    // Cascade the model update
+    function update(item: Group|null) { emit('update:modelValue', item); }
+
     // Toggle the modal
-    function toggle() {
-      showModal.value = !showModal.value;
-    }
+    function toggle() { showModal.value = !showModal.value; }
 
     // Set the modal state to 'ADD' and show it
     function startAdd() {
@@ -138,10 +135,9 @@ export default defineComponent({
           });
 
           update(group);
+          toggle();
         } catch (e) {
           GlobalState.setCurrentError(e?.message ?? e);
-        } finally {
-          toggle();
         }
       }
 
@@ -155,10 +151,9 @@ export default defineComponent({
           });
 
           update(group);
+          toggle();
         } catch (e) {
           GlobalState.setCurrentError(e?.message ?? e);
-        } finally {
-          toggle();
         }
       }
 
@@ -182,8 +177,11 @@ export default defineComponent({
       toggle();
     }
 
-    // Clear the group selection when the groups change
-    watch(() => groupStore.groups.value, () => update(null), { immediate: true });
+    // Clear the group selection when the groups change and our selected group is no longer listed
+    watchEffect(() => {
+      const selected = groupStore.groups.value?.find((x) => x.id === props.modelValue?.id ?? -1);
+      if (!selected) update(null);
+    });
 
     return {
       ModalState,
@@ -200,6 +198,7 @@ export default defineComponent({
       startDelete,
       handleOk,
       handleCancel,
+      id,
     };
   },
 });
