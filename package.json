@@ -14,7 +14,6 @@
     "graphql": "^15.4.0",
     "vee-validate": "^4.1.0",
     "vue": "^3.0.0",
-    "vue-class-component": "^8.0.0-0",
     "vue-router": "^4.0.0-0"
   },
   "devDependencies": {
