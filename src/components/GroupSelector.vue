@@ -8,7 +8,7 @@
   >
     <template #list="{ options, className, select }">
       <li v-for="option in options" :key="option.id" :class="className" @click="select(option)">
-        {{option?.name ?? prompt}}
+        {{option.name}}
       </li>
       <li class="select__items__divider"><hr /></li>
       <li :class="className" @click.prevent="startAdd">Add...</li>
