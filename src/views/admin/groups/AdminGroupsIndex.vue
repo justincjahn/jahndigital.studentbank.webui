@@ -1,7 +1,7 @@
 <template>
   <div class="sub-menu">
     <template v-if="selectedInstance">
-      <group-selector v-model="selectedGroup"/>
+      <the-group-selector />
     </template>
     <template v-else>
       <p>Please select an instance...</p>
@@ -23,11 +23,11 @@
       <Suspense>
         <template #default>
           <span class="sub-menu__bulk-buttons__button">
-            <button :disabled="!hasSelection" @click.prevent="handleShowBulkTransactionModal()">Bulk Transaction</button>
+            <button :disabled="!hasSelection" @click.prevent="toggleBulkTransaction()">Bulk Transaction</button>
             <bulk-post-modal
               :show="showBulkTransactionModal"
-              @ok="handleBulkTransactionModalOk"
-              @cancel="handleBulkTransactionModalCancel"
+              @ok="toggleBulkTransaction"
+              @cancel="toggleBulkTransaction"
             />
           </span>
         </template>
@@ -37,11 +37,11 @@
       <Suspense>
         <template #default>
           <span class="sub-menu__bulk-buttons__button">
-            <button :disabled="!hasSelection" @click.prevent="handleShowBulkGroupModal()">Bulk Move</button>
+            <button :disabled="!hasSelection" @click.prevent="toggleBulkGroup()">Bulk Move</button>
             <bulk-group-modal
               :show="showBulkGroupModal"
               @ok="handleBulkGroupModalOk"
-              @cancel="handleBulkGroupModalCancel"
+              @cancel="toggleBulkGroup"
             />
           </span>
         </template>
@@ -55,11 +55,11 @@
 
 <script lang="ts">
 import StudentList from '@/components/admin/groups/TheStudentList.vue';
-import GroupSelector from '@/components/GroupSelector.vue';
+import TheGroupSelector from '@/components/admin/groups/TheGroupSelector.vue';
 import groupStore from '@/store/group';
 import selection from '@/services/StudentSelectionService';
-import { ref, computed, watchEffect, defineAsyncComponent } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { ref, computed, defineAsyncComponent } from 'vue';
+import { useRouter } from 'vue-router';
 import LoadingIcon from '@/components/LoadingIcon.vue';
 
 const BulkPostModal = defineAsyncComponent(
@@ -73,23 +73,16 @@ const BulkGroupModal = defineAsyncComponent(
 export default {
   components: {
     StudentList,
-    GroupSelector,
+    TheGroupSelector,
     BulkPostModal,
     LoadingIcon,
     BulkGroupModal,
   },
   setup() {
     const router = useRouter();
-    const route = useRoute();
     const showBulkTransactionModal = ref(false);
     const showBulkGroupModal = ref(false);
-    const selectedGroup = ref<Group|null>(null);
-
-    const hasSelection = computed(() => {
-      if (selection.getGroups().length > 0) return true;
-      if (selection.getStudents().length > 0) return true;
-      return false;
-    });
+    const hasSelection = computed(() => selection.length > 0);
 
     function handleGroupSelection(item: Group|null) {
       groupStore.setSelected(item);
@@ -102,66 +95,25 @@ export default {
       });
     }
 
-    function handleShowBulkTransactionModal() {
-      showBulkTransactionModal.value = true;
-    }
+    function toggleBulkTransaction() { showBulkTransactionModal.value = !showBulkTransactionModal.value; }
 
-    function handleBulkTransactionModalOk() {
-      showBulkTransactionModal.value = false;
-    }
-
-    function handleBulkTransactionModalCancel() {
-      showBulkTransactionModal.value = false;
-    }
-
-    function handleShowBulkGroupModal() {
-      showBulkGroupModal.value = true;
-    }
+    function toggleBulkGroup() { showBulkGroupModal.value = !showBulkGroupModal.value; }
 
     function handleBulkGroupModalOk(movedGroup: Group) {
       showBulkGroupModal.value = false;
-      const group = groupStore.groups.value.find((x) => x.id === movedGroup.id) ?? null;
-      handleGroupSelection(group);
+      handleGroupSelection(movedGroup);
       selection.clear();
     }
-
-    function handleBulkGroupModalCancel() {
-      showBulkGroupModal.value = false;
-    }
-
-    // Rehydrate the selected group
-    watchEffect(() => {
-      if (
-        groupStore.groups.value.length > 0
-        && groupStore.selected.value === null
-        && route.params.groupId
-      ) {
-        const gid = parseInt(route.params.groupId as string, 10) ?? -1;
-        const group = groupStore.groups.value.find((x) => x.id === gid);
-
-        if (group && (groupStore.instanceStore.selected.value?.id === group.id ?? false)) {
-          groupStore.setSelected(group);
-        }
-      }
-    });
-
-    // Sync the selected group with the store
-    watchEffect(() => groupStore.setSelected(selectedGroup.value));
 
     return {
       selection,
       hasSelection,
-      handleGroupSelection,
       showBulkTransactionModal,
-      handleShowBulkTransactionModal,
-      handleBulkTransactionModalOk,
-      handleBulkTransactionModalCancel,
+      toggleBulkTransaction,
       showBulkGroupModal,
-      handleShowBulkGroupModal,
+      toggleBulkGroup,
       handleBulkGroupModalOk,
-      handleBulkGroupModalCancel,
       selectedInstance: groupStore.instanceStore.selected,
-      selectedGroup,
     };
   },
 };

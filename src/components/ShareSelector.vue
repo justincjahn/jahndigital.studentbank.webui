@@ -11,7 +11,7 @@
         v-for="share in shares"
         :key="share.id"
         @click="selectShare(share)"
-        :class="{ selected: share.id === selected?.id ?? false }"
+        :class="{ selected: share.id === modelValue?.id ?? false }"
       >
         <th>{{share.shareType?.name ?? 'Unknown'}}</th>
         <td>{{
@@ -37,20 +37,14 @@ export default defineComponent({
       type: Object as () => Share[],
       required: true,
     },
-    selected: {
+    modelValue: {
       type: Object as () => Share|null,
-      required: false,
-      default: null,
+      required: true,
     },
   },
   setup(_, { emit }) {
-    function selectShare(share: Share) {
-      emit('select', share);
-    }
-
-    return {
-      selectShare,
-    };
+    function selectShare(share: Share) { emit('update:modelValue', share); }
+    return { selectShare };
   },
 });
 </script>

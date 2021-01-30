@@ -8,7 +8,7 @@
   >
     <template #list="{ options, className, select }">
       <li v-for="option in options" :key="option.id" :class="className" @click="select(option)">
-        {{option.name}}
+        {{option?.name ?? prompt}}
       </li>
       <li class="select__items__divider"><hr /></li>
       <li :class="className" @click.prevent="startAdd">Add...</li>
@@ -16,6 +16,7 @@
       <li :class="className" @click.prevent="startDelete">Delete...</li>
     </template>
   </base-select>
+
   <Modal
     :title="modalTitle"
     :customClass="modalClass"
@@ -37,13 +38,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, PropType, watchEffect } from 'vue';
-import uuid4 from '@/utils/uuid4';
 import BaseSelect, { Search } from '@/components/BaseSelect.vue';
 import Modal from '@/components/Modal.vue';
 import errorStore from '@/store/error';
-import instanceStore from '@/store/instance';
 import groupStore from '@/store/group';
+import { defineComponent, ref, computed, PropType } from 'vue';
+import uuid4 from '@/utils/uuid4';
 
 enum ModalState {
   ADD,
@@ -126,11 +126,11 @@ export default defineComponent({
     // Add a group or update and delete the selected group.
     async function handleOk() {
       if (modalState.value === ModalState.ADD) {
-        if (!instanceStore.selected.value) return;
+        if (!groupStore.instanceStore.selected.value) return;
 
         try {
           const group = await groupStore.newGroup({
-            instanceId: instanceStore.selected.value.id,
+            instanceId: groupStore.instanceStore.selected.value.id,
             name: input.value,
           });
 
@@ -177,27 +177,21 @@ export default defineComponent({
       toggle();
     }
 
-    // Clear the group selection when the groups change and our selected group is no longer listed
-    watchEffect(() => {
-      const selected = groupStore.groups.value?.find((x) => x.id === props.modelValue?.id ?? -1);
-      if (!selected) update(null);
-    });
-
     return {
       ModalState,
       options: groupStore.groups,
-      value,
-      update,
-      input,
-      showModal,
-      modalState,
       modalTitle,
       modalClass,
+      modalState,
+      showModal,
       startAdd,
       startEdit,
       startDelete,
       handleOk,
       handleCancel,
+      input,
+      update,
+      value,
       id,
     };
   },

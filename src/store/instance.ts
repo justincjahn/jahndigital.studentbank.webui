@@ -7,7 +7,9 @@ import { computed, reactive } from 'vue';
 
 /**
  * Stores information regarding the database instances and which one is currently active and
- * enables CRUD operations for instances.
+ * enables CRUD operations for instances.  Instances are in essence bespoke operating environments
+ * with their own groups, students, stocks, share types, etc.  They are most often used to create
+ * new environments for new terms/groups of students/people.
  */
 export function setup() {
   const store = reactive({
@@ -112,6 +114,19 @@ export function setup() {
         mutation: gqlDeleteInstance,
         variables: {
           id: instance.id,
+        },
+        update(cache, data) {
+          const wasDeleted = data.data?.deleteInstance;
+          if (!wasDeleted) return;
+
+          cache.writeQuery<InstanceResponse>({
+            query: gqlInstances,
+            data: {
+              instances: {
+                nodes: store.instances.filter((x: Instance) => x.id !== instance.id),
+              },
+            },
+          });
         },
       });
 

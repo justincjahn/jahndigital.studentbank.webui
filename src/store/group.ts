@@ -4,13 +4,13 @@ import gqlNewGroup from '@/graphql/newGroup.mutation.gql';
 import gqlUpdateGroup from '@/graphql/updateGroup.mutation.gql';
 import gqlDeleteGroup from '@/graphql/deleteGroup.mutation.gql';
 import theInstanceStore, { InstanceStore } from '@/store/instance';
-import { computed, reactive, watchEffect } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 /**
  * Stores information regarding the groups of the currently selected Instance and
- * enables CRUD operations.
+ * enables CRUD operations.  Groups are collections of students/people- i.e., classes.
  *
- * @param instanceStore The InstanceStore to use.
+ * @param instanceStore Watches the selected instance and fetches groups for it automatically.
  */
 export function setup(instanceStore: InstanceStore) {
   const store = reactive({
@@ -29,9 +29,7 @@ export function setup(instanceStore: InstanceStore) {
   const loading = computed(() => store.loading);
 
   // SETs the selected group
-  function setSelected(item: Group|null) {
-    store.selected = store.groups.find((x) => x.id === item?.id) ?? null;
-  }
+  function setSelected(item: Group|null) { store.selected = item; }
 
   // Fetch the groups of a specific instance.
   async function fetchGroups(instanceId: number) {
@@ -77,8 +75,9 @@ export function setup(instanceStore: InstanceStore) {
       });
 
       if (res.data) {
-        store.groups = [...store.groups, ...res.data.newGroup];
-        return res.data.newGroup[0];
+        const [group] = res.data.newGroup;
+        store.groups = [...store.groups, group];
+        return group;
       }
 
       throw new Error('Unable to create group: unknown error.');
@@ -93,6 +92,22 @@ export function setup(instanceStore: InstanceStore) {
       const res = await Apollo.mutate<UpdateGroupResponse>({
         mutation: gqlUpdateGroup,
         variables: input,
+        update(cache, data) {
+          const group = data.data?.updateGroup;
+          if (!group) return;
+
+          cache.writeQuery<GroupResponse>({
+            query: gqlGroups,
+            data: {
+              groups: {
+                nodes: [
+                  ...store.groups.filter((x: Group) => x.id !== group[0].id),
+                  ...group,
+                ],
+              },
+            },
+          });
+        },
       });
 
       if (res.data) {
@@ -118,15 +133,24 @@ export function setup(instanceStore: InstanceStore) {
         variables: {
           id: group.id,
         },
+        update(cache, data) {
+          const wasDeleted = data.data?.deleteGroup;
+          if (!wasDeleted) return;
+
+          cache.writeQuery<GroupResponse>({
+            query: gqlGroups,
+            data: {
+              groups: {
+                nodes: store.groups.filter((x: Group) => x.id !== group.id),
+              },
+            },
+          });
+        },
       });
 
       if (res.data && res.data.deleteGroup === true) {
-        store.groups = store.groups.filter((x: Group) => x.id !== group.id);
-
-        if (store.selected === group) {
-          store.selected = null;
-        }
-
+        store.groups = store.groups.filter((x) => x.id !== group.id);
+        if (store.selected === group) { store.selected = null; }
         return;
       }
 
@@ -136,7 +160,9 @@ export function setup(instanceStore: InstanceStore) {
     }
   }
 
-  watchEffect(() => {
+  // Watch for selected instance changes and fetch new groups
+  // @NOTE Not using watchEffect here because we don't want to watch store.groups changes.
+  watch(() => instanceStore.selected.value, () => {
     if (instanceStore.selected.value === null) {
       store.groups = [];
     } else {
@@ -146,7 +172,7 @@ export function setup(instanceStore: InstanceStore) {
     if (instanceStore.selected.value?.id !== store.selected?.instanceId ?? false) {
       store.selected = null;
     }
-  });
+  }, { immediate: true });
 
   return {
     instanceStore,

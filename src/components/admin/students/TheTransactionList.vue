@@ -50,34 +50,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watchEffect } from 'vue';
-import studentStore from '@/store/student';
+import { defineComponent, watch } from 'vue';
 import shareStore from '@/store/share';
 
 export default defineComponent({
   setup() {
-    const prevStudent = ref<Student|null>(null);
-
-    // When the share selection changes, load transactions
-    watchEffect(() => {
-      if (shareStore.selected.value !== null) {
-        shareStore.fetchShareTransactions({
-          shareId: shareStore.selected.value.id,
-        });
+    // When the selected share changes, fetch new transactions
+    watch(() => shareStore.selected.value, (newValue) => {
+      if (newValue !== null) {
+        shareStore.fetchShareTransactions({ shareId: newValue.id });
       } else {
         shareStore.clearTransactions();
       }
-    });
-
-    // When the student changes, clear the selection
-    watchEffect(() => {
-      if (studentStore.selected.value !== null) {
-        if (studentStore.selected.value.id !== prevStudent.value?.id ?? true) {
-          prevStudent.value = studentStore.selected.value;
-          shareStore.setSelected(null);
-        }
-      }
-    });
+    }, { immediate: true });
 
     return {
       shareStore,

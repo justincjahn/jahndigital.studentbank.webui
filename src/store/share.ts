@@ -2,7 +2,8 @@ import Apollo from '@/services/Apollo';
 import gqlTransactions from '@/graphql/transactions.query.gql';
 import gqlNewTransaction from '@/graphql/newTransaction.mutation.gql';
 import { FETCH_OPTIONS } from '@/constants';
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
+import theStudentStore, { StudentStore } from './student';
 
 type FetchOptions = {
   shareId: number;
@@ -10,9 +11,11 @@ type FetchOptions = {
 }
 
 /**
- * Stores information about shares in the system.
+ * Stores information about shares in the system.  Shares are deposit accounts that have
+ * transaction histories and a balance.  The Student object receives Share data from the
+ * GraphQL api, so we tie the functionality of this store to the studentStore passed in.
  */
-export function setup() {
+export function setup(studentStore: StudentStore) {
   const store = reactive({
     loading: false,
     totalCount: 0,
@@ -181,7 +184,18 @@ export function setup() {
     }
   }
 
+  // Watch for selected student changes and select the first share of that student.
+  watch(() => studentStore.selected.value, () => {
+    if (studentStore.selected.value === null && store.selected !== null) {
+      store.selected = null;
+    } else if (studentStore.selected.value !== null) {
+      const shares = studentStore.selected.value.shares ?? [];
+      if (shares.length > 0) [store.selected] = shares;
+    }
+  });
+
   return {
+    studentStore,
     loading,
     totalCount,
     selected,
@@ -197,6 +211,6 @@ export function setup() {
   };
 }
 
-const store = setup();
+const store = setup(theStudentStore);
 export type ShareStore = ReturnType<typeof setup>;
 export default store;

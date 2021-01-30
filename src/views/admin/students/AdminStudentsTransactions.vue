@@ -3,8 +3,7 @@
   <div class="student-transactions__sidebar">
     <share-selector
       :shares="studentStore.selected.value?.shares"
-      :selected="shareStore.selected.value"
-      @select="selectShare"
+      v-model="selectedShare"
     />
 
     <transaction-poster
@@ -21,13 +20,12 @@
 </template>
 
 <script lang="ts">
-import studentStore from '@/store/student';
 import shareStore from '@/store/share';
 import errorStore from '@/store/error';
 import ShareSelector from '@/components/ShareSelector.vue';
 import TransactionList from '@/components/admin/students/TheTransactionList.vue';
 import TransactionPoster from '@/components/TransactionPoster.vue';
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import Money from '@/utils/money';
 
 export default defineComponent({
@@ -39,13 +37,11 @@ export default defineComponent({
   setup() {
     const isPosting = ref<boolean>(false);
 
-    /**
-     * Set the selected share when the use clicks a button.
-     */
-    function selectShare(share: Share) {
-      if (shareStore.selected.value === share) return;
-      shareStore.setSelected(share);
-    }
+    // Proxy get/set requests to the shareStore
+    const selectedShare = computed<Share|null>({
+      get: () => shareStore.selected.value,
+      set: (item) => shareStore.setSelected(item),
+    });
 
     /**
      * Attempt to post the transaction from the TransactionPoster component and
@@ -66,7 +62,7 @@ export default defineComponent({
           takeNegative: true,
         });
 
-        await studentStore.refreshSelected();
+        await shareStore.studentStore.refreshSelected();
       } catch (e) {
         errorStore.setCurrentError(e?.message ?? e);
       } finally {
@@ -75,9 +71,9 @@ export default defineComponent({
     }
 
     return {
-      studentStore,
+      studentStore: shareStore.studentStore,
       shareStore,
-      selectShare,
+      selectedShare,
       postTransaction,
       isPosting,
     };
