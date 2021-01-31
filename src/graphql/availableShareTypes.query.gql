@@ -1,5 +1,5 @@
-query availableShareTypes {
-  availableShareTypes {
+query availableShareTypes($first: PaginationAmount) {
+  availableShareTypes(first: $first) {
     pageInfo {
       startCursor
       endCursor

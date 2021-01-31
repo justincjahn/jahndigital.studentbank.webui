@@ -106,8 +106,16 @@ interface UpdateBulkStudentResponse {
   updateBulkStudent: Student[];
 }
 
-interface ShareTypeResponse {
-  shareTypes: {
+interface PagedShareTypeResponse {
+  shareTypes?: {
+    pageInfo: PageInfo;
+    totalCount: number;
+    nodes: ShareType[];
+  };
+
+  availableShareTypes?: {
+    pageInfo: PageInfo;
+    totalCount: number;
     nodes: ShareType[];
   };
 }

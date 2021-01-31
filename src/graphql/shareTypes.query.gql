@@ -1,5 +1,5 @@
-query ShareTypes($instanceId: Long!) {
-  shareTypes(instanceId: $instanceId) {
+query ShareTypes($instanceId: Long!, $first: PaginationAmount) {
+  shareTypes(instanceId: $instanceId, first: $first) {
     pageInfo {
       startCursor
       endCursor
@@ -11,6 +11,9 @@ query ShareTypes($instanceId: Long!) {
       id
       name
       dividendRate
+      shareTypeInstances {
+        instanceId
+      }
     }
   }
 }

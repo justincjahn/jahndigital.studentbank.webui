@@ -14,12 +14,6 @@ interface Transaction {
   newBalance: number;
 }
 
-interface ShareType {
-  id: number;
-  name: string;
-  rate: number;
-}
-
 interface Share {
   id: number;
   shareTypeId: number;
@@ -82,7 +76,10 @@ interface PageInfo {
   endCursor: string;
 }
 
-type ShareTypeInstances = { instanceId: number }
+interface ShareTypeInstances {
+  instanceId: number;
+}
+
 interface ShareType {
   id: number;
   name: string;
