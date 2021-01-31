@@ -41,7 +41,7 @@
 import BaseSelect, { Search } from '@/components/BaseSelect.vue';
 import Modal from '@/components/Modal.vue';
 import errorStore from '@/store/error';
-import groupStore from '@/store/group';
+import theGroupStore, { GroupStore } from '@/store/group';
 import { defineComponent, ref, computed, PropType } from 'vue';
 import uuid4 from '@/utils/uuid4';
 
@@ -51,6 +51,11 @@ enum ModalState {
   DELETE,
 }
 
+/**
+ * A component that allows users to select, add, rename, and delete a Group linked to the currently
+ * selected instance. A custom groupStore may be passed in if using the global groupStore is not
+ * desired.
+ */
 export default defineComponent({
   components: {
     BaseSelect,
@@ -59,6 +64,9 @@ export default defineComponent({
   props: {
     modelValue: {
       type: Object as PropType<Group|null>,
+    },
+    groupStore: {
+      type: Object as PropType<GroupStore>,
     },
   },
   setup(props, { emit }) {
@@ -91,6 +99,9 @@ export default defineComponent({
 
       return null;
     });
+
+    // Use either the provided groupStore or the global one.
+    const groupStore = computed<GroupStore>(() => props.groupStore ?? theGroupStore);
 
     // Return the name of the group as the value
     const value: Search = (x) => (typeof x === 'object' ? x?.name ?? x : x);
@@ -126,11 +137,11 @@ export default defineComponent({
     // Add a group or update and delete the selected group.
     async function handleOk() {
       if (modalState.value === ModalState.ADD) {
-        if (!groupStore.instanceStore.selected.value) return;
+        if (!groupStore.value.instanceStore.selected.value) return;
 
         try {
-          const group = await groupStore.newGroup({
-            instanceId: groupStore.instanceStore.selected.value.id,
+          const group = await groupStore.value.newGroup({
+            instanceId: groupStore.value.instanceStore.selected.value.id,
             name: input.value,
           });
 
@@ -145,7 +156,7 @@ export default defineComponent({
         if (!props.modelValue) return;
 
         try {
-          const group = await groupStore.updateGroup({
+          const group = await groupStore.value.updateGroup({
             id: props.modelValue.id,
             name: input.value,
           });
@@ -161,7 +172,7 @@ export default defineComponent({
         if (!props.modelValue) return;
 
         try {
-          await groupStore.deleteGroup(props.modelValue);
+          await groupStore.value.deleteGroup(props.modelValue);
           update(null);
         } catch (e) {
           errorStore.setCurrentError(e?.message ?? e);
@@ -179,7 +190,7 @@ export default defineComponent({
 
     return {
       ModalState,
-      options: groupStore.groups,
+      options: groupStore.value.groups,
       modalTitle,
       modalClass,
       modalState,

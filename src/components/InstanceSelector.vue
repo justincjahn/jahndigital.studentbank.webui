@@ -46,7 +46,7 @@
 import BaseSelect, { Search } from '@/components/BaseSelect.vue';
 import Modal from '@/components/Modal.vue';
 import errorStore from '@/store/error';
-import instanceStore from '@/store/instance';
+import theInstanceStore, { InstanceStore } from '@/store/instance';
 import userStore from '@/store/user';
 import { computed, defineComponent, PropType, ref, watchEffect } from 'vue';
 import uuid4 from '@/utils/uuid4';
@@ -57,6 +57,10 @@ export enum ModalState {
   DELETE,
 }
 
+/**
+ * A component that allows users to select, add, rename, and delete an Instance. A custom
+ * instanceStore may be passed in if using the global instanceStore is not desired.
+ */
 export default defineComponent({
   components: {
     BaseSelect,
@@ -65,6 +69,9 @@ export default defineComponent({
   props: {
     modelValue: {
       type: Object as PropType<Instance>,
+    },
+    instanceStore: {
+      type: Object as PropType<InstanceStore>,
     },
   },
   setup(props, { emit }) {
@@ -79,6 +86,9 @@ export default defineComponent({
 
     // The current state of the modal
     const modalState = ref<ModalState>(ModalState.ADD);
+
+    // Use either the provided instanceStore or the global one.
+    const instanceStore = computed(() => props.instanceStore ?? theInstanceStore);
 
     // The title of the modal window
     const modalTitle = computed(() => {
@@ -142,7 +152,7 @@ export default defineComponent({
         }
 
         try {
-          const instance = await instanceStore.newInstance({ description: input.value });
+          const instance = await instanceStore.value.newInstance({ description: input.value });
           update(instance);
           toggle();
         } catch (e) {
@@ -159,7 +169,7 @@ export default defineComponent({
         if (props.modelValue === null) return;
 
         try {
-          const instance = await instanceStore.updateInstance({
+          const instance = await instanceStore.value.updateInstance({
             id: props.modelValue?.id ?? -1,
             description: input.value,
           });
@@ -176,7 +186,7 @@ export default defineComponent({
 
         try {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          await instanceStore.deleteInstance(props.modelValue!);
+          await instanceStore.value.deleteInstance(props.modelValue!);
           update(null);
         } catch (e) {
           errorStore.setCurrentError(e.message ?? e);
@@ -194,14 +204,14 @@ export default defineComponent({
 
     // Fetch instances if there are none, or the user just authenticated
     watchEffect(() => {
-      if (userStore.isAuthenticated.value || instanceStore.instances.value.length === 0) {
-        instanceStore.fetchInstances();
+      if (userStore.isAuthenticated.value || instanceStore.value.instances.value.length === 0) {
+        instanceStore.value.fetchInstances();
       }
     });
 
     return {
       ModalState,
-      options: instanceStore.instances,
+      options: instanceStore.value.instances,
       modalTitle,
       modalClass,
       modalState,

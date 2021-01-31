@@ -20,6 +20,23 @@ import { defineComponent, onMounted, onUnmounted, ref, PropType } from 'vue';
 export type Item = Record<string, any>|number|string|null;
 export type Search = <T extends Item>(obj: T) => string;
 
+/**
+ * A custom drop-down component with some customizability and animations.  When an item
+ * is selected, the v-model is updated via an update:modelValue event.  Anonymous functions
+ * may be passed in that output the name of each item.  When no item is selected, a custom
+ * prompt message may be passed in as a param.
+ *
+ * Slots:
+ *   + selected: The contents of the button containing the selected item.
+ *     - option: The object/number/string currently selected.
+ *     - prompt: The promp to use when there is nothing selected.
+ *   + list: Create custom list elements for each item.
+ *     - options: The list of items to render.
+ *     - className: The class that should be applied to each list item.
+ *     - select: The function to call when an item is selected.  Add it to each list items @click event.
+ *   + option: The contents of each list item.  Can be used to customize the display of each list item.
+ *     - option: The object/number/string being rendered.
+ */
 export default defineComponent({
   props: {
     modelValue: {
@@ -53,22 +70,14 @@ export default defineComponent({
     const root = ref<HTMLButtonElement|null>(null);
 
     // Open and close the select when the user clicks on/off the button.
-    function toggle(e: Event) {
-      open.value = !(e.target !== root.value);
-    }
+    function toggle(e: Event) { open.value = !(e.target !== root.value); }
 
     // Update the v-model when a new item is selected
-    function select(item: Item) {
-      emit('update:modelValue', item);
-    }
+    function select(item: Item) { emit('update:modelValue', item); }
 
-    onMounted(() => {
-      document.addEventListener('click', toggle);
-    });
-
-    onUnmounted(() => {
-      document.removeEventListener('click', toggle);
-    });
+    // Register/unregister a global click event that toggles the selector
+    onMounted(() => { document.addEventListener('click', toggle); });
+    onUnmounted(() => { document.removeEventListener('click', toggle); });
 
     return {
       root,

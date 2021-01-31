@@ -25,7 +25,7 @@
           Funds will be deposited or withdrawn from the first share of the type you select:
         </p>
 
-        <share-type-selector :selectedValue="state.selectedShareType" @select="handleShareTypeSelection" />
+        <share-type-selector :modelValue="state.selectedShareType" @update:modelValue="handleShareTypeSelection" />
 
         <p class="bpm__step-1__error error" v-if="state.errors[1] !== null">{{state.errors[1]}}</p>
       </div>
