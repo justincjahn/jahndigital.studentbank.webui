@@ -5,13 +5,30 @@
     :modelValue="modelValue"
     @update:modelValue="update"
     prompt="Choose a share type..."
-  />
+  >
+    <template #list="{ options, className, select }">
+      <li v-for="option in options" :key="option.id" :class="className" @click="select(option)">
+        {{option.name}}
+      </li>
+      <li class="select__items__divider"><hr /></li>
+      <li :class="className" @click.prevent="startAdd">Add...</li>
+      <li :class="className" @click.prevent="startEdit">Rename...</li>
+      <li :class="className" @click.prevent="startDelete">Delete...</li>
+    </template>
+  </base-select>
+
+  <add-link-modal :show="showAddLink" @ok="startAdd" />
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed } from 'vue';
+import { defineComponent, defineAsyncComponent, PropType, ref, computed } from 'vue';
 import theShareTypeStore, { ShareTypeStore } from '@/store/shareType';
 import BaseSelect, { Search } from '@/components/BaseSelect.vue';
+
+enum ModalState {
+  EDIT,
+  DELETE,
+}
 
 /**
  * A component that allows users to select a Share Type linked to the currently
@@ -21,6 +38,7 @@ import BaseSelect, { Search } from '@/components/BaseSelect.vue';
 export default defineComponent({
   components: {
     BaseSelect,
+    AddLinkModal: defineAsyncComponent(() => import('@/components/admin/ShareTypeAddLinkModal.vue')),
   },
   props: {
     modelValue: {
@@ -31,6 +49,10 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
+    const modalState = ref<ModalState>(ModalState.EDIT);
+
+    const showAddLink = ref(false);
+
     // Use either the provided shareTypeStore or the global one.
     const shareTypeStore = computed<ShareTypeStore>(() => props.shareTypeStore ?? theShareTypeStore);
 
@@ -40,10 +62,23 @@ export default defineComponent({
     // When an item is selected, update our parent
     function update(item: ShareType) { emit('update:modelValue', item); }
 
+    // Set the modal state to 'ADD' and show it
+    function startAdd() { showAddLink.value = !showAddLink.value; }
+
+    // Set the modal state to 'EDIT' and show it
+    function startEdit() { modalState.value = ModalState.EDIT; }
+
+    // Set the modal state to 'DELETE' and show it
+    function startDelete() { modalState.value = ModalState.DELETE; }
+
     return {
       options: shareTypeStore.value.shareTypes,
       update,
       value,
+      startAdd,
+      startEdit,
+      startDelete,
+      showAddLink,
     };
   },
 });

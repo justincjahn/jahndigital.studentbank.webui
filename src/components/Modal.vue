@@ -23,6 +23,7 @@
             <button
               tabindex="1"
               class="modal__container__buttons__cancel"
+              :class="[cancelButtonClass]"
               v-if="cancelLabel"
               @click.prevent="handleCancel"
               :disabled="!canCancel"
@@ -31,7 +32,8 @@
             </button>
             <button
               tabindex="0"
-              class="modal__container__buttons__ok primary"
+              class="modal__container__buttons__ok"
+              :class="[okButtonClass]"
               @click.prevent="handleOk" ref="okButton"
               :disabled="!canSubmit"
             >
@@ -76,10 +78,20 @@ export default defineComponent({
       required: false,
       default: 'Ok',
     },
+    okButtonClass: {
+      type: String,
+      required: false,
+      default: 'primary',
+    },
     cancelLabel: {
       type: String,
       required: false,
       default: null,
+    },
+    cancelButtonClass: {
+      type: String,
+      required: false,
+      default: '',
     },
     canSubmit: {
       type: Boolean,
@@ -87,6 +99,16 @@ export default defineComponent({
       default: true,
     },
     canCancel: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    handleEnter: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    handleEscape: {
       type: Boolean,
       required: false,
       default: true,
@@ -121,7 +143,7 @@ export default defineComponent({
         return;
       }
 
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && props.handleEscape) {
         e.preventDefault();
 
         if (props.cancelLabel) {
@@ -131,7 +153,7 @@ export default defineComponent({
         }
       }
 
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' && props.handleEnter) {
         e.preventDefault();
         handleOk(e);
       }
