@@ -1,7 +1,7 @@
 <template>
   <div class="sub-menu">
     <template v-if="selectedInstance">
-      <the-group-selector />
+      <suspense><the-group-selector /></suspense>
     </template>
     <template v-else>
       <p>Please select an instance...</p>
@@ -20,7 +20,7 @@
     <div class="sub-menu__bulk-buttons">
       <button :disabled="!hasSelection" @click.prevent="selection.clear">Clear Selection</button>
 
-      <Suspense>
+      <suspense>
         <template #default>
           <span class="sub-menu__bulk-buttons__button">
             <button :disabled="!hasSelection" @click.prevent="toggleBulkTransaction()">Bulk Transaction</button>
@@ -32,9 +32,9 @@
           </span>
         </template>
         <template #fallback><loading-icon /></template>
-      </Suspense>
+      </suspense>
 
-      <Suspense>
+      <suspense>
         <template #default>
           <span class="sub-menu__bulk-buttons__button">
             <button :disabled="!hasSelection" @click.prevent="toggleBulkGroup()">Bulk Move</button>
@@ -46,28 +46,34 @@
           </span>
         </template>
         <template #fallback><loading-icon /></template>
-      </Suspense>
+      </suspense>
     </div>
   </div>
 
-  <StudentList />
+  <suspense><StudentList /></suspense>
 </template>
 
 <script lang="ts">
-import StudentList from '@/components/admin/groups/TheStudentList.vue';
-import TheGroupSelector from '@/components/admin/groups/TheGroupSelector.vue';
+import LoadingIcon from '@/components/LoadingIcon.vue';
 import groupStore from '@/store/group';
 import selection from '@/services/StudentSelectionService';
 import { ref, computed, defineAsyncComponent } from 'vue';
 import { useRouter } from 'vue-router';
-import LoadingIcon from '@/components/LoadingIcon.vue';
 
 const BulkPostModal = defineAsyncComponent(
-  () => import('@/components/admin/groups/BulkPostModal.vue'),
+  () => import(/* webpackChunkName: "admin-groups" */ '@/components/admin/groups/BulkPostModal.vue'),
 );
 
 const BulkGroupModal = defineAsyncComponent(
-  () => import('@/components/admin/groups/BulkGroupModal.vue'),
+  () => import(/* webpackChunkName: "admin-groups" */ '@/components/admin/groups/BulkGroupModal.vue'),
+);
+
+const TheGroupSelector = defineAsyncComponent(
+  () => import(/* webpackChunkName: "admin-groups" */ '@/components/admin/groups/TheGroupSelector.vue'),
+);
+
+const StudentList = defineAsyncComponent(
+  () => import(/* webpackChunkName: "admin-groups" */ '@/components/admin/groups/TheStudentList.vue'),
 );
 
 export default {

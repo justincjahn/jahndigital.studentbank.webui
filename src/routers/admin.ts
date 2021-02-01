@@ -1,10 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import AdminStudentsIndex from '@/views/admin/students/AdminStudentsIndex.vue';
-import AdminStudentTransactions from '@/views/admin/students/AdminStudentsTransactions.vue';
-import AdminStudentStocks from '@/views/admin/students/AdminStudentsStocks.vue';
-import AdminStudentPurchases from '@/views/admin/students/AdminStudentsPurchases.vue';
-import AdminLogin from '@/views/admin/AdminLogin.vue';
-import About from '@/views/About.vue';
+import routerStore from '@/store/router';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -16,24 +11,24 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/admin/students/:studentId?',
     name: 'Students',
-    component: AdminStudentsIndex,
+    component: import(/* webpackChunkName: "admin-students" */ '@/views/admin/students/AdminStudentsIndex.vue'),
     children: [
       {
         path: 'transactions',
         name: 'StudentsTransactions',
-        component: AdminStudentTransactions,
+        component: () => import(/* webpackChunkName: "admin-students" */ '@/views/admin/students/AdminStudentsTransactions.vue'),
       },
 
       {
         path: 'stocks',
         name: 'StudentsStocks',
-        component: AdminStudentStocks,
+        component: () => import(/* webpackChunkName: "admin-students" */ '@/views/admin/students/AdminStudentsStocks.vue'),
       },
 
       {
         path: 'purchases',
         name: 'StudentsPurchases',
-        component: AdminStudentPurchases,
+        component: () => import(/* webpackChunkName: "admin-students" */ '@/views/admin/students/AdminStudentsPurchases.vue'),
       },
     ],
   },
@@ -41,37 +36,51 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/admin/groups/:groupId?',
     name: 'Groups',
-    component: () => import('@/views/admin/groups/AdminGroupsIndex.vue'),
+    component: () => import(/* webpackChunkName: "admin-groups" */ '@/views/admin/groups/AdminGroupsIndex.vue'),
   },
 
   {
     path: '/admin/stocks',
     name: 'Stocks',
-    component: About,
+    component: () => import(/* webpackChunkName: "about" */ '@/views/About.vue'),
   },
 
   {
     path: '/admin/purchases',
     name: 'Purchases',
-    component: About,
+    component: () => import(/* webpackChunkName: "about" */ '@/views/About.vue'),
   },
 
   {
     path: '/admin/settings',
     name: 'Settings',
-    component: About,
+    component: () => import(/* webpackChunkName: "about" */ '@/views/About.vue'),
   },
 
   {
     path: '/admin/login',
     name: 'login',
-    component: AdminLogin,
+    component: () => import(/* webpackChunkName: "admin-main" */ '@/views/admin/AdminLogin.vue'),
   },
 ];
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
+});
+
+router.beforeEach((to, _, next) => {
+  if (typeof to.matched[0]?.components.default === 'function') {
+    routerStore.setLoading(true);
+  }
+
+  next();
+});
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+router.beforeResolve((_, __, next) => {
+  routerStore.setLoading(false);
+  next();
 });
 
 export default router;

@@ -1,5 +1,7 @@
 <template>
-  <StudentSelector @select="handleSelection" @clear="handleClear"/>
+  <suspense>
+    <student-selector @select="handleSelection" @clear="handleClear"/>
+  </suspense>
 
   <div class="student-info">
     <form @submit.prevent="handleSubmit" autocomplete="off">
@@ -57,11 +59,10 @@
 </template>
 
 <script lang="ts">
-import StudentSelector from '@/components/StudentSelector.vue';
 import studentStore from '@/store/student';
 import errorStore from '@/store/error';
 import { useRouter, useRoute } from 'vue-router';
-import { defineComponent, onMounted, computed } from 'vue';
+import { defineComponent, onMounted, computed, defineAsyncComponent } from 'vue';
 import { Field, useForm } from 'vee-validate';
 import Apollo from '@/services/Apollo';
 import gqlSearchAccounts from '@/graphql/studentsByAccountNumber.gql';
@@ -72,7 +73,7 @@ import gqlStudentById from '@/graphql/studentById.gql';
  */
 export default defineComponent({
   components: {
-    StudentSelector,
+    StudentSelector: defineAsyncComponent(() => import(/* webpackChunkName: "admin-students" */ '@/components/StudentSelector.vue')),
     Field,
   },
   setup() {
@@ -265,7 +266,6 @@ export default defineComponent({
     const params = computed(() => route.params);
 
     return {
-      StudentSelector,
       studentStore,
       handleSelection,
       handleClear,

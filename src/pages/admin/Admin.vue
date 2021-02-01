@@ -5,12 +5,12 @@
 
       <div class="main-nav__instances">
         <template v-if="userStore.isAuthenticated.value">
-          <instance-selector />
+          <suspense><instance-selector /></suspense>
         </template>
       </div>
 
       <div class="main-nav__login">
-        <login-widget />
+        <suspense><login-widget /></suspense>
       </div>
     </section>
 
@@ -23,18 +23,23 @@
     </section>
   </header>
 
-  <main><router-view/></main>
+  <main>
+    <div class="loading" v-if="loading"><loading-icon>Loading, please wait...</loading-icon></div>
+    <router-view v-else />
+  </main>
 
   <footer>&copy; 2020 Jahn Digital</footer>
 
-  <Modal
-    :show="errorStore.error.value !== null"
-    customClass="destructive"
-    title="Error"
-    @ok="errorStore.setCurrentError(null)"
-  >
-    {{errorStore.error.value}}
-  </Modal>
+  <suspense>
+    <Modal
+      :show="errorStore.error.value !== null"
+      customClass="destructive"
+      title="Error"
+      @ok="errorStore.setCurrentError(null)"
+    >
+      {{errorStore.error.value}}
+    </Modal>
+  </suspense>
 </template>
 
 <style lang="scss">
@@ -42,19 +47,19 @@
 </style>
 
 <script>
-import LoginWidget from '@/components/admin/navigation/TheLoginWidget.vue';
-import InstanceSelector from '@/components/admin/navigation/TheInstanceSelector.vue';
-import Modal from '@/components/Modal.vue';
+import routerStore from '@/store/router';
 import userStore from '@/store/user';
 import errorStore from '@/store/error';
+import LoadingIcon from '@/components/LoadingIcon.vue';
 import { useRouter } from 'vue-router';
-import { watchEffect } from 'vue';
+import { defineAsyncComponent, watchEffect } from 'vue';
 
 export default {
   components: {
-    LoginWidget,
-    InstanceSelector,
-    Modal,
+    LoginWidget: defineAsyncComponent(() => import(/* webpackChunkName: "admin-main" */ '@/components/admin/navigation/TheLoginWidget.vue')),
+    InstanceSelector: defineAsyncComponent(() => import(/* webpackChunkName: "admin-main" */ '@/components/admin/navigation/TheInstanceSelector.vue')),
+    Modal: defineAsyncComponent(() => import(/* webpackChunkName: "admin-main" */ '@/components/Modal.vue')),
+    LoadingIcon,
   },
 
   setup() {
@@ -70,7 +75,14 @@ export default {
     return {
       errorStore,
       userStore,
+      loading: routerStore.loading,
     };
   },
 };
 </script>
+
+<style scoped>
+  .loading {
+    font-size: 2em;
+  }
+</style>
