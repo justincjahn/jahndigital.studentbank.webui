@@ -1,0 +1,10 @@
+mutation newShareType($name: String, $dividendRate: Rate) {
+  newShareType(input: { name: $name, dividendRate: $dividendRate}) {
+    id
+    name
+    dividendRate
+    shareTypeInstances {
+      instanceId
+    }
+  }
+}

@@ -1,4 +1,4 @@
-<template >
+<template>
   <div class="loading" v-if="show">
     <svg xmlns="http://www.w3.org/2000/svg" class="loading__img" viewBox="0 0 139.01 318.26">
       <g class="loading__img__main">
@@ -39,17 +39,19 @@ export default defineComponent({
   padding: 0;
   display: flex;
   flex-direction: row;
-  align-items: center;
+  justify-content: center;
 
   &__content {
-    margin: auto 0 auto 0.15em;
+    font-size: 1em;
+    margin: 0 0 0 0.5em;
+    align-self: center;
   }
 
   &__img {
+    font-size: 0.75em;
     position: relative;
     overflow: visible;
     animation: wobble 4s ease-in-out 4.25s infinite;
-    margin: 0.25em;
     height: 1.5em;
 
     &__s, &__l1, &__l2 {

@@ -3,7 +3,6 @@
     <thead>
       <tr>
         <th></th>
-        <th>ID</th>
         <th>Name</th>
         <th>Rate</th>
       </tr>
@@ -13,19 +12,17 @@
         v-for="s in shareTypes"
         :key="s.id"
         :class="{ selected: isSelected(s) }"
-        @click="select(s)"
       >
         <td>
           <input type="checkbox" :checked="isSelected(s)" @click="select(s)" v-if="modelValue" />
         </td>
-        <td>{{s.id}}</td>
-        <td>{{s.name}}</td>
-        <td>{{s.dividendRate.toLocaleString('us', { style: 'percent', minimumFractionDigits: 2 })}}</td>
+        <td @click="select(s)">{{s.name}}</td>
+        <td @click="select(s)">{{s.dividendRate.toLocaleString('us', { style: 'percent', minimumFractionDigits: 2 })}}</td>
       </tr>
     </tbody>
     <tbody v-else>
       <tr>
-        <td colspan="4" class="center">{{prompt}}</td>
+        <td colspan="3" class="center">{{prompt}}</td>
       </tr>
     </tbody>
   </table>

@@ -1,3 +1,7 @@
+/*
+ * USERS
+ */
+
 interface AuthenticateResponse {
   // Unique ID of the user.
   id: number;
@@ -6,24 +10,16 @@ interface AuthenticateResponse {
   jwtToken: string;
 }
 
-interface DeleteGroupResponse {
-  deleteGroup: boolean;
+interface UserLoginResponse {
+  userLogin: AuthenticateResponse;
 }
 
-interface DeleteInstanceResponse {
-  deleteInstance: boolean;
-}
+/*
+ * INSTANCES
+ */
 
-interface GroupResponse {
-  groups: {
-    nodes: Group[];
-  };
-}
-
-interface GroupResponse {
-  groups: {
-    nodes: Group[];
-  };
+interface NewInstanceResponse {
+  newInstance: Instance;
 }
 
 interface InstanceResponse {
@@ -32,23 +28,50 @@ interface InstanceResponse {
   };
 }
 
-interface NewGroupRequest {
-  instanceId: number;
-  name: string;
+interface UpdateInstanceResponse {
+  updateInstance: Instance[];
 }
+
+interface DeleteInstanceResponse {
+  deleteInstance: boolean;
+}
+
+/*
+ * GROUPS
+ */
 
 interface NewGroupResponse {
   newGroup: Group[];
 }
 
-interface NewInstanceResponse {
-  newInstance: Instance;
+interface GroupResponse {
+  groups: {
+    nodes: Group[];
+  };
 }
 
 interface PagedGroupResponse {
   groups: {
     pageInfo: PageInfo;
     nodes: Group[];
+  };
+}
+
+interface UpdateGroupResponse {
+  updateGroup: Group[];
+}
+
+interface DeleteGroupResponse {
+  deleteGroup: boolean;
+}
+
+/*
+ * STUDENTS
+ */
+
+interface StudentResponse {
+  students: {
+    nodes: Student[];
   };
 }
 
@@ -60,38 +83,24 @@ interface PagedStudentResponse {
   };
 }
 
+interface UpdateStudentResponse {
+  updateStudent: Student[];
+}
+
+interface UpdateBulkStudentResponse {
+  updateBulkStudent: Student[];
+}
+
+/*
+ * TRANSACTIONS
+ */
+
 interface PagedTransactionResponse {
   transactions: {
     pageInfo: PageInfo;
     totalCount: number;
     nodes: Transaction[];
   };
-}
-
-interface StudentResponse {
-  students: {
-    nodes: Student[];
-  };
-}
-
-interface UpdateGroupResponse {
-  updateGroup: Group[];
-}
-
-interface UpdateInstanceResponse {
-  updateInstance: Instance[];
-}
-
-interface UpdateStudentResponse {
-  updateStudent: Student[];
-}
-
-interface UpdateStudentResponse {
-  updateStudent: Student[];
-}
-
-interface UserLoginResponse {
-  userLogin: AuthenticateResponse;
 }
 
 interface NewTransactionResponse {
@@ -102,8 +111,12 @@ interface NewBulkTransactionResponse {
   newBulkTransaction: Transaction[];
 }
 
-interface UpdateBulkStudentResponse {
-  updateBulkStudent: Student[];
+/*
+ * SHARE TYPES
+ */
+
+interface NewShareTypeResponse {
+  newShareType: ShareType[];
 }
 
 interface PagedShareTypeResponse {
@@ -118,4 +131,20 @@ interface PagedShareTypeResponse {
     totalCount: number;
     nodes: ShareType[];
   };
+}
+
+interface UpdateShareTypeResponse {
+  updateShareType: ShareType[];
+}
+
+interface LinkShareTypeResponse {
+  linkShareType: ShareType[];
+}
+
+interface UnlinkShareTypeResponse {
+  unlinkShareType: ShareType[];
+}
+
+interface DeleteShareTypeResponse {
+  deleteShareType: boolean;
 }

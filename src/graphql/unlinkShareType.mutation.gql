@@ -1,0 +1,10 @@
+mutation unlinkShareType($shareTypeId: Long!, $instanceId: Long!) {
+  unlinkShareType(input: { shareTypeId: $shareTypeId, instanceId: $instanceId }) {
+    id
+    name
+    dividendRate
+    shareTypeInstances {
+      instanceId
+    }
+  }
+}

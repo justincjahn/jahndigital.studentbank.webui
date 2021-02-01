@@ -9,20 +9,30 @@
     @cancel.prevent="handleOk"
     :handleEnter="false"
   >
-    <div class="share-type-form">
-      <div class="share-type-form--fieldset">
-        <label :for="`share-type-form__name--${id}`">Name</label>
-        <input type="text" ref="inputElement" :id="`share-type-form__name--${id}`" v-model="input" />
+    <form class="stf" @submit.prevent="handleAdd">
+      <div class="stf__fieldset stf__fieldset--name">
+        <label :for="`stf__fieldset--name--${id}`">Name<span class="required">*</span></label>
+        <input type="text" :id="`stf__fieldset--name--${id}`" v-model="nameValue" />
+        <p class="error" v-if="nameError">{{nameError}}</p>
       </div>
-      <div class="share-type-form--fieldset">
-        <label :for="`share-type-form__rate--${id}`">Dividend Rate</label>
+      <div class="stf__fieldset stf__fieldset--rate">
+        <label :for="`stf__fieldset--rate--${id}`">Dividend Rate<span class="required">*</span></label>
         <p class="help-text">Specify the dividend rate in percent.</p>
-        <input type="text" :id="`share-type-form__rate--${id}`" v-model="rate" />
+        <div class="stf__fieldset--adorner">
+          <input type="text" :id="`stf__fieldset--rate--${id}`" v-model="rateValue" />
+          <span class="stf__fieldset--adorner--adornment">%</span>
+        </div>
+        <p class="error" v-if="rateError">{{rateError}}</p>
       </div>
-      <button class="primary">Add</button>
-    </div>
+      <button type="submit" class="primary" :disabled="addLoading || !canAdd">
+        <loading-icon :show="addLoading">
+          <template v-if="addLoading">Adding...</template>
+          <template v-else>Add</template>
+        </loading-icon>
+      </button>
+    </form>
 
-    <div class="share-type-link">
+    <div class="stl">
       <share-type-multiselect
         :shareTypes="shareTypes"
         :loading="loading"
@@ -30,22 +40,38 @@
         prompt="Use the form above to add a new Share Type, and link it here."
       />
 
-      <button class="share-type-link__button primary">Link Selected</button>
+      <button
+        class="stl__button primary"
+        :disabled="!canLink"
+        @click.prevent="handleLink"
+      >
+        Link Selected
+      </button>
     </div>
   </Modal>
 </template>
 
 <script lang="ts">
-import { defineAsyncComponent, defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, computed, watchEffect } from 'vue';
+import { useField } from 'vee-validate';
+import errorStore from '@/store/error';
 import instanceStore from '@/store/instance';
-import { setup as setupShareTypeStore } from '@/store/shareType';
+import theShareTypeStore, { setup as setupShareTypeStore } from '@/store/shareType';
 import Modal from '@/components/Modal.vue';
+import LoadingIcon from '@/components/LoadingIcon.vue';
+import ShareTypeMultiselect from '@/components/ShareTypeMultiselector.vue';
 import uuid4 from '@/utils/uuid4';
+import Rate from '@/utils/rate';
 
+/**
+ * Allows users to create new Share Types and then link them to the currently selected
+ * instance.  Updates the global shareTypeStore to ensure the new share type(s) are valid.
+ */
 export default defineComponent({
   components: {
     Modal,
-    ShareTypeMultiselect: defineAsyncComponent(() => import('@/components/ShareTypeMultiselector.vue')),
+    LoadingIcon,
+    ShareTypeMultiselect,
   },
   props: {
     show: {
@@ -56,41 +82,158 @@ export default defineComponent({
   emits: [
     'ok',
   ],
-  setup(_, { emit }) {
+  setup(props, { emit }) {
+    // Use a bespoke ShareTypeStore for the available share types list so we don't muddle global state.
     const shareTypeStore = setupShareTypeStore(instanceStore, false);
+
+    // True if a share type add operation is awaiting the server.
+    const addLoading = ref(false);
+
+    // An array of selected share types
     const selected = ref<ShareType[]>([]);
-    const input = ref('');
-    const rate = ref(0.00);
+
+    // A unique ID for the form elements
     const id = uuid4();
 
     // Filter share types that are already in the selected instance
-    const shareTypes = computed(() => (
-      shareTypeStore.shareTypes.value.filter((s) => (
-        s.shareTypeInstances.findIndex(
-          (instance) => (instanceStore.selected.value?.id ?? -1) !== instance.instanceId,
-        )
-      ))
-    ));
+    const shareTypes = computed(() => {
+      const instanceId = shareTypeStore.instanceStore.selected?.value?.id ?? -1;
+      const filtered = shareTypeStore.shareTypes.value.filter((st) => {
+        const hasInstance = st.shareTypeInstances.find((instance) => instance.instanceId === instanceId);
+        return !hasInstance;
+      });
 
-    function handleOk() { emit('ok'); }
+      return filtered;
+    });
+
+    // Ensures that the share type's name is valid
+    function validateName(val: string): string|boolean {
+      if (val && val.trim()) return true;
+      return 'Name is required.';
+    }
+
+    // Ensures that the rate is valid
+    function validateRate(val: string): string|boolean {
+      if (!val || !val.trim()) return 'Rate is required.';
+
+      try {
+        Rate.fromString(`${val}%`);
+      } catch (e) {
+        return e.message;
+      }
+
+      return true;
+    }
+
+    // The share type's name
+    const {
+      value: nameValue,
+      errorMessage: nameError,
+      handleReset: nameReset,
+      validate: nameValidate,
+    } = useField('name', validateName, {
+      validateOnMount: true,
+      initialValue: '',
+    });
+
+    // The dividend rate
+    const { value: rateValue, errorMessage: rateError, handleReset: rateReset } = useField('rate', validateRate, {
+      initialValue: '0',
+    });
+
+    // Reset the form back to defaults
+    function reset() {
+      nameReset();
+      rateReset();
+      nameValidate();
+    }
+
+    // True if the add button should be enabled
+    const canAdd = computed(() => !(nameError.value || rateError.value));
+
+    // True if the link button should be enabled
+    const canLink = computed(() => selected.value.length > 0);
+
+    // Tell the parent to close the modal
+    function handleOk() { reset(); emit('ok'); }
+
+    // Fetch a list of available share types using our custom store.
+    async function fetchAvailableShareTypes() { await shareTypeStore.fetch({ available: true }); }
+
+    // Link the selected share types
+    async function handleLink() {
+      if (!theShareTypeStore.instanceStore.selected.value) return;
+      const instanceId = theShareTypeStore.instanceStore.selected.value.id;
+      const errors = [] as string[];
+
+      await Promise.all(selected.value.map(async (shareType) => {
+        try {
+          await theShareTypeStore.linkShareType({
+            shareTypeId: shareType.id,
+            instanceId,
+          });
+        } catch (e) {
+          errors.push(e?.message ?? e);
+        }
+      }));
+
+      if (errors.length > 0) {
+        errorStore.setCurrentError(errors.join(', '));
+      }
+
+      await theShareTypeStore.fetch();
+      await fetchAvailableShareTypes();
+    }
+
+    // Add a new share type and refresh available share types
+    async function handleAdd() {
+      addLoading.value = true;
+
+      try {
+        await shareTypeStore.newShareType({
+          name: nameValue.value,
+          dividendRate: Rate.fromString(`${rateValue.value}%`).getRate(),
+        });
+
+        reset();
+        await fetchAvailableShareTypes();
+      } catch (e) {
+        errorStore.setCurrentError('Unable to add the Share Type.  Does it already exist?');
+        console.error(e);
+      } finally {
+        addLoading.value = false;
+      }
+    }
+
+    // Perform initial fetch of available share types on show
+    watchEffect(() => {
+      if (props.show === true) fetchAvailableShareTypes();
+    });
 
     return {
       selected,
       shareTypes,
       loading: shareTypeStore.loading,
+      addLoading,
       handleOk,
-      input,
-      rate,
+      handleAdd,
+      handleLink,
+      canAdd,
+      canLink,
+      nameValue,
+      nameError,
+      rateValue,
+      rateError,
       id,
     };
   },
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 $size: 35rem;
 
-.share-type-form {
+.stf {
   @include round-border();
 
   display: flex;
@@ -100,16 +243,31 @@ $size: 35rem;
   margin: 0px auto;
   padding: 1em;
 
-  &--fieldset input {
+  &__fieldset input {
     width: 100%;
   }
 
   & button {
+    font-size: 1em;
     margin: 0;
+  }
+
+  &__fieldset--rate {
+    & .stf__fieldset--adorner {
+      position: relative;
+
+      &--adornment {
+        position: absolute;
+        right: 1ch;
+        top: 0.25em;
+        user-select: none;
+        opacity: 0.6;
+      }
+    }
   }
 }
 
-.share-type-link {
+.stl {
   margin-top: 1em;
   display: flex;
   flex-direction: column;

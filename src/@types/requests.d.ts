@@ -1,3 +1,7 @@
+/*
+ * INSTANCES
+ */
+
 interface NewInstanceRequest {
   description: string;
 }
@@ -8,11 +12,24 @@ interface UpdateInstanceRequest {
   isActive?: boolean;
 }
 
+/*
+ * GROUPS
+ */
+
+interface NewGroupRequest {
+  instanceId: number;
+  name: string;
+}
+
 interface UpdateGroupRequest {
   id: number;
   name?: string;
   instanceId?: number;
 }
+
+/*
+ * TRANSACTIONS
+ */
 
 interface NewTransactionRequest {
   shareId: number;
@@ -26,6 +43,10 @@ interface NewBulkTransactionRequest {
   skipNegative: boolean;
 }
 
+/*
+ * STUDENTS
+ */
+
 interface UpdateStudentRequest {
   id: number;
   groupId?: number;
@@ -37,3 +58,23 @@ interface UpdateStudentRequest {
 }
 
 type UpdateBulkStudentRequest = UpdateStudentRequest[];
+
+/*
+ * SHARE TYPES
+ */
+
+interface NewShareTypeRequest {
+  name: string;
+  dividendRate: number;
+}
+
+interface UpdateShareTypeRequest {
+  id: number;
+  name?: string;
+  dividendDate?: number;
+}
+
+interface LinkUnlinkShareTypeRequest {
+  shareTypeId: number;
+  instanceId: number;
+}

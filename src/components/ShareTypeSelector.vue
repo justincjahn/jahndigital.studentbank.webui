@@ -17,7 +17,9 @@
     </template>
   </base-select>
 
-  <add-link-modal :show="showAddLink" @ok="startAdd" />
+  <suspense>
+    <add-link-modal :show="showAddLink" @ok="startAdd" />
+  </suspense>
 </template>
 
 <script lang="ts">
@@ -38,7 +40,7 @@ enum ModalState {
 export default defineComponent({
   components: {
     BaseSelect,
-    AddLinkModal: defineAsyncComponent(() => import('@/components/admin/ShareTypeAddLinkModal.vue')),
+    AddLinkModal: defineAsyncComponent(() => import(/* webpackChunkName: "st" */ '@/components/admin/ShareTypeAddLinkModal.vue')),
   },
   props: {
     modelValue: {
