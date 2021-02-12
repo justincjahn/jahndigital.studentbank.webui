@@ -57,6 +57,14 @@ interface UpdateStudentRequest {
   password?: string;
 }
 
+interface NewStudentRequest {
+  groupId: number;
+  accountNumber: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
 type UpdateBulkStudentRequest = UpdateStudentRequest[];
 
 /*

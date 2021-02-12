@@ -11,7 +11,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/admin/students/:studentId?',
     name: 'Students',
-    component: import(/* webpackChunkName: "admin-students" */ '@/views/admin/students/AdminStudentsIndex.vue'),
+    component: () => import(/* webpackChunkName: "admin-students" */ '@/views/admin/students/AdminStudentsIndex.vue'),
     children: [
       {
         path: 'transactions',

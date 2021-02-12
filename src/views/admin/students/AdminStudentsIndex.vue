@@ -65,8 +65,10 @@ import { useRouter, useRoute } from 'vue-router';
 import { defineComponent, onMounted, computed, defineAsyncComponent } from 'vue';
 import { Field, useForm } from 'vee-validate';
 import Apollo from '@/services/Apollo';
-import gqlSearchAccounts from '@/graphql/studentsByAccountNumber.gql';
 import gqlStudentById from '@/graphql/studentById.gql';
+import { validateAccountUnique, validateEmail, validateName } from '@/utils/validators';
+
+const validateAccount = validateAccountUnique({ studentStore });
 
 /**
  * Handles high-level selection of students and routing to sub-routes.
@@ -80,89 +82,9 @@ export default defineComponent({
     const router = useRouter();
     const route = useRoute();
 
-    /**
-     * Ensure the account number is less than 10 digits, and only digits.
-     */
-    function validateAccount(value: string): string|boolean {
-      if (!value) {
-        return 'Account number is required.';
-      }
-
-      if (value.length > 10) {
-        return 'Account numbers cannot be more than 10 characters.';
-      }
-
-      if (!/^[0-9]+$/.test(value)) {
-        return 'Account numbers can only contain numbers.';
-      }
-
-      return true;
-    }
-
-    /**
-     * Ensure the account is unique across the instance.
-     */
-    async function validateAccountUnique(value: string): Promise<string|boolean> {
-      const isValid = validateAccount(value);
-      if (isValid !== true) return isValid;
-
-      try {
-        const res = await Apollo.query<PagedStudentResponse>({
-          query: gqlSearchAccounts,
-          variables: {
-            accountNumber: value.padStart(10, '0'),
-          },
-        });
-
-        if (!res.data || res.data.students.totalCount <= 0) return true;
-
-        let i = 0;
-        res.data.students.nodes.forEach((x) => {
-          // Skip accounts not in the student's instance
-          if (x.group?.instanceId !== studentStore.selected.value?.group?.instanceId ?? false) {
-            return;
-          }
-
-          if (x.id !== studentStore.selected.value?.id ?? true) i += 1;
-        });
-
-        if (i > 0) return 'A student with the same account number already exists.';
-      } catch {
-        return 'Unable to contact server please try again later.';
-      }
-
-      return true;
-    }
-
-    /**
-     * Ensure the email address is valid.
-     */
-    function validateEmail(value: string): string|boolean {
-      if (!value) {
-        return 'Email is required.';
-      }
-
-      if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.]+\.[a-zA-Z-]+$/.test(value)) {
-        return ' Email is invalid.';
-      }
-
-      return true;
-    }
-
-    /**
-     * Ensure the names are valid.
-     */
-    function validateName(value: string): string|boolean {
-      if (!value) {
-        return 'First and last name are required.';
-      }
-
-      return true;
-    }
-
     const form = useForm({
       validationSchema: {
-        accountNumber: validateAccountUnique,
+        accountNumber: validateAccount,
         email: validateEmail,
         firstName: validateName,
         lastName: validateName,

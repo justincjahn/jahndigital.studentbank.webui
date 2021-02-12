@@ -47,6 +47,21 @@
         </template>
         <template #fallback><loading-icon /></template>
       </suspense>
+
+      <suspense>
+        <template #default>
+          <span class="sub-menu__bulk-buttons__button">
+            <button :disabled="selectedGroup === null" @click.prevent="toggleNewStudent">New Student</button>
+            <new-student-modal
+              :show="showNewStudentModal"
+              :groupStore="groupStore"
+              @ok="toggleNewStudent"
+              @cancel="toggleNewStudent"
+            />
+          </span>
+        </template>
+        <template #fallback><loading-icon /></template>
+      </suspense>
     </div>
   </div>
 
@@ -68,6 +83,10 @@ const BulkGroupModal = defineAsyncComponent(
   () => import(/* webpackChunkName: "admin-groups" */ '@/components/admin/groups/BulkGroupModal.vue'),
 );
 
+const NewStudentModal = defineAsyncComponent(
+  () => import(/* webpackChunkName: "admin-groups" */ '@/components/admin/NewStudentModal.vue'),
+);
+
 const TheGroupSelector = defineAsyncComponent(
   () => import(/* webpackChunkName: "admin-groups" */ '@/components/admin/groups/TheGroupSelector.vue'),
 );
@@ -81,12 +100,14 @@ export default {
     StudentList,
     TheGroupSelector,
     BulkPostModal,
+    NewStudentModal,
     LoadingIcon,
     BulkGroupModal,
   },
   setup() {
     const router = useRouter();
     const showBulkTransactionModal = ref(false);
+    const showNewStudentModal = ref(false);
     const showBulkGroupModal = ref(false);
     const hasSelection = computed(() => selection.length > 0);
 
@@ -103,6 +124,8 @@ export default {
 
     function toggleBulkTransaction() { showBulkTransactionModal.value = !showBulkTransactionModal.value; }
 
+    function toggleNewStudent() { showNewStudentModal.value = !showNewStudentModal.value; }
+
     function toggleBulkGroup() { showBulkGroupModal.value = !showBulkGroupModal.value; }
 
     function handleBulkGroupModalOk(movedGroup: Group) {
@@ -116,10 +139,14 @@ export default {
       hasSelection,
       showBulkTransactionModal,
       toggleBulkTransaction,
+      showNewStudentModal,
+      toggleNewStudent,
       showBulkGroupModal,
       toggleBulkGroup,
       handleBulkGroupModalOk,
       selectedInstance: groupStore.instanceStore.selected,
+      selectedGroup: groupStore.selected ?? null,
+      groupStore,
     };
   },
 };
