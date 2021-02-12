@@ -19,6 +19,7 @@
       <li :class="className" @click.prevent="startAdd">Add...</li>
       <li :class="className" @click.prevent="startEdit">Rename...</li>
       <li :class="className" @click.prevent="startDelete">Delete...</li>
+      <li :class="className" @click.prevent="startActive">Activate...</li>
     </template>
   </base-select>
 
@@ -32,6 +33,10 @@
   >
       <template v-if="modalState === ModalState.DELETE">
         This action cannot be undone!
+      </template>
+      <template v-else-if="modalState === ModalState.ACTIVE">
+        <strong>Warning:</strong> Making this instance active will mark all other instances inactive.
+        Students in inactive instances cannot log in.
       </template>
       <template v-else>
         <div class="instance-form">
@@ -55,6 +60,7 @@ export enum ModalState {
   ADD,
   EDIT,
   DELETE,
+  ACTIVE,
 }
 
 /**
@@ -100,6 +106,10 @@ export default defineComponent({
         return 'Rename Instance';
       }
 
+      if (modalState.value === ModalState.ACTIVE) {
+        return 'Activate Instance';
+      }
+
       return 'Are you sure?';
     });
 
@@ -120,6 +130,13 @@ export default defineComponent({
 
     // Open or close the New Instance form.
     function toggle() { showModal.value = !showModal.value; }
+
+    // Begin the make active process and open the modal.
+    function startActive() {
+      modalState.value = ModalState.ACTIVE;
+      input.value = '';
+      toggle();
+    }
 
     // Begin the new instance process and open the modal.
     function startAdd() {
@@ -181,6 +198,22 @@ export default defineComponent({
         }
       }
 
+      if (modalState.value === ModalState.ACTIVE) {
+        if (props.modelValue === null) return;
+
+        try {
+          const instance = await instanceStore.value.updateInstance({
+            id: props.modelValue?.id ?? -1,
+            isActive: true,
+          });
+
+          update(instance);
+          toggle();
+        } catch (e) {
+          errorStore.setCurrentError(e?.message ?? e);
+        }
+      }
+
       if (modalState.value === ModalState.DELETE) {
         if (props.modelValue === null) return;
 
@@ -216,6 +249,7 @@ export default defineComponent({
       modalClass,
       modalState,
       showModal,
+      startActive,
       startAdd,
       startEdit,
       startDelete,

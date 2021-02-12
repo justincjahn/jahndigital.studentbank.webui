@@ -1,5 +1,5 @@
-mutation updateInstance($id: Long!, $description: String!) {
-  updateInstance(input: { id: $id, description: $description }) {
+mutation updateInstance($id: Long!, $description: String, $isActive: Boolean) {
+  updateInstance(input: { id: $id, description: $description, isActive: $isActive }) {
     id
     description
     isActive

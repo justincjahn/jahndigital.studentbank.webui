@@ -92,8 +92,17 @@ export function setup() {
       });
 
       if (res.data) {
+        // If we've activated an instance, then we need to update all of them
+        let existing = [...store.instances];
+        if (input.isActive && input.isActive === true) {
+          existing = store.instances.map((x: Instance) => ({
+            ...x,
+            isActive: false,
+          }));
+        }
+
         const instanceList = [
-          ...store.instances.filter((x: Instance) => x.id !== res.data?.updateInstance[0].id),
+          ...existing.filter((x: Instance) => x.id !== res.data?.updateInstance[0].id),
           ...res.data.updateInstance,
         ];
 

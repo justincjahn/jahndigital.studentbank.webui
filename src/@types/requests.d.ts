@@ -8,7 +8,7 @@ interface NewInstanceRequest {
 
 interface UpdateInstanceRequest {
   id: number;
-  description: string;
+  description?: string;
   isActive?: boolean;
 }
 
