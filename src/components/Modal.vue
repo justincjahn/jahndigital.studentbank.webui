@@ -4,7 +4,8 @@
       class="modal"
       ref="root"
       :style="modalStyle"
-      :class="[{ 'modal--open': show, 'modal--hidden': !show && closedBefore }, customClass]"
+      :class="[{ 'modal--open': show, 'modal--hidden': !show && closedBefore }]"
+      v-bind="$attrs"
     >
       <div class="modal__container">
         <div v-if="title" class="modal__container__title">
@@ -64,11 +65,6 @@ export default defineComponent({
       default: false,
     },
     title: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    customClass: {
       type: String,
       required: false,
       default: null,

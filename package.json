@@ -40,7 +40,11 @@
     "env": {
       "node": true
     },
+    "plugins": [
+      "vue"
+    ],
     "extends": [
+      "plugin:vue/vue3-recommended",
       "plugin:vue/vue3-essential",
       "@vue/airbnb",
       "@vue/typescript/recommended"
@@ -53,7 +57,8 @@
       "@typescript-eslint/interface-name-prefix": "off",
       "object-curly-newline": "off",
       "max-len": "off",
-      "no-underscore-dangle": ["error", { "allowAfterThis": true }]
+      "no-underscore-dangle": ["error", { "allowAfterThis": true }],
+      "vue/html-self-closing": "off"
     }
   },
   "browserslist": [

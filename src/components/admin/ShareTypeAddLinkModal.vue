@@ -1,42 +1,73 @@
 <template>
   <Modal
     title="Add and Link Share Types"
-    okLabel="Close"
-    customClass="large"
-    okButtonClass=""
+    ok-label="Close"
+    class="large"
+    ok-button-class=""
     :show="show"
-    @ok.prevent="handleOk"
-    @cancel.prevent="handleOk"
-    :handleEnter="false"
+    :handle-enter="false"
+    @ok="handleOk"
+    @cancel="handleOk"
   >
-    <form class="stf" @submit.prevent="handleAdd">
+    <form
+      class="stf"
+      @submit="handleAdd"
+    >
       <div class="stf__fieldset stf__fieldset--name">
         <label :for="`stf__fieldset--name--${id}`">Name<span class="required">*</span></label>
-        <input type="text" :id="`stf__fieldset--name--${id}`" v-model="nameValue" />
-        <p class="error" v-if="nameError">{{nameError}}</p>
+        <Field
+          :id="`stf__fieldset--name--${id}`"
+          name="name"
+          type="text"
+        />
+        <p
+          v-if="formErrors['name']"
+          class="error"
+        >
+          {{ formErrors['name'] }}
+        </p>
       </div>
       <div class="stf__fieldset stf__fieldset--rate">
         <label :for="`stf__fieldset--rate--${id}`">Dividend Rate<span class="required">*</span></label>
-        <p class="help-text">Specify the dividend rate in percent.</p>
+        <p class="help-text">
+          Specify the dividend rate in percent.
+        </p>
         <div class="stf__fieldset--adorner">
-          <input type="text" :id="`stf__fieldset--rate--${id}`" v-model="rateValue" />
+          <Field
+            :id="`stf__fieldset--rate--${id}`"
+            name="rate"
+            type="text"
+          />
           <span class="stf__fieldset--adorner--adornment">%</span>
         </div>
-        <p class="error" v-if="rateError">{{rateError}}</p>
+        <p
+          v-if="formErrors['rate']"
+          class="error"
+        >
+          {{ formErrors['rate'] }}
+        </p>
       </div>
-      <button type="submit" class="primary" :disabled="addLoading || !canAdd">
+      <button
+        type="submit"
+        class="primary"
+        :disabled="addLoading || !canAdd"
+      >
         <loading-icon :show="addLoading">
-          <template v-if="addLoading">Adding...</template>
-          <template v-else>Add</template>
+          <template v-if="addLoading">
+            Adding...
+          </template>
+          <template v-else>
+            Add
+          </template>
         </loading-icon>
       </button>
     </form>
 
     <div class="stl">
       <share-type-multiselect
-        :shareTypes="shareTypes"
-        :loading="loading"
         v-model="selected"
+        :share-types="shareTypes"
+        :loading="loading"
         prompt="Use the form above to add a new Share Type, and link it here."
       />
 
@@ -53,7 +84,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, watchEffect } from 'vue';
-import { useField } from 'vee-validate';
+import { useForm, Field } from 'vee-validate';
 import errorStore from '@/store/error';
 import instanceStore from '@/store/instance';
 import theShareTypeStore, { setup as setupShareTypeStore } from '@/store/shareType';
@@ -63,6 +94,11 @@ import ShareTypeMultiselect from '@/components/ShareTypeMultiselector.vue';
 import uuid4 from '@/utils/uuid4';
 import Rate from '@/utils/rate';
 
+interface NewShareTypeForm {
+  name: string;
+  rate: string;
+}
+
 /**
  * Allows users to create new Share Types and then link them to the currently selected
  * instance.  Updates the global shareTypeStore to ensure the new share type(s) are valid.
@@ -70,6 +106,7 @@ import Rate from '@/utils/rate';
 export default defineComponent({
   components: {
     Modal,
+    Field,
     LoadingIcon,
     ShareTypeMultiselect,
   },
@@ -125,31 +162,33 @@ export default defineComponent({
       return true;
     }
 
-    // The share type's name
+    // Configure a form for vee-validate and hook up validation
     const {
-      value: nameValue,
-      errorMessage: nameError,
-      handleReset: nameReset,
-      validate: nameValidate,
-    } = useField('name', validateName, {
+      handleSubmit,
+      errors: formErrors,
+      resetForm,
+      validate,
+      values,
+    } = useForm<NewShareTypeForm>({
+      validationSchema: {
+        name: validateName,
+        rate: validateRate,
+      },
+      initialValues: {
+        name: '',
+        rate: '0',
+      },
       validateOnMount: true,
-      initialValue: '',
-    });
-
-    // The dividend rate
-    const { value: rateValue, errorMessage: rateError, handleReset: rateReset } = useField('rate', validateRate, {
-      initialValue: '0',
     });
 
     // Reset the form back to defaults
     function reset() {
-      nameReset();
-      rateReset();
-      nameValidate();
+      resetForm();
+      validate();
     }
 
     // True if the add button should be enabled
-    const canAdd = computed(() => !(nameError.value || rateError.value));
+    const canAdd = computed(() => !(formErrors.value.name || formErrors.value.rate));
 
     // True if the link button should be enabled
     const canLink = computed(() => selected.value.length > 0);
@@ -159,6 +198,26 @@ export default defineComponent({
 
     // Fetch a list of available share types using our custom store.
     async function fetchAvailableShareTypes() { await shareTypeStore.fetch({ available: true }); }
+
+    // Add a new share type and refresh available share types
+    const handleAdd = handleSubmit(async () => {
+      addLoading.value = true;
+
+      try {
+        await shareTypeStore.newShareType({
+          name: values.name,
+          dividendRate: Rate.fromString(`${values.rate}%`).getRate(),
+        });
+
+        reset();
+        await fetchAvailableShareTypes();
+      } catch (e) {
+        errorStore.setCurrentError('Unable to add the Share Type.  Does it already exist?');
+        console.error(e);
+      } finally {
+        addLoading.value = false;
+      }
+    });
 
     // Link the selected share types
     async function handleLink() {
@@ -185,26 +244,6 @@ export default defineComponent({
       await fetchAvailableShareTypes();
     }
 
-    // Add a new share type and refresh available share types
-    async function handleAdd() {
-      addLoading.value = true;
-
-      try {
-        await shareTypeStore.newShareType({
-          name: nameValue.value,
-          dividendRate: Rate.fromString(`${rateValue.value}%`).getRate(),
-        });
-
-        reset();
-        await fetchAvailableShareTypes();
-      } catch (e) {
-        errorStore.setCurrentError('Unable to add the Share Type.  Does it already exist?');
-        console.error(e);
-      } finally {
-        addLoading.value = false;
-      }
-    }
-
     // Perform initial fetch of available share types on show
     watchEffect(() => {
       if (props.show === true) fetchAvailableShareTypes();
@@ -220,11 +259,8 @@ export default defineComponent({
       handleLink,
       canAdd,
       canLink,
-      nameValue,
-      nameError,
-      rateValue,
-      rateError,
       id,
+      formErrors,
     };
   },
 });

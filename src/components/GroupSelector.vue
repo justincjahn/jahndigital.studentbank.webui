@@ -19,7 +19,7 @@
 
   <Modal
     :title="modalTitle"
-    :customClass="modalClass"
+    :class="modalClass"
     :show="showModal"
     cancelLabel="Cancel"
     @ok.prevent="handleOk"

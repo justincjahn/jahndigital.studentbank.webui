@@ -6,7 +6,7 @@
     @ok="handleOk"
     @cancel="handleCancel"
     title="Bulk Transaction"
-    customClass="bpm large"
+    class="bpm large"
   >
     <template #default>
       <!-- Step 1 -->

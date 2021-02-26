@@ -2,24 +2,44 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "chrome",
+      "name": "Chrome - Admin Portal",
+      "type": "pwa-chrome",
       "request": "launch",
-      "name": "Admin Portal",
       "url": "http://localhost:8080/admin",
       "webRoot": "${workspaceFolder}/src",
-      "breakOnLoad": true,
       "sourceMapPathOverrides": {
         "webpack:///src/*": "${webRoot}/*"
       }
     },
 
     {
-      "type": "chrome",
+      "name": "Chrome - Student Portal",
+      "type": "pwa-chrome",
       "request": "launch",
-      "name": "Student Portal",
       "url": "http://localhost:8080/",
       "webRoot": "${workspaceFolder}/src",
-      "breakOnLoad": true,
+      "sourceMapPathOverrides": {
+        "webpack:///src/*": "${webRoot}/*"
+      }
+    },
+
+    {
+      "name": "Edge - Admin Portal",
+      "type": "pwa-msedge",
+      "request": "launch",
+      "url": "http://localhost:8080/admin",
+      "webRoot": "${workspaceFolder}/src",
+      "sourceMapPathOverrides": {
+        "webpack:///src/*": "${webRoot}/*"
+      }
+    },
+
+    {
+      "name": "Edge - Student Portal",
+      "type": "pwa-msedge",
+      "request": "launch",
+      "url": "http://localhost:8080/",
+      "webRoot": "${workspaceFolder}/src",
       "sourceMapPathOverrides": {
         "webpack:///src/*": "${webRoot}/*"
       }

@@ -33,7 +33,7 @@
   <suspense>
     <Modal
       :show="errorStore.error.value !== null"
-      customClass="destructive"
+      class="destructive"
       title="Error"
       @ok="errorStore.setCurrentError(null)"
     >

@@ -2,9 +2,9 @@
   <base-select
     :options="options"
     :value="value"
-    :modelValue="modelValue"
-    @update:modelValue="update"
+    :model-value="modelValue"
     prompt="Select an instance..."
+    @update:modelValue="update"
   >
     <template v-slot:selected="{ option, prompt }">
       <template v-if="option?.isActive ?? false"><span class="active">(Active)</span> {{option.description}}</template>
@@ -25,25 +25,25 @@
 
   <Modal
     :title="modalTitle"
-    :customClass="modalClass"
+    :class="modalClass"
     :show="showModal"
-    cancelLabel="Cancel"
+    cancel-label="Cancel"
     @ok.prevent="handleOk"
     @cancel.prevent="handleCancel"
   >
-      <template v-if="modalState === ModalState.DELETE">
-        This action cannot be undone!
-      </template>
-      <template v-else-if="modalState === ModalState.ACTIVE">
-        <strong>Warning:</strong> Making this instance active will mark all other instances inactive.
-        Students in inactive instances cannot log in.
-      </template>
-      <template v-else>
-        <div class="instance-form">
-          <label :for="`instance-form__instance-name--${id}`">Name</label>
-          <input type="text" ref="inputElement" :id="`instance-form__instance-name--${id}`" v-model="input" />
-        </div>
-      </template>
+    <template v-if="modalState === ModalState.DELETE">
+      This action cannot be undone!
+    </template>
+    <template v-else-if="modalState === ModalState.ACTIVE">
+      <strong>Warning:</strong> Making this instance active will mark all other instances inactive.
+      Students in inactive instances cannot log in.
+    </template>
+    <template v-else>
+      <div class="instance-form">
+        <label :for="`instance-form__instance-name--${id}`">Name</label>
+        <input type="text" ref="inputElement" :id="`instance-form__instance-name--${id}`" v-model="input" />
+      </div>
+    </template>
   </Modal>
 </template>
 

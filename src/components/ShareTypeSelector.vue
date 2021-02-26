@@ -2,28 +2,54 @@
   <base-select
     :options="options"
     :value="value"
-    :modelValue="modelValue"
-    @update:modelValue="update"
+    :model-value="modelValue"
     prompt="Choose a share type..."
+    v-bind="$attrs"
+    @update:modelValue="update"
   >
     <template #list="{ options, className, select }">
-      <li v-for="option in options" :key="option.id" :class="className" @click="select(option)">
-        {{option.name}}
+      <li
+        v-for="option in options"
+        :key="option.id"
+        :class="className"
+        @click="select(option)"
+      >
+        {{ option.name }}
       </li>
-      <li class="select__items__divider"><hr /></li>
-      <li :class="className" @click.prevent="startAdd">Add...</li>
-      <li :class="className" @click.prevent="startEdit">Rename...</li>
-      <li :class="className" @click.prevent="startDelete">Delete...</li>
+      <li class="select__items__divider">
+        <hr />
+      </li>
+      <li
+        :class="className"
+        @click.prevent="startAdd"
+      >
+        Add...
+      </li>
+      <li
+        :class="className"
+        @click.prevent="startEdit"
+      >
+        Rename...
+      </li>
+      <li
+        :class="className"
+        @click.prevent="startDelete"
+      >
+        Delete...
+      </li>
     </template>
   </base-select>
 
   <suspense>
-    <add-link-modal :show="showAddLink" @ok="startAdd" />
+    <add-link-modal
+      :show="showAddLink"
+      @ok="startAdd"
+    />
   </suspense>
 </template>
 
 <script lang="ts">
-import { defineComponent, defineAsyncComponent, PropType, ref, computed } from 'vue';
+import { defineComponent, defineAsyncComponent, ref, computed, PropType } from 'vue';
 import theShareTypeStore, { ShareTypeStore } from '@/store/shareType';
 import BaseSelect, { Search } from '@/components/BaseSelect.vue';
 
@@ -45,11 +71,16 @@ export default defineComponent({
   props: {
     modelValue: {
       type: Object as PropType<ShareType|null>,
+      default: null,
     },
     shareTypeStore: {
       type: Object as PropType<ShareTypeStore>,
+      default: null,
     },
   },
+  emits: [
+    'update:modelValue',
+  ],
   setup(props, { emit }) {
     const modalState = ref<ModalState>(ModalState.EDIT);
 
