@@ -1,6 +1,8 @@
 import Apollo from '@/services/Apollo';
 import gqlTransactions from '@/graphql/transactions.query.gql';
 import gqlNewTransaction from '@/graphql/newTransaction.mutation.gql';
+import gqlNewShare from '@/graphql/newShare.mutation.gql';
+import gqlDeleteShare from '@/graphql/deleteShare.mutation.gql';
 import { FETCH_OPTIONS } from '@/constants';
 import { computed, reactive, watch } from 'vue';
 import theStudentStore, { StudentStore } from './student';
@@ -184,6 +186,46 @@ export function setup(studentStore: StudentStore) {
     }
   }
 
+  // Create a new share
+  async function newShare(input: NewShareRequest) {
+    try {
+      const res = await Apollo.mutate<NewShareResponse>({
+        mutation: gqlNewShare,
+        variables: input,
+      });
+
+      if (res.data) {
+        const [share] = res.data.newShare;
+        return share;
+      }
+
+      throw new Error('Unable to create share: unknown reason.');
+    } catch (e) {
+      throw e?.message ?? e;
+    }
+  }
+
+  // Delete a share
+  async function deleteShare(share: Share) {
+    try {
+      const res = await Apollo.mutate<DeleteShareResponse>({
+        mutation: gqlDeleteShare,
+        variables: { id: share.id },
+      });
+
+      if (res.data && res.data.deleteShare === true) {
+        const isSelected = store.selected?.id === share.id ?? false;
+        if (isSelected) {
+          store.selected = null;
+        }
+      } else {
+        throw new Error('Unable to delete Share: unknown reason.');
+      }
+    } catch (e) {
+      throw e?.message ?? e;
+    }
+  }
+
   // Watch for selected student changes and select the first share of that student.
   watch(() => studentStore.selected.value, () => {
     if (studentStore.selected.value === null && store.selected !== null) {
@@ -208,6 +250,8 @@ export function setup(studentStore: StudentStore) {
     fetchPreviousTransactions,
     clearTransactions,
     postTransaction,
+    newShare,
+    deleteShare,
   };
 }
 

@@ -91,6 +91,14 @@ interface UpdateBulkStudentResponse {
   updateBulkStudent: Student[];
 }
 
+interface NewStudentResponse {
+  newStudent: Student[];
+}
+
+interface DeleteStudentResponse {
+  deleteStudent: boolean;
+}
+
 /*
  * TRANSACTIONS
  */
@@ -109,6 +117,17 @@ interface NewTransactionResponse {
 
 interface NewBulkTransactionResponse {
   newBulkTransaction: Transaction[];
+}
+
+/*
+ * SHARES
+ */
+interface NewShareResponse {
+  newShare: Share[];
+}
+
+interface DeleteShareResponse {
+  deleteShare: boolean;
 }
 
 /*

@@ -1,0 +1,17 @@
+mutation newShare(
+  $shareTypeId: Long!,
+  $studentId: Long!,
+) {
+  newShare(input: {
+    shareTypeId: $shareTypeId,
+    studentId: $studentId
+  }) {
+    id
+    balance
+    shareTypeId
+    shareType {
+      name
+      dividendRate
+    }
+  }
+}

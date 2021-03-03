@@ -71,11 +71,11 @@ export default defineComponent({
   props: {
     modelValue: {
       type: Object as PropType<ShareType|null>,
-      default: null,
+      default: undefined,
     },
     shareTypeStore: {
       type: Object as PropType<ShareTypeStore>,
-      default: null,
+      default: undefined,
     },
   },
   emits: [

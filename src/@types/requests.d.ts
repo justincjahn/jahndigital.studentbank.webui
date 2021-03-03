@@ -60,12 +60,22 @@ interface UpdateStudentRequest {
 interface NewStudentRequest {
   groupId: number;
   accountNumber: string;
-  email: string;
   firstName: string;
   lastName: string;
+  password: string;
+  email?: string;
 }
 
 type UpdateBulkStudentRequest = UpdateStudentRequest[];
+
+/*
+ * SHARES
+ */
+
+interface NewShareRequest {
+  shareTypeId: number;
+  studentId: number;
+}
 
 /*
  * SHARE TYPES

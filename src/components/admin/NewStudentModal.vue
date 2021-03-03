@@ -101,7 +101,11 @@ import { defineComponent, ref, watchEffect, PropType } from 'vue';
 import Modal from '@/components/Modal.vue';
 import uuid4 from '@/utils/uuid4';
 import { GroupStore } from '@/store/group';
+import { setup as setupStudentStore } from '@/store/student';
+import { setup as setupShareStore } from '@/store/share';
+import errorStore from '@/store/error';
 import { validateAccountUnique, validateEmail, validateName } from '@/utils/validators';
+import generatePassword from '@/utils/generatePassword';
 import { Field, useForm } from 'vee-validate';
 import ShareTypeSelector from '../ShareTypeSelector.vue';
 
@@ -155,11 +159,34 @@ export default defineComponent({
     const onSubmit = handleSubmit(async (values) => {
       const newValues: NewStudentRequest = {
         ...values,
+        password: generatePassword(),
         groupId: props.groupStore.selected.value?.id ?? -1,
       };
 
-      console.log('values', newValues);
-      console.log('sharetypes', shareTemplate.value);
+      const studentStore = setupStudentStore();
+      const shareStore = setupShareStore(studentStore);
+
+      try {
+        const student = await studentStore.newStudent(newValues);
+
+        const results: Promise<Share>[] = [];
+        shareTemplate.value.forEach((tpl) => {
+          if (tpl === null) return;
+
+          results.push(shareStore.newShare({
+            shareTypeId: tpl.id,
+            studentId: student.id,
+          }));
+        });
+
+        await Promise.all(results);
+
+        // TODO: Initial amounts for new shares.
+        // TODO: Refresh selected group to add students?
+      } catch (e) {
+        errorStore.setCurrentError(e?.message ?? e);
+      }
+
       emit('ok');
     });
 

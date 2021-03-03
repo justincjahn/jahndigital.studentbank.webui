@@ -2,6 +2,8 @@ import Apollo from '@/services/Apollo';
 import StudentsWithShares from '@/graphql/studentsWithShares.query.gql';
 import UpdateStudent from '@/graphql/updateStudent.mutation.gql';
 import gqlStudentById from '@/graphql/studentById.gql';
+import gqlNewStudent from '@/graphql/newStudent.mutation.gql';
+import gqlDeleteStudent from '@/graphql/deleteStudent.mutation.gql';
 import { FETCH_OPTIONS } from '@/constants';
 import { computed, reactive } from 'vue';
 
@@ -55,38 +57,6 @@ export function setup() {
 
   // SETs the selected student
   function setSelected(item: Student|null) { store.selected = item; }
-
-  // Update a student
-  async function updateStudent(student: Student) {
-    try {
-      const res = await Apollo.mutate<UpdateStudentResponse>({
-        mutation: UpdateStudent,
-        variables: {
-          id: student.id,
-          groupId: student.groupId,
-          accountNumber: student.accountNumber.padStart(10, '0'),
-          firstName: student.firstName,
-          lastName: student.lastName,
-          email: student.email,
-        },
-      });
-
-      if (res.data) {
-        if (store.selected && store.selected.id === student.id) {
-          [store.selected] = res.data.updateStudent;
-
-          const index = store.students.findIndex((x) => x.id === student.id);
-          if (index >= 0) {
-            store.students = store.students.splice(index, 1, student);
-          }
-        }
-
-        await Apollo.clearStore();
-      }
-    } catch (e) {
-      throw e?.message ?? e;
-    }
-  }
 
   // Refresh the currently selected student
   async function refreshSelected() {
@@ -203,6 +173,86 @@ export function setup() {
     store.totalCount = 0;
   }
 
+  // Update a student
+  async function updateStudent(student: Student) {
+    try {
+      const res = await Apollo.mutate<UpdateStudentResponse>({
+        mutation: UpdateStudent,
+        variables: {
+          id: student.id,
+          groupId: student.groupId,
+          accountNumber: student.accountNumber.padStart(10, '0'),
+          firstName: student.firstName,
+          lastName: student.lastName,
+          email: student.email,
+        },
+      });
+
+      if (res.data) {
+        if (store.selected && store.selected.id === student.id) {
+          [store.selected] = res.data.updateStudent;
+
+          const index = store.students.findIndex((x) => x.id === student.id);
+          if (index >= 0) {
+            store.students = store.students.splice(index, 1, student);
+          }
+        }
+
+        await Apollo.clearStore();
+        return res.data.updateStudent;
+      }
+
+      throw new Error('Unable to update Student: unknown error.');
+    } catch (e) {
+      throw e?.message ?? e;
+    }
+  }
+
+  // Create a new student
+  async function newStudent(input: NewStudentRequest) {
+    try {
+      const res = await Apollo.mutate<NewStudentResponse>({
+        mutation: gqlNewStudent,
+        variables: input,
+      });
+
+      if (res.data) {
+        const [student] = res.data.newStudent;
+
+        if (store.students[0]?.groupId === input.groupId ?? false) {
+          store.students = [...store.students, student];
+        }
+
+        return student;
+      }
+
+      throw new Error('Unable to create Student: unknown error.');
+    } catch (e) {
+      throw e?.message ?? e;
+    }
+  }
+
+  // Delete a student
+  async function deleteStudent(student: Student) {
+    try {
+      const res = await Apollo.mutate<DeleteStudentResponse>({
+        mutation: gqlDeleteStudent,
+        variables: { id: student.id },
+      });
+
+      if (res.data && res.data.deleteStudent === true) {
+        const isListed = store.students.findIndex((x) => x.id === student.id);
+        if (isListed >= 0) {
+          store.students = store.students.filter((x) => x.id !== student.id);
+        }
+      } else {
+        throw new Error('Unable to delete student: unknown reason.');
+      }
+    } catch (e) {
+      throw e?.message ?? e;
+    }
+  }
+
   return {
     loading,
     totalCount,
@@ -211,12 +261,14 @@ export function setup() {
     selected,
     totalPages,
     setSelected,
-    updateStudent,
     refreshSelected,
     fetch,
     fetchNext,
     fetchPrevious,
     clear,
+    newStudent,
+    updateStudent,
+    deleteStudent,
   };
 }
 
