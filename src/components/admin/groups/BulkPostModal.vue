@@ -1,23 +1,33 @@
 <template>
   <modal
     :show="show"
-    cancelLabel="Cancel"
-    okLabel="Post"
-    @ok="handleOk"
-    @cancel="handleCancel"
     title="Bulk Transaction"
     class="bpm large"
+    cancel-label="Cancel"
+    ok-label="Post"
+    @ok="handleOk"
+    @cancel="handleCancel"
   >
     <template #default>
       <!-- Step 1 -->
-      <div class="bpm__step-1" v-if="state.currentStep === 1">
+      <div
+        v-if="state.currentStep === 1"
+        class="bpm__step-1"
+      >
         <h2>Step 1: Select a Share Type</h2>
 
         <p class="bpm__step-1__selected-students">
-          <template v-if="state.isLoading">Please wait...</template>
-          <strong v-else-if="state.students.length <= 0" class="error">Please select some students to begin!</strong>
+          <template v-if="state.isLoading">
+            Please wait...
+          </template>
+          <strong
+            v-else-if="state.students.length <= 0"
+            class="error"
+          >
+            Please select some students to begin!
+          </strong>
           <template v-else>
-            You have {{state.students.length}} {{state.students.length > 1 ? 'students' : 'student'}} selected.
+            You have {{ state.students.length }} {{ state.students.length > 1 ? 'students' : 'student' }} selected.
           </template>
         </p>
 
@@ -25,13 +35,24 @@
           Funds will be deposited or withdrawn from the first share of the type you select:
         </p>
 
-        <share-type-selector :modelValue="state.selectedShareType" @update:modelValue="handleShareTypeSelection" />
+        <share-type-selector
+          :model-value="state.selectedShareType"
+          @update:modelValue="handleShareTypeSelection"
+        />
 
-        <p class="bpm__step-1__error error" v-if="state.errors[1] !== null">{{state.errors[1]}}</p>
+        <p
+          v-if="state.errors[1] !== null"
+          class="bpm__step-1__error error"
+        >
+          {{ state.errors[1] }}
+        </p>
       </div>
 
       <!-- Step 2 -->
-      <div class="bpm__step-2" v-if="state.currentStep === 2">
+      <div
+        v-if="state.currentStep === 2"
+        class="bpm__step-2"
+      >
         <h2>Step 2: Choose an Amount</h2>
 
         <div class="bpm__step-2__fieldset">
@@ -39,23 +60,35 @@
           <div class="bpm__step-2__fieldset__amount-wrapper">
             <span class="bpm__step-2__fieldset__amount-wrapper__currency">$</span>
             <input
+              id="bpm__step-2--amount"
+              v-model="state.amountField.value"
               type="text"
               name="amount"
-              id="bpm__step-2--amount"
               @focus="$event.target.select()"
-              v-model="state.amountField.value" />
+            />
           </div>
-          <p class="error" v-if="state.amountField.errorMessage">{{state.amountField.errorMessage}}</p>
+          <p
+            v-if="state.amountField.errorMessage"
+            class="error"
+          >
+            {{ state.amountField.errorMessage }}
+          </p>
         </div>
 
         <div class="bpm__step-2__fieldset">
           <label for="bpm__step-2--comment">Comment</label>
           <input
+            id="bpm__step-2--comment"
+            v-model="state.commentField.value"
             type="text"
             name="comment"
-            id="bpm__step-2--comment"
-            v-model="state.commentField.value" />
-          <p class="error" v-if="state.commentField.errorMessage">{{state.commentField.errorMessage}}</p>
+          />
+          <p
+            v-if="state.commentField.errorMessage"
+            class="error"
+          >
+            {{ state.commentField.errorMessage }}
+          </p>
         </div>
 
         <div class="bpm__step-2__fieldset">
@@ -63,43 +96,54 @@
 
           <div class="bpm__step-2__fieldset__item">
             <input
-              type="radio"
-              name="postingPolicy"
               id="bpm__step-2--policy-none"
               v-model="state.postingPolicyField.value"
-              value="none" />
+              type="radio"
+              name="postingPolicy"
+              value="none"
+            />
             <label for="bpm__step-2--policy-none">None</label>
             <span class="light">Fail if any shares are taken negative.</span>
           </div>
 
           <div class="bpm__step-2__fieldset__item">
             <input
-              type="radio"
-              name="postingPolicy"
               id="bpm__step-2--policy-take"
               v-model="state.postingPolicyField.value"
-              value="take" />
+              type="radio"
+              name="postingPolicy"
+              value="take"
+            />
             <label for="bpm__step-2--policy-take">Take Negative</label>
             <span class="light">Allow shares to be taken negative.</span>
           </div>
 
           <div class="bpm__step-2__fieldset__item">
             <input
-              type="radio"
-              name="postingPolicy"
               id="bpm__step-2--policy-skip"
               v-model="state.postingPolicyField.value"
-              value="skip" />
+              type="radio"
+              name="postingPolicy"
+              value="skip"
+            />
             <label for="bpm__step-2--policy-skip">Skip Negative</label>
             <span class="light">Skip shares that would be taken negative.</span>
           </div>
         </div>
 
-        <p class="bpm__step-2__error error" v-if="state.errors[2] !== null">{{state.errors[2]}}</p>
+        <p
+          v-if="state.errors[2] !== null"
+          class="bpm__step-2__error error"
+        >
+          {{ state.errors[2] }}
+        </p>
       </div>
 
       <!-- Step 3 -->
-      <div class="bpm__step-3" v-if="state.currentStep === 3">
+      <div
+        v-if="state.currentStep === 3"
+        class="bpm__step-3"
+      >
         <h2>Step 3: Review</h2>
 
         <table class="bpm__step-3__shares">
@@ -114,28 +158,31 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="share in randomShares" :key="share.id">
-              <td>{{getGroupName(share)}}</td>
-              <td>{{getAccountNumber(share)}}</td>
-              <td>{{getStudentName(share)}}</td>
-              <td>{{shareTypeName}}</td>
+            <tr
+              v-for="share in randomShares"
+              :key="share.id"
+            >
+              <td>{{ getGroupName(share) }}</td>
+              <td>{{ getAccountNumber(share) }}</td>
+              <td>{{ getStudentName(share) }}</td>
+              <td>{{ shareTypeName }}</td>
               <td>
-                {{new Intl.NumberFormat(
+                {{ new Intl.NumberFormat(
                   'en-US',
                   {
                     style: 'currency',
                     currency: 'USD',
                   }
-                ).format(share.balance)}}
+                ).format(share.balance) }}
               </td>
               <td>
-                {{new Intl.NumberFormat(
+                {{ new Intl.NumberFormat(
                   'en-US',
                   {
                     style: 'currency',
                     currency: 'USD',
                   }
-                ).format(getEffectiveBalance(share))}}
+                ).format(getEffectiveBalance(share)) }}
               </td>
             </tr>
           </tbody>
@@ -143,12 +190,34 @@
       </div>
     </template>
     <template #buttons="{ okLabel, handleOk, cancelLabel, handleCancel }">
-      <button @click.prevent="handleCancel">{{cancelLabel}}</button>
-      <button @click.prevent="state.decrementStep()" v-if="state.hasPreviousStep()">Previous</button>
-      <button :disabled="!isValid" @click.prevent="state.incrementStep()" v-if="state.hasNextStep()">Next</button>
-      <button class="primary" :disabled="!isValid" @click.prevent="handleOk" v-if="!state.hasNextStep()">
-        <template v-if="!state.isLoading">{{okLabel}}</template>
-        <template v-else><loading-icon>Posting...</loading-icon></template>
+      <button @click.prevent="handleCancel">
+        {{ cancelLabel }}
+      </button>
+      <button
+        v-if="state.hasPreviousStep()"
+        @click.prevent="state.decrementStep()"
+      >
+        Previous
+      </button>
+      <button
+        v-if="state.hasNextStep()"
+        :disabled="!isValid"
+        @click.prevent="state.incrementStep()"
+      >
+        Next
+      </button>
+      <button
+        v-if="!state.hasNextStep()"
+        class="primary"
+        :disabled="!isValid"
+        @click.prevent="handleOk"
+      >
+        <template v-if="!state.isLoading">
+          {{ okLabel }}
+        </template>
+        <template v-else>
+          <loading-icon>Posting...</loading-icon>
+        </template>
       </button>
     </template>
   </modal>
@@ -336,8 +405,10 @@ export default defineComponent({
       // Get a list of shares from that list with the correct type
       const shares: Share[] = [];
       studentsWithShares.forEach((student) => {
-        const studentShares = student.shares?.sort((a, b) => a.id - b.id) ?? [];
-        const share = studentShares?.find((sh) => sh.shareTypeId === item.id);
+        if (typeof student.shares === 'undefined') return;
+        const studentShares = [...student.shares];
+        studentShares.sort((a, b) => a.id - b.id);
+        const share = studentShares.find((sh) => sh.shareTypeId === item.id);
         if (share) shares.push(share);
       });
 
