@@ -1,17 +1,38 @@
 <template>
-  <div class="loading" v-if="show">
-    <svg xmlns="http://www.w3.org/2000/svg" class="loading__img" viewBox="0 0 139.01 318.26">
+  <div
+    v-if="show"
+    class="loading"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="loading__img"
+      viewBox="0 0 139.01 318.26"
+    >
       <g class="loading__img__main">
-      <path class="loading__img__s"
-        d="M130.05,59.46C74.25,30.44,23.12,50,17.72,89.13S42.47,135.76,74.87,152s57.64,28.77,54.94,63.87-32.4,48.6-59.41,48.6-67-16.2-67-16.2" />
-      <path class="loading__img__l1" d="M51.32,0V318.26" />
-      <path class="loading__img__l2" d="M93,0V318.26" />
+        <path
+          class="loading__img__s"
+          d="M130.05,59.46C74.25,30.44,23.12,50,17.72,89.13S42.47,135.76,74.87,152s57.64,28.77,54.94,63.87-32.4,48.6-59.41,48.6-67-16.2-67-16.2"
+        />
+        <path
+          class="loading__img__l1"
+          d="M51.32,0V318.26"
+        />
+        <path
+          class="loading__img__l2"
+          d="M93,0V318.26"
+        />
       </g>
     </svg>
 
-    <div class="loading__content"><slot>Please wait...</slot></div>
+    <div class="loading__content">
+      <slot>
+        Please wait...
+      </slot>
+    </div>
   </div>
-  <template v-else><slot></slot></template>
+  <template v-else>
+    <slot />
+  </template>
 </template>
 
 <script lang="ts">

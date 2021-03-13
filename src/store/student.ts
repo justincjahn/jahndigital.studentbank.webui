@@ -219,7 +219,7 @@ export function setup() {
       if (res.data) {
         const [student] = res.data.newStudent;
 
-        if (store.students[0]?.groupId === input.groupId ?? false) {
+        if (store.students[0]?.groupId === input.groupId ?? true) {
           store.students = [...store.students, student];
         }
 

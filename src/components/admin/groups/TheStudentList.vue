@@ -1,5 +1,8 @@
 <template>
-  <div class="student-list" :class="{ 'student-list--loading': studentStore.loading.value }">
+  <div
+    class="student-list"
+    :class="{ 'student-list--loading': studentStore.loading.value }"
+  >
     <table class="student-list__list">
       <thead>
         <tr>
@@ -18,28 +21,51 @@
       </thead>
       <tbody>
         <tr v-if="selectedGroup === null">
-          <td class="student-list__select-group" colspan="5">Please select a group...</td>
+          <td
+            class="student-list__select-group"
+            colspan="5"
+          >
+            Please select a group...
+          </td>
         </tr>
         <template v-else>
           <tr
             v-for="student in studentStore.students.value"
             :key="student.id"
-            @click="studentClick(student)"
-            class="student-list__student"
             :class="{ 'student-list__student--selected': selection.hasStudent(student) }"
+            class="student-list__student"
+            @click="studentClick(student)"
           >
-            <td><input type="checkbox" :checked="selection.hasStudent(student)" /></td>
-            <td>{{student.accountNumber}}</td>
-            <td>{{student.firstName}}</td>
-            <td>{{student.lastName}}</td>
-            <td>{{student.email}}</td>
+            <td>
+              <input
+                type="checkbox"
+                :checked="selection.hasStudent(student)"
+              />
+            </td>
+            <td>{{ student.accountNumber }}</td>
+            <td>{{ student.firstName }}</td>
+            <td>{{ student.lastName }}</td>
+            <td>{{ student.email }}</td>
           </tr>
         </template>
       </tbody>
     </table>
-    <div class="student-list__pagination" v-if="studentStore.pageInfo.value != null">
-      <button :disabled="!studentStore.pageInfo.value.hasPreviousPage" @click.passive="studentStore.fetchPrevious">Previous</button>
-      <button :disabled="!studentStore.pageInfo.value.hasNextPage" @click.passive="studentStore.fetchNext">Next</button>
+    <div
+      v-if="studentStore.pageInfo.value != null"
+      class="student-list__pagination"
+    >
+      <button
+        :disabled="!studentStore.pageInfo.value.hasPreviousPage"
+        @click.passive="studentStore.fetchPrevious"
+      >
+        Previous
+      </button>
+      <button
+        :disabled="!studentStore.pageInfo.value.hasNextPage"
+        @click.passive="studentStore.fetchNext"
+      >
+        Next
+      </button>
     </div>
   </div>
 </template>

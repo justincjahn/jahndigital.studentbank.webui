@@ -1,19 +1,27 @@
 <template>
   <Teleport to="#modal">
     <div
-      class="modal"
       ref="root"
+      class="modal"
       :style="modalStyle"
       :class="[{ 'modal--open': show, 'modal--hidden': !show && closedBefore }]"
       v-bind="$attrs"
     >
       <div class="modal__container">
-        <div v-if="title" class="modal__container__title">
-          <slot name="title"><h1>{{title}}</h1></slot>
+        <div
+          v-if="title"
+          class="modal__container__title"
+        >
+          <slot name="title">
+            <h1>{{ title }}</h1>
+          </slot>
         </div>
-        <div class="modal__container__content"><slot /></div>
+        <div class="modal__container__content">
+          <slot />
+        </div>
         <div class="modal__container__buttons">
-          <slot name="buttons"
+          <slot
+            name="buttons"
             :cancelLabel="cancelLabel"
             :okLabel="okLabel"
             :handleCancel="handleCancel"
@@ -22,23 +30,36 @@
             :canCancel="canCancel"
           >
             <button
+              v-if="cancelLabel"
               tabindex="1"
               class="modal__container__buttons__cancel"
               :class="[cancelButtonClass]"
-              v-if="cancelLabel"
-              @click.prevent="handleCancel"
               :disabled="!canCancel"
+              @click.prevent="handleCancel"
             >
-              <slot name="cancelLabel" :cancelLabel="cancelLabel" :canCancel="canCancel">{{cancelLabel}}</slot>
+              <slot
+                name="cancelLabel"
+                :cancelLabel="cancelLabel"
+                :canCancel="canCancel"
+              >
+                {{ cancelLabel }}
+              </slot>
             </button>
             <button
+              ref="okButton"
               tabindex="0"
               class="modal__container__buttons__ok"
               :class="[okButtonClass]"
-              @click.prevent="handleOk" ref="okButton"
               :disabled="!canSubmit"
+              @click.prevent="handleOk"
             >
-              <slot name="okLabel" :okLabel="okLabel" :canSubmit="canSubmit">{{okLabel}}</slot>
+              <slot
+                name="okLabel"
+                :okLabel="okLabel"
+                :canSubmit="canSubmit"
+              >
+                {{ okLabel }}
+              </slot>
             </button>
           </slot>
         </div>
