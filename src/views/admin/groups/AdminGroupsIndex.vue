@@ -18,12 +18,23 @@
     </div>-->
 
     <div class="sub-menu__bulk-buttons">
-      <button :disabled="!hasSelection" @click.prevent="selection.clear">Clear Selection</button>
+      <button
+        :disabled="!hasSelection"
+        @click.prevent="selection.clear"
+      >
+        Clear Selection
+      </button>
 
       <suspense>
         <template #default>
           <span class="sub-menu__bulk-buttons__button">
-            <button :disabled="!hasSelection" @click.prevent="toggleBulkTransaction()">Bulk Transaction</button>
+            <button
+              :disabled="!hasSelection"
+              @click.prevent="toggleBulkTransaction()"
+            >
+              Bulk Transaction
+            </button>
+
             <bulk-post-modal
               :show="showBulkTransactionModal"
               @ok="toggleBulkTransaction"
@@ -31,13 +42,21 @@
             />
           </span>
         </template>
-        <template #fallback><loading-icon /></template>
+        <template #fallback>
+          <loading-icon />
+        </template>
       </suspense>
 
       <suspense>
         <template #default>
           <span class="sub-menu__bulk-buttons__button">
-            <button :disabled="!hasSelection" @click.prevent="toggleBulkGroup()">Bulk Move</button>
+            <button
+              :disabled="!hasSelection"
+              @click.prevent="toggleBulkGroup()"
+            >
+              Bulk Move
+            </button>
+
             <bulk-group-modal
               :show="showBulkGroupModal"
               @ok="handleBulkGroupModalOk"
@@ -45,22 +64,45 @@
             />
           </span>
         </template>
-        <template #fallback><loading-icon /></template>
+        <template #fallback>
+          <loading-icon />
+        </template>
       </suspense>
 
       <suspense>
         <template #default>
           <span class="sub-menu__bulk-buttons__button">
-            <button :disabled="selectedGroup === null" @click.prevent="toggleNewStudent">New Student</button>
+            <button
+              :disabled="selectedGroup === null"
+              @click.prevent="toggleNewStudent"
+            >
+              New Student
+            </button>
+
             <new-student-modal
               :show="showNewStudentModal"
-              :groupStore="groupStore"
+              :group-store="groupStore"
               @ok="toggleNewStudent"
               @cancel="toggleNewStudent"
             />
           </span>
         </template>
-        <template #fallback><loading-icon /></template>
+        <template #fallback>
+          <loading-icon />
+        </template>
+      </suspense>
+
+      <suspense>
+        <template #default>
+          <span class="sub-menu__bulk-buttons__button">
+            <button @click.prevent="toggleBulkImport">Bulk Import</button>
+            <bulk-import-modal
+              :show="showBulkImportModal"
+              @ok="toggleBulkImport"
+              @cancel="toggleBulkImport"
+            />
+          </span>
+        </template>
       </suspense>
     </div>
   </div>
@@ -83,6 +125,10 @@ const BulkGroupModal = defineAsyncComponent(
   () => import(/* webpackChunkName: "admin-groups" */ '@/components/admin/groups/BulkGroupModal.vue'),
 );
 
+const BulkImportModal = defineAsyncComponent(
+  () => import(/* webpackChunkName: "admin-groups" */ '@/components/admin/BulkImportModal.vue'),
+);
+
 const NewStudentModal = defineAsyncComponent(
   () => import(/* webpackChunkName: "admin-groups" */ '@/components/admin/NewStudentModal.vue'),
 );
@@ -103,12 +149,14 @@ export default {
     NewStudentModal,
     LoadingIcon,
     BulkGroupModal,
+    BulkImportModal,
   },
   setup() {
     const router = useRouter();
     const showBulkTransactionModal = ref(false);
     const showNewStudentModal = ref(false);
     const showBulkGroupModal = ref(false);
+    const showBulkImportModal = ref(false);
     const hasSelection = computed(() => selection.length > 0);
 
     function handleGroupSelection(item: Group|null) {
@@ -128,6 +176,8 @@ export default {
 
     function toggleBulkGroup() { showBulkGroupModal.value = !showBulkGroupModal.value; }
 
+    function toggleBulkImport() { showBulkImportModal.value = !showBulkImportModal.value; }
+
     function handleBulkGroupModalOk(movedGroup: Group) {
       showBulkGroupModal.value = false;
       handleGroupSelection(movedGroup);
@@ -144,6 +194,8 @@ export default {
       showBulkGroupModal,
       toggleBulkGroup,
       handleBulkGroupModalOk,
+      toggleBulkImport,
+      showBulkImportModal,
       selectedInstance: groupStore.instanceStore.selected,
       selectedGroup: groupStore.selected ?? null,
       groupStore,

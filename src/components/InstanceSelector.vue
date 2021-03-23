@@ -6,20 +6,55 @@
     prompt="Select an instance..."
     @update:modelValue="update"
   >
-    <template v-slot:selected="{ option, prompt }">
-      <template v-if="option?.isActive ?? false"><span class="active">(Active)</span> {{option.description}}</template>
-      <template v-else>{{option?.description ?? prompt}}</template>
+    <template #selected="{ option, prompt }">
+      <template v-if="option?.isActive ?? false">
+        <span class="active">(Active)</span> {{ option.description }}
+      </template>
+      <template v-else>
+        {{ option?.description ?? prompt }}
+      </template>
     </template>
-    <template v-slot:list="{ options, className, select }">
-      <li v-for="option in options" :key="option.id" :class="className" @click="select(option)">
-        <template v-if="option?.isActive ?? false"><span class="active">(Active)</span> {{option.description}}</template>
-        <template v-else>{{option?.description ?? option}}</template>
+    <template #list="{ options, className, select }">
+      <li
+        v-for="option in options"
+        :key="option.id"
+        :class="className"
+        @click="select(option)"
+      >
+        <template v-if="option?.isActive ?? false">
+          <span class="active">(Active)</span> {{ option.description }}
+        </template>
+        <template v-else>
+          {{ option?.description ?? option }}
+        </template>
       </li>
-      <li class="select__items__divider"><hr /></li>
-      <li :class="className" @click.prevent="startAdd">Add...</li>
-      <li :class="className" @click.prevent="startEdit">Rename...</li>
-      <li :class="className" @click.prevent="startDelete">Delete...</li>
-      <li :class="className" @click.prevent="startActive">Activate...</li>
+      <li class="select__items__divider">
+        <hr />
+      </li>
+      <li
+        :class="className"
+        @click.prevent="startAdd"
+      >
+        Add...
+      </li>
+      <li
+        :class="className"
+        @click.prevent="startEdit"
+      >
+        Rename...
+      </li>
+      <li
+        :class="className"
+        @click.prevent="startDelete"
+      >
+        Delete...
+      </li>
+      <li
+        :class="className"
+        @click.prevent="startActive"
+      >
+        Activate...
+      </li>
     </template>
   </base-select>
 
@@ -41,7 +76,12 @@
     <template v-else>
       <div class="instance-form">
         <label :for="`instance-form__instance-name--${id}`">Name</label>
-        <input type="text" ref="inputElement" :id="`instance-form__instance-name--${id}`" v-model="input" />
+        <input
+          :id="`instance-form__instance-name--${id}`"
+          ref="inputElement"
+          v-model="input"
+          type="text"
+        />
       </div>
     </template>
   </Modal>
@@ -75,11 +115,16 @@ export default defineComponent({
   props: {
     modelValue: {
       type: Object as PropType<Instance>,
+      default: undefined,
     },
     instanceStore: {
       type: Object as PropType<InstanceStore>,
+      default: undefined,
     },
   },
+  emits: [
+    'update:modelValue',
+  ],
   setup(props, { emit }) {
     // If the modal is open.
     const showModal = ref(false);

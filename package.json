@@ -58,7 +58,14 @@
       "object-curly-newline": "off",
       "max-len": "off",
       "no-underscore-dangle": ["error", { "allowAfterThis": true }],
-      "vue/html-self-closing": "off"
+      "vue/html-self-closing": "off",
+      "vue/max-attributes-per-line": ["warn", {
+        "singleline": 3,
+        "multiline": {
+          "max": 1,
+          "allowFirstLine": false
+        }
+      }]
     }
   },
   "browserslist": [
