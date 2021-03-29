@@ -1,5 +1,6 @@
 * { padding: 0; margin: 0; }
 *, *::before, *::after { box-sizing: border-box; }
+ul, blockquote { margin-left: 1em; }
 
 body {
   font-size:               12pt;
@@ -36,7 +37,7 @@ button.destructive, input[type=submit].destructive {
   @include button(button-destructive);
 }
 
-p.error, span.error, strong.error {
+p.error, span.error, strong.error, li.error, ul.errors li {
   color: map.get($theme, button-destructive, color);
 }
 

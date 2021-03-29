@@ -45,7 +45,33 @@
           v-show="false"
           ref="fileUploader"
           type="file"
+          @change.prevent="handleFileChange"
         />
+
+        <p v-if="state.students.length > 0" class="bit__step__import-info">
+          <template v-if="state.errors.length > 0">
+            Import succeeded with error(s).
+          </template>
+
+          <template v-else>
+            Import succeeded.
+          </template>
+
+          {{ state.students.length }} student(s) will be imported into {{ state.groups.length }} group(s).
+
+          <template v-if="state.errors.length > 0">
+            Here's a summary of the errors found in the import file:
+          </template>
+        </p>
+
+        <ul
+          v-if="state.errors.length > 0"
+          class="errors"
+        >
+          <li v-for="(error, index) of state.errors" :key="index">
+            {{ error }}
+          </li>
+        </ul>
       </div>
 
       <!-- Step 3: Configure Share Types -->
@@ -110,6 +136,7 @@
 import { computed, ref, reactive, defineComponent } from 'vue';
 import BulkImportService from '@/services/BulkImportService';
 import { setup as defineInstance } from '@/store/instance';
+import errorStore from '@/store/error';
 import Modal from '@/components/Modal.vue';
 import InstanceSelector from '@/components/InstanceSelector.vue';
 import LoadingIcon from '@/components/LoadingIcon.vue';
@@ -146,11 +173,18 @@ export default defineComponent({
     // True if the user is dragging a file
     const isDragging = ref(false);
 
+    // A reference to the hidden field used to trigger the open file dialog
     const fileUploader = ref<HTMLInputElement|null>(null);
 
     // True if the form is valid for the current state.
     const isValid = computed(() => {
       if (state.selectedInstance === null) return false;
+      if (state.isLoading) return false;
+
+      if (state.currentStep >= 2) {
+        if (state.students.length === 0) return false;
+      }
+
       return true;
     });
 
@@ -165,9 +199,38 @@ export default defineComponent({
       emit('cancel');
     }
 
+    // Click the hidden file upload input box.
     function handleUploadClick() {
       if (fileUploader.value === null) return;
       fileUploader.value.click();
+    }
+
+    // Ensure that the file is a CSV and pass it to the state for processing
+    function processFile(fileInfo: File) {
+      state.resetImportData();
+
+      const extIndex = fileInfo.name.lastIndexOf('.');
+      const extension = fileInfo.name.substring(extIndex).toLowerCase();
+      const isCSV = extension.toLowerCase() === '.csv';
+      if (!isCSV) {
+        errorStore.setCurrentError(`Import requires a .csv file and you provided ${extension}.`);
+        return;
+      }
+
+      state.setLoading(true);
+      fileInfo.text().then((value) => {
+        try {
+          const numErrors = state.importCSV(value);
+
+          if (numErrors > 0) {
+            errorStore.setCurrentError(`${numErrors} error(s) have occurred during import. Please review and correct them or some students may not be imported.`);
+          }
+        } catch (e) {
+          errorStore.setCurrentError(e.message ?? e);
+        } finally {
+          state.setLoading(false);
+        }
+      });
     }
 
     // Process the dropped file
@@ -175,12 +238,22 @@ export default defineComponent({
       const file = e.dataTransfer?.files[0];
       if (!file) return;
 
-      const isCSV = file.name.substring(file.name.length - 3).toLowerCase() === 'csv';
-      if (!isCSV) return;
+      processFile(file);
+    }
 
-      file.text().then((value) => {
-        console.log(value);
-      });
+    // Process the file from the file brow
+    function handleFileChange(e: Event) {
+      const input = e.target as null|HTMLInputElement;
+      if (!input) return;
+
+      const file = input.files ? input.files[0] : null;
+      if (!file) return;
+
+      processFile(file);
+
+      // Reset the form so a change is triggered again
+      input.value = '';
+      input.blur();
     }
 
     return {
@@ -193,6 +266,7 @@ export default defineComponent({
       isDragging,
       handleDrop,
       handleUploadClick,
+      handleFileChange,
       fileUploader,
     };
   },
@@ -216,6 +290,14 @@ export default defineComponent({
         &--hover-ok {
           border-style: dashed;
         }
+      }
+
+      &__import-info {
+        margin-top: 1em;
+      }
+
+      ul.errors {
+        margin-left: 2em;
       }
     }
   }
