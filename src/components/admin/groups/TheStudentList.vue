@@ -78,7 +78,7 @@ import { ref, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
 
 const delay = 300;
-let timer: NodeJS.Timeout|null = null;
+let timer: number|null = null;
 
 export default {
   setup() {

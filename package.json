@@ -8,8 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@apollo/client": "^3.2.9",
-    "apollo-link-token-refresh": "^0.3.2",
+    "@apollo/client": "^3.3.14",
     "core-js": "^3.6.5",
     "graphql": "^15.4.0",
     "vee-validate": "^4.1.0",
@@ -57,15 +56,23 @@
       "@typescript-eslint/interface-name-prefix": "off",
       "object-curly-newline": "off",
       "max-len": "off",
-      "no-underscore-dangle": ["error", { "allowAfterThis": true }],
-      "vue/html-self-closing": "off",
-      "vue/max-attributes-per-line": ["warn", {
-        "singleline": 3,
-        "multiline": {
-          "max": 1,
-          "allowFirstLine": false
+      "no-underscore-dangle": [
+        "error",
+        {
+          "allowAfterThis": true
         }
-      }]
+      ],
+      "vue/html-self-closing": "off",
+      "vue/max-attributes-per-line": [
+        "warn",
+        {
+          "singleline": 3,
+          "multiline": {
+            "max": 1,
+            "allowFirstLine": false
+          }
+        }
+      ]
     }
   },
   "browserslist": [

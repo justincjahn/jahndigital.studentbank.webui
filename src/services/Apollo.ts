@@ -8,11 +8,11 @@ import {
   throwServerError,
 } from '@apollo/client/core';
 
-import persistToken from '@/utils/persistToken';
-import { TokenRefreshLink } from 'apollo-link-token-refresh';
-import userStore from '@/store/user';
 import { onError } from '@apollo/client/link/error';
 import { setContext } from '@apollo/client/link/context';
+import persistToken from '@/utils/persistToken';
+import { TokenRefreshLink } from '@/utils/tokenRefreshLink';
+import userStore from '@/store/user';
 import { ERROR_CODES, API_ENDPOINT } from '@/constants';
 
 /**
