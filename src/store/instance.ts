@@ -28,7 +28,7 @@ export function setup() {
   const loading = computed(() => store.loading);
 
   // SETs (or clears) the selected instance.
-  function setSelected(item: Instance|null) { store.selected = item; }
+  function setSelected(item: Instance | null) { store.selected = item; }
 
   // Fetch instances from the server
   async function fetchInstances() {
@@ -42,7 +42,13 @@ export function setup() {
       if (res.data) {
         store.instances = res.data.instances.nodes;
         const active = store.instances.findIndex((x) => x.isActive === true);
-        setSelected(store.instances[active > -1 ? active : 0]);
+
+        // Only set the instance if we don't already have a valid one selected
+        const sid = store.selected?.id ?? -1;
+        const hasSelected = store.instances.findIndex((x) => x.id === sid);
+        if (hasSelected <= 0) {
+          setSelected(store.instances[active > -1 ? active : 0]);
+        }
       }
     } catch (e) {
       throw e.message ?? e;

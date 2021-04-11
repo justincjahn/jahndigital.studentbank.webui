@@ -15,16 +15,28 @@
     </section>
 
     <section class="sub-nav">
-      <router-link :to="{name: 'Students'}">Students</router-link>
-      <router-link :to="{name: 'Groups'}">Groups</router-link>
-      <router-link :to="{name: 'Stocks'}">Stocks</router-link>
-      <router-link :to="{name: 'Purchases'}">Purchases</router-link>
-      <router-link :to="{name: 'Settings'}">Settings</router-link>
+      <router-link :to="{name: 'Students'}">
+        Students
+      </router-link>
+      <router-link :to="{name: 'Groups'}">
+        Groups
+      </router-link>
+      <router-link :to="{name: 'Stocks'}">
+        Stocks
+      </router-link>
+      <router-link :to="{name: 'Purchases'}">
+        Purchases
+      </router-link>
+      <router-link :to="{name: 'Settings'}">
+        Settings
+      </router-link>
     </section>
   </header>
 
   <main>
-    <div class="loading" v-if="loading"><loading-icon>Loading, please wait...</loading-icon></div>
+    <div v-if="loading" class="loading">
+      <loading-icon>Loading, please wait...</loading-icon>
+    </div>
     <router-view v-else />
   </main>
 
@@ -37,14 +49,10 @@
       title="Error"
       @ok="errorStore.setCurrentError(null)"
     >
-      {{errorStore.error.value}}
+      {{ errorStore.error.value }}
     </Modal>
   </suspense>
 </template>
-
-<style lang="scss">
-@import '@/scss/admin.scss';
-</style>
 
 <script>
 import routerStore from '@/store/router';
@@ -80,6 +88,10 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+@import '@/scss/admin.scss';
+</style>
 
 <style scoped>
   .loading {
