@@ -11,23 +11,23 @@
     <template #default>
       <!-- Step 1 -->
       <div
-        v-if="state.currentStep === 1"
+        v-if="currentStep === 1"
         class="bpm__step-1"
       >
         <h2>Step 1: Select a Share Type</h2>
 
         <p class="bpm__step-1__selected-students">
-          <template v-if="state.isLoading">
+          <template v-if="loading">
             Please wait...
           </template>
           <strong
-            v-else-if="state.students.length <= 0"
+            v-else-if="students.length <= 0"
             class="error"
           >
             Please select some students to begin!
           </strong>
           <template v-else>
-            You have {{ state.students.length }} {{ state.students.length > 1 ? 'students' : 'student' }} selected.
+            You have {{ students.length }} {{ students.length > 1 ? 'students' : 'student' }} selected.
           </template>
         </p>
 
@@ -36,21 +36,21 @@
         </p>
 
         <share-type-selector
-          :model-value="state.selectedShareType"
+          :model-value="selectedShareType"
           @update:modelValue="handleShareTypeSelection"
         />
 
         <p
-          v-if="state.errors[1] !== null"
+          v-if="errors[1] !== null"
           class="bpm__step-1__error error"
         >
-          {{ state.errors[1] }}
+          {{ errors[1] }}
         </p>
       </div>
 
       <!-- Step 2 -->
       <div
-        v-if="state.currentStep === 2"
+        v-if="currentStep === 2"
         class="bpm__step-2"
       >
         <h2>Step 2: Choose an Amount</h2>
@@ -61,17 +61,18 @@
             <span class="bpm__step-2__fieldset__amount-wrapper__currency">$</span>
             <input
               id="bpm__step-2--amount"
-              v-model="state.amountField.value"
+              v-model="amountValue"
               type="text"
               name="amount"
+              @update:modelValue="trySetAmount"
               @focus="$event.target.select()"
             />
           </div>
           <p
-            v-if="state.amountField.errorMessage"
+            v-if="amountError"
             class="error"
           >
-            {{ state.amountField.errorMessage }}
+            {{ amountError }}
           </p>
         </div>
 
@@ -79,15 +80,16 @@
           <label for="bpm__step-2--comment">Comment</label>
           <input
             id="bpm__step-2--comment"
-            v-model="state.commentField.value"
+            v-model="commentValue"
             type="text"
             name="comment"
+            @update:modelValue="trySetComment"
           />
           <p
-            v-if="state.commentField.errorMessage"
+            v-if="commentError"
             class="error"
           >
-            {{ state.commentField.errorMessage }}
+            {{ commentError }}
           </p>
         </div>
 
@@ -97,10 +99,10 @@
           <div class="bpm__step-2__fieldset__item">
             <input
               id="bpm__step-2--policy-none"
-              v-model="state.postingPolicyField.value"
               type="radio"
               name="postingPolicy"
-              value="none"
+              :checked="postingPolicy === PostingPolicy.none"
+              @click="setPostingPolicy(PostingPolicy.none)"
             />
             <label for="bpm__step-2--policy-none">None</label>
             <span class="light">Fail if any shares are taken negative.</span>
@@ -109,10 +111,10 @@
           <div class="bpm__step-2__fieldset__item">
             <input
               id="bpm__step-2--policy-take"
-              v-model="state.postingPolicyField.value"
               type="radio"
               name="postingPolicy"
-              value="take"
+              :checked="postingPolicy === PostingPolicy.take"
+              @click="setPostingPolicy(PostingPolicy.take)"
             />
             <label for="bpm__step-2--policy-take">Take Negative</label>
             <span class="light">Allow shares to be taken negative.</span>
@@ -121,10 +123,10 @@
           <div class="bpm__step-2__fieldset__item">
             <input
               id="bpm__step-2--policy-skip"
-              v-model="state.postingPolicyField.value"
               type="radio"
               name="postingPolicy"
-              value="skip"
+              :checked="postingPolicy === PostingPolicy.skip"
+              @click="setPostingPolicy(PostingPolicy.skip)"
             />
             <label for="bpm__step-2--policy-skip">Skip Negative</label>
             <span class="light">Skip shares that would be taken negative.</span>
@@ -132,16 +134,16 @@
         </div>
 
         <p
-          v-if="state.errors[2] !== null"
+          v-if="errors[2] !== null"
           class="bpm__step-2__error error"
         >
-          {{ state.errors[2] }}
+          {{ errors[2] }}
         </p>
       </div>
 
       <!-- Step 3 -->
       <div
-        v-if="state.currentStep === 3"
+        v-if="currentStep === 3"
         class="bpm__step-3"
       >
         <h2>Step 3: Review</h2>
@@ -159,7 +161,7 @@
           </thead>
           <tbody>
             <tr
-              v-for="share in randomShares"
+              v-for="share in sampleShares"
               :key="share.id"
             >
               <td>{{ getGroupName(share) }}</td>
@@ -194,25 +196,25 @@
         {{ cancelLabel }}
       </button>
       <button
-        v-if="state.hasPreviousStep()"
-        @click.prevent="state.decrementStep()"
+        v-if="hasPreviousStep"
+        @click.prevent="decrementStep"
       >
         Previous
       </button>
       <button
-        v-if="state.hasNextStep()"
-        :disabled="!isValid"
-        @click.prevent="state.incrementStep()"
+        v-if="hasNextStep"
+        :disabled="isValid !== true"
+        @click.prevent="incrementStep"
       >
         Next
       </button>
       <button
-        v-if="!state.hasNextStep()"
+        v-if="!hasNextStep"
         class="primary"
         :disabled="!isValid"
         @click.prevent="handleOk"
       >
-        <template v-if="!state.isLoading">
+        <template v-if="!loading">
           {{ okLabel }}
         </template>
         <template v-else>
@@ -224,15 +226,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watchEffect, computed, reactive, ref } from 'vue';
-import sample from '@/utils/sample';
-import BulkPostService from '@/services/BulkPostService';
+import { defineComponent, watchEffect, computed, ref } from 'vue';
 import Modal from '@/components/Modal.vue';
 import ShareTypeSelector from '@/components/ShareTypeSelector.vue';
-import Money from '@/utils/money';
 import groupStore from '@/store/group';
 import LoadingIcon from '@/components/LoadingIcon.vue';
 import errorStore from '@/store/error';
+import bulkPostStore, { PostingPolicy } from '@/store/bulkPost';
 
 export default defineComponent({
   components: {
@@ -251,63 +251,54 @@ export default defineComponent({
     'cancel',
   ],
   setup(props, { emit }) {
-    const bulkPostState = reactive(new BulkPostService());
-    const timerFunc = ref<number>(-1);
-    const sampleStudents = ref<Map<number, Student>>(new Map<number, Student>());
-
-    // Computed property to ensure the form is valid and postable.
-    const isValid = computed(() => {
-      // eslint-disable-next-line no-unreachable
-      if (bulkPostState.isLoading) return false;
-      if (bulkPostState.students.length === 0) return false;
-
-      if (bulkPostState.currentStep >= 1) {
-        if (bulkPostState.selectedShareType === null) return false;
-      }
-
-      if (bulkPostState.currentStep >= 2) {
-        if (bulkPostState.amountField.errorMessage) return false;
-        if (bulkPostState.commentField.errorMessage) return false;
-
-        if (
-          bulkPostState.postingPolicyField.value === 'none'
-          && bulkPostState.noncompliantShares.length > 0
-        ) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-
-    // Generates a selection of random shares for the verification step and map them to students.
-    const randomShares = computed<Share[]>(() => {
-      if (bulkPostState.selectedShares.length <= 0) return [];
-      const shares = sample(bulkPostState.selectedShares, Math.min(10, bulkPostState.selectedShares.length));
-
-      const students: Map<number, Student> = new Map<number, Student>();
-      shares.forEach((share) => {
-        const student = bulkPostState.students.find((x) => (x.shares?.findIndex((y) => y.id === share.id) ?? -1) >= 0);
-        if (typeof student === 'undefined') {
-          console.log('Error: Cannot find student for sample share.', share);
-          return;
-        }
-
-        students.set(share.id, student);
-      });
-
-      sampleStudents.value = students;
-      return shares;
-    });
-
     // Generate a shorthand name for the selected share
-    const shareTypeName = computed(() => bulkPostState.selectedShareType?.name.toUpperCase().substring(0, 3) ?? 'UNK');
+    const shareTypeName = computed(() => bulkPostStore.selectedShareType.value?.name.toUpperCase().substring(0, 3) ?? 'UNK');
+
+    // Form value for the amount
+    const amountValue = ref('0.00');
+
+    // Error message for the amount field, if any.
+    const amountError = ref('');
+
+    // Form value for the comment
+    const commentValue = ref('');
+
+    // Error message for the comment field, if any.
+    const commentError = ref('');
+
+    /**
+     * Tries to set the amount and sets an error if it's invalid.
+     */
+    function trySetAmount(value: string) {
+      amountValue.value = value;
+
+      try {
+        bulkPostStore.setAmount(value);
+        amountError.value = '';
+      } catch (e) {
+        amountError.value = e?.message ?? e;
+      }
+    }
+
+    /**
+     * Tries to set the comment and sets an error if it's invalid.
+     */
+    function trySetComment(value: string) {
+      commentValue.value = value;
+
+      try {
+        bulkPostStore.setComment(value);
+        commentError.value = '';
+      } catch (e) {
+        commentError.value = e?.message ?? e;
+      }
+    }
 
     /**
      * Get the first and last name of the student who owns the provided share.
      */
     function getStudentName(share: Share) {
-      const student = sampleStudents.value.get(share.id);
+      const student = bulkPostStore.studentMap.value.get(share.id);
 
       if (student) {
         return `${student.lastName}, ${student.firstName}`;
@@ -320,7 +311,7 @@ export default defineComponent({
      * Get the account number of the student who owns the provided share.
      */
     function getAccountNumber(share: Share) {
-      const student = sampleStudents.value.get(share.id);
+      const student = bulkPostStore.studentMap.value.get(share.id);
 
       if (student) {
         return student.accountNumber;
@@ -333,7 +324,7 @@ export default defineComponent({
      * Get the group name for the given student.
      */
     function getGroupName(share: Share) {
-      const student = sampleStudents.value.get(share.id);
+      const student = bulkPostStore.studentMap.value.get(share.id);
 
       if (student) {
         const group = groupStore.groups.value.find((x) => x.id === student.groupId);
@@ -344,40 +335,21 @@ export default defineComponent({
     }
 
     /**
-     * Estimate the effective balance of the share after the transaction was posted.
-     */
-    function getEffectiveBalance(share: Share) {
-      const curBalance = share.balance;
-      const amount = +bulkPostState.amountField.value;
-      const policy = bulkPostState.postingPolicyField.value;
-
-      if (amount >= 0) {
-        return curBalance + amount;
-      }
-
-      if (policy === 'skip' && curBalance < Math.abs(amount)) {
-        return curBalance;
-      }
-
-      return curBalance + amount;
-    }
-
-    /**
      * Fired when the user clicks 'OK', or hits Enter.  Either moves to the next step
      * or attempts to post the transactions and emits an 'ok' event.
      */
     async function handleOk() {
       // Only allow the posting logic to run if there is a valid state.
-      if (!isValid.value) return;
+      if (bulkPostStore.isValid.value !== true) return;
 
-      if (bulkPostState.hasNextStep()) {
-        bulkPostState.incrementStep();
+      if (bulkPostStore.hasNextStep.value) {
+        bulkPostStore.incrementStep();
         return;
       }
 
       // We're on the last step
       try {
-        const data = await bulkPostState.post();
+        const data = await bulkPostStore.post();
         emit('ok', data);
       } catch (e) {
         errorStore.setCurrentError(e?.message ?? e);
@@ -395,109 +367,16 @@ export default defineComponent({
      * When a share type is selected, select the first share for each student.
      */
     function handleShareTypeSelection(item: ShareType|null) {
-      if (item === null) return;
-
-      // Filter only students that have a share with the correct type
-      const studentsWithShares = bulkPostState.students.filter(
-        (student) => (student.shares?.findIndex((share) => share.shareTypeId === item.id) ?? -1) >= 0,
-      );
-
-      // Get a list of shares from that list with the correct type
-      const shares: Share[] = [];
-      studentsWithShares.forEach((student) => {
-        if (typeof student.shares === 'undefined') return;
-        const studentShares = [...student.shares];
-        studentShares.sort((a, b) => a.id - b.id);
-        const share = studentShares.find((sh) => sh.shareTypeId === item.id);
-        if (share) shares.push(share);
-      });
-
-      const diff = bulkPostState.students.length - studentsWithShares.length;
-      if (diff > 0) {
-        bulkPostState.setError(1,
-          `Warning: There are ${diff} students without the selected share type and will not incur the transaction.`);
-      } else {
-        bulkPostState.setError(1, null);
-      }
-
-      bulkPostState.setSelectedShareType(item);
-      bulkPostState.setSelectedShares(shares);
+      bulkPostStore.setSelectedShareType(item);
     }
-
-    /**
-     * Ensure that the selected shares comply with the selected posting policy.
-     */
-    function checkShares() {
-      // Posting policy only affects withdrawals
-      if (+bulkPostState.amountField.value >= 0) {
-        bulkPostState.setError(2, null);
-        bulkPostState.setNoncompliantShares([]);
-        bulkPostState.setLoading(false);
-        return;
-      }
-
-      // Get a list of shares that will be taken negative
-      const noncompliantShares: Share[] = [];
-      const amount = Money.fromNumber(Math.abs(+bulkPostState.amountField.value));
-      bulkPostState.selectedShares.forEach((share) => {
-        if (share.balance < amount.getAmount()) noncompliantShares.push(share);
-      });
-
-      bulkPostState.setNoncompliantShares(noncompliantShares);
-
-      // Skip error generation if there were no noncompliant shares
-      if (noncompliantShares.length === 0) {
-        bulkPostState.setError(2, null);
-        bulkPostState.setLoading(false);
-        return;
-      }
-
-      if (bulkPostState.postingPolicyField.value === 'none') {
-        bulkPostState.setError(2,
-          `Error: ${noncompliantShares.length} shares(s) do not have the funds to cover the specified amount and the transaction will fail.
-          Choose another Posting Policy to continue.`);
-      } else if (bulkPostState.postingPolicyField.value === 'take') {
-        bulkPostState.setError(2,
-          `Warning: ${noncompliantShares.length} share(s) will have a negative balance as a result of this transaction.`);
-      } else if (bulkPostState.postingPolicyField.value === 'skip') {
-        bulkPostState.setError(2,
-          `Warning: ${noncompliantShares.length} share(s) will be skipped because they do not have the funds to cover the specified amount.`);
-      }
-
-      bulkPostState.setLoading(false);
-    }
-
-    // When the user enters a negative amount, validate the shares can handle it (debounced)
-    watchEffect(() => {
-      const amount = +bulkPostState.amountField.value;
-      const policy = bulkPostState.postingPolicyField.value;
-
-      if (bulkPostState.currentStep === 2) {
-        window.clearTimeout(timerFunc.value);
-        bulkPostState.setLoading(true);
-        timerFunc.value = window.setTimeout(checkShares, 200);
-        return;
-      }
-
-      if (amount < 0) {
-        window.clearTimeout(timerFunc.value);
-        bulkPostState.setLoading(true);
-        timerFunc.value = window.setTimeout(checkShares, 200);
-        return;
-      }
-
-      if (policy !== null) {
-        window.clearTimeout(timerFunc.value);
-        bulkPostState.setLoading(true);
-        timerFunc.value = window.setTimeout(checkShares, 200);
-      }
-    });
 
     // Fetch the selected students when the modal is shown.
     watchEffect(() => {
       if (props.show) {
-        bulkPostState.reset();
-        bulkPostState.fetchSelection();
+        bulkPostStore.reset();
+        amountValue.value = '0.00';
+        commentValue.value = '';
+        bulkPostStore.fetchSelection();
       }
     });
 
@@ -505,14 +384,18 @@ export default defineComponent({
       handleOk,
       handleCancel,
       handleShareTypeSelection,
-      isValid,
-      state: bulkPostState,
-      randomShares,
       getStudentName,
       getAccountNumber,
       getGroupName,
-      getEffectiveBalance,
       shareTypeName,
+      amountValue,
+      amountError,
+      trySetAmount,
+      commentValue,
+      commentError,
+      trySetComment,
+      PostingPolicy,
+      ...bulkPostStore,
     };
   },
 });

@@ -2,6 +2,7 @@ import Apollo from '@/services/Apollo';
 import gqlSearchAccounts from '@/graphql/studentsByAccountNumber.gql';
 import { StudentStore } from '@/store/student';
 import { InstanceStore } from '@/store/instance';
+import Money from './money';
 
 /**
  * Ensure the account number is less than 10 digits, and only digits.
@@ -95,5 +96,31 @@ export function validateName(value: string): string|boolean {
     return 'First and last name are required.';
   }
 
+  return true;
+}
+
+/**
+ * Ensures that the provided string is a valid monetary amount that's non-zero.
+ *
+ * @param value
+ */
+export function validateAmountNonzero(value: string): string | boolean {
+  if (!value || value.length === 0) return 'Specify an amount.';
+
+  const num = +value;
+  if (Number.isNaN(num)) return 'Amount must be a number.';
+  if (Money.round(num) === 0) return 'Amount cannot be zero.';
+
+  return true;
+}
+
+/**
+ * Ensures that the provided string is a valid transaction comment.
+ *
+ * @param value
+ * @returns true or an error message.
+ */
+export function validateTransactionComment(value: string): string | boolean {
+  if (value && value.length > 255) return 'Comment can only be 255 characters.';
   return true;
 }

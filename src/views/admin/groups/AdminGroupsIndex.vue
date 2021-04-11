@@ -25,85 +25,60 @@
         Clear Selection
       </button>
 
-      <suspense>
-        <template #default>
-          <span class="sub-menu__bulk-buttons__button">
-            <button
-              :disabled="!hasSelection"
-              @click.prevent="toggleBulkTransaction()"
-            >
-              Bulk Transaction
-            </button>
+      <span class="sub-menu__bulk-buttons__button">
+        <button
+          :disabled="!hasSelection"
+          @click.prevent="toggleBulkTransaction"
+        >
+          Bulk Transaction
+        </button>
 
-            <bulk-post-modal
-              :show="showBulkTransactionModal"
-              @ok="toggleBulkTransaction"
-              @cancel="toggleBulkTransaction"
-            />
-          </span>
-        </template>
-        <template #fallback>
-          <loading-icon />
-        </template>
-      </suspense>
+        <bulk-post-modal
+          :show="showBulkTransactionModal"
+          @ok="toggleBulkTransaction"
+          @cancel="toggleBulkTransaction"
+        />
+      </span>
 
-      <suspense>
-        <template #default>
-          <span class="sub-menu__bulk-buttons__button">
-            <button
-              :disabled="!hasSelection"
-              @click.prevent="toggleBulkGroup()"
-            >
-              Bulk Move
-            </button>
+      <span class="sub-menu__bulk-buttons__button">
+        <button
+          :disabled="!hasSelection"
+          @click.prevent="toggleBulkGroup"
+        >
+          Bulk Move
+        </button>
 
-            <bulk-group-modal
-              :show="showBulkGroupModal"
-              @ok="handleBulkGroupModalOk"
-              @cancel="toggleBulkGroup"
-            />
-          </span>
-        </template>
-        <template #fallback>
-          <loading-icon />
-        </template>
-      </suspense>
+        <bulk-group-modal
+          :show="showBulkGroupModal"
+          @ok="handleBulkGroupModalOk"
+          @cancel="toggleBulkGroup"
+        />
+      </span>
 
-      <suspense>
-        <template #default>
-          <span class="sub-menu__bulk-buttons__button">
-            <button
-              :disabled="selectedGroup === null"
-              @click.prevent="toggleNewStudent"
-            >
-              New Student
-            </button>
+      <span class="sub-menu__bulk-buttons__button">
+        <button
+          :disabled="selectedGroup === null"
+          @click.prevent="toggleNewStudent"
+        >
+          New Student
+        </button>
 
-            <new-student-modal
-              :show="showNewStudentModal"
-              :group-store="groupStore"
-              @ok="toggleNewStudent"
-              @cancel="toggleNewStudent"
-            />
-          </span>
-        </template>
-        <template #fallback>
-          <loading-icon />
-        </template>
-      </suspense>
+        <new-student-modal
+          :show="showNewStudentModal"
+          :group-store="groupStore"
+          @ok="toggleNewStudent"
+          @cancel="toggleNewStudent"
+        />
+      </span>
 
-      <suspense>
-        <template #default>
-          <span class="sub-menu__bulk-buttons__button">
-            <button @click.prevent="toggleBulkImport">Bulk Import</button>
-            <bulk-import-modal
-              :show="showBulkImportModal"
-              @ok="toggleBulkImport"
-              @cancel="toggleBulkImport"
-            />
-          </span>
-        </template>
-      </suspense>
+      <span class="sub-menu__bulk-buttons__button">
+        <button @click.prevent="toggleBulkImport">Bulk Import</button>
+        <bulk-import-modal
+          :show="showBulkImportModal"
+          @ok="toggleBulkImport"
+          @cancel="toggleBulkImport"
+        />
+      </span>
     </div>
   </div>
 
@@ -111,7 +86,6 @@
 </template>
 
 <script lang="ts">
-import LoadingIcon from '@/components/LoadingIcon.vue';
 import groupStore from '@/store/group';
 import selection from '@/services/StudentSelectionService';
 import { ref, computed, defineAsyncComponent } from 'vue';
@@ -147,7 +121,6 @@ export default {
     TheGroupSelector,
     BulkPostModal,
     NewStudentModal,
-    LoadingIcon,
     BulkGroupModal,
     BulkImportModal,
   },
