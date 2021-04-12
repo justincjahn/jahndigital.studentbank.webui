@@ -211,7 +211,7 @@
       <button
         v-if="!hasNextStep"
         class="primary"
-        :disabled="!isValid"
+        :disabled="isValid !== true"
         @click.prevent="handleOk"
       >
         <template v-if="!loading">

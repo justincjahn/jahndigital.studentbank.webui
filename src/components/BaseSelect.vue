@@ -1,12 +1,35 @@
 <template>
   <div class="select" :class="{ 'select--open': open }">
-    <button class="select__selected" :class="{ 'select__selected--open': open }" ref="root" @click="toggle">
-      <slot name="selected" :option="modelValue" :prompt="prompt">{{modelValue ? value(modelValue) : prompt}}</slot>
+    <button
+      ref="root"
+      class="select__selected"
+      :class="{ 'select__selected--open': open }"
+      @click="toggle"
+    >
+      <slot name="selected" :option="modelValue" :prompt="prompt">
+        {{ modelValue ? value(modelValue) : prompt }}
+      </slot>
     </button>
-    <ul class="select__items" :class="{ 'select__items--hidden': !open }" v-if="options.length > 0">
-      <slot name="list" :options="options" :className="'select__items__item'" :select="select">
-        <li v-for="option in options" :key="key(option)" @click="select(option)" class="select__items__item">
-          <slot name="option" :option="option">{{value(option)}}</slot>
+    <ul
+      v-if="options.length > 0 || true"
+      class="select__items"
+      :class="{ 'select__items--hidden': !open }"
+    >
+      <slot
+        name="list"
+        :options="options"
+        :className="'select__items__item'"
+        :select="select"
+      >
+        <li
+          v-for="option in options"
+          :key="key(option)"
+          class="select__items__item"
+          @click="select(option)"
+        >
+          <slot name="option" :option="option">
+            {{ value(option) }}
+          </slot>
         </li>
       </slot>
     </ul>
@@ -41,6 +64,7 @@ export default defineComponent({
   props: {
     modelValue: {
       type: [Object, Number, String] as PropType<Item>,
+      default: null,
     },
     options: {
       type: Array as PropType<Readonly<Item[]>>,
@@ -65,6 +89,9 @@ export default defineComponent({
       default: 'Choose an item...',
     },
   },
+  emits: [
+    'update:modelValue',
+  ],
   setup(_, { emit }) {
     const open = ref(false);
     const root = ref<HTMLButtonElement|null>(null);

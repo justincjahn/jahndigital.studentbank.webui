@@ -83,11 +83,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watchEffect } from 'vue';
+import { defineComponent, ref, computed, watchEffect, PropType } from 'vue';
 import { useForm, Field } from 'vee-validate';
 import errorStore from '@/store/error';
-import instanceStore from '@/store/instance';
-import theShareTypeStore, { setup as setupShareTypeStore } from '@/store/shareType';
+import { setup as setupShareTypeStore, ShareTypeStore } from '@/store/shareType';
 import Modal from '@/components/Modal.vue';
 import LoadingIcon from '@/components/LoadingIcon.vue';
 import ShareTypeMultiselect from '@/components/ShareTypeMultiselector.vue';
@@ -115,13 +114,17 @@ export default defineComponent({
       type: Boolean,
       required: true,
     },
+    shareTypeStore: {
+      type: Object as PropType<ShareTypeStore>,
+      required: true,
+    },
   },
   emits: [
     'ok',
   ],
   setup(props, { emit }) {
     // Use a bespoke ShareTypeStore for the available share types list so we don't muddle global state.
-    const shareTypeStore = setupShareTypeStore(instanceStore, false);
+    const shareTypeStore = setupShareTypeStore(props.shareTypeStore.instanceStore, false);
 
     // True if a share type add operation is awaiting the server.
     const addLoading = ref(false);
@@ -213,7 +216,6 @@ export default defineComponent({
         await fetchAvailableShareTypes();
       } catch (e) {
         errorStore.setCurrentError('Unable to add the Share Type.  Does it already exist?');
-        console.error(e);
       } finally {
         addLoading.value = false;
       }
@@ -221,13 +223,13 @@ export default defineComponent({
 
     // Link the selected share types
     async function handleLink() {
-      if (!theShareTypeStore.instanceStore.selected.value) return;
-      const instanceId = theShareTypeStore.instanceStore.selected.value.id;
+      if (!props.shareTypeStore.instanceStore.selected.value) return;
+      const instanceId = props.shareTypeStore.instanceStore.selected.value.id;
       const errors = [] as string[];
 
       await Promise.all(selected.value.map(async (shareType) => {
         try {
-          await theShareTypeStore.linkShareType({
+          await props.shareTypeStore.linkShareType({
             shareTypeId: shareType.id,
             instanceId,
           });
@@ -240,7 +242,7 @@ export default defineComponent({
         errorStore.setCurrentError(errors.join(', '));
       }
 
-      await theShareTypeStore.fetch();
+      await props.shareTypeStore.fetch();
       await fetchAvailableShareTypes();
     }
 

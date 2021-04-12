@@ -5,27 +5,28 @@
     ok-label="Ok"
     title="Bulk Import Tool"
     class="bit large"
-    :can-submit="canSubmit"
+    :can-submit="isValid"
     @ok="handleOk"
     @cancel="handleCancel"
   >
     <template #default>
       <!-- Step 1: Choose an instance -->
       <div
-        v-if="state.currentStep === 1"
+        v-if="currentStep === BulkImportStep.selectInstance"
         class="bit__step bit__step--1"
       >
         <h1>Step 1: Choose an instance</h1>
         <p>Select or create an instance that new groups and students will be created.</p>
         <instance-selector
-          v-model="state.selectedInstance"
+          :model-value="instance"
           :instance-store="instanceStore"
+          @update:modelValue="handleSetInstance"
         />
       </div>
 
       <!-- Step 2: Import data -->
       <div
-        v-if="state.currentStep === 2"
+        v-if="currentStep === BulkImportStep.uploadData"
         class="bit__step bit__step--2"
       >
         <h1>Step 2: Import data</h1>
@@ -48,35 +49,31 @@
           @change.prevent="handleFileChange"
         />
 
-        <p v-if="state.students.length > 0" class="bit__step__import-info">
-          <template v-if="state.errors.length > 0">
-            Import succeeded with error(s).
-          </template>
+        <h2 v-if="students.length > 0 && errors.length === 0">
+          Import Suceeded
+        </h2>
 
-          <template v-else>
-            Import succeeded.
-          </template>
-
-          {{ state.students.length }} student(s) will be imported into {{ state.groups.length }} group(s).
-
-          <template v-if="state.errors.length > 0">
-            Here's a summary of the errors found in the import file:
-          </template>
-        </p>
+        <h2 v-if="errors.length > 0">
+          Import Suceeded with Errors
+        </h2>
 
         <ul
-          v-if="state.errors.length > 0"
-          class="errors"
+          v-if="errors.length > 0"
+          class="bit__step__import-info errors"
         >
-          <li v-for="(error, index) of state.errors" :key="index">
+          <li v-for="(error, index) of errors" :key="index">
             {{ error }}
           </li>
         </ul>
+
+        <p v-if="students.length > 0" class="bit__step__import-info">
+          Press <strong>Next</strong> to continue.
+        </p>
       </div>
 
       <!-- Step 3: Configure Share Types -->
       <div
-        v-if="state.currentStep === 3"
+        v-if="currentStep === BulkImportStep.shareTypes"
         class="bit__step bit__step--3"
       >
         <h1>Step 3: Configure Share Types</h1>
@@ -86,11 +83,45 @@
           You can use the <em>Share Type</em> drop down to create and link or unlink <em>Share Types</em>
           to your <em>Instance</em>.
         </p>
+
+        <div
+          v-for="(share, index) in shareTemplate"
+          :key="index"
+          class="nsm__shares__fieldset"
+        >
+          <share-type-selector
+            v-model="shareTemplate[index].shareType"
+            :share-type-store="shareTypeStore"
+            class="nsm__shareTypeSelector"
+          />
+
+          <input
+            :id="`nsm__shares__initialDeposit__${index}`"
+            v-model="shareTemplate[index].initialDeposit"
+            :name="`initialDeposit[${index}]`"
+            type="text"
+          />
+
+          <!--<ErrorMessage :name="`initialDeposit[${index}]`" />-->
+
+          <button
+            type="button"
+            @click="removeShareType(index)"
+          >
+            Remove
+          </button>
+        </div>
+        <button
+          type="button"
+          @click="addShareType()"
+        >
+          Add Share
+        </button>
       </div>
 
       <!-- Step 4: Validate and import -->
       <div
-        v-if="state.currentStep === 4"
+        v-if="currentStep === BulkImportStep.validate"
         class="bit__step bit__step--4"
       >
         <h1>Step 4: Validate and commit</h1>
@@ -103,25 +134,25 @@
         {{ cancelLabel }}
       </button>
       <button
-        v-if="state.hasPreviousStep()"
-        @click.prevent="state.decrementStep()"
+        v-if="hasPreviousStep"
+        @click.prevent="decrementStep"
       >
         Previous
       </button>
       <button
-        v-if="state.hasNextStep()"
-        :disabled="!isValid"
-        @click.prevent="state.incrementStep()"
+        v-if="hasNextStep"
+        :disabled="isValid !== true"
+        @click.prevent="handleIncrement"
       >
         Next
       </button>
       <button
-        v-if="!state.hasNextStep()"
+        v-if="!hasNextStep"
         class="primary"
-        :disabled="!isValid || state.isLoading"
+        :disabled="isValid !== true"
         @click.prevent="handleOk"
       >
-        <template v-if="!state.isLoading">
+        <template v-if="!loading">
           {{ okLabel }}
         </template>
         <template v-else>
@@ -133,18 +164,21 @@
 </template>
 
 <script lang="ts">
-import { computed, ref, reactive, defineComponent } from 'vue';
-import BulkImportService from '@/services/BulkImportService';
+import { ref, defineComponent } from 'vue';
 import { setup as defineInstance } from '@/store/instance';
+import { setup as defineShareType } from '@/store/shareType';
+import bulkImportStore, { BulkImportStep, ShareTemplate } from '@/store/bulkImport';
 import errorStore from '@/store/error';
 import Modal from '@/components/Modal.vue';
 import InstanceSelector from '@/components/InstanceSelector.vue';
+import ShareTypeSelector from '@/components/ShareTypeSelector.vue';
 import LoadingIcon from '@/components/LoadingIcon.vue';
 
 export default defineComponent({
   components: {
     Modal,
     InstanceSelector,
+    ShareTypeSelector,
     LoadingIcon,
   },
 
@@ -164,11 +198,8 @@ export default defineComponent({
     // A fresh InstanceStore we can use for the modal
     const instanceStore = defineInstance();
 
-    // If the form can be submitted
-    const canSubmit = computed(() => true);
-
-    // The state of the modal
-    const state = reactive(new BulkImportService());
+    // A fresh ShareTypeStore we can use for the modal
+    const shareTypeStore = defineShareType(instanceStore);
 
     // True if the user is dragging a file
     const isDragging = ref(false);
@@ -176,17 +207,24 @@ export default defineComponent({
     // A reference to the hidden field used to trigger the open file dialog
     const fileUploader = ref<HTMLInputElement|null>(null);
 
-    // True if the form is valid for the current state.
-    const isValid = computed(() => {
-      if (state.selectedInstance === null) return false;
-      if (state.isLoading) return false;
+    // An array of new Share Types to create with initial values.  Also holds promise when they are submitted.
+    const shareTemplate = ref<ShareTemplate[]>([]);
 
-      if (state.currentStep >= 2) {
-        if (state.students.length === 0) return false;
+    // Set the instance for both stores
+    function handleSetInstance(value: Instance|null) {
+      instanceStore.setSelected(value);
+      bulkImportStore.setInstance(value);
+    }
+
+    // Move to the next step
+    function handleIncrement() {
+      if (bulkImportStore.currentStep.value === BulkImportStep.shareTypes) {
+        bulkImportStore.setShareTypeTemplate(shareTemplate.value);
       }
 
-      return true;
-    });
+      console.log(bulkImportStore.shareTemplates.value);
+      bulkImportStore.incrementStep();
+    }
 
     // Commit the import
     function handleOk() {
@@ -195,7 +233,8 @@ export default defineComponent({
 
     // Cancel the import
     function handleCancel() {
-      state.reset();
+      bulkImportStore.reset();
+      shareTemplate.value = [];
       emit('cancel');
     }
 
@@ -207,30 +246,11 @@ export default defineComponent({
 
     // Ensure that the file is a CSV and pass it to the state for processing
     function processFile(fileInfo: File) {
-      state.resetImportData();
-
-      const extIndex = fileInfo.name.lastIndexOf('.');
-      const extension = fileInfo.name.substring(extIndex).toLowerCase();
-      const isCSV = extension.toLowerCase() === '.csv';
-      if (!isCSV) {
-        errorStore.setCurrentError(`Import requires a .csv file and you provided ${extension}.`);
-        return;
+      try {
+        bulkImportStore.processFile(fileInfo);
+      } catch (e) {
+        errorStore.setCurrentError(e?.message ?? e);
       }
-
-      state.setLoading(true);
-      fileInfo.text().then((value) => {
-        try {
-          const numErrors = state.importCSV(value);
-
-          if (numErrors > 0) {
-            errorStore.setCurrentError(`${numErrors} error(s) have occurred during import. Please review and correct them or some students may not be imported.`);
-          }
-        } catch (e) {
-          errorStore.setCurrentError(e.message ?? e);
-        } finally {
-          state.setLoading(false);
-        }
-      });
     }
 
     // Process the dropped file
@@ -256,18 +276,43 @@ export default defineComponent({
       input.blur();
     }
 
+    // Add a new element to the shareTemplate array, triggering a share type selector
+    function addShareType() {
+      shareTemplate.value = [
+        ...shareTemplate.value,
+
+        {
+          shareType: null,
+          initialDeposit: '0.00',
+        },
+      ];
+    }
+
+    // Remove the provided index from the array
+    function removeShareType(index: number) {
+      shareTemplate.value = [
+        ...shareTemplate.value.slice(0, index),
+        ...shareTemplate.value.slice(index + 1),
+      ];
+    }
+
     return {
-      canSubmit,
       handleOk,
       handleCancel,
-      state,
-      isValid,
       instanceStore,
+      shareTypeStore,
       isDragging,
+      handleSetInstance,
       handleDrop,
       handleUploadClick,
       handleFileChange,
+      handleIncrement,
       fileUploader,
+      shareTemplate,
+      addShareType,
+      removeShareType,
+      BulkImportStep,
+      ...bulkImportStore,
     };
   },
 });
@@ -293,6 +338,10 @@ export default defineComponent({
       }
 
       &__import-info {
+        margin-top: 1em;
+      }
+
+      h2 {
         margin-top: 1em;
       }
 

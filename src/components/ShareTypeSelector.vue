@@ -43,6 +43,7 @@
   <suspense>
     <add-link-modal
       :show="showAddLink"
+      :share-type-store="store"
       @ok="startAdd"
     />
   </suspense>
@@ -112,6 +113,7 @@ export default defineComponent({
       startEdit,
       startDelete,
       showAddLink,
+      store: shareTypeStore.value,
     };
   },
 });
