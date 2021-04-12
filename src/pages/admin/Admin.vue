@@ -15,29 +15,26 @@
     </section>
 
     <section class="sub-nav">
-      <router-link :to="{name: 'Students'}">
+      <router-link :to="{name: studentsIndex }">
         Students
       </router-link>
-      <router-link :to="{name: 'Groups'}">
+      <router-link :to="{name: groupsIndex }">
         Groups
       </router-link>
-      <router-link :to="{name: 'Stocks'}">
+      <router-link :to="{name: stocksIndex }">
         Stocks
       </router-link>
-      <router-link :to="{name: 'Purchases'}">
+      <router-link :to="{name: purchasesIndex }">
         Purchases
       </router-link>
-      <router-link :to="{name: 'Settings'}">
+      <router-link :to="{name: settingsIndex }">
         Settings
       </router-link>
     </section>
   </header>
 
   <main>
-    <div v-if="loading" class="loading">
-      <loading-icon>Loading, please wait...</loading-icon>
-    </div>
-    <router-view v-else />
+    <router-view />
   </main>
 
   <footer>&copy; 2020 Jahn Digital</footer>
@@ -55,19 +52,22 @@
 </template>
 
 <script>
+import { RouteNames as GroupRouteNames } from '@/modules/admin/groups/routes';
+import { RouteNames as StudentRouteNames } from '@/modules/admin/students/routes';
+import { RouteNames as PurchasesRouteNames } from '@/modules/admin/purchases/routes';
+import { RouteNames as StocksRouteNames } from '@/modules/admin/stocks/routes';
+import { RouteNames as SettingsRouteNames } from '@/modules/admin/settings/routes';
 import routerStore from '@/store/router';
 import userStore from '@/store/user';
 import errorStore from '@/store/error';
-import LoadingIcon from '@/components/LoadingIcon.vue';
 import { useRouter } from 'vue-router';
 import { defineAsyncComponent, watchEffect } from 'vue';
 
 export default {
   components: {
-    LoginWidget: defineAsyncComponent(() => import(/* webpackChunkName: "admin-main" */ '@/components/admin/navigation/TheLoginWidget.vue')),
-    InstanceSelector: defineAsyncComponent(() => import(/* webpackChunkName: "admin-main" */ '@/components/admin/navigation/TheInstanceSelector.vue')),
+    LoginWidget: defineAsyncComponent(() => import(/* webpackChunkName: "admin-main" */ '@/modules/admin/components/LoginWidget.vue')),
+    InstanceSelector: defineAsyncComponent(() => import(/* webpackChunkName: "admin-main" */ '@/modules/admin/components/TheInstanceSelector.vue')),
     Modal: defineAsyncComponent(() => import(/* webpackChunkName: "admin-main" */ '@/components/Modal.vue')),
-    LoadingIcon,
   },
 
   setup() {
@@ -81,6 +81,11 @@ export default {
     });
 
     return {
+      groupsIndex: GroupRouteNames.index,
+      studentsIndex: StudentRouteNames.index,
+      purchasesIndex: PurchasesRouteNames.index,
+      stocksIndex: StocksRouteNames.index,
+      settingsIndex: SettingsRouteNames.index,
       errorStore,
       userStore,
       loading: routerStore.loading,
