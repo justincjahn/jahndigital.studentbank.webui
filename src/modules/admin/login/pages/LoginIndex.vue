@@ -18,9 +18,9 @@
 
 <script>
 import { ref, watchEffect } from 'vue';
+import { useRouter } from 'vue-router';
 import userStore from '@/store/user';
 import AuthenticationService from '@/services/AuthenticationService';
-import { useRouter } from 'vue-router';
 import Apollo from '@/services/Apollo';
 
 export default {
@@ -30,6 +30,7 @@ export default {
     const password = ref('');
     const error = ref('');
 
+    // TODO: Not a fan of the global userStore being manipulated by the auth service and the Apollo service.
     async function login() {
       const auth = new AuthenticationService(Apollo);
 

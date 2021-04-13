@@ -39,7 +39,6 @@ router.beforeEach((to, _, next) => {
 // After the route component has loaded, tell the store we're done loading
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 router.beforeResolve((_, __, next) => {
-  console.log('resolved!');
   routerStore.setLoading(false);
   next();
 });

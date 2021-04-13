@@ -92,27 +92,27 @@ import { ref, computed, defineAsyncComponent } from 'vue';
 import { useRouter } from 'vue-router';
 
 const BulkPostModal = defineAsyncComponent(
-  () => import(/* webpackChunkName: "admin-groups" */ '@/modules/admin/groups/components/BulkPostModal.vue'),
+  () => import(/* webpackChunkName: "admin-groups" */ '../components/BulkPostModal.vue'),
 );
 
 const BulkGroupModal = defineAsyncComponent(
-  () => import(/* webpackChunkName: "admin-groups" */ '@/modules/admin/groups/components/BulkGroupModal.vue'),
+  () => import(/* webpackChunkName: "admin-groups" */ '../components/BulkGroupModal.vue'),
 );
 
 const BulkImportModal = defineAsyncComponent(
-  () => import(/* webpackChunkName: "admin-groups" */ '@/modules/admin/groups/components/BulkImportModal.vue'),
+  () => import(/* webpackChunkName: "admin-groups" */ '../components/BulkImportModal.vue'),
 );
 
 const NewStudentModal = defineAsyncComponent(
-  () => import(/* webpackChunkName: "admin-groups" */ '@/modules/admin/groups/components/NewStudentModal.vue'),
+  () => import(/* webpackChunkName: "admin-groups" */ '../components/NewStudentModal.vue'),
 );
 
 const GroupSelector = defineAsyncComponent(
-  () => import(/* webpackChunkName: "admin-groups" */ '@/modules/admin/groups/components/GroupSelector.vue'),
+  () => import(/* webpackChunkName: "admin-groups" */ '../components/GroupSelector.vue'),
 );
 
 const StudentList = defineAsyncComponent(
-  () => import(/* webpackChunkName: "admin-groups" */ '@/modules/admin/groups/components/StudentList.vue'),
+  () => import(/* webpackChunkName: "admin-groups" */ '../components/StudentList.vue'),
 );
 
 export default {

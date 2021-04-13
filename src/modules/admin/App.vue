@@ -52,16 +52,21 @@
 </template>
 
 <script>
+import { defineAsyncComponent, watchEffect } from 'vue';
+import { useRouter } from 'vue-router';
+
+// Routes
 import { RouteNames as GroupRouteNames } from '@/modules/admin/groups/routes';
 import { RouteNames as StudentRouteNames } from '@/modules/admin/students/routes';
 import { RouteNames as PurchasesRouteNames } from '@/modules/admin/purchases/routes';
 import { RouteNames as StocksRouteNames } from '@/modules/admin/stocks/routes';
 import { RouteNames as SettingsRouteNames } from '@/modules/admin/settings/routes';
+import { RouteNames as LoginRouteNames } from '@/modules/admin/login/routes';
+
+// Stores
 import routerStore from '@/store/router';
-import userStore from '@/store/user';
 import errorStore from '@/store/error';
-import { useRouter } from 'vue-router';
-import { defineAsyncComponent, watchEffect } from 'vue';
+import userStore from '@/store/user';
 
 export default {
   components: {
@@ -76,7 +81,7 @@ export default {
     // Force users to the login page if they aren't authenticated
     watchEffect(() => {
       if (userStore.isAuthenticated.value === false && !userStore.jwtToken.value) {
-        router.push({ name: 'login' });
+        router.push({ name: LoginRouteNames.index });
       }
     });
 
