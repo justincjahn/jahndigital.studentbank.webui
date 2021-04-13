@@ -4,14 +4,14 @@ module.exports = {
   pages: {
     index: {
       // entry for the page
-      entry: './src/pages/index/index.ts',
+      entry: './src/modules/student/index.ts',
 
       // the source template
       template: 'public/index.html',
 
       // when using title option,
       // template title tag needs to be <title><%= htmlWebpackPlugin.options.title %></title>
-      title: 'Home',
+      title: 'StudentBank',
 
       // chunks to include on this page, by default includes
       // extracted common chunks and vendor chunks.
@@ -20,14 +20,14 @@ module.exports = {
 
     admin: {
       // entry for the page
-      entry: './src/pages/admin/admin.ts',
+      entry: './src/modules/admin/index.ts',
 
       // the source template
-      template: 'public/admin.html',
+      template: 'public/index.html',
 
       // when using title option,
       // template title tag needs to be <title><%= htmlWebpackPlugin.options.title %></title>
-      title: 'Admin',
+      title: 'StudentBank Admin',
 
       // chunks to include on this page, by default includes
       // extracted common chunks and vendor chunks.

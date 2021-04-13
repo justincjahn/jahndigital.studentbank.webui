@@ -7,7 +7,7 @@ export enum RouteNames {
 
 const routes: RouteRecordRaw[] = [
   {
-    path: 'stocks',
+    path: '/stocks',
     name: RouteNames.index,
     component: StocksModule,
   },

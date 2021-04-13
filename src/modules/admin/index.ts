@@ -1,8 +1,8 @@
 import { createApp, h } from 'vue';
 import { AUTH_TOKEN } from '@/constants';
 import userStore from '@/store/user';
-import router from '@/routers/admin';
-import Admin from './Admin.vue';
+import router from './routes';
+import App from './App.vue';
 
 createApp({
   setup() {
@@ -11,7 +11,7 @@ createApp({
   },
 
   render() {
-    return h(Admin);
+    return h(App);
   },
 })
   .use(router)

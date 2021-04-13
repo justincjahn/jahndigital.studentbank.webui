@@ -6,10 +6,10 @@
       <div class="student-search__input">
         <span class="student-search__input__reset-wrapper">
           <input
-            type="text"
             id="student-search__input__input"
-            autocomplete="off"
             v-model="searchCriteria"
+            type="text"
+            autocomplete="off"
             @keyup="handleKeypress"
             @blur="handleClose"
             @focus="handleOpen"
@@ -17,33 +17,33 @@
           <input type="reset" value="X" />
         </span>
 
-        <ul class="student-search__input__results" ref="resultElements">
+        <ul ref="resultElements" class="student-search__input__results">
           <li
-            class="student-search__input__results__item"
             v-if="instanceStudents.length === 0"
+            class="student-search__input__results__item"
           >
             <em>No students in active instance...</em>
           </li>
 
           <li
-            class="student-search__input__results__item selectable"
             v-for="student in instanceStudents"
             :key="student.id"
+            class="student-search__input__results__item selectable"
             :class="{ selected: selection === student}"
             @click="handleSelection(student)"
           >
-            <span class="student-search__input__results__item--account-number">{{student.accountNumber}}</span>
-            <span class="student-search__input__results__item--name">{{student.lastName}}, {{student.firstName}}</span>
-            <span class="student-search__input__results__item--email">{{student.email}}</span>
+            <span class="student-search__input__results__item--account-number">{{ student.accountNumber }}</span>
+            <span class="student-search__input__results__item--name">{{ student.lastName }}, {{ student.firstName }}</span>
+            <span class="student-search__input__results__item--email">{{ student.email }}</span>
 
             <ul class="student-search__input__results__item__shares">
               <li
-                class="student-search__input__results__item__shares__item"
-                v-for="share in student.shares ?? []"
+                v-for="share in getStudentShares(student)"
                 :key="share.id"
+                class="student-search__input__results__item__shares__item"
               >
                 <span class="student-search__input__results__item__shares__item--name">
-                  {{share.shareType.name.substring(0, 3).toUpperCase()}}
+                  {{ share.shareType?.name.substring(0, 3).toUpperCase() ?? 'UNK' }}
                 </span>
                 <span class="student-search__input__results__item__shares__item--balance">
                   {{
@@ -63,24 +63,24 @@
           <hr v-if="otherStudents.length > 0" />
 
           <li
-            class="student-search__input__results__item selectable"
             v-for="student in otherStudents"
             :key="student.id"
+            class="student-search__input__results__item selectable"
             :class="{ selected: selection === student}"
             @click="handleSelection(student)"
           >
-            <span class="student-search__input__results__item--account-number">{{student.accountNumber}}</span>
-            <span class="student-search__input__results__item--name">{{student.lastName}}, {{student.firstName}}</span>
-            <span class="student-search__input__results__item--email">{{student.email}}</span>
+            <span class="student-search__input__results__item--account-number">{{ student.accountNumber }}</span>
+            <span class="student-search__input__results__item--name">{{ student.lastName }}, {{ student.firstName }}</span>
+            <span class="student-search__input__results__item--email">{{ student.email }}</span>
 
             <ul class="student-search__input__results__item__shares">
               <li
-                class="student-search__input__results__item__shares__item"
-                v-for="share in student.shares ?? []"
+                v-for="share in getStudentShares(student)"
                 :key="share.id"
+                class="student-search__input__results__item__shares__item"
               >
                 <span class="student-search__input__results__item__shares__item--name">
-                  {{share.shareType.name.substring(0, 3).toUpperCase()}}
+                  {{ share.shareType?.name.substring(0, 3).toUpperCase() ?? 'UNK' }}
                 </span>
                 <span class="student-search__input__results__item__shares__item--balance">
                   {{
@@ -329,6 +329,14 @@ export default defineComponent({
       }
     }
 
+    /**
+     * Returns a list of shares for the given student, or an empty array.
+     * NOTE: I was getting false-positive errors in the template, so I made this.
+     */
+    function getStudentShares(student: Student) {
+      return student.shares ?? ([] as Share[]);
+    }
+
     return {
       handleKeypress,
       handleClose,
@@ -339,6 +347,7 @@ export default defineComponent({
       isOpen,
       instanceStudents,
       otherStudents,
+      getStudentShares,
       selection,
       resultElements,
       inputElement,

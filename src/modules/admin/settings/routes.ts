@@ -7,7 +7,7 @@ export enum RouteNames {
 
 const routes: RouteRecordRaw[] = [
   {
-    path: 'settings',
+    path: '/settings',
     name: RouteNames.index,
     component: SettingsModule,
   },

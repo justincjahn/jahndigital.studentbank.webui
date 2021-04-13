@@ -10,19 +10,21 @@
       <tr
         v-for="share in shares"
         :key="share.id"
-        @click="selectShare(share)"
         :class="{ selected: share.id === modelValue?.id ?? false }"
+        @click="selectShare(share)"
       >
-        <th>{{share.shareType?.name ?? 'Unknown'}}</th>
-        <td>{{
-          new Intl.NumberFormat(
-            'en-US',
-            {
-              style: 'currency',
-              currency: 'USD',
-            }
-          ).format(share.balance)
-        }}</td>
+        <th>{{ share.shareType?.name ?? 'Unknown' }}</th>
+        <td>
+          {{
+            new Intl.NumberFormat(
+              'en-US',
+              {
+                style: 'currency',
+                currency: 'USD',
+              }
+            ).format(share.balance)
+          }}
+        </td>
       </tr>
     </tbody>
   </table>
@@ -42,6 +44,9 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: [
+    'update:modelValue',
+  ],
   setup(_, { emit }) {
     function selectShare(share: Share) { emit('update:modelValue', share); }
     return { selectShare };

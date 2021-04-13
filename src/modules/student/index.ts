@@ -1,10 +1,10 @@
 import { createApp, h } from 'vue';
-import router from '@/routers/index';
-import Index from './Index.vue';
+import router from './routes';
+import App from './App.vue';
 
 createApp({
   render() {
-    return h(Index);
+    return h(App);
   },
 })
   .use(router)

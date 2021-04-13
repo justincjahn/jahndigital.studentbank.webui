@@ -8,7 +8,7 @@ export enum RouteNames {
 
 const routes: RouteRecordRaw[] = [
   {
-    path: 'groups',
+    path: '/groups',
     component: GroupsModule,
 
     children: [

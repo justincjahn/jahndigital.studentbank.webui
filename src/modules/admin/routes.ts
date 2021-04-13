@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import AdminPage from '@/modules/admin/AdminPage.vue';
 import GroupRoutes, { RouteNames as GroupRouteNames } from '@/modules/admin/groups/routes';
 import StudentRoutes from '@/modules/admin/students/routes';
 import PurchasesRoutes from '@/modules/admin/purchases/routes';
@@ -10,27 +9,21 @@ import routerStore from '@/store/router';
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/admin',
-    component: AdminPage,
-    children: [
-      {
-        name: 'index',
-        path: '',
-        redirect: { name: GroupRouteNames.index },
-      },
-
-      ...GroupRoutes,
-      ...StudentRoutes,
-      ...PurchasesRoutes,
-      ...StocksRoutes,
-      ...SettingsRoutes,
-      ...LoginRoutes,
-    ],
+    path: '/',
+    name: 'index',
+    redirect: { name: GroupRouteNames.index },
   },
+
+  ...GroupRoutes,
+  ...StudentRoutes,
+  ...PurchasesRoutes,
+  ...StocksRoutes,
+  ...SettingsRoutes,
+  ...LoginRoutes,
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(`${process.env.BASE_URL}admin`),
   routes,
 });
 

@@ -9,7 +9,7 @@ export enum RouteNames {
 
 const routes: RouteRecordRaw[] = [
   {
-    path: 'students/:studentId?',
+    path: '/students/:studentId?',
     name: RouteNames.index,
     component: () => import(/* webpackChunkName: "admin-students" */ '@/modules/admin/students/pages/StudentsIndex.vue'),
     children: [
