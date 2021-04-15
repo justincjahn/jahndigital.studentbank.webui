@@ -1,0 +1,21 @@
+#import "../fragments/student.gql"
+
+mutation newStudent(
+  $accountNumber: String!,
+  $groupId: Long!,
+  $firstName: String!,
+  $lastName: String!,
+  $password: String!,
+  $email: String
+) {
+  newStudent(input: {
+    accountNumber: $accountNumber,
+    groupId: $groupId,
+    firstName: $firstName,
+    lastName: $lastName,
+    password: $password,
+    email: $email
+  }) {
+    ...StudentParts
+  }
+}

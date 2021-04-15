@@ -1,8 +1,8 @@
 import Apollo from '@/services/Apollo';
-import gqlGroups from '@/graphql/groups.query.gql';
-import gqlNewGroup from '@/graphql/newGroup.mutation.gql';
-import gqlUpdateGroup from '@/graphql/updateGroup.mutation.gql';
-import gqlDeleteGroup from '@/graphql/deleteGroup.mutation.gql';
+import gqlGroups from '@/modules/admin/graphql/queries/groupsByInstance.gql';
+import gqlNewGroup from '@/modules/admin/graphql/mutations/groupCreate.gql';
+import gqlUpdateGroup from '@/modules/admin/graphql/mutations/groupUpdate.gql';
+import gqlDeleteGroup from '@/modules/admin/graphql/mutations/groupDelete.gql';
 import theInstanceStore, { InstanceStore } from '@/store/instance';
 import { computed, reactive, watch } from 'vue';
 
@@ -10,7 +10,7 @@ import { computed, reactive, watch } from 'vue';
  * Stores information regarding the groups of the currently selected Instance and
  * enables CRUD operations.  Groups are collections of students/people- i.e., classes.
  *
- * @param instanceStore Watches the selected instance and fetches groups for it automatically.
+ * @param {InstanceStore} instanceStore Watches the selected instance and fetches groups for it automatically.
  */
 export function setup(instanceStore: InstanceStore) {
   const store = reactive({
@@ -175,10 +175,10 @@ export function setup(instanceStore: InstanceStore) {
   }, { immediate: true });
 
   return {
-    instanceStore,
     selected,
     groups,
     loading,
+    instanceStore,
     setSelected,
     fetchGroups,
     newGroup,

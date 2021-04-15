@@ -1,0 +1,7 @@
+#import "../fragments/shareType.gql"
+
+mutation unlinkShareType($shareTypeId: Long!, $instanceId: Long!) {
+  unlinkShareType(input: { shareTypeId: $shareTypeId, instanceId: $instanceId }) {
+    ...ShareTypeParts
+  }
+}

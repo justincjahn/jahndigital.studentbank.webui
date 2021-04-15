@@ -1,11 +1,15 @@
-import Apollo from '@/services/Apollo';
-import gqlTransactions from '@/graphql/transactions.query.gql';
-import gqlNewTransaction from '@/graphql/newTransaction.mutation.gql';
-import gqlNewShare from '@/graphql/newShare.mutation.gql';
-import gqlDeleteShare from '@/graphql/deleteShare.mutation.gql';
 import { FETCH_OPTIONS } from '@/constants';
 import { computed, reactive, watch } from 'vue';
-import theStudentStore, { StudentStore } from './student';
+
+// Store
+import theStudentStore, { StudentStore } from '@/modules/admin/stores/student';
+
+// API
+import Apollo from '@/services/Apollo';
+import gqlTransactions from '@/modules/admin/graphql/queries/transactionsByShare.gql';
+import gqlNewTransaction from '@/modules/admin/graphql/mutations/transactionCreate.gql';
+import gqlNewShare from '@/modules/admin/graphql/mutations/shareCreate.gql';
+import gqlDeleteShare from '@/modules/admin/graphql/mutations/shareDelete.gql';
 
 type FetchOptions = {
   shareId: number;

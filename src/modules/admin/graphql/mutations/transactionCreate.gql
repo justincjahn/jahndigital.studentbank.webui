@@ -1,0 +1,17 @@
+#import "@/graphql/fragments/transaction.gql"
+
+mutation newTransaction(
+  $shareId: Long!,
+  $amount: Money!,
+  $takeNegative: Boolean = false,
+  $comment: String
+) {
+  newTransaction(input: {
+    shareId: $shareId,
+    amount: $amount,
+    takeNegative: $takeNegative,
+    comment: $comment
+  }) {
+    ...TransactionParts
+  }
+}

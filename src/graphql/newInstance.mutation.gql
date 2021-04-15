@@ -1,8 +1,0 @@
-mutation newInstance($description: String!) {
-  newInstance(input: { description: $description }) {
-    id
-    description
-    inviteCode
-    isActive
-  }
-}

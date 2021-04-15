@@ -1,0 +1,7 @@
+#import "../fragments/shareType.gql"
+
+mutation updateShareType($id: Long!, $name: String, $dividendRate: Rate) {
+  updateShareType(input: { id: $id, name: $name, dividendRate: $dividendRate}) {
+    ...ShareTypeParts
+  }
+}

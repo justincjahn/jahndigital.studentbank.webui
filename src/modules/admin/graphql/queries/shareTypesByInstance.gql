@@ -1,0 +1,14 @@
+#import "@/graphql/fragments/pageInfo.gql"
+#import "../fragments/shareType.gql"
+
+query ShareTypes($instanceId: Long!, $first: PaginationAmount) {
+  shareTypes(instanceId: $instanceId, first: $first) {
+    pageInfo {
+      ...PageInfoParts
+    }
+    totalCount
+    nodes {
+      ...ShareTypeParts
+    }
+  }
+}

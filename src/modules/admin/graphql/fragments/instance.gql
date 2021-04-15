@@ -1,0 +1,6 @@
+fragment InstanceParts on Instance {
+  id
+  description
+  inviteCode
+  isActive
+}

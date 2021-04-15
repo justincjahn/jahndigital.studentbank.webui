@@ -1,0 +1,7 @@
+#import "../fragments/group.gql"
+
+mutation newGroup($instanceId: Long!, $name: String!) {
+  newGroup(input: { instanceId: $instanceId, name: $name }) {
+    ...GroupParts
+  }
+}

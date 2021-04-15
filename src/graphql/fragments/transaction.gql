@@ -1,0 +1,9 @@
+fragment TransactionParts on Transaction {
+  id
+  targetShareId
+  transactionType
+  effectiveDate
+  comment
+  amount
+  newBalance
+}

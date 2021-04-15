@@ -1,7 +1,7 @@
 import { onLogin, onLogout } from '@/utils/login';
 import userStore from '@/store/user';
+import query from '@/modules/admin/graphql/mutations/userLogin.gql';
 import ApolloServiceAbstract from './ApolloServiceAbstract';
-import query from '../graphql/userlogin.mutation.gql';
 
 /**
  * Perform login and logout operations against the API.

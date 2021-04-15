@@ -1,8 +1,0 @@
-mutation updateInstance($id: Long!, $description: String, $isActive: Boolean) {
-  updateInstance(input: { id: $id, description: $description, isActive: $isActive }) {
-    id
-    description
-    inviteCode
-    isActive
-  }
-}

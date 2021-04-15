@@ -1,0 +1,11 @@
+#import "../fragments/student.gql"
+
+query studentsById($id: Long!) {
+  students(
+    where: { id: $id },
+  ) {
+    nodes {
+      ...StudentParts
+    }
+  }
+}

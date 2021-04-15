@@ -1,0 +1,9 @@
+#import "../fragments/instance.gql"
+
+query allInstances {
+  instances(order_by: {description: ASC}) {
+    nodes {
+      ...InstanceParts
+    }
+  }
+}

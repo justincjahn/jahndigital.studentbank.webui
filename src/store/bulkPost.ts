@@ -1,11 +1,17 @@
-import Apollo from '@/services/Apollo';
-import Money from '@/utils/money';
 import { reactive, computed } from 'vue';
-import gqlNewBulkTransaction from '@/graphql/newBulkTransaction.mutation.gql';
+
+// Services
 import studentSelection from '@/services/StudentSelectionService';
+
+// Utils
+import Money from '@/utils/money';
 import { validateAmountNonzero, validateTransactionComment } from '@/utils/validators';
 import debounce from '@/utils/debounce';
 import sample from '@/utils/sample';
+
+// API
+import Apollo from '@/services/Apollo';
+import gqlNewBulkTransaction from '@/modules/admin/graphql/mutations/transactionBulk.gql';
 
 /**
  * Specifies how the system handles shares without funds to cover the transaction.

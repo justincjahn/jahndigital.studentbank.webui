@@ -1,26 +1,36 @@
 <template>
-  <div class="transaction-poster" v-if="share !== null">
-    <form @submit.prevent="onSubmit" autocomplete="off">
+  <div
+    v-if="share !== null"
+    class="transaction-poster"
+  >
+    <form
+      autocomplete="off"
+      @submit.prevent="onSubmit"
+    >
       <div class="transaction-poster--form-group">
         <label for="transaction-poster__amount">Amount<span class="required">*</span></label>
         <div class="transaction-poster__amount--wrapper">
           <span class="transaction-poster__amount--currency">$</span>
           <Field
+            id="transaction-poster__amount"
             name="amount"
             type="text"
-            id="transaction-poster__amount"
           />
         </div>
-        <p class="error" v-if="errors.amount">{{errors.amount}}</p>
+        <p v-if="errors.amount" class="error">
+          {{ errors.amount }}
+        </p>
       </div>
       <div class="transaction-poster--form-group">
         <label for="transaction-poster__comment">Comment</label>
         <Field
+          id="transaction-poster__comment"
           name="comment"
           type="text"
-          id="transaction-poster__comment"
         />
-        <p class="error" v-if="errors.comment">{{errors.comment}}</p>
+        <p v-if="errors.comment" class="error">
+          {{ errors.comment }}
+        </p>
       </div>
       <div class="transaction-poster--submit-group">
         <input
@@ -40,10 +50,14 @@ import { useForm, Field } from 'vee-validate';
 import Money from '@/utils/money';
 
 export default defineComponent({
+  components: {
+    Field,
+  },
   props: {
     share: {
       type: Object as () => Share|null,
       required: false,
+      default: null,
     },
     loading: {
       type: Boolean,
@@ -51,9 +65,9 @@ export default defineComponent({
       default: false,
     },
   },
-  components: {
-    Field,
-  },
+  emits: [
+    'submit',
+  ],
   setup(_, { emit }) {
     const { errors, resetForm, handleSubmit } = useForm({
       validationSchema: {
@@ -95,48 +109,48 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.transaction-poster {
-  @include round-border;
+  .transaction-poster {
+    @include round-border;
 
-  background-color: colorStep(secondary, $step: 0, $darken: false);
-  padding: 1em;
+    background-color: colorStep(secondary, $step: 0, $darken: false);
+    padding: 1em;
 
-  &--form-group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 0.5em;
+    &--form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 0.5em;
 
-    p.error {
-      font-style: italic;
+      p.error {
+        font-style: italic;
+        color: map.get($theme, button-destructive, color);
+        margin: 0.5em 0;
+      }
+    }
+
+    &__amount--wrapper {
+      position: relative;
+    }
+
+    &__amount--currency {
+      position: absolute;
+      top: calc(0.4em / 2);
+      left: 1ch;
+      user-select: none;
+    }
+
+    label span.required {
+      font-size: 0.7em;
       color: map.get($theme, button-destructive, color);
-      margin: 0.5em 0;
+      vertical-align: super;
+    }
+
+    input[type=submit] {
+      width: 100%;
     }
   }
 
-  &__amount--wrapper {
-    position: relative;
-  }
-
-  &__amount--currency {
-    position: absolute;
-    top: calc(0.4em / 2);
-    left: 1ch;
-    user-select: none;
-  }
-
-  label span.required {
-    font-size: 0.7em;
-    color: map.get($theme, button-destructive, color);
-    vertical-align: super;
-  }
-
-  input[type=submit] {
+  #transaction-poster__amount {
     width: 100%;
+    padding-left: 3ch;
   }
-}
-
-#transaction-poster__amount {
-  width: 100%;
-  padding-left: 3ch;
-}
 </style>

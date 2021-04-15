@@ -1,9 +1,9 @@
-import Apollo from '@/services/Apollo';
-import gqlInstances from '@/graphql/instances.query.gql';
-import gqlNewInstance from '@/graphql/newInstance.mutation.gql';
-import gqlUpdateInstance from '@/graphql/updateInstance.mutation.gql';
-import gqlDeleteInstance from '@/graphql/deleteInstance.mutation.gql';
 import { computed, reactive } from 'vue';
+import Apollo from '@/services/Apollo';
+import gqlInstances from '@/modules/admin/graphql/queries/instances.gql';
+import gqlNewInstance from '@/modules/admin/graphql/mutations/instanceCreate.gql';
+import gqlUpdateInstance from '@/modules/admin/graphql/mutations/instanceUpdate.gql';
+import gqlDeleteInstance from '@/modules/admin/graphql/mutations/instanceDelete.gql';
 
 /**
  * Stores information regarding the database instances and which one is currently active and

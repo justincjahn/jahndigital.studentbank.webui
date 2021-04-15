@@ -1,7 +1,12 @@
 <template>
   <div class="sub-menu">
     <template v-if="selectedInstance">
-      <suspense><group-selector /></suspense>
+      <suspense>
+        <group-selector
+          v-model="selectedGroup"
+          :group-store="groupStore"
+        />
+      </suspense>
     </template>
     <template v-else>
       <p>Please select an instance...</p>
@@ -50,6 +55,9 @@
 
         <bulk-group-modal
           :show="showBulkGroupModal"
+          :students="selectedStudents"
+          :loading="selectedStudentsResolving"
+          :group-store="groupStore"
           @ok="handleBulkGroupModalOk"
           @cancel="toggleBulkGroup"
         />
@@ -82,14 +90,21 @@
     </div>
   </div>
 
-  <suspense><StudentList /></suspense>
+  <suspense>
+    <StudentList
+      :group-store="groupStore"
+      :student-store="studentStore"
+    />
+  </suspense>
 </template>
 
 <script lang="ts">
-import groupStore from '@/store/group';
-import selection from '@/services/StudentSelectionService';
 import { ref, computed, defineAsyncComponent } from 'vue';
 import { useRouter } from 'vue-router';
+import errorStore from '@/store/error';
+import groupStore from '@/store/group';
+import studentStore from '@/modules/admin/stores/student';
+import selection from '@/services/StudentSelectionService';
 
 const BulkPostModal = defineAsyncComponent(
   () => import(/* webpackChunkName: "admin-groups" */ '../components/BulkPostModal.vue'),
@@ -108,7 +123,7 @@ const NewStudentModal = defineAsyncComponent(
 );
 
 const GroupSelector = defineAsyncComponent(
-  () => import(/* webpackChunkName: "admin-groups" */ '../components/GroupSelector.vue'),
+  () => import(/* webpackChunkName: "admin-groups" */ '@/modules/admin/components/GroupSelector.vue'),
 );
 
 const StudentList = defineAsyncComponent(
@@ -132,6 +147,21 @@ export default {
     const showBulkImportModal = ref(false);
     const hasSelection = computed(() => selection.length > 0);
 
+    // True if the selected students are being resolved.
+    const selectedStudentsResolving = ref(false);
+
+    // A list of selected students, resolved when the user opens certain modals
+    const selectedStudents = ref<Student[]>([]);
+
+    // GETs/SETs The currently selected group
+    const selectedGroup = computed<Group|null>({
+      get: () => groupStore.selected.value,
+      set: (value) => groupStore.setSelected(value),
+    });
+
+    /**
+     * Set the selected group and update the route when the user selects a group.
+     */
     function handleGroupSelection(item: Group|null) {
       groupStore.setSelected(item);
 
@@ -143,19 +173,55 @@ export default {
       });
     }
 
+    /**
+     * Toggle the bulk transaction modal.
+     */
     function toggleBulkTransaction() { showBulkTransactionModal.value = !showBulkTransactionModal.value; }
 
+    /**
+     * Toggle the new student modal.
+     */
     function toggleNewStudent() { showNewStudentModal.value = !showNewStudentModal.value; }
 
-    function toggleBulkGroup() { showBulkGroupModal.value = !showBulkGroupModal.value; }
+    /**
+     * Toggle the bulk group move modal and resolve the list of students.
+     */
+    async function toggleBulkGroup() {
+      if (showBulkGroupModal.value === false) {
+        try {
+          selectedStudentsResolving.value = true;
+          showBulkGroupModal.value = true;
+          selectedStudents.value = await selection.resolve();
+        } catch (e) {
+          errorStore.setCurrentError(e?.message ?? e);
+        } finally {
+          selectedStudentsResolving.value = false;
+        }
+      } else {
+        showBulkGroupModal.value = false;
+      }
+    }
 
-    function toggleBulkImport() { showBulkImportModal.value = !showBulkImportModal.value; }
-
+    /**
+     * When the user presses OK on the bulk group modal, call the API to do the move.
+     */
     function handleBulkGroupModalOk(movedGroup: Group) {
+      try {
+        console.log(movedGroup, selectedStudents.value);
+        studentStore.bulkMove(movedGroup, selectedStudents.value);
+      } catch (e) {
+        errorStore.setCurrentError(e?.message ?? e);
+      }
+
       showBulkGroupModal.value = false;
       handleGroupSelection(movedGroup);
       selection.clear();
     }
+
+    /**
+     * Toggle the bulk import modal.
+     */
+    function toggleBulkImport() { showBulkImportModal.value = !showBulkImportModal.value; }
 
     return {
       selection,
@@ -170,8 +236,11 @@ export default {
       toggleBulkImport,
       showBulkImportModal,
       selectedInstance: groupStore.instanceStore.selected,
-      selectedGroup: groupStore.selected ?? null,
       groupStore,
+      selectedGroup,
+      studentStore,
+      selectedStudents,
+      selectedStudentsResolving,
     };
   },
 };

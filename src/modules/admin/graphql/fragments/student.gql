@@ -1,0 +1,17 @@
+#import "../fragments/group.gql"
+#import "../fragments/share.gql"
+
+fragment StudentParts on Student {
+  id
+  accountNumber
+  firstName
+  lastName
+  groupId
+  shares {
+    ...ShareParts
+  }
+  group {
+    ...GroupParts
+  }
+  email
+}

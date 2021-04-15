@@ -9,7 +9,7 @@
     @cancel="handleCancel"
   >
     <template #default>
-      <group-selector v-model="selectedGroup" />
+      <group-selector v-model="selectedGroup" :group-store="groupStore" />
     </template>
     <template #okLabel="{ okLabel, canSubmit }">
       <template v-if="canSubmit || !loading">
@@ -23,14 +23,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watchEffect } from 'vue';
+import { defineComponent, ref, computed, PropType } from 'vue';
+
+// Components
 import Modal from '@/components/Modal.vue';
 import GroupSelector from '@/modules/admin/components/GroupSelector.vue';
-import errorStore from '@/store/error';
-import StudentSelectionService from '@/services/StudentSelectionService';
 import LoadingIcon from '@/components/LoadingIcon.vue';
-import Apollo from '@/services/Apollo';
-import gqlBulkGroup from '@/graphql/updateBulkStudent.mutation.gql';
+import { GroupStore } from '@/store/group';
 
 export default defineComponent({
   components: {
@@ -43,76 +42,51 @@ export default defineComponent({
       type: Boolean,
       required: true,
     },
+    loading: {
+      type: Boolean,
+      required: true,
+    },
+    students: {
+      type: Object as PropType<Student[]>,
+      required: true,
+    },
+    groupStore: {
+      type: Object as PropType<GroupStore>,
+      required: true,
+    },
   },
   emits: [
     'ok',
     'cancel',
   ],
   setup(props, { emit }) {
-    const selectedGroup = ref<Group|null>(null);
-    const selectedStudents = ref<Student[]>([]);
-    const loading = ref(false);
-    const posting = ref(false);
-    const okLabel = computed(() => (loading.value ? 'Loading...' : 'Move'));
+    const okLabel = computed(() => (props.loading === true ? 'Loading...' : 'Move'));
 
+    // The group that is currently selected
+    const selectedGroup = ref<Group|null>(null);
+
+    // True if the state is valid for submission
     const canSubmit = computed(() => {
       if (selectedGroup.value === null) return false;
-      if (selectedStudents.value.length === 0) return false;
-      if (loading.value === true) return false;
+      if (props.students.length === 0) return false;
+      if (props.loading === true) return false;
       return true;
     });
 
+    /**
+     * Ensure that the state is valid and emit the group to the parent.
+     */
     async function handleOk() {
       if (!canSubmit.value) return;
-      if (selectedGroup.value == null) return;
-
-      const students: UpdateStudentRequest[] = [];
-      selectedStudents.value.forEach((student) => {
-        students.push({
-          id: student.id,
-          groupId: selectedGroup.value?.id ?? student.groupId,
-        });
-      });
-
-      try {
-        posting.value = true;
-        const res = await Apollo.mutate<UpdateBulkStudentResponse>({
-          mutation: gqlBulkGroup,
-          variables: {
-            students,
-          },
-          update(cache) {
-            cache.evict({ fieldName: 'students' });
-          },
-        });
-
-        if (!res.data) throw new Error('Unable post transaction: unknown error.');
-      } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
-      } finally {
-        posting.value = false;
-      }
-
       emit('ok', selectedGroup.value);
     }
 
+    /**
+     * Emit an event to close the modal.
+     */
     function handleCancel() {
       emit('cancel');
     }
-
-    watchEffect(async () => {
-      if (props.show === true) {
-        try {
-          loading.value = true;
-          selectedGroup.value = null;
-          selectedStudents.value = await StudentSelectionService.resolve();
-        } catch (e) {
-          errorStore.setCurrentError(e?.message ?? e);
-        } finally {
-          loading.value = false;
-        }
-      }
-    });
 
     return {
       okLabel,
@@ -120,7 +94,6 @@ export default defineComponent({
       handleCancel,
       selectedGroup,
       canSubmit,
-      loading,
     };
   },
 });

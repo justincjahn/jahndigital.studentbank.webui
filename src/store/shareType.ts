@@ -1,15 +1,22 @@
-import Apollo from '@/services/Apollo';
-import gqlAvailableShareTypes from '@/graphql/availableShareTypes.query.gql';
-import gqlShareTypesByInstance from '@/graphql/shareTypes.query.gql';
-import gqlNewShareType from '@/graphql/newShareType.mutation.gql';
-import gqlUpdateShareType from '@/graphql/updateShareType.mutation.gql';
-import gqlLinkShareType from '@/graphql/linkShareType.mutation.gql';
-import gqlUnlinkShareType from '@/graphql/unlinkShareType.mutation.gql';
-import gqlDeleteShareType from '@/graphql/deleteShareType.mutation.gql';
-import { FETCH_OPTIONS } from '@/constants';
 import { computed, reactive, watch } from 'vue';
+import { FETCH_OPTIONS } from '@/constants';
+
+// Stores
 import theInstanceStore, { InstanceStore } from '@/store/instance';
 
+// GraphQL
+import Apollo from '@/services/Apollo';
+import gqlAvailableShareTypes from '@/modules/admin/graphql/queries/shareTypesAvailable.gql';
+import gqlShareTypesByInstance from '@/modules/admin/graphql/queries/shareTypesByInstance.gql';
+import gqlNewShareType from '@/modules/admin/graphql/mutations/shareTypeCreate.gql';
+import gqlUpdateShareType from '@/modules/admin/graphql/mutations/shareTypeUpdate.gql';
+import gqlLinkShareType from '@/modules/admin/graphql/mutations/shareTypeLink.gql';
+import gqlUnlinkShareType from '@/modules/admin/graphql/mutations/shareTypeUnlink.gql';
+import gqlDeleteShareType from '@/modules/admin/graphql/mutations/shareTypeDelete.gql';
+
+/**
+ * Options used on the initial fetch.
+ */
 type FetchOptions = {
   available?: boolean;
   first?: number;

@@ -1,7 +1,0 @@
-mutation updateGroup($id: Long!, $name: String!) {
-  updateGroup(input: { id: $id, name: $name }) {
-    id
-    instanceId
-    name
-  }
-}

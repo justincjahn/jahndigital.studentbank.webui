@@ -1,0 +1,8 @@
+fragment ShareTypeParts on ShareType {
+  id
+  name
+  dividendRate
+  shareTypeInstances {
+    instanceId
+  }
+}

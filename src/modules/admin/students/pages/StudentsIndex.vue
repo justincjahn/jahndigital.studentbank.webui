@@ -1,6 +1,10 @@
 <template>
   <suspense>
-    <student-selector @select="handleSelection" @clear="handleClear" />
+    <student-selector
+      :selected-instance="selectedInstance"
+      @select="handleSelection"
+      @clear="handleClear"
+    />
   </suspense>
 
   <div class="student-info">
@@ -73,29 +77,33 @@
 </template>
 
 <script lang="ts">
-import { RouteNames as StudentRouteNames } from '@/modules/admin/students/routes';
-import studentStore from '@/store/student';
-import errorStore from '@/store/error';
 import { useRouter, useRoute } from 'vue-router';
 import { defineComponent, onMounted, computed, defineAsyncComponent } from 'vue';
+
+// Validator
 import { Field, useForm } from 'vee-validate';
-import Apollo from '@/services/Apollo';
-import gqlStudentById from '@/graphql/studentById.gql';
 import { validateAccountUnique, validateEmail, validateName } from '@/utils/validators';
 
-const validateAccount = validateAccountUnique({ studentStore });
+// Routes
+import { RouteNames as StudentRouteNames } from '@/modules/admin/students/routes';
+
+// Stores
+import errorStore from '@/store/error';
+import instanceStore from '@/store/instance';
+import studentStore from '@/modules/admin/stores/student';
 
 /**
  * Handles high-level selection of students and routing to sub-routes.
  */
 export default defineComponent({
   components: {
-    StudentSelector: defineAsyncComponent(() => import(/* webpackChunkName: "admin-students" */ '@/components/StudentSelector.vue')),
+    StudentSelector: defineAsyncComponent(() => import(/* webpackChunkName: "admin-students" */ '@/modules/admin/components/StudentSelector.vue')),
     Field,
   },
   setup() {
     const router = useRouter();
     const route = useRoute();
+    const validateAccount = validateAccountUnique({ studentStore });
 
     const form = useForm({
       validationSchema: {
@@ -148,27 +156,6 @@ export default defineComponent({
     }
 
     /**
-     * Fetch a student by ID number and set it as the selectedStudent.
-     */
-    async function fetchStudentById(id: number) {
-      try {
-        const res = await Apollo.query<PagedStudentResponse>({
-          query: gqlStudentById,
-          variables: {
-            id,
-          },
-        });
-
-        if (res.data && res.data.students.nodes.length > 0) {
-          const [student] = res.data.students.nodes;
-          setSelectedStudent(student);
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    }
-
-    /**
      * Handle when the user makes a selection in the search widget.
      */
     function handleSelection(student: Student) {
@@ -194,8 +181,16 @@ export default defineComponent({
           10,
         );
 
-        if (Number.isNaN(studentId)) return;
-        fetchStudentById(studentId);
+        if (!Number.isNaN(studentId)) {
+          studentStore
+            .getById(studentId)
+            .then((student) => {
+              studentStore.setSelected(student);
+            })
+            .catch((error) => {
+              errorStore.setCurrentError(error?.message ?? error);
+            });
+        }
       }
     });
 
@@ -209,6 +204,7 @@ export default defineComponent({
       handleClear,
       errors: form.errors,
       handleSubmit,
+      selectedInstance: instanceStore.selected,
       params,
     };
   },

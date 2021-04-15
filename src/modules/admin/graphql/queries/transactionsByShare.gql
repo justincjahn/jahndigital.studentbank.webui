@@ -1,0 +1,23 @@
+#import "@/graphql/fragments/pageInfo.gql"
+#import "@/graphql/fragments/transaction.gql"
+
+query transactions(
+  $shareId: Long!,
+  $first: PaginationAmount! = 25,
+  $after: String,
+) {
+  transactions(
+    shareId: $shareId,
+    first: $first,
+    order_by: { effectiveDate: DESC },
+    after: $after
+  ) {
+    pageInfo {
+      ...PageInfoParts
+    }
+    totalCount
+    nodes {
+      ...TransactionParts
+    }
+  }
+}

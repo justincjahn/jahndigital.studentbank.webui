@@ -1,0 +1,10 @@
+#import "./shareType.gql"
+
+fragment ShareParts on Share {
+  id
+  shareTypeId
+  balance
+  shareType {
+    ...ShareTypeParts
+  }
+}

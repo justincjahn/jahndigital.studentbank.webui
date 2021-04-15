@@ -71,36 +71,47 @@
 </template>
 
 <script lang="ts">
-import { RouteNames as StudentRouteNames } from '@/modules/admin/students/routes';
-import studentStore from '@/store/student';
-import groupStore from '@/store/group';
-import selection from '@/services/StudentSelectionService';
-import { ref, watchEffect } from 'vue';
+import { defineComponent, PropType, ref, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
+import { RouteNames as StudentRouteNames } from '@/modules/admin/students/routes';
+import { StudentStore } from '@/modules/admin/stores/student';
+import { GroupStore } from '@/store/group';
+import selection from '@/services/StudentSelectionService';
 
 const delay = 300;
 let timer: number|null = null;
 
-export default {
-  setup() {
+export default defineComponent({
+  props: {
+    groupStore: {
+      type: Object as PropType<GroupStore>,
+      required: true,
+    },
+
+    studentStore: {
+      type: Object as PropType<StudentStore>,
+      required: true,
+    },
+  },
+  setup(props) {
     const router = useRouter();
     const prevInstance = ref<Instance|null>(null);
     const clicks = ref(0);
 
     // When the group changes, fetch students for the new group
     watchEffect(() => {
-      if (groupStore.selected.value !== null) {
-        studentStore.fetch({ groupId: groupStore.selected.value.id });
+      if (props.groupStore.selected.value !== null) {
+        props.studentStore.fetch({ groupId: props.groupStore.selected.value.id });
       } else {
-        studentStore.clear();
+        props.studentStore.clear();
       }
     });
 
     // When the instance changes, clear the selection
     watchEffect(() => {
-      if (groupStore.instanceStore.selected.value !== null) {
-        if (groupStore.instanceStore.selected.value.id !== prevInstance.value?.id ?? true) {
-          prevInstance.value = groupStore.instanceStore.selected.value;
+      if (props.groupStore.instanceStore.selected.value !== null) {
+        if (props.groupStore.instanceStore.selected.value.id !== prevInstance.value?.id ?? true) {
+          prevInstance.value = props.groupStore.instanceStore.selected.value;
           selection.clear();
         }
       }
@@ -132,13 +143,12 @@ export default {
     }
 
     return {
-      selectedGroup: groupStore.selected,
-      studentStore,
+      selectedGroup: props.groupStore.selected,
       studentClick,
       selection,
     };
   },
-};
+});
 </script>
 
 <style lang="scss">

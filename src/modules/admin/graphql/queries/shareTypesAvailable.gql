@@ -1,0 +1,14 @@
+#import "@/graphql/fragments/pageInfo.gql"
+#import "../fragments/shareType.gql"
+
+query availableShareTypes($first: PaginationAmount) {
+  availableShareTypes(first: $first) {
+    pageInfo {
+      ...PageInfoParts
+    }
+    totalCount
+    nodes {
+      ...ShareTypeParts
+    }
+  }
+}

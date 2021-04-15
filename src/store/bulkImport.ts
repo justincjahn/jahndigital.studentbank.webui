@@ -4,7 +4,8 @@ import { parseCSV } from '@/utils/csv';
 import { computed, reactive } from 'vue';
 import Apollo from '@/services/Apollo';
 import { gql } from '@apollo/client/core';
-import gqlGroups from '@/graphql/groups.query.gql';
+import { setup as defineInstanceStore } from './instance';
+import { setup as defineGroupStore } from './group';
 
 /**
  * Enum that describes the steps for the Bulk Import multi-part form.
@@ -224,16 +225,9 @@ export function setup() {
     store.loading = true;
 
     try {
-      const res = await Apollo.query<GroupResponse>({
-        query: gqlGroups,
-        variables: {
-          instanceId: store.instance.id,
-        },
-      });
-
-      if (res.data) {
-        store.dbGroups = res.data.groups.nodes;
-      }
+      const groupStore = defineGroupStore(defineInstanceStore());
+      await groupStore.fetchGroups(store.instance.id);
+      store.dbGroups = [...groupStore.groups.value];
     } catch (e) {
       throw new Error(e?.message ?? e);
     } finally {

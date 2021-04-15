@@ -1,0 +1,9 @@
+#import "../fragments/group.gql"
+
+query groupsByInstance($instanceId: Long) {
+  groups(where: { instanceId: $instanceId }, order_by: { name: ASC }) {
+    nodes {
+      ...GroupParts
+    }
+  }
+}
