@@ -1,4 +1,5 @@
 import { RouteRecordRaw } from 'vue-router';
+import StudentsModule from './StudentsModule.vue';
 
 export enum RouteNames {
   index = 'students',
@@ -11,7 +12,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/students/:studentId?',
     name: RouteNames.index,
-    component: () => import(/* webpackChunkName: "admin-students" */ '@/modules/admin/students/pages/StudentsIndex.vue'),
+    component: StudentsModule,
     children: [
       {
         path: 'transactions',

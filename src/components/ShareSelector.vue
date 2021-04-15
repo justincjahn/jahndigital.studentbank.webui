@@ -41,7 +41,7 @@ export default defineComponent({
     },
     modelValue: {
       type: Object as () => Share|null,
-      required: true,
+      default: null,
     },
   },
   emits: [

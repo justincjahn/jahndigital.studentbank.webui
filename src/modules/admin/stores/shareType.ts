@@ -2,7 +2,7 @@ import { computed, reactive, watch } from 'vue';
 import { FETCH_OPTIONS } from '@/constants';
 
 // Stores
-import theInstanceStore, { InstanceStore } from '@/store/instance';
+import { InstanceStore } from '@/modules/admin/stores/instance';
 
 // GraphQL
 import Apollo from '@/services/Apollo';
@@ -329,6 +329,4 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
   };
 }
 
-const store = setup(theInstanceStore);
 export type ShareTypeStore = ReturnType<typeof setup>;
-export default store;

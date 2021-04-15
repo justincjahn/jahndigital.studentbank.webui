@@ -43,16 +43,20 @@
   <suspense>
     <add-link-modal
       :show="showAddLink"
-      :share-type-store="store"
+      :share-type-store="shareTypeStore"
       @ok="startAdd"
     />
   </suspense>
 </template>
 
 <script lang="ts">
-import { defineComponent, defineAsyncComponent, ref, computed, PropType } from 'vue';
-import theShareTypeStore, { ShareTypeStore } from '@/store/shareType';
+import { defineComponent, defineAsyncComponent, ref, PropType } from 'vue';
+
+// Components
 import BaseSelect, { Search } from '@/components/BaseSelect.vue';
+
+// Stores
+import { ShareTypeStore } from '../stores/shareType';
 
 enum ModalState {
   EDIT,
@@ -76,7 +80,7 @@ export default defineComponent({
     },
     shareTypeStore: {
       type: Object as PropType<ShareTypeStore>,
-      default: undefined,
+      required: true,
     },
   },
   emits: [
@@ -86,9 +90,6 @@ export default defineComponent({
     const modalState = ref<ModalState>(ModalState.EDIT);
 
     const showAddLink = ref(false);
-
-    // Use either the provided shareTypeStore or the global one.
-    const shareTypeStore = computed<ShareTypeStore>(() => props.shareTypeStore ?? theShareTypeStore);
 
     // Returns the name of the share type to the base-select component
     const value: Search = (x) => (typeof x === 'object' ? x?.name ?? x : x);
@@ -106,14 +107,13 @@ export default defineComponent({
     function startDelete() { modalState.value = ModalState.DELETE; }
 
     return {
-      options: shareTypeStore.value.shareTypes,
+      options: props.shareTypeStore.shareTypes,
       update,
       value,
       startAdd,
       startEdit,
       startDelete,
       showAddLink,
-      store: shareTypeStore.value,
     };
   },
 });

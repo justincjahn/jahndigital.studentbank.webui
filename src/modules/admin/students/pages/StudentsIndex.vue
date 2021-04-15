@@ -77,11 +77,12 @@
 </template>
 
 <script lang="ts">
-import { useRouter, useRoute } from 'vue-router';
 import { defineComponent, onMounted, computed, defineAsyncComponent } from 'vue';
-
-// Validator
+import { useRouter, useRoute } from 'vue-router';
 import { Field, useForm } from 'vee-validate';
+
+// Utils
+import injectStrict from '@/utils/injectStrict';
 import { validateAccountUnique, validateEmail, validateName } from '@/utils/validators';
 
 // Routes
@@ -89,8 +90,10 @@ import { RouteNames as StudentRouteNames } from '@/modules/admin/students/routes
 
 // Stores
 import errorStore from '@/store/error';
-import instanceStore from '@/store/instance';
-import studentStore from '@/modules/admin/stores/student';
+
+// Symbols
+import { INSTANCE_STORE_SYMBOL } from '@/modules/admin/symbols';
+import { STUDENT_STORE_SYMBOL } from '../symbols';
 
 /**
  * Handles high-level selection of students and routing to sub-routes.
@@ -103,6 +106,8 @@ export default defineComponent({
   setup() {
     const router = useRouter();
     const route = useRoute();
+    const instanceStore = injectStrict(INSTANCE_STORE_SYMBOL);
+    const studentStore = injectStrict(STUDENT_STORE_SYMBOL);
     const validateAccount = validateAccountUnique({ studentStore });
 
     const form = useForm({

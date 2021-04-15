@@ -450,6 +450,4 @@ export function setup() {
   };
 }
 
-const store = setup();
 export type BulkPostStore = ReturnType<typeof setup>;
-export default store;

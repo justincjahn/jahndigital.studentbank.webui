@@ -37,6 +37,7 @@
 
         <share-type-selector
           :model-value="selectedShareType"
+          :share-type-store="shareTypeStore"
           @update:modelValue="handleShareTypeSelection"
         />
 
@@ -226,13 +227,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watchEffect, computed, ref } from 'vue';
+import { defineComponent, watchEffect, computed, ref, PropType } from 'vue';
+
+// Components
 import Modal from '@/components/Modal.vue';
 import ShareTypeSelector from '@/modules/admin/components/ShareTypeSelector.vue';
-import groupStore from '@/store/group';
 import LoadingIcon from '@/components/LoadingIcon.vue';
+
+// Stores
 import errorStore from '@/store/error';
-import bulkPostStore, { PostingPolicy } from '@/store/bulkPost';
+import { setup as defineBulkPostStore, PostingPolicy } from '@/modules/admin/groups/stores/bulkPost';
+import { ShareTypeStore } from '@/modules/admin/stores/shareType';
+import { GroupStore } from '../stores/group';
 
 export default defineComponent({
   components: {
@@ -245,12 +251,23 @@ export default defineComponent({
       type: Boolean,
       required: true,
     },
+    groupStore: {
+      type: Object as PropType<GroupStore>,
+      required: true,
+    },
+    shareTypeStore: {
+      type: Object as PropType<ShareTypeStore>,
+      required: true,
+    },
   },
   emits: [
     'ok',
     'cancel',
   ],
   setup(props, { emit }) {
+    // Create a new instance of the bulk post store
+    const bulkPostStore = defineBulkPostStore();
+
     // Generate a shorthand name for the selected share
     const shareTypeName = computed(() => bulkPostStore.selectedShareType.value?.name.toUpperCase().substring(0, 3) ?? 'UNK');
 
@@ -327,7 +344,7 @@ export default defineComponent({
       const student = bulkPostStore.studentMap.value.get(share.id);
 
       if (student) {
-        const group = groupStore.groups.value.find((x) => x.id === student.groupId);
+        const group = props.groupStore.groups.value.find((x) => x.id === student.groupId);
         if (group) return group.name;
       }
 

@@ -110,7 +110,7 @@ export default defineComponent({
   props: {
     selectedInstance: {
       type: Object as PropType<Instance|null>,
-      required: true,
+      default: null,
     },
   },
   emits: [

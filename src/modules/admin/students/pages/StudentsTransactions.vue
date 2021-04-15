@@ -14,19 +14,30 @@
     </div>
 
     <div class="student-transactions__main">
-      <transaction-list />
+      <transaction-list
+        :share-store="shareStore"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import shareStore from '@/store/share';
-import errorStore from '@/store/error';
+import { defineComponent, ref, computed } from 'vue';
+
+// Components
 import ShareSelector from '@/components/ShareSelector.vue';
 import TransactionList from '@/modules/admin/students/components/TransactionList.vue';
 import TransactionPoster from '@/components/TransactionPoster.vue';
-import { defineComponent, ref, computed } from 'vue';
+
+// Utils
 import Money from '@/utils/money';
+import injectStrict from '@/utils/injectStrict';
+
+// Stores
+import { setup as defineShareStore } from '@/modules/admin/stores/share';
+import errorStore from '@/store/error';
+
+import { STUDENT_STORE_SYMBOL } from '../symbols';
 
 export default defineComponent({
   components: {
@@ -35,6 +46,8 @@ export default defineComponent({
     TransactionPoster,
   },
   setup() {
+    const studentStore = injectStrict(STUDENT_STORE_SYMBOL);
+    const shareStore = defineShareStore(studentStore);
     const isPosting = ref<boolean>(false);
 
     // Proxy get/set requests to the shareStore

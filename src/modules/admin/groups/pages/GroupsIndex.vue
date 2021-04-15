@@ -40,6 +40,8 @@
 
         <bulk-post-modal
           :show="showBulkTransactionModal"
+          :group-store="groupStore"
+          :share-type-store="shareTypeStore"
           @ok="toggleBulkTransaction"
           @cancel="toggleBulkTransaction"
         />
@@ -101,10 +103,20 @@
 <script lang="ts">
 import { ref, computed, defineAsyncComponent } from 'vue';
 import { useRouter } from 'vue-router';
-import errorStore from '@/store/error';
-import groupStore from '@/store/group';
-import studentStore from '@/modules/admin/stores/student';
+
+// Services
 import selection from '@/services/StudentSelectionService';
+
+// Utils
+import injectStrict from '@/utils/injectStrict';
+
+// Stores
+import studentStore from '@/modules/admin/stores/student';
+import errorStore from '@/store/error';
+
+// Symbols
+import { SHARE_TYPE_STORE_SYMBOL } from '@/modules/admin/symbols';
+import { GROUP_STORE_SYMBOL } from '../symbols';
 
 const BulkPostModal = defineAsyncComponent(
   () => import(/* webpackChunkName: "admin-groups" */ '../components/BulkPostModal.vue'),
@@ -141,6 +153,8 @@ export default {
   },
   setup() {
     const router = useRouter();
+    const groupStore = injectStrict(GROUP_STORE_SYMBOL);
+    const shareTypeStore = injectStrict(SHARE_TYPE_STORE_SYMBOL);
     const showBulkTransactionModal = ref(false);
     const showNewStudentModal = ref(false);
     const showBulkGroupModal = ref(false);
@@ -239,6 +253,7 @@ export default {
       groupStore,
       selectedGroup,
       studentStore,
+      shareTypeStore,
       selectedStudents,
       selectedStudentsResolving,
     };

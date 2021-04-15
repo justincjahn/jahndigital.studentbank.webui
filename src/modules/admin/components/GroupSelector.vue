@@ -57,12 +57,17 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, PropType } from 'vue';
+
+// Components
 import BaseSelect, { Search } from '@/components/BaseSelect.vue';
 import Modal from '@/components/Modal.vue';
-import errorStore from '@/store/error';
-import { GroupStore } from '@/store/group';
 
+// Utils
 import uuid4 from '@/utils/uuid4';
+
+// Stores
+import errorStore from '@/store/error';
+import { GroupStore } from '../groups/stores/group';
 
 enum ModalState {
   ADD,

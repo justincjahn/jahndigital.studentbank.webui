@@ -85,13 +85,19 @@
 <script lang="ts">
 import { defineComponent, ref, computed, watchEffect, PropType } from 'vue';
 import { useForm, Field } from 'vee-validate';
-import errorStore from '@/store/error';
-import { setup as setupShareTypeStore, ShareTypeStore } from '@/store/shareType';
+
+// Components
 import Modal from '@/components/Modal.vue';
 import LoadingIcon from '@/components/LoadingIcon.vue';
 import ShareTypeMultiselect from '@/modules/admin/components/ShareTypeMultiselector.vue';
+
+// Utils
 import uuid4 from '@/utils/uuid4';
 import Rate from '@/utils/rate';
+
+// Stores
+import errorStore from '@/store/error';
+import { setup as setupShareTypeStore, ShareTypeStore } from '@/modules/admin/stores/shareType';
 
 interface NewShareTypeForm {
   name: string;

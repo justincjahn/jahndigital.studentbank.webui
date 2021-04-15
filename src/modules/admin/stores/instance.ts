@@ -168,6 +168,4 @@ export function setup() {
   };
 }
 
-const store = setup();
 export type InstanceStore = ReturnType<typeof setup>;
-export default store;

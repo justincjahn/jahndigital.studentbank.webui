@@ -5,7 +5,12 @@
 
       <div class="main-nav__instances">
         <template v-if="userStore.isAuthenticated.value">
-          <suspense><instance-selector /></suspense>
+          <suspense>
+            <instance-selector
+              v-model="selectedInstance"
+              :instance-store="instanceStore"
+            />
+          </suspense>
         </template>
       </div>
 
@@ -51,8 +56,8 @@
   </suspense>
 </template>
 
-<script>
-import { defineAsyncComponent, watchEffect } from 'vue';
+<script lang="ts">
+import { defineAsyncComponent, defineComponent, watchEffect, computed, provide } from 'vue';
 import { useRouter } from 'vue-router';
 
 // Routes
@@ -67,16 +72,31 @@ import { RouteNames as LoginRouteNames } from '@/modules/admin/login/routes';
 import routerStore from '@/store/router';
 import errorStore from '@/store/error';
 import userStore from '@/store/user';
+import { setup as defineInstanceStore } from './stores/instance';
+import { setup as defineShareTypeStore } from './stores/shareType';
+import * as symbols from './symbols';
 
-export default {
+export default defineComponent({
   components: {
     LoginWidget: defineAsyncComponent(() => import(/* webpackChunkName: "admin-main" */ '@/modules/admin/components/LoginWidget.vue')),
-    InstanceSelector: defineAsyncComponent(() => import(/* webpackChunkName: "admin-main" */ '@/modules/admin/components/TheInstanceSelector.vue')),
+    InstanceSelector: defineAsyncComponent(() => import(/* webpackChunkName: "admin-main" */ '@/modules/admin/components/InstanceSelector.vue')),
     Modal: defineAsyncComponent(() => import(/* webpackChunkName: "admin-main" */ '@/components/Modal.vue')),
   },
-
   setup() {
     const router = useRouter();
+
+    // Create and provide the instance store to the child routes
+    const instanceStore = defineInstanceStore();
+    provide(symbols.INSTANCE_STORE_SYMBOL, instanceStore);
+
+    // Create and provide the share type store to the child routes
+    const shareTypeStore = defineShareTypeStore(instanceStore);
+    provide(symbols.SHARE_TYPE_STORE_SYMBOL, shareTypeStore);
+
+    const selectedInstance = computed<Instance|null>({
+      get: () => instanceStore.selected.value,
+      set: (item) => instanceStore.setSelected(item),
+    });
 
     // Force users to the login page if they aren't authenticated
     watchEffect(() => {
@@ -91,12 +111,14 @@ export default {
       purchasesIndex: PurchasesRouteNames.index,
       stocksIndex: StocksRouteNames.index,
       settingsIndex: SettingsRouteNames.index,
+      selectedInstance,
+      instanceStore,
       errorStore,
       userStore,
       loading: routerStore.loading,
     };
   },
-};
+});
 </script>
 
 <style lang="scss">

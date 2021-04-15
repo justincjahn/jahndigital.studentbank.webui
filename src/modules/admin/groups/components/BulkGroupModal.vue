@@ -29,7 +29,9 @@ import { defineComponent, ref, computed, PropType } from 'vue';
 import Modal from '@/components/Modal.vue';
 import GroupSelector from '@/modules/admin/components/GroupSelector.vue';
 import LoadingIcon from '@/components/LoadingIcon.vue';
-import { GroupStore } from '@/store/group';
+
+// Stores
+import { GroupStore } from '../stores/group';
 
 export default defineComponent({
   components: {

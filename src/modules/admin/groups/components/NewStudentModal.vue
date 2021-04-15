@@ -117,17 +117,24 @@
 
 <script lang="ts">
 import { defineComponent, ref, watchEffect, computed, PropType } from 'vue';
-import Modal from '@/components/Modal.vue';
-import uuid4 from '@/utils/uuid4';
-import { GroupStore } from '@/store/group';
-import shareStore from '@/store/share';
-import errorStore from '@/store/error';
-import { validateAccountUnique, validateEmail, validateName } from '@/utils/validators';
-import generatePassword from '@/utils/generatePassword';
-import { Field, ErrorMessage, useForm } from 'vee-validate';
-import Money from '@/utils/money';
+
+// Components
 import LoadingIcon from '@/components/LoadingIcon.vue';
 import ShareTypeSelector from '@/modules/admin/components/ShareTypeSelector.vue';
+import Modal from '@/components/Modal.vue';
+
+// Utils
+import uuid4 from '@/utils/uuid4';
+import { Field, ErrorMessage, useForm } from 'vee-validate';
+import { validateAccountUnique, validateEmail, validateName } from '@/utils/validators';
+import generatePassword from '@/utils/generatePassword';
+import Money from '@/utils/money';
+
+// Store
+import errorStore from '@/store/error';
+import { setup as defineStudentStore } from '@/modules/admin/stores/student';
+import { setup as defineShareStore } from '@/modules/admin/stores/share';
+import { GroupStore } from '../stores/group';
 
 interface NewStudentForm {
   accountNumber: string;
@@ -165,6 +172,10 @@ export default defineComponent({
     'cancel',
   ],
   setup(props, { emit }) {
+    const studentStore = defineStudentStore();
+
+    const shareStore = defineShareStore(studentStore);
+
     const loading = ref(false);
 
     // Pass in the instanceStore so the validator can check for existing students
@@ -209,8 +220,6 @@ export default defineComponent({
         password: generatePassword(),
         groupId: props.groupStore.selected.value?.id ?? -1,
       };
-
-      const { studentStore } = shareStore;
 
       try {
         const student = await studentStore.newStudent(newValues);

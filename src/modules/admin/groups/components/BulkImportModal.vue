@@ -165,14 +165,18 @@
 
 <script lang="ts">
 import { ref, defineComponent } from 'vue';
-import { setup as defineInstance } from '@/store/instance';
-import { setup as defineShareType } from '@/store/shareType';
-import bulkImportStore, { BulkImportStep, ShareTemplate } from '@/store/bulkImport';
-import errorStore from '@/store/error';
+
+// Components
 import Modal from '@/components/Modal.vue';
 import InstanceSelector from '@/modules/admin/components/InstanceSelector.vue';
 import ShareTypeSelector from '@/modules/admin/components/ShareTypeSelector.vue';
 import LoadingIcon from '@/components/LoadingIcon.vue';
+
+// Stores
+import { setup as defineInstanceStore } from '@/modules/admin/stores/instance';
+import { setup as defineShareTypeStore } from '@/modules/admin/stores/shareType';
+import { setup as defineBulkImportStore, BulkImportStep, ShareTemplate } from '@/modules/admin/groups/stores/bulkImport';
+import errorStore from '@/store/error';
 
 export default defineComponent({
   components: {
@@ -181,25 +185,25 @@ export default defineComponent({
     ShareTypeSelector,
     LoadingIcon,
   },
-
   props: {
     show: {
       type: Boolean,
       required: true,
     },
   },
-
   emits: [
     'ok',
     'cancel',
   ],
-
   setup(_, { emit }) {
     // A fresh InstanceStore we can use for the modal
-    const instanceStore = defineInstance();
+    const instanceStore = defineInstanceStore();
 
     // A fresh ShareTypeStore we can use for the modal
-    const shareTypeStore = defineShareType(instanceStore);
+    const shareTypeStore = defineShareTypeStore(instanceStore);
+
+    // The store we'll use to do the import
+    const bulkImportStore = defineBulkImportStore();
 
     // True if the user is dragging a file
     const isDragging = ref(false);

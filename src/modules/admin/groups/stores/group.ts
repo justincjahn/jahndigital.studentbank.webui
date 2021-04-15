@@ -3,7 +3,7 @@ import gqlGroups from '@/modules/admin/graphql/queries/groupsByInstance.gql';
 import gqlNewGroup from '@/modules/admin/graphql/mutations/groupCreate.gql';
 import gqlUpdateGroup from '@/modules/admin/graphql/mutations/groupUpdate.gql';
 import gqlDeleteGroup from '@/modules/admin/graphql/mutations/groupDelete.gql';
-import theInstanceStore, { InstanceStore } from '@/store/instance';
+import { InstanceStore } from '@/modules/admin/stores/instance';
 import { computed, reactive, watch } from 'vue';
 
 /**
@@ -187,6 +187,4 @@ export function setup(instanceStore: InstanceStore) {
   };
 }
 
-const store = setup(theInstanceStore);
 export type GroupStore = ReturnType<typeof setup>;
-export default store;

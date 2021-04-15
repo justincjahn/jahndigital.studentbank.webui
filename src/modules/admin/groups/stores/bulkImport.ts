@@ -4,7 +4,7 @@ import { parseCSV } from '@/utils/csv';
 import { computed, reactive } from 'vue';
 import Apollo from '@/services/Apollo';
 import { gql } from '@apollo/client/core';
-import { setup as defineInstanceStore } from './instance';
+import { setup as defineInstanceStore } from '@/modules/admin/stores/instance';
 import { setup as defineGroupStore } from './group';
 
 /**
@@ -486,6 +486,4 @@ export function setup() {
   };
 }
 
-const store = setup();
 export type BulkImportStore = ReturnType<typeof setup>;
-export default store;

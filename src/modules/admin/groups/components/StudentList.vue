@@ -72,11 +72,17 @@
 
 <script lang="ts">
 import { defineComponent, PropType, ref, watchEffect } from 'vue';
+
+// Routing
 import { useRouter } from 'vue-router';
 import { RouteNames as StudentRouteNames } from '@/modules/admin/students/routes';
-import { StudentStore } from '@/modules/admin/stores/student';
-import { GroupStore } from '@/store/group';
+
+// Services
 import selection from '@/services/StudentSelectionService';
+
+// Stores
+import { StudentStore } from '@/modules/admin/stores/student';
+import { GroupStore } from '../stores/group';
 
 const delay = 300;
 let timer: number|null = null;

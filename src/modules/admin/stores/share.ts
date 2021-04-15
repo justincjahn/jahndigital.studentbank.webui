@@ -2,7 +2,7 @@ import { FETCH_OPTIONS } from '@/constants';
 import { computed, reactive, watch } from 'vue';
 
 // Store
-import theStudentStore, { StudentStore } from '@/modules/admin/stores/student';
+import { StudentStore } from '@/modules/admin/stores/student';
 
 // API
 import Apollo from '@/services/Apollo';
@@ -238,7 +238,7 @@ export function setup(studentStore: StudentStore) {
       const shares = studentStore.selected.value.shares ?? [];
       if (shares.length > 0) [store.selected] = shares;
     }
-  });
+  }, { immediate: true });
 
   return {
     studentStore,
@@ -259,6 +259,4 @@ export function setup(studentStore: StudentStore) {
   };
 }
 
-const store = setup(theStudentStore);
 export type ShareStore = ReturnType<typeof setup>;
-export default store;

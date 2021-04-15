@@ -88,12 +88,18 @@
 </template>
 
 <script lang="ts">
+import { computed, defineComponent, PropType, ref, watchEffect } from 'vue';
+
+// Components
 import BaseSelect, { Search } from '@/components/BaseSelect.vue';
 import Modal from '@/components/Modal.vue';
+
+// Stores
 import errorStore from '@/store/error';
-import theInstanceStore, { InstanceStore } from '@/store/instance';
+import { InstanceStore } from '@/modules/admin/stores/instance';
 import userStore from '@/store/user';
-import { computed, defineComponent, PropType, ref, watchEffect } from 'vue';
+
+// Utils
 import uuid4 from '@/utils/uuid4';
 
 export enum ModalState {
@@ -119,7 +125,7 @@ export default defineComponent({
     },
     instanceStore: {
       type: Object as PropType<InstanceStore>,
-      default: undefined,
+      required: true,
     },
   },
   emits: [
@@ -137,9 +143,6 @@ export default defineComponent({
 
     // The current state of the modal
     const modalState = ref<ModalState>(ModalState.ADD);
-
-    // Use either the provided instanceStore or the global one.
-    const instanceStore = computed(() => props.instanceStore ?? theInstanceStore);
 
     // The title of the modal window
     const modalTitle = computed(() => {
@@ -214,7 +217,7 @@ export default defineComponent({
         }
 
         try {
-          const instance = await instanceStore.value.newInstance({ description: input.value });
+          const instance = await props.instanceStore.newInstance({ description: input.value });
           update(instance);
           toggle();
         } catch (e) {
@@ -231,7 +234,7 @@ export default defineComponent({
         if (props.modelValue === null) return;
 
         try {
-          const instance = await instanceStore.value.updateInstance({
+          const instance = await props.instanceStore.updateInstance({
             id: props.modelValue?.id ?? -1,
             description: input.value,
           });
@@ -247,7 +250,7 @@ export default defineComponent({
         if (props.modelValue === null) return;
 
         try {
-          const instance = await instanceStore.value.updateInstance({
+          const instance = await props.instanceStore.updateInstance({
             id: props.modelValue?.id ?? -1,
             isActive: true,
           });
@@ -264,7 +267,7 @@ export default defineComponent({
 
         try {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          await instanceStore.value.deleteInstance(props.modelValue!);
+          await props.instanceStore.deleteInstance(props.modelValue!);
           update(null);
         } catch (e) {
           errorStore.setCurrentError(e.message ?? e);
@@ -282,14 +285,14 @@ export default defineComponent({
 
     // Fetch instances if there are none, or the user just authenticated
     watchEffect(() => {
-      if (userStore.isAuthenticated.value || instanceStore.value.instances.value.length === 0) {
-        instanceStore.value.fetchInstances();
+      if (userStore.isAuthenticated.value || props.instanceStore.instances.value.length === 0) {
+        props.instanceStore.fetchInstances();
       }
     });
 
     return {
       ModalState,
-      options: instanceStore.value.instances,
+      options: props.instanceStore.instances,
       modalTitle,
       modalClass,
       modalState,
