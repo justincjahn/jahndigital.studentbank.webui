@@ -221,7 +221,6 @@ export default {
      */
     function handleBulkGroupModalOk(movedGroup: Group) {
       try {
-        console.log(movedGroup, selectedStudents.value);
         studentStore.bulkMove(movedGroup, selectedStudents.value);
       } catch (e) {
         errorStore.setCurrentError(e?.message ?? e);

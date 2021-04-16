@@ -100,6 +100,41 @@ export function validateName(value: string): string|boolean {
 }
 
 /**
+ * Ensures that the provided string is a valid monetary value.
+ *
+ * @param value
+ */
+export function validateAmount(value: string): string | boolean {
+  if (!value || value.length === 0) return 'Specify an amount.';
+
+  try {
+    Money.fromString(value);
+  } catch {
+    return 'Amount must be a number.';
+  }
+
+  return true;
+}
+
+/**
+ * Ensures that the provided string is a valid monetary value that is not negative.
+ *
+ * @param value
+ */
+export function validateAmountNotNegative(value: string): string | boolean {
+  if (!value || value.length === 0) return 'Specify an amount.';
+
+  try {
+    const num = Money.fromString(value);
+    if (num.round() < 0) return 'Amount cannot be negative.';
+  } catch {
+    return 'Amount must be a number.';
+  }
+
+  return true;
+}
+
+/**
  * Ensures that the provided string is a valid monetary amount that's non-zero.
  *
  * @param value
@@ -107,9 +142,12 @@ export function validateName(value: string): string|boolean {
 export function validateAmountNonzero(value: string): string | boolean {
   if (!value || value.length === 0) return 'Specify an amount.';
 
-  const num = +value;
-  if (Number.isNaN(num)) return 'Amount must be a number.';
-  if (Money.round(num) === 0) return 'Amount cannot be zero.';
+  try {
+    const num = Money.fromString(value);
+    if (Money.round(num.getAmount()) === 0) return 'Amount cannot be zero.';
+  } catch {
+    return 'Amount must be a number.';
+  }
 
   return true;
 }

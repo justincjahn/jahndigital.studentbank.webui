@@ -23,6 +23,42 @@ export default class Money {
     return new Money(amount);
   }
 
+  /**
+   * Converts a string into a Money object.
+   *
+   * @param amount
+   */
+  static fromString(amount: string): Money {
+    const trimmed = amount.trim();
+    if (/^\$?[0-9]{0,}\.?[0-9]{0,}$/.test(trimmed) !== true) {
+      throw new Error('Provided value is not valid US currency.');
+    }
+
+    const sanitized = trimmed.replace(',', '').replace('$', '');
+    const value = Number.parseFloat(sanitized);
+    if (Number.isNaN(value)) {
+      // We probably shouldn't end up here, but *just in case*
+      throw new Error('Provided value is not a number.');
+    }
+
+    return this.fromNumber(value);
+  }
+
+  /**
+   * Attempt to convert a string into a Money object, or return a Money object with a zero balance.
+   *
+   * @param amount The amount to try converting into a Money object.
+   * @returns A Money object with the value provided as a string, or zero.
+   */
+  static fromStringOrDefault(amount: string): Money {
+    try {
+      const ret = this.fromString(amount);
+      return ret;
+    } catch {
+      return this.fromNumber(0);
+    }
+  }
+
   // The actual amount as a float
   private amount: number;
 
@@ -71,6 +107,21 @@ export default class Money {
    */
   add(addend: Money): Money {
     return new Money(this.amount + addend.getAmount());
+  }
+
+  /**
+   * Converts the object into a currency string.
+   *
+   * @returns String in the format $1.00.
+   */
+  toString() {
+    return new Intl.NumberFormat(
+      'en-US',
+      {
+        style: 'currency',
+        currency: 'USD',
+      },
+    ).format(this.round());
   }
 
   /**

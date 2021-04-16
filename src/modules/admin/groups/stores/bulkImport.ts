@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/camelcase */
 
-import { parseCSV } from '@/utils/csv';
 import { computed, reactive } from 'vue';
+
+// Utils
+import { parseCSV } from '@/utils/csv';
+import sample from '@/utils/sample';
+import Money from '@/utils/money';
+
+// API
 import Apollo from '@/services/Apollo';
 import { gql } from '@apollo/client/core';
 import { setup as defineInstanceStore } from '@/modules/admin/stores/instance';
@@ -41,6 +47,7 @@ export const StudentImportColumns: StudentImportKeys = {
 export interface ShareTemplate {
   shareType: ShareType|null;
   initialDeposit: string;
+  error: string | boolean;
 }
 
 /**
@@ -52,6 +59,13 @@ export interface StudentImport {
   first_name?: string;
   last_name?: string;
   group?: string;
+}
+
+/**
+ * An interface for sampling students.
+ */
+export interface BulkImportSample extends StudentImport {
+  shares: ShareTemplate[];
 }
 
 /**
@@ -126,6 +140,9 @@ export function setup() {
 
     // Share Types that will be created for each student
     shareTypes: [] as ShareTemplate[],
+
+    // Sampling
+    samples: [] as BulkImportSample[],
   });
 
   /**
@@ -174,14 +191,35 @@ export function setup() {
   const shareTemplates = computed(() => store.shareTypes);
 
   /**
+   * A list of sample accounts from the import process.
+   */
+  const samples = computed(() => store.samples);
+
+  /**
    * True if the store is valid for the current step.
    */
   const isValid = computed(() => {
-    if (store.loading) return false;
-    if (store.instance === null) return false;
+    if (store.loading) return 'Store is loading.';
+    if (store.instance === null) return 'Please select an instance.';
 
+    // Validate that there are students to import if we're on or after step 2
     if (store.currentStep >= 2) {
-      if (Object.values(store.studentsToCreate).length === 0) return false;
+      if (Object.values(store.studentsToCreate).length === 0) return 'There are no students to import.';
+    }
+
+    // Validate the Share Type templates if we're on or after step 3.
+    if (store.currentStep >= 3) {
+      for (let i = 0; i < store.shareTypes.length; i += 1) {
+        const shareType = store.shareTypes[i];
+        if (shareType.shareType === null) return 'One or more Share Type templates is missing a Share Type selection.';
+
+        try {
+          const amount = Money.fromString(shareType.initialDeposit);
+          if (amount.round() < 0) return 'One or more Share Type templates has a negative amount.';
+        } catch {
+          return 'One or more Share Type templates has an invalid amount.';
+        }
+      }
     }
 
     return true;
@@ -201,6 +239,7 @@ export function setup() {
     store.errors = [];
     store.studentsToCreate = {};
     store.groupsToCreate = [];
+    store.samples = [];
   }
 
   /**
@@ -453,6 +492,46 @@ export function setup() {
   }
 
   /**
+   * Resolves the group name provided with a database value or pending group.
+   *
+   * @param name The group name.
+   */
+  function resolveGroupName(name: string) {
+    const dbGroup = store.dbGroups.find((x) => x.name.toLowerCase() === name.toLowerCase());
+    if (dbGroup) return dbGroup.name;
+
+    const groupName = store.groupsToCreate.find((x) => x.toLowerCase() === name.toLowerCase());
+    if (groupName) return groupName;
+
+    throw new Error(`Unable to resolve group '${name}.`);
+  }
+
+  /**
+   * Select a group of students that should appear in the summary step.
+   */
+  function generateSample(count = 10) {
+    if (students.value.length <= 0) {
+      store.samples = [];
+      return;
+    }
+
+    const keys = Object.keys(store.studentsToCreate);
+    const accountNumbers = sample(keys, Math.min(count, keys.length));
+    const ret: BulkImportSample[] = [];
+
+    accountNumbers.forEach((accountNumber) => {
+      const student = store.studentsToCreate[accountNumber.toString()];
+      student.group = resolveGroupName(student.group);
+      ret.push({
+        ...student,
+        shares: [...store.shareTypes],
+      });
+    });
+
+    store.samples = ret;
+  }
+
+  /**
    * Increment the multi-part workflow to the next step.
    */
   function incrementStep() {
@@ -475,6 +554,7 @@ export function setup() {
     instance,
     groups,
     students,
+    samples,
     shareTemplates,
     isValid,
     incrementStep,
@@ -482,6 +562,7 @@ export function setup() {
     setInstance,
     processFile,
     setShareTypeTemplate,
+    generateSample,
     reset,
   };
 }

@@ -5,7 +5,6 @@
     ok-label="Ok"
     title="Bulk Import Tool"
     class="bit large"
-    :can-submit="isValid"
     @ok="handleOk"
     @cancel="handleCancel"
   >
@@ -77,7 +76,7 @@
         class="bit__step bit__step--3"
       >
         <h1>Step 3: Configure Share Types</h1>
-        <p>
+        <p class="bit__step--description">
           Add one or more <em>Share Types</em> using the controls below.  During the import, each
           <em>Student</em> will have an account opened with the initial deposits you choose here.
           You can use the <em>Share Type</em> drop down to create and link or unlink <em>Share Types</em>
@@ -87,32 +86,38 @@
         <div
           v-for="(share, index) in shareTemplate"
           :key="index"
-          class="nsm__shares__fieldset"
+          class="bit__shares__fieldset"
         >
           <share-type-selector
             v-model="shareTemplate[index].shareType"
             :share-type-store="shareTypeStore"
-            class="nsm__shareTypeSelector"
+            class="bit__shareTypeSelector"
           />
 
-          <input
-            :id="`nsm__shares__initialDeposit__${index}`"
+          <currency-input
+            :id="`bit__shares__initialDeposit__${index}`"
             v-model="shareTemplate[index].initialDeposit"
+            v-model:error="shareTemplate[index].error"
             :name="`initialDeposit[${index}]`"
-            type="text"
+            :allow-zero="true"
+            :allow-negative="false"
           />
-
-          <!--<ErrorMessage :name="`initialDeposit[${index}]`" />-->
 
           <button
             type="button"
+            class="bit__shares--remove-button"
             @click="removeShareType(index)"
           >
             Remove
           </button>
+
+          <p class="bit__shares__initialDeposit--error error">
+            {{ shareTemplate[index].error }}
+          </p>
         </div>
         <button
           type="button"
+          class="bit__shares--add-button"
           @click="addShareType()"
         >
           Add Share
@@ -126,6 +131,51 @@
       >
         <h1>Step 4: Validate and commit</h1>
         <p>Review the tables below to ensure the data looks right.  When you are ready, hit <em>Import</em>.</p>
+
+        <ul class="bit__summary">
+          <li><strong>Instance:</strong> {{ instance.description }}</li>
+          <li><strong>Number of groups to create:</strong> {{ groups.length }}</li>
+          <li><strong>Number of students to create:</strong> {{ students.length }}</li>
+        </ul>
+
+        <button class="secondary" @click="generateSample()">
+          Refresh Samples
+        </button>
+
+        <table class="bit__samples">
+          <thead>
+            <tr>
+              <th>Group</th>
+              <th>Account Number</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th :class="(samples[0]?.shares.length ?? -1) > 0 ? 'center' : 'left'">
+                Shares
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="sample in samples" :key="sample.accountNumber">
+              <td>{{ sample.group }}</td>
+              <td>{{ sample.accountNumber }}</td>
+              <td>{{ sample.firstName }}</td>
+              <td>{{ sample.lastName }}</td>
+              <td v-if="sample.shares.length > 0">
+                <div v-for="(share, index) in sample.shares" :key="index" class="bit__samples__share">
+                  <div class="bit__samples__share__name">
+                    {{ share.shareType.name }}
+                  </div>
+                  <div class="bit__samples__share__amount">
+                    {{ Money.fromStringOrDefault(share.initialDeposit).toString() }}
+                  </div>
+                </div>
+              </td>
+              <td v-else class="left">
+                <em>No shares will be created.</em>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </template>
 
@@ -141,7 +191,7 @@
       </button>
       <button
         v-if="hasNextStep"
-        :disabled="isValid !== true"
+        :disabled="canContinue !== true"
         @click.prevent="handleIncrement"
       >
         Next
@@ -149,7 +199,7 @@
       <button
         v-if="!hasNextStep"
         class="primary"
-        :disabled="isValid !== true"
+        :disabled="canContinue !== true"
         @click.prevent="handleOk"
       >
         <template v-if="!loading">
@@ -164,13 +214,17 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent } from 'vue';
+import { ref, computed, defineComponent, watchEffect } from 'vue';
 
 // Components
 import Modal from '@/components/Modal.vue';
 import InstanceSelector from '@/modules/admin/components/InstanceSelector.vue';
 import ShareTypeSelector from '@/modules/admin/components/ShareTypeSelector.vue';
 import LoadingIcon from '@/components/LoadingIcon.vue';
+import CurrencyInput from '@/components/CurrencyInput.vue';
+
+// Utils
+import Money from '@/utils/money';
 
 // Stores
 import { setup as defineInstanceStore } from '@/modules/admin/stores/instance';
@@ -184,6 +238,7 @@ export default defineComponent({
     InstanceSelector,
     ShareTypeSelector,
     LoadingIcon,
+    CurrencyInput,
   },
   props: {
     show: {
@@ -195,7 +250,7 @@ export default defineComponent({
     'ok',
     'cancel',
   ],
-  setup(_, { emit }) {
+  setup(props, { emit }) {
     // A fresh InstanceStore we can use for the modal
     const instanceStore = defineInstanceStore();
 
@@ -214,41 +269,68 @@ export default defineComponent({
     // An array of new Share Types to create with initial values.  Also holds promise when they are submitted.
     const shareTemplate = ref<ShareTemplate[]>([]);
 
-    // Set the instance for both stores
+    // True if the form is valid for the current state.  Enhances bulkImportStore with Share Type Template validation.
+    const canContinue = computed(() => {
+      const isValid = bulkImportStore.isValid.value;
+      if (isValid !== true) return isValid;
+
+      if (bulkImportStore.currentStep.value >= BulkImportStep.shareTypes) {
+        for (let i = 0; i < shareTemplate.value.length; i += 1) {
+          const template = shareTemplate.value[i];
+          if (template.shareType === null) return 'Please ensure all Share Type templates have a Share Type selected.';
+          if (template.error) return 'Please verify initial balances and correct any errors to continue.';
+        }
+      }
+
+      return true;
+    });
+
+    /**
+     * Set the selected instance for both stores.
+     */
     function handleSetInstance(value: Instance|null) {
       instanceStore.setSelected(value);
       bulkImportStore.setInstance(value);
     }
 
-    // Move to the next step
+    /**
+     * Move to the next step in the workflow.  If we hit the share type template step, update the store with
+     * computed share types.
+     */
     function handleIncrement() {
       if (bulkImportStore.currentStep.value === BulkImportStep.shareTypes) {
         bulkImportStore.setShareTypeTemplate(shareTemplate.value);
+        bulkImportStore.generateSample();
       }
 
-      console.log(bulkImportStore.shareTemplates.value);
       bulkImportStore.incrementStep();
     }
 
-    // Commit the import
+    /**
+     * Commit the import.
+     */
     function handleOk() {
       emit('ok');
     }
 
-    // Cancel the import
+    /**
+     * Cancel the import.
+     */
     function handleCancel() {
-      bulkImportStore.reset();
-      shareTemplate.value = [];
       emit('cancel');
     }
 
-    // Click the hidden file upload input box.
+    /**
+     * Click the hidden file uplod input.
+     */
     function handleUploadClick() {
       if (fileUploader.value === null) return;
       fileUploader.value.click();
     }
 
-    // Ensure that the file is a CSV and pass it to the state for processing
+    /**
+     * Ensure that the file is a CSV and pass it to the state for processing.
+     */
     function processFile(fileInfo: File) {
       try {
         bulkImportStore.processFile(fileInfo);
@@ -257,7 +339,9 @@ export default defineComponent({
       }
     }
 
-    // Process the dropped file
+    /**
+     * Process the dropped file
+     */
     function handleDrop(e: DragEvent) {
       const file = e.dataTransfer?.files[0];
       if (!file) return;
@@ -265,7 +349,9 @@ export default defineComponent({
       processFile(file);
     }
 
-    // Process the file from the file brow
+    /**
+     * Process the file from the file browser
+     */
     function handleFileChange(e: Event) {
       const input = e.target as null|HTMLInputElement;
       if (!input) return;
@@ -280,7 +366,9 @@ export default defineComponent({
       input.blur();
     }
 
-    // Add a new element to the shareTemplate array, triggering a share type selector
+    /**
+     * Add a new element to the shareTemplate array, triggering a share type selector.
+     */
     function addShareType() {
       shareTemplate.value = [
         ...shareTemplate.value,
@@ -288,11 +376,14 @@ export default defineComponent({
         {
           shareType: null,
           initialDeposit: '0.00',
+          error: '',
         },
       ];
     }
 
-    // Remove the provided index from the array
+    /**
+     * Remove the provided index from the array
+     */
     function removeShareType(index: number) {
       shareTemplate.value = [
         ...shareTemplate.value.slice(0, index),
@@ -300,7 +391,18 @@ export default defineComponent({
       ];
     }
 
+    /**
+     * When the modal is closed, clear it
+     */
+    watchEffect(() => {
+      if (props.show === false) {
+        bulkImportStore.reset();
+        shareTemplate.value = [];
+      }
+    });
+
     return {
+      Money,
       handleOk,
       handleCancel,
       instanceStore,
@@ -315,6 +417,7 @@ export default defineComponent({
       shareTemplate,
       addShareType,
       removeShareType,
+      canContinue,
       BulkImportStep,
       ...bulkImportStore,
     };
@@ -341,6 +444,10 @@ export default defineComponent({
         }
       }
 
+      &--description {
+        margin-bottom: 1em;
+      }
+
       &__import-info {
         margin-top: 1em;
       }
@@ -351,6 +458,38 @@ export default defineComponent({
 
       ul.errors {
         margin-left: 2em;
+      }
+    }
+
+    &__summary {
+      margin: 1em 0;
+
+      li {
+        margin-left: 3em;
+      }
+    }
+
+    &__shares {
+      &--add-button {
+        margin: 1em 0 0 0;
+      }
+    }
+
+    &__samples {
+      @include table($selectable: false);
+
+      margin-top: 1em;
+
+      &__share {
+        display: flex;
+        flex-direction: row;
+        padding: 0 !important;
+
+        &__name {
+          text-align: left;
+          width: 100%;
+          font-weight: bold;
+        }
       }
     }
   }
