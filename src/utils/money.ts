@@ -30,7 +30,7 @@ export default class Money {
    */
   static fromString(amount: string): Money {
     const trimmed = amount.trim();
-    if (/^\$?[0-9]{0,}\.?[0-9]{0,}$/.test(trimmed) !== true) {
+    if (/^\$?-?[0-9]{0,}\.?[0-9]{0,}$/.test(trimmed) !== true) {
       throw new Error('Provided value is not valid US currency.');
     }
 
