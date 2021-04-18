@@ -206,7 +206,7 @@ export default defineComponent({
     function handleOk() { reset(); emit('ok'); }
 
     // Fetch a list of available share types using our custom store.
-    async function fetchAvailableShareTypes() { await shareTypeStore.fetch({ available: true }); }
+    async function fetchAvailableShareTypes() { await shareTypeStore.fetch({ available: true, cache: false }); }
 
     // Add a new share type and refresh available share types
     const handleAdd = handleSubmit(async () => {
@@ -248,7 +248,8 @@ export default defineComponent({
         errorStore.setCurrentError(errors.join(', '));
       }
 
-      await props.shareTypeStore.fetch();
+      // Refetch the share types from the API since we know they've changed on the server
+      await props.shareTypeStore.fetch({ cache: false });
       await fetchAvailableShareTypes();
     }
 

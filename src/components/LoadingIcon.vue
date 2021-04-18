@@ -2,6 +2,7 @@
   <div
     v-if="show"
     class="loading"
+    :class="$attrs.class"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"

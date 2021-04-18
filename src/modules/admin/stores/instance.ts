@@ -5,6 +5,11 @@ import gqlNewInstance from '@/modules/admin/graphql/mutations/instanceCreate.gql
 import gqlUpdateInstance from '@/modules/admin/graphql/mutations/instanceUpdate.gql';
 import gqlDeleteInstance from '@/modules/admin/graphql/mutations/instanceDelete.gql';
 
+// Instances are global so instead of managing data per store instance, do it globally
+const instanceCache = reactive({
+  instances: [] as Instance[],
+});
+
 /**
  * Stores information regarding the database instances and which one is currently active and
  * enables CRUD operations for instances.  Instances are in essence bespoke operating environments
@@ -14,7 +19,6 @@ import gqlDeleteInstance from '@/modules/admin/graphql/mutations/instanceDelete.
 export function setup() {
   const store = reactive({
     selected: null as Instance|null,
-    instances: [] as Instance[],
     loading: false,
   });
 
@@ -22,7 +26,7 @@ export function setup() {
   const selected = computed(() => store.selected);
 
   // GETs a list of instances
-  const instances = computed(() => store.instances);
+  const instances = computed(() => instanceCache.instances);
 
   // GETs the loading state of fetch requests
   const loading = computed(() => store.loading);
@@ -31,7 +35,7 @@ export function setup() {
   function setSelected(item: Instance | null) { store.selected = item; }
 
   // Fetch instances from the server
-  async function fetchInstances(cache = true) {
+  async function fetch(cache = true) {
     store.loading = true;
 
     try {
@@ -41,14 +45,14 @@ export function setup() {
       });
 
       if (res.data) {
-        store.instances = res.data.instances.nodes;
-        const active = store.instances.findIndex((x) => x.isActive === true);
+        instanceCache.instances = res.data.instances.nodes;
+        const active = instanceCache.instances.findIndex((x) => x.isActive === true);
 
         // Only set the instance if we don't already have a valid one selected
         const sid = store.selected?.id ?? -1;
-        const hasSelected = store.instances.findIndex((x) => x.id === sid);
+        const hasSelected = instanceCache.instances.findIndex((x) => x.id === sid);
         if (hasSelected <= 0) {
-          setSelected(store.instances[active > -1 ? active : 0]);
+          setSelected(instanceCache.instances[active > -1 ? active : 0]);
         }
       }
     } catch (e) {
@@ -64,23 +68,10 @@ export function setup() {
       const res = await Apollo.mutate<NewInstanceResponse>({
         mutation: gqlNewInstance,
         variables: input,
-        update(cache, data) {
-          const instance = data.data?.newInstance;
-          if (!instance) return;
-
-          cache.writeQuery<InstanceResponse>({
-            query: gqlInstances,
-            data: {
-              instances: {
-                nodes: [...store.instances, instance],
-              },
-            },
-          });
-        },
       });
 
       if (res.data) {
-        store.instances = [...store.instances, res.data.newInstance];
+        instanceCache.instances = [...instanceCache.instances, res.data.newInstance];
         return res.data.newInstance;
       }
 
@@ -100,9 +91,9 @@ export function setup() {
 
       if (res.data) {
         // If we've activated an instance, then we need to update all of them
-        let existing = [...store.instances];
+        let existing = [...instanceCache.instances];
         if (input.isActive && input.isActive === true) {
-          existing = store.instances.map((x: Instance) => ({
+          existing = instanceCache.instances.map((x: Instance) => ({
             ...x,
             isActive: false,
           }));
@@ -113,7 +104,7 @@ export function setup() {
           ...res.data.updateInstance,
         ];
 
-        store.instances = instanceList;
+        instanceCache.instances = instanceList;
         return res.data.updateInstance[0];
       }
 
@@ -139,7 +130,7 @@ export function setup() {
             query: gqlInstances,
             data: {
               instances: {
-                nodes: store.instances.filter((x: Instance) => x.id !== instance.id),
+                nodes: instanceCache.instances.filter((x: Instance) => x.id !== instance.id),
               },
             },
           });
@@ -147,7 +138,7 @@ export function setup() {
       });
 
       if (res.data && res.data.deleteInstance === true) {
-        store.instances = store.instances.filter((x) => x.id !== instance.id);
+        instanceCache.instances = instanceCache.instances.filter((x) => x.id !== instance.id);
         return;
       }
 
@@ -162,7 +153,7 @@ export function setup() {
     instances,
     loading,
     setSelected,
-    fetchInstances,
+    fetchInstances: fetch,
     newInstance,
     updateInstance,
     deleteInstance,

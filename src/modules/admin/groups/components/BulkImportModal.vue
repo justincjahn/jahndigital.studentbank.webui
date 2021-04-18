@@ -5,6 +5,8 @@
     ok-label="Ok"
     title="Bulk Import Tool"
     class="bit large"
+    :handle-enter="!isPosting"
+    :handle-escape="!isPosting"
     @ok="handleOk"
     @cancel="handleCancel"
   >
@@ -130,68 +132,81 @@
         class="bit__step bit__step--4"
       >
         <h1>Step 4: Validate and commit</h1>
-        <p>Review the tables below to ensure the data looks right.  When you are ready, hit <em>Import</em>.</p>
 
-        <ul class="bit__summary">
-          <li><strong>Instance:</strong> {{ instance?.description }}</li>
-          <li><strong>Number of groups to create:</strong> {{ groups.length }}</li>
-          <li><strong>Number of students to create:</strong> {{ students.length }}</li>
-        </ul>
+        <template v-if="!isPosting">
+          <p>Review the tables below to ensure the data looks right.  When you are ready, hit <em>Import</em>.</p>
 
-        <button class="secondary" @click="generateSample()">
-          Refresh Samples
-        </button>
+          <ul class="bit__summary">
+            <li><strong>Instance:</strong> {{ instance?.description }}</li>
+            <li><strong>Number of groups to create:</strong> {{ groups.length }}</li>
+            <li><strong>Number of students to create:</strong> {{ students.length }}</li>
+          </ul>
 
-        <table class="bit__samples">
-          <thead>
-            <tr>
-              <th>Group</th>
-              <th>Account Number</th>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th :class="(samples[0]?.shares.length ?? -1) > 0 ? 'center' : 'left'">
-                Shares
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="sample in samples" :key="sample.accountNumber">
-              <td>{{ sample.group }}</td>
-              <td>{{ sample.accountNumber }}</td>
-              <td>{{ sample.firstName }}</td>
-              <td>{{ sample.lastName }}</td>
-              <td v-if="sample.shares.length > 0">
-                <div v-for="(share, index) in sample.shares" :key="index" class="bit__samples__share">
-                  <div class="bit__samples__share__name">
-                    {{ share.shareType?.name ?? '#ERROR' }}
+          <button class="secondary" @click="generateSample()">
+            Refresh Samples
+          </button>
+
+          <table class="bit__samples">
+            <thead>
+              <tr>
+                <th>Group</th>
+                <th>Account Number</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th :class="(samples[0]?.shares.length ?? -1) > 0 ? 'center' : 'left'">
+                  Shares
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="sample in samples" :key="sample.accountNumber">
+                <td>{{ sample.group }}</td>
+                <td>{{ sample.accountNumber }}</td>
+                <td>{{ sample.firstName }}</td>
+                <td>{{ sample.lastName }}</td>
+                <td v-if="sample.shares.length > 0">
+                  <div v-for="(share, index) in sample.shares" :key="index" class="bit__samples__share">
+                    <div class="bit__samples__share__name">
+                      {{ share.shareType?.name ?? '#ERROR' }}
+                    </div>
+                    <div class="bit__samples__share__amount">
+                      {{ Money.fromStringOrDefault(share.initialDeposit).toString() }}
+                    </div>
                   </div>
-                  <div class="bit__samples__share__amount">
-                    {{ Money.fromStringOrDefault(share.initialDeposit).toString() }}
-                  </div>
-                </div>
-              </td>
-              <td v-else class="left">
-                <em>No shares will be created.</em>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                </td>
+                <td v-else class="left">
+                  <em>No shares will be created.</em>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </template>
+        <template v-else>
+          <loading-icon :show="isPosting" class="bit__post-loading">
+            Please wait while data is imported.  This may take a few minutes.
+            Do not close or refresh your browser until the import is complete.
+          </loading-icon>
+        </template>
       </div>
     </template>
 
     <template #buttons="{ okLabel, handleOk, cancelLabel, handleCancel }">
-      <button @click.prevent="handleCancel">
+      <button
+        :disabled="isPosting"
+        @click.prevent="handleCancel"
+      >
         {{ cancelLabel }}
       </button>
       <button
         v-if="hasPreviousStep"
+        :disabled="isPosting"
         @click.prevent="decrementStep"
       >
         Previous
       </button>
       <button
         v-if="hasNextStep"
-        :disabled="canContinue !== true"
+        :disabled="canContinue !== true || isPosting"
         @click.prevent="handleIncrement"
       >
         Next
@@ -199,7 +214,7 @@
       <button
         v-if="!hasNextStep"
         class="primary"
-        :disabled="canContinue !== true"
+        :disabled="canContinue !== true || isPosting"
         @click.prevent="handleOk"
       >
         <template v-if="!loading">
@@ -269,6 +284,9 @@ export default defineComponent({
     // An array of new Share Types to create with initial values.  Also holds promise when they are submitted.
     const shareTemplate = ref<ShareTemplate[]>([]);
 
+    // Tells the UI that we are posting and to disable a bunch of stuff so the user doesn't close it
+    const isPosting = ref(false);
+
     // True if the form is valid for the current state.  Enhances bulkImportStore with Share Type Template validation.
     const canContinue = computed(() => {
       const isValid = bulkImportStore.isValid.value;
@@ -312,10 +330,13 @@ export default defineComponent({
     async function handleOk() {
       // We're on the last step
       try {
+        isPosting.value = true;
         await bulkImportStore.post();
         emit('ok', bulkImportStore);
       } catch (e) {
         errorStore.setCurrentError(e?.message ?? e);
+      } finally {
+        isPosting.value = false;
       }
     }
 
@@ -426,6 +447,7 @@ export default defineComponent({
       canContinue,
       BulkImportStep,
       ...bulkImportStore,
+      isPosting,
     };
   },
 });
@@ -497,6 +519,11 @@ export default defineComponent({
           font-weight: bold;
         }
       }
+    }
+
+    &__post-loading {
+      margin-top: 1em;
+      font-size: 1.6em;
     }
   }
 </style>

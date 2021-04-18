@@ -39,7 +39,7 @@ export function parseCSVLine(
 
     if ((current === delimiter && !encapsulated) || line.length === (i + 1)) {
       // Last character in the line, but the encapsulation was never closed
-      if (line.length === (i + 1)) {
+      if (line.length === (i + 1) && current !== delimiter) {
         buffer += current;
       }
 
