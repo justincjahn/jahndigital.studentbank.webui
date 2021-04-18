@@ -32,12 +32,13 @@ export function setup(instanceStore: InstanceStore) {
   function setSelected(item: Group|null) { store.selected = item; }
 
   // Fetch the groups of a specific instance.
-  async function fetchGroups(instanceId: number) {
+  async function fetchGroups(instanceId: number, cache = true) {
     store.loading = true;
 
     try {
       const res = await Apollo.query<GroupResponse>({
         query: gqlGroups,
+        fetchPolicy: cache ? 'cache-first' : 'network-only',
         variables: {
           instanceId,
         },

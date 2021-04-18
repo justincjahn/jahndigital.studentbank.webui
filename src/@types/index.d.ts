@@ -17,6 +17,7 @@ interface Transaction {
 
 interface Share {
   id: number;
+  studentId: number;
   shareTypeId: number;
   balance: number;
   shareType?: ShareType;

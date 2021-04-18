@@ -79,6 +79,7 @@
         >
           <share-type-selector
             v-model="shareTemplate[index].shareType"
+            :share-type-store="shareTypeStore"
             class="nsm__shareTypeSelector"
           />
 
@@ -134,6 +135,7 @@ import Money from '@/utils/money';
 import errorStore from '@/store/error';
 import { setup as defineStudentStore } from '@/modules/admin/stores/student';
 import { setup as defineShareStore } from '@/modules/admin/stores/share';
+import { setup as defineShareTypeStore } from '@/modules/admin/stores/shareType';
 import { GroupStore } from '../stores/group';
 
 interface NewStudentForm {
@@ -175,6 +177,8 @@ export default defineComponent({
     const studentStore = defineStudentStore();
 
     const shareStore = defineShareStore(studentStore);
+
+    const shareTypeStore = defineShareTypeStore(props.groupStore.instanceStore);
 
     const loading = ref(false);
 
@@ -260,13 +264,12 @@ export default defineComponent({
         }
 
         await Promise.all(transactions);
+        emit('ok', student);
       } catch (e) {
         errorStore.setCurrentError(e?.message ?? e);
       } finally {
         loading.value = false;
       }
-
-      emit('ok');
     });
 
     // Funnel the OK button to the vee-validate submission logic
@@ -315,6 +318,7 @@ export default defineComponent({
       removeShareType,
       addShareType,
       loading,
+      shareTypeStore,
     };
   },
 });

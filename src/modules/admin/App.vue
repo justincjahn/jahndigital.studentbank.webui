@@ -95,7 +95,7 @@ export default defineComponent({
 
     const selectedInstance = computed<Instance|null>({
       get: () => instanceStore.selected.value,
-      set: (item) => instanceStore.setSelected(item),
+      set: (item) => (instanceStore.selected.value !== item) && instanceStore.setSelected(item),
     });
 
     // Force users to the login page if they aren't authenticated

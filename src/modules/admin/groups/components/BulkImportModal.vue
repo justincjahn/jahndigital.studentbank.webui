@@ -133,7 +133,7 @@
         <p>Review the tables below to ensure the data looks right.  When you are ready, hit <em>Import</em>.</p>
 
         <ul class="bit__summary">
-          <li><strong>Instance:</strong> {{ instance.description }}</li>
+          <li><strong>Instance:</strong> {{ instance?.description }}</li>
           <li><strong>Number of groups to create:</strong> {{ groups.length }}</li>
           <li><strong>Number of students to create:</strong> {{ students.length }}</li>
         </ul>
@@ -163,7 +163,7 @@
               <td v-if="sample.shares.length > 0">
                 <div v-for="(share, index) in sample.shares" :key="index" class="bit__samples__share">
                   <div class="bit__samples__share__name">
-                    {{ share.shareType.name }}
+                    {{ share.shareType?.name ?? '#ERROR' }}
                   </div>
                   <div class="bit__samples__share__amount">
                     {{ Money.fromStringOrDefault(share.initialDeposit).toString() }}
@@ -297,7 +297,7 @@ export default defineComponent({
      * Move to the next step in the workflow.  If we hit the share type template step, update the store with
      * computed share types.
      */
-    function handleIncrement() {
+    async function handleIncrement() {
       if (bulkImportStore.currentStep.value === BulkImportStep.shareTypes) {
         bulkImportStore.setShareTypeTemplate(shareTemplate.value);
         bulkImportStore.generateSample();
@@ -309,8 +309,14 @@ export default defineComponent({
     /**
      * Commit the import.
      */
-    function handleOk() {
-      emit('ok');
+    async function handleOk() {
+      // We're on the last step
+      try {
+        await bulkImportStore.post();
+        emit('ok', bulkImportStore);
+      } catch (e) {
+        errorStore.setCurrentError(e?.message ?? e);
+      }
     }
 
     /**

@@ -4,13 +4,17 @@ import { computed, reactive } from 'vue';
 
 // Utils
 import { parseCSV } from '@/utils/csv';
+import uuid4 from '@/utils/uuid4';
 import sample from '@/utils/sample';
 import Money from '@/utils/money';
 
 // API
 import Apollo from '@/services/Apollo';
 import { gql } from '@apollo/client/core';
+import gqlNewBulkTransaction from '@/modules/admin/graphql/mutations/transactionBulk.gql';
 import { setup as defineInstanceStore } from '@/modules/admin/stores/instance';
+import { setup as defineStudentStore } from '@/modules/admin/stores/student';
+import { setup as defineShareStore } from '@/modules/admin/stores/share';
 import { setup as defineGroupStore } from './group';
 
 /**
@@ -62,13 +66,6 @@ export interface StudentImport {
 }
 
 /**
- * An interface for sampling students.
- */
-export interface BulkImportSample extends StudentImport {
-  shares: ShareTemplate[];
-}
-
-/**
  * A type that helps gurantee a JS object has all of the fields of the StudentImport interface.
  */
 type StudentImportKeys = { [key in keyof Required<StudentImport>]: true };
@@ -82,6 +79,13 @@ interface StudentInfo {
   firstName: string;
   lastName: string;
   group: string;
+}
+
+/**
+ * An interface for sampling students.
+ */
+export interface BulkImportSample extends StudentInfo {
+  shares: ShareTemplate[];
 }
 
 /**
@@ -143,6 +147,11 @@ export function setup() {
 
     // Sampling
     samples: [] as BulkImportSample[],
+
+    // Posting
+    createdGroups: [] as Group[],
+    createdStudents: [] as Student[],
+    createdTransactions: [] as Transaction[],
   });
 
   /**
@@ -194,6 +203,21 @@ export function setup() {
    * A list of sample accounts from the import process.
    */
   const samples = computed(() => store.samples);
+
+  /**
+   * A list of groups created by the posting process.
+   */
+  const createdGroups = computed(() => store.createdGroups);
+
+  /**
+   * A list of students created by the posting process.
+   */
+  const createdStudents = computed(() => store.createdStudents);
+
+  /**
+   * A list of transactions resulting from the posting process.
+   */
+  const createdTransactions = computed(() => store.createdTransactions);
 
   /**
    * True if the store is valid for the current step.
@@ -260,17 +284,12 @@ export function setup() {
       throw new Error('No instance has been selected!');
     }
 
-    // Fetch instance groups
-    store.loading = true;
-
     try {
       const groupStore = defineGroupStore(defineInstanceStore());
-      await groupStore.fetchGroups(store.instance.id);
+      await groupStore.fetchGroups(store.instance.id, false);
       store.dbGroups = [...groupStore.groups.value];
     } catch (e) {
-      throw new Error(e?.message ?? e);
-    } finally {
-      store.loading = false;
+      throw new Error(`Error fetching groups: '${e?.message ?? e}'.`);
     }
   }
 
@@ -288,7 +307,13 @@ export function setup() {
     }
 
     if (store.instance !== null) {
-      await getGroups();
+      store.loading = true;
+
+      try {
+        await getGroups();
+      } finally {
+        store.loading = false;
+      }
     }
   }
 
@@ -507,6 +532,17 @@ export function setup() {
   }
 
   /**
+   * Resolves the group name to an ID number, or throws an error.
+   *
+   * @param name The group name
+   */
+  function resolveGroupId(name: string) {
+    const group = store.dbGroups.find((x) => x.name.toLowerCase() === name.trim().toLowerCase());
+    if (!group) throw new Error(`Group ID could not be found for a group named: ${name}.`);
+    return group.id;
+  }
+
+  /**
    * Select a group of students that should appear in the summary step.
    */
   function generateSample(count = 10) {
@@ -529,6 +565,177 @@ export function setup() {
     });
 
     store.samples = ret;
+  }
+
+  /**
+   * Post the import.
+   */
+  async function post() {
+    if (isValid.value !== true) throw new Error(isValid.value);
+    if (store.instance === null) throw new Error('Instance not selected.');
+
+    const instanceId = store.instance.id;
+    const instanceStore = defineInstanceStore();
+    const groupStore = defineGroupStore(instanceStore);
+    const studentStore = defineStudentStore();
+    const shareStore = defineShareStore(studentStore);
+
+    console.debug('[Bulk Import]: Starting post...');
+    store.loading = true;
+
+    // Create the new groups in batches of 5 to limit concurrent requests to the backend
+    const dbGroups = [...store.dbGroups];
+    const groupsToCreate = [...store.groupsToCreate];
+    const aCreatedGroups: Group[] = [];
+    while (groupsToCreate.length) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const res = await Promise.all(
+          groupsToCreate.splice(0, 5).map((name) => groupStore.newGroup({ instanceId, name })),
+        );
+
+        res.forEach((group) => {
+          console.debug('[Bulk Import]: Group Created.', group);
+          dbGroups.push(group);
+          aCreatedGroups.push(group);
+        });
+      } catch (e) {
+        store.loading = false;
+        throw new Error(e?.message ?? e);
+      }
+    }
+
+    console.debug('[Bulk Import]: Group creation complete.', aCreatedGroups);
+    store.dbGroups = dbGroups;
+    store.createdGroups = aCreatedGroups;
+
+    // Create the new students
+    const aCreatedStudents: Student[] = [];
+    const studentsToCreate = Object.values(store.studentsToCreate);
+    while (studentsToCreate.length) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const res = await Promise.all(
+          studentsToCreate.splice(0, 5).map((studentInfo) => {
+            const groupId = resolveGroupId(studentInfo.group);
+
+            return studentStore.newStudent({
+              groupId,
+              accountNumber: studentInfo.accountNumber,
+              firstName: studentInfo.firstName,
+              lastName: studentInfo.lastName,
+              email: studentInfo.email,
+              password: uuid4(),
+            });
+          }),
+        );
+
+        res.forEach((student) => {
+          console.debug('[Bulk Import]: Student Created.', student);
+          aCreatedStudents.push(student);
+        });
+      } catch (e) {
+        store.loading = false;
+        throw new Error(`Unable to create one or more students: ${e?.message ?? e}.`);
+      }
+    }
+
+    console.debug('[Bulk Import]: Student creation complete.', aCreatedStudents);
+
+    // Create share types for each student
+    const studentIds = aCreatedStudents.map((student) => student.id);
+    const sharesToCreate: NewShareRequest[] = [];
+    studentIds.forEach((studentId) => {
+      store.shareTypes.forEach((shareType) => {
+        if (shareType.shareType === null) throw new Error('Missing Share Type during share creation pass.');
+        const shareTypeId = shareType.shareType.id;
+        sharesToCreate.push({ studentId, shareTypeId });
+      });
+    });
+
+    const createdShares: Share[] = [];
+    while (sharesToCreate.length) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const res = await Promise.all(
+          sharesToCreate.splice(0, 5).map((newShareRequest) => shareStore.newShare(newShareRequest)),
+        );
+
+        res.forEach((share) => {
+          console.debug('[Bulk Import]: Share Created.', share);
+          createdShares.push(share);
+        });
+      } catch (e) {
+        store.loading = false;
+        throw new Error(`Unable to create one or more shares on students: ${e?.message ?? e}.`);
+      }
+    }
+
+    console.debug('[Bulk Import]: Share creation complete.', createdShares);
+
+    // Initial transactions
+    const transactionsToPost: NewTransactionRequest[] = [];
+    const transactions: Transaction[] = [];
+    store.shareTypes.forEach((shareType) => {
+      const initialDeposit = Money.fromStringOrDefault(shareType.initialDeposit).round();
+      const shareTypeId = shareType.shareType?.id ?? -1;
+      if (shareTypeId < 0) throw new Error('Missing Share Type during initial deposit pass.');
+
+      createdShares
+        .filter((share) => share.shareTypeId === shareTypeId)
+        .forEach((share) => transactionsToPost.push({
+          shareId: share.id,
+          amount: initialDeposit,
+          comment: 'Initial Deposit',
+        }));
+    });
+
+    const bulkTransactionReq: NewBulkTransactionRequest = {
+      shares: transactionsToPost,
+      skipNegative: true,
+    };
+
+    try {
+      const res = await Apollo.mutate<NewBulkTransactionResponse>({
+        mutation: gqlNewBulkTransaction,
+        variables: bulkTransactionReq,
+      });
+
+      if (res.data) {
+        transactions.push(...res.data.newBulkTransaction);
+      }
+    } catch (e) {
+      store.loading = false;
+      throw new Error(`Unable to perform transaction bulk post: ${e?.message ?? e}.`);
+    }
+
+    console.debug('[Bulk Import]: Bulk transactions complete.', transactions);
+    store.createdTransactions = transactions;
+
+    // Set the new balances of the student object
+    for (let i = 0; i < aCreatedStudents.length; i += 1) {
+      const student = aCreatedStudents[i];
+      const shares = student.shares ?? [];
+
+      createdShares.filter((x) => x.studentId === student.id).forEach((share) => {
+        const shareType = store.shareTypes.find((x) => (x.shareType?.id ?? -1) === share.shareTypeId);
+        const initialDeposit = shareType?.initialDeposit ?? '0';
+
+        shares.push({
+          ...share,
+          balance: Money.fromStringOrDefault(initialDeposit).getAmount(),
+        });
+      });
+
+      aCreatedStudents[i] = {
+        ...student,
+        shares,
+      };
+    }
+
+    console.debug('[Bulk Import]: Completed without errors.');
+    store.createdStudents = aCreatedStudents;
+    store.loading = false;
   }
 
   /**
@@ -556,6 +763,9 @@ export function setup() {
     students,
     samples,
     shareTemplates,
+    createdGroups,
+    createdStudents,
+    createdTransactions,
     isValid,
     incrementStep,
     decrementStep,
@@ -563,6 +773,7 @@ export function setup() {
     processFile,
     setShareTypeTemplate,
     generateSample,
+    post,
     reset,
   };
 }

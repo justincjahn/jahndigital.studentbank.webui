@@ -20,6 +20,7 @@ import gqlDeleteShareType from '@/modules/admin/graphql/mutations/shareTypeDelet
 type FetchOptions = {
   available?: boolean;
   first?: number;
+  cache?: boolean;
 }
 
 /**
@@ -101,7 +102,7 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
       const res = await Apollo.query<PagedShareTypeResponse>({
         query: store.query,
         variables,
-        fetchPolicy: 'network-only',
+        fetchPolicy: ((options?.cache ?? true) === false) ? 'network-only' : 'cache-first',
       });
 
       if (res.data) {

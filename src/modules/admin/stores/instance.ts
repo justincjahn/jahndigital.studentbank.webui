@@ -31,12 +31,13 @@ export function setup() {
   function setSelected(item: Instance | null) { store.selected = item; }
 
   // Fetch instances from the server
-  async function fetchInstances() {
+  async function fetchInstances(cache = true) {
     store.loading = true;
 
     try {
       const res = await Apollo.query<InstanceResponse>({
         query: gqlInstances,
+        fetchPolicy: cache ? 'cache-first' : 'network-only',
       });
 
       if (res.data) {

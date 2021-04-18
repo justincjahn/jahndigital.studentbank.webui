@@ -20,6 +20,9 @@ type FetchOptions = {
 
   // The number of students to skip for the initial fetch
   first?: number;
+
+  // If the cache should be hit for the fetch operations
+  cache?: boolean;
 }
 
 /**
@@ -107,6 +110,7 @@ export function setup() {
     try {
       const res = await Apollo.query<PagedStudentResponse>({
         query: gqlStudents,
+        fetchPolicy: (options.cache === false) ? 'network-only' : 'cache-first',
         variables: {
           groupId: options.groupId,
           first: pageCount,

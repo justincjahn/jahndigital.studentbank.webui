@@ -4,6 +4,7 @@ fragment ShareParts on Share {
   id
   shareTypeId
   balance
+  studentId
   shareType {
     ...ShareTypeParts
   }

@@ -76,7 +76,7 @@
         <new-student-modal
           :show="showNewStudentModal"
           :group-store="groupStore"
-          @ok="toggleNewStudent"
+          @ok="handleNewStudentModalOk"
           @cancel="toggleNewStudent"
         />
       </span>
@@ -85,7 +85,7 @@
         <button @click.prevent="toggleBulkImport">Bulk Import</button>
         <bulk-import-modal
           :show="showBulkImportModal"
-          @ok="toggleBulkImport"
+          @ok="handleBulkImportModalOk"
           @cancel="toggleBulkImport"
         />
       </span>
@@ -111,12 +111,13 @@ import selection from '@/services/StudentSelectionService';
 import injectStrict from '@/utils/injectStrict';
 
 // Stores
-import studentStore from '@/modules/admin/stores/student';
+import { setup as defineStudentStore } from '@/modules/admin/stores/student';
 import errorStore from '@/store/error';
 
 // Symbols
 import { SHARE_TYPE_STORE_SYMBOL } from '@/modules/admin/symbols';
 import { GROUP_STORE_SYMBOL } from '../symbols';
+import { BulkImportStore } from '../stores/bulkImport';
 
 const BulkPostModal = defineAsyncComponent(
   () => import(/* webpackChunkName: "admin-groups" */ '../components/BulkPostModal.vue'),
@@ -154,6 +155,7 @@ export default {
   setup() {
     const router = useRouter();
     const groupStore = injectStrict(GROUP_STORE_SYMBOL);
+    const studentStore = defineStudentStore();
     const shareTypeStore = injectStrict(SHARE_TYPE_STORE_SYMBOL);
     const showBulkTransactionModal = ref(false);
     const showNewStudentModal = ref(false);
@@ -198,6 +200,14 @@ export default {
     function toggleNewStudent() { showNewStudentModal.value = !showNewStudentModal.value; }
 
     /**
+     * When the user presses OK on the new student modal, refresh the stores.
+     */
+    async function handleNewStudentModalOk(student: Student) {
+      await studentStore.fetch({ groupId: student.groupId, cache: false });
+      toggleNewStudent();
+    }
+
+    /**
      * Toggle the bulk group move modal and resolve the list of students.
      */
     async function toggleBulkGroup() {
@@ -236,6 +246,25 @@ export default {
      */
     function toggleBulkImport() { showBulkImportModal.value = !showBulkImportModal.value; }
 
+    /**
+     * Reset the stores and close the modal.
+     */
+    async function handleBulkImportModalOk(bulkImportStore: BulkImportStore) {
+      const { instanceStore } = groupStore;
+
+      // Force an instance refresh and set the selected instance
+      await instanceStore.fetchInstances(false);
+      instanceStore.setSelected(bulkImportStore.instance.value);
+
+      // Force a group refresh and select the first group
+      await groupStore.fetchGroups(instanceStore.selected.value?.id ?? -1, false);
+      const firstGroup = groupStore.groups.value[0];
+      if (firstGroup) groupStore.setSelected(firstGroup);
+
+      // Close the modal
+      toggleBulkImport();
+    }
+
     return {
       selection,
       hasSelection,
@@ -243,10 +272,12 @@ export default {
       toggleBulkTransaction,
       showNewStudentModal,
       toggleNewStudent,
+      handleNewStudentModalOk,
       showBulkGroupModal,
       toggleBulkGroup,
       handleBulkGroupModalOk,
       toggleBulkImport,
+      handleBulkImportModalOk,
       showBulkImportModal,
       selectedInstance: groupStore.instanceStore.selected,
       groupStore,
