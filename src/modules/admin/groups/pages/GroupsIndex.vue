@@ -102,7 +102,6 @@
 
 <script lang="ts">
 import { ref, computed, defineAsyncComponent } from 'vue';
-import { useRouter } from 'vue-router';
 
 // Services
 import selection from '@/services/StudentSelectionService';
@@ -153,7 +152,6 @@ export default {
     BulkImportModal,
   },
   setup() {
-    const router = useRouter();
     const groupStore = injectStrict(GROUP_STORE_SYMBOL);
     const studentStore = defineStudentStore();
     const shareTypeStore = injectStrict(SHARE_TYPE_STORE_SYMBOL);
@@ -178,16 +176,7 @@ export default {
     /**
      * Set the selected group and update the route when the user selects a group.
      */
-    function handleGroupSelection(item: Group|null) {
-      groupStore.setSelected(item);
-
-      router.replace({
-        name: 'Groups',
-        params: {
-          groupId: item?.id ?? -1,
-        },
-      });
-    }
+    function handleGroupSelection(item: Group|null) { groupStore.setSelected(item); }
 
     /**
      * Toggle the bulk transaction modal.
@@ -229,16 +218,19 @@ export default {
     /**
      * When the user presses OK on the bulk group modal, call the API to do the move.
      */
-    function handleBulkGroupModalOk(movedGroup: Group) {
+    async function handleBulkGroupModalOk(movedGroup: Group) {
+      selectedStudentsResolving.value = true;
+
       try {
-        studentStore.bulkMove(movedGroup, selectedStudents.value);
+        await studentStore.bulkMove(movedGroup, selectedStudents.value);
+        showBulkGroupModal.value = false;
+        handleGroupSelection(movedGroup);
+        selection.clear();
       } catch (e) {
         errorStore.setCurrentError(e?.message ?? e);
+      } finally {
+        selectedStudentsResolving.value = false;
       }
-
-      showBulkGroupModal.value = false;
-      handleGroupSelection(movedGroup);
-      selection.clear();
     }
 
     /**

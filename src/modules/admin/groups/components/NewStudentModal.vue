@@ -1,11 +1,14 @@
 <template>
   <modal
-    :show="show"
     cancel-label="Cancel"
     ok-label="Create"
     title="New Student"
     class="nsm large"
+    :show="show"
     :can-submit="canSubmit"
+    :can-cancel="!loading"
+    :handle-enter="canSubmit"
+    :handle-escape="!loading"
     @ok="handleOk"
     @cancel="handleCancel"
   >
@@ -25,27 +28,16 @@
             {{ errors.accountNumber }}
           </p>
         </div>
-        <div class="nsm__fieldset">
-          <label :for="`nsm__fieldset--email--${id}`">Email<span class="required">*</span></label>
-          <Field
-            :id="`nsm__fieldset--email--${id}`"
-            name="email"
-            type="text"
-          />
-          <p
-            v-if="errors.email"
-            class="error"
-          >
-            {{ errors.email }}
-          </p>
-        </div>
+
         <div class="nsm__fieldset">
           <label :for="`nsm__fieldset--firstName--${id}`">First Name<span class="required">*</span></label>
+
           <Field
             :id="`nsm__fieldset--firstName--${id}`"
             name="firstName"
             type="text"
           />
+
           <p
             v-if="errors.firstName"
             class="error"
@@ -53,13 +45,16 @@
             {{ errors.firstName }}
           </p>
         </div>
+
         <div class="nsm__fieldset">
           <label :for="`nsm__fieldset--lastName--${id}`">Last Name<span class="required">*</span></label>
+
           <Field
             :id="`nsm__fieldset--lastName--${id}`"
             name="lastName"
             type="text"
           />
+
           <p
             v-if="errors.lastName"
             class="error"
@@ -67,11 +62,29 @@
             {{ errors.lastName }}
           </p>
         </div>
+
+        <div class="nsm__fieldset">
+          <label :for="`nsm__fieldset--email--${id}`">Email</label>
+
+          <Field
+            :id="`nsm__fieldset--email--${id}`"
+            name="email"
+            type="text"
+          />
+
+          <p
+            v-if="errors.email"
+            class="error"
+          >
+            {{ errors.email }}
+          </p>
+        </div>
       </form>
 
       <div class="nsm__shares">
         <h2>Share Types</h2>
         <p>Specify the share types you want to open for this student.</p>
+
         <div
           v-for="(share, index) in shareTemplate"
           :key="index"
@@ -83,15 +96,11 @@
             class="nsm__shareTypeSelector"
           />
 
-          <Field
-            :id="`nsm__shares__initialDeposit__${index}`"
+          <currency-input
             v-model="shareTemplate[index].initialDeposit"
-            :name="`initialDeposit[${index}]`"
-            type="text"
-            :rules="validateAmount"
+            v-model:error="shareTemplate[index].error"
+            :allow-negative="false"
           />
-
-          <ErrorMessage :name="`initialDeposit[${index}]`" />
 
           <button
             type="button"
@@ -99,6 +108,10 @@
           >
             Remove
           </button>
+
+          <span v-if="shareTemplate[index].error" class="error">
+            {{ shareTemplate[index].error }}
+          </span>
         </div>
         <button
           type="button"
@@ -117,17 +130,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watchEffect, computed, PropType } from 'vue';
+import { defineComponent, ref, reactive, watchEffect, computed, PropType, toRef } from 'vue';
 
 // Components
 import LoadingIcon from '@/components/LoadingIcon.vue';
 import ShareTypeSelector from '@/modules/admin/components/ShareTypeSelector.vue';
+import CurrencyInput from '@/components/CurrencyInput.vue';
 import Modal from '@/components/Modal.vue';
 
 // Utils
 import uuid4 from '@/utils/uuid4';
-import { Field, ErrorMessage, useForm } from 'vee-validate';
-import { validateAccountUnique, validateEmail, validateName } from '@/utils/validators';
+import { Field, useForm } from 'vee-validate';
+import { validateAccountUnique, validateEmailOptional, validateName, validateAmountNotNegative } from '@/utils/validators';
 import generatePassword from '@/utils/generatePassword';
 import Money from '@/utils/money';
 
@@ -149,15 +163,16 @@ interface NewStudentForm {
 interface ShareTemplate {
   shareType: ShareType|null;
   initialDeposit: string;
+  error: string;
 }
 
 export default defineComponent({
   components: {
     Modal,
     Field,
-    ErrorMessage,
     ShareTypeSelector,
     LoadingIcon,
+    CurrencyInput,
   },
   props: {
     show: {
@@ -174,27 +189,25 @@ export default defineComponent({
     'cancel',
   ],
   setup(props, { emit }) {
-    const studentStore = defineStudentStore();
-
-    const shareStore = defineShareStore(studentStore);
-
+    // Used to manage Share Types
     const shareTypeStore = defineShareTypeStore(props.groupStore.instanceStore);
 
+    // Used to create new students
+    const studentStore = defineStudentStore();
+
+    // Used to create new shares on the student
+    const shareStore = defineShareStore(studentStore);
+
+    // True when the modal is posting to the API
     const loading = ref(false);
 
     // Pass in the instanceStore so the validator can check for existing students
     const validateAccount = validateAccountUnique({ instanceStore: props.groupStore.instanceStore });
 
-    // Ensure the dollar amount for the initial deposit is valid.
-    function validateAmount(value: string): string|boolean {
-      const num = +value;
-      if (Number.isNaN(num)) return 'Amount must be a number.';
-      if (num < 0) return 'Amount cannot be negative for initial deposits.';
-      return true;
-    }
-
     // An array of new Share Types to create with initial values.  Also holds promise when they are submitted.
-    const shareTemplate = ref<ShareTemplate[]>([]);
+    const shareTemplates = reactive({
+      templates: [] as ShareTemplate[],
+    });
 
     // A unique ID for the form
     const id = uuid4();
@@ -203,13 +216,26 @@ export default defineComponent({
     const { resetForm, handleSubmit, errors, meta } = useForm<NewStudentForm>({
       validationSchema: {
         accountNumber: validateAccount,
-        email: validateEmail,
+        email: validateEmailOptional,
         firstName: validateName,
         lastName: validateName,
       },
     });
 
-    const canSubmit = computed(() => meta.value.valid && !loading.value);
+    // True if there are no errors in the ShareTemplate array and all share types are selected
+    const shareTemplateValid = computed(() => {
+      let i = 0;
+
+      shareTemplates.templates.forEach((x) => {
+        if (x.error !== '') i += 1;
+        if (x.shareType === null) i += 1;
+      });
+
+      return i === 0;
+    });
+
+    // True if the modal can be submitted
+    const canSubmit = computed(() => meta.value.valid && !loading.value && shareTemplateValid.value);
 
     // Create the new student and emit the OK event
     const onSubmit = handleSubmit(async (values) => {
@@ -229,8 +255,8 @@ export default defineComponent({
         const student = await studentStore.newStudent(newValues);
 
         const sharePromises: Promise<Share>[] = [];
-        for (let i = 0; i < shareTemplate.value.length; i += 1) {
-          const tpl = shareTemplate.value[i];
+        for (let i = 0; i < shareTemplates.templates.length; i += 1) {
+          const tpl = shareTemplates.templates[i];
           if (tpl === null || tpl.shareType === null) return;
 
           sharePromises.push(
@@ -247,7 +273,7 @@ export default defineComponent({
         // Loop through and post transactions, even 0 dollar transactions so there's an initial deposit.
         const transactions: Promise<void>[] = [];
         for (let i = 0; i < shares.length; i += 1) {
-          const tpl = shareTemplate.value[i];
+          const tpl = shareTemplates.templates[i];
           const share = shares[i];
 
           if (!tpl.initialDeposit || Number.isNaN(+tpl.initialDeposit)) {
@@ -280,28 +306,22 @@ export default defineComponent({
 
     // Add a new element to the shareTemplate array, triggering a share type selector
     function addShareType() {
-      shareTemplate.value = [
-        ...shareTemplate.value,
-
-        {
-          shareType: null,
-          initialDeposit: '0.00',
-        },
-      ];
+      shareTemplates.templates.push({
+        shareType: null,
+        initialDeposit: '0.00',
+        error: '',
+      });
     }
 
     // Remove the provided index from the array
     function removeShareType(index: number) {
-      shareTemplate.value = [
-        ...shareTemplate.value.slice(0, index),
-        ...shareTemplate.value.slice(index + 1),
-      ];
+      shareTemplates.templates.splice(index, 1);
     }
 
     // Reset the form when the modal closes
     watchEffect(() => {
       if (props.show === false) {
-        shareTemplate.value = [];
+        shareTemplates.templates = [];
         resetForm();
       }
     });
@@ -313,8 +333,8 @@ export default defineComponent({
       handleOk,
       handleCancel,
       canSubmit,
-      shareTemplate,
-      validateAmount,
+      shareTemplate: toRef(shareTemplates, 'templates'),
+      validateAmount: validateAmountNotNegative,
       removeShareType,
       addShareType,
       loading,

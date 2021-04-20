@@ -110,32 +110,6 @@
   }
 
   & tbody tr {
-    @if $selectable {
-      cursor: pointer;
-
-      &.selected {
-        $bgcolor: colorStep(accent1, $step: 6, $darken: false);
-        background-color: $bgcolor;
-
-        color: chooseColor(
-          $bgcolor,
-          map.get($theme, accent1, font-color),
-          map.get($theme, accent1, font-color-alt)
-        );
-
-        &:hover {
-          $bgcolor: colorStep(accent1, $step: 4, $darken: false);
-          background-color: $bgcolor;
-
-          color: chooseColor(
-            $bgcolor,
-            map.get($theme, accent1, font-color),
-            map.get($theme, accent1, font-color-alt)
-          );
-        }
-      }
-    }
-
     td {
       padding: 0.5em 0.25em;
       @if $selectable { user-select: none; }
@@ -161,6 +135,30 @@
     }
 
     @if $selectable {
+      cursor: pointer;
+
+      &.selected {
+        $bgcolor: colorStep(accent1, $step: 6, $darken: false);
+        background-color: $bgcolor;
+
+        color: chooseColor(
+          $bgcolor,
+          map.get($theme, accent1, font-color),
+          map.get($theme, accent1, font-color-alt)
+        );
+
+        &:hover {
+          $bgcolor: colorStep(accent1, $step: 4, $darken: false);
+          background-color: $bgcolor;
+
+          color: chooseColor(
+            $bgcolor,
+            map.get($theme, accent1, font-color),
+            map.get($theme, accent1, font-color-alt)
+          );
+        }
+      }
+
       &:hover {
         $bgcolor: colorStep(secondary, $step: 3, $darken: true);
         background-color: $bgcolor;

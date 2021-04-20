@@ -355,7 +355,6 @@ export function setup() {
           }
         }
 
-        await Apollo.clearStore();
         return res.data.updateStudent;
       }
 
@@ -381,7 +380,13 @@ export function setup() {
           students: s.map((x) => ({ id: x.id, groupId: g.id })),
         },
         update(cache) {
-          cache.evict({ fieldName: 'students' });
+          cache.evict({
+            id: 'ROOT_QUERY',
+            fieldName: 'students',
+            broadcast: false,
+          });
+
+          cache.gc();
         },
       });
 
@@ -404,6 +409,11 @@ export function setup() {
       const res = await Apollo.mutate<DeleteStudentResponse>({
         mutation: gqlDeleteStudent,
         variables: { id: student.id },
+        update(cache) {
+          cache.evict({
+            id: cache.identify({ ...student }),
+          });
+        },
       });
 
       if (res.data && res.data.deleteStudent === true) {

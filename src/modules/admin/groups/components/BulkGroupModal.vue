@@ -5,6 +5,8 @@
     :show="show"
     :can-submit="canSubmit"
     :ok-label="okLabel"
+    :handle-enter="!loading"
+    :handle-escape="!loading"
     @ok="handleOk"
     @cancel="handleCancel"
   >
@@ -87,6 +89,7 @@ export default defineComponent({
      * Emit an event to close the modal.
      */
     function handleCancel() {
+      if (props.loading) return;
       emit('cancel');
     }
 

@@ -104,25 +104,6 @@ export default defineComponent({
     const prevInstance = ref<Instance|null>(null);
     const clicks = ref(0);
 
-    // When the group changes, fetch students for the new group
-    watchEffect(() => {
-      if (props.groupStore.selected.value !== null) {
-        props.studentStore.fetch({ groupId: props.groupStore.selected.value.id });
-      } else {
-        props.studentStore.clear();
-      }
-    });
-
-    // When the instance changes, clear the selection
-    watchEffect(() => {
-      if (props.groupStore.instanceStore.selected.value !== null) {
-        if (props.groupStore.instanceStore.selected.value.id !== prevInstance.value?.id ?? true) {
-          prevInstance.value = props.groupStore.instanceStore.selected.value;
-          selection.clear();
-        }
-      }
-    });
-
     /**
      * Single or double-click on a student.
      */
@@ -147,6 +128,25 @@ export default defineComponent({
         });
       }
     }
+
+    // When the group changes, fetch students for the new group
+    watchEffect(() => {
+      if (props.groupStore.selected.value !== null) {
+        props.studentStore.fetch({ groupId: props.groupStore.selected.value.id });
+      } else {
+        props.studentStore.clear();
+      }
+    });
+
+    // When the instance changes, clear the selection
+    watchEffect(() => {
+      if (props.groupStore.instanceStore.selected.value !== null) {
+        if (props.groupStore.instanceStore.selected.value.id !== prevInstance.value?.id ?? true) {
+          prevInstance.value = props.groupStore.instanceStore.selected.value;
+          selection.clear();
+        }
+      }
+    });
 
     return {
       selectedGroup: props.groupStore.selected,

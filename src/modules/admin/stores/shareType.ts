@@ -36,7 +36,6 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
     pageCount: FETCH_OPTIONS.DEFAULT_COUNT,
     cursorStack: [] as string[],
     shareTypes: [] as ShareType[],
-    selected: null as ShareType|null,
   });
 
   // GETs the loading state of the fetch operation
@@ -44,9 +43,6 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
 
   // GETs the total number of shares
   const totalCount = computed(() => store.totalCount);
-
-  // GETs the selected share
-  const selected = computed(() => store.selected);
 
   // GETs the PageInfo property
   const pageInfo = computed(() => store.pageInfo);
@@ -66,10 +62,11 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
     return 0;
   });
 
-  // SETs the selected share
-  function setSelected(item: ShareType|null) { store.selected = item; }
-
-  // Update the store with the response from the server
+  /**
+   * Update the store with the response from the server.
+   *
+   * @param res
+   */
   function set(res: PagedShareTypeResponse) {
     if (res.shareTypes) {
       store.shareTypes = res.shareTypes.nodes;
@@ -82,7 +79,11 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
     }
   }
 
-  // Fetch the initial list of shareTypes
+  /**
+   * Fetch the initial list of shareTypes.
+   *
+   * @param options
+   */
   async function fetch(options?: FetchOptions) {
     const pageCount = options?.first ?? currentFetchCount.value;
     store.loading = true;
@@ -117,7 +118,9 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
     }
   }
 
-  // Fetch the next page of shareTypes
+  /**
+   * Fetch the next page of shareTypes.
+   */
   async function fetchNext() {
     store.loading = true;
     const endCursor = store.pageInfo?.endCursor ?? '';
@@ -146,7 +149,9 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
     }
   }
 
-  // Fetch the previous page of shareTypes
+  /**
+   * Fetch the previous page of shareTypes.
+   */
   async function fetchPrevious() {
     store.loading = true;
 
@@ -176,7 +181,11 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
     }
   }
 
-  // Create a new share type
+  /**
+   * Create a new share type.
+   *
+   * @param input
+   */
   async function newShareType(input: NewShareTypeRequest) {
     try {
       const res = await Apollo.mutate<NewShareTypeResponse>({
@@ -204,7 +213,11 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
     }
   }
 
-  // Update a share type
+  /**
+   * Update a share type.
+   *
+   * @param input
+   */
   async function updateShareType(input: UpdateShareTypeRequest) {
     try {
       const res = await Apollo.mutate<UpdateShareTypeResponse>({
@@ -227,7 +240,11 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
     }
   }
 
-  // Link a share type to an instance
+  /**
+   * Link a share type to an instance.
+   *
+   * @param input
+   */
   async function linkShareType(input: LinkUnlinkShareTypeRequest) {
     try {
       const res = await Apollo.mutate<LinkShareTypeResponse>({
@@ -253,7 +270,11 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
     }
   }
 
-  // Unlink a share type from an instance
+  /**
+   * Unlink a share type from an instance.
+   *
+   * @param input
+   */
   async function unlinkShareType(input: LinkUnlinkShareTypeRequest) {
     try {
       const res = await Apollo.mutate<UnlinkShareTypeResponse>({
@@ -279,7 +300,11 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
     }
   }
 
-  // Delete a share type
+  /**
+   * Delete a share type.
+   *
+   * @param shareType
+   */
   async function deleteShareType(shareType: ShareType) {
     try {
       const res = await Apollo.mutate<DeleteShareTypeResponse>({
@@ -314,11 +339,9 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
     instanceStore,
     loading,
     totalCount,
-    selected,
     pageInfo,
     shareTypes,
     totalTransactionPages,
-    setSelected,
     fetch,
     fetchNext,
     fetchPrevious,

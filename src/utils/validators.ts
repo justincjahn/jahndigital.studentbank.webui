@@ -89,6 +89,16 @@ export function validateEmail(value: string): string|boolean {
 }
 
 /**
+ * Validate an email address if it's specified, otherwise return true.
+ *
+ * @param value
+ */
+export function validateEmailOptional(value: string): string | boolean {
+  if (typeof value === 'undefined' || value.length === 0) return true;
+  return validateEmail(value);
+}
+
+/**
  * Ensure the names are valid.
  */
 export function validateName(value: string): string|boolean {
