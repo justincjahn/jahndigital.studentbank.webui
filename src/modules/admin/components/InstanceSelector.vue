@@ -1,9 +1,11 @@
 <template>
   <base-select
+    prompt="Select an instance..."
+    class="instance-selector"
+    v-bind="$attrs"
     :options="options"
     :value="value"
     :model-value="modelValue"
-    prompt="Select an instance..."
     @update:modelValue="update"
   >
     <template #selected="{ option, prompt }">
@@ -14,11 +16,11 @@
         {{ option?.description ?? prompt }}
       </template>
     </template>
-    <template #list="{ options, className, select }">
+    <template #list="{ options, className, select, selected }">
       <li
         v-for="option in options"
         :key="option.id"
-        :class="className"
+        :class="[className, selected(option)]"
         @click="select(option)"
       >
         <template v-if="option?.isActive ?? false">
@@ -58,7 +60,7 @@
     </template>
   </base-select>
 
-  <Modal
+  <modal
     :title="modalTitle"
     :class="modalClass"
     :show="showModal"
@@ -84,7 +86,7 @@
         />
       </div>
     </template>
-  </Modal>
+  </modal>
 </template>
 
 <script lang="ts">

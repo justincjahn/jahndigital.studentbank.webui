@@ -489,6 +489,10 @@ export default defineComponent({
       }
     }
 
+    &__shareTypeSelector {
+      margin-right: 0.25em;
+    }
+
     &__summary {
       margin: 1em 0;
 

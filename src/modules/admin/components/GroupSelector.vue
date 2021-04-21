@@ -1,16 +1,18 @@
 <template>
   <base-select
     prompt="Select a group..."
+    class="group-selector"
+    v-bind="$attrs"
     :options="options"
     :value="value"
     :model-value="modelValue"
     @update:modelValue="update"
   >
-    <template #list="{ options, className, select }">
+    <template #list="{ options, className, select, selected }">
       <li
         v-for="option in options"
         :key="option.id"
-        :class="className"
+        :class="[className, selected(option)]"
         @click="select(option)"
       >
         {{ option.name }}
@@ -30,7 +32,7 @@
     </template>
   </base-select>
 
-  <Modal
+  <modal
     cancel-label="Cancel"
     :title="modalTitle"
     :class="modalClass"
@@ -52,7 +54,7 @@
         />
       </div>
     </template>
-  </Modal>
+  </modal>
 </template>
 
 <script lang="ts">

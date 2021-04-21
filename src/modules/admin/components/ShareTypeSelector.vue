@@ -1,17 +1,18 @@
 <template>
   <base-select
+    prompt="Select a share type..."
+    class="share-type-selector"
+    v-bind="$attrs"
     :options="options"
     :value="value"
     :model-value="modelValue"
-    prompt="Choose a share type..."
-    v-bind="$attrs"
     @update:modelValue="update"
   >
-    <template #list="{ options, className, select }">
+    <template #list="{ options, className, select, selected }">
       <li
         v-for="option in options"
         :key="option.id"
-        :class="className"
+        :class="[className, selected(option)]"
         @click="select(option)"
       >
         {{ option.name }}

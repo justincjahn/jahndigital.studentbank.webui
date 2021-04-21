@@ -4,6 +4,7 @@
       ref="root"
       class="select__selected"
       :class="{ 'select__selected--open': open }"
+      :style="styles"
       @click="toggle"
     >
       <slot name="selected" :option="modelValue" :prompt="prompt">
@@ -14,17 +15,20 @@
       v-if="options.length > 0 || true"
       class="select__items"
       :class="{ 'select__items--hidden': !open }"
+      :style="styles"
     >
       <slot
         name="list"
         :options="options"
         :className="'select__items__item'"
+        :selected="selected"
         :select="select"
       >
         <li
           v-for="option in options"
           :key="key(option)"
           class="select__items__item"
+          :class="selected(option)"
           @click="select(option)"
         >
           <slot name="option" :option="option">
@@ -37,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUnmounted, ref, PropType } from 'vue';
+import { defineComponent, onMounted, onUnmounted, ref, computed, PropType } from 'vue';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Item = Record<string, any>|number|string|null;
@@ -57,6 +61,7 @@ export type Search = <T extends Item>(obj: T) => string;
  *     - options: The list of items to render.
  *     - className: The class that should be applied to each list item.
  *     - select: The function to call when an item is selected.  Add it to each list items @click event.
+ *     - selected: Should be called in the class prop for each option.  Outputs the className for the currently selected option.
  *   + option: The contents of each list item.  Can be used to customize the display of each list item.
  *     - option: The object/number/string being rendered.
  */
@@ -88,19 +93,33 @@ export default defineComponent({
       required: false,
       default: 'Choose an item...',
     },
+    width: {
+      type: String,
+      required: false,
+      default: '10rem',
+    },
   },
   emits: [
     'update:modelValue',
   ],
-  setup(_, { emit }) {
+  setup(props, { emit }) {
+    // True if the select box is open
     const open = ref(false);
+
+    // Stored reference to the root element
     const root = ref<HTMLButtonElement|null>(null);
+
+    // Used to specify the width of the selection box and drop down.
+    const styles = computed(() => ({ width: props.width }));
 
     // Open and close the select when the user clicks on/off the button.
     function toggle(e: Event) { open.value = !(e.target !== root.value); }
 
     // Update the v-model when a new item is selected
     function select(item: Item) { emit('update:modelValue', item); }
+
+    // Determines if the provided item is currently selected
+    function selected(item: Item) { return props.key(props.modelValue) === props.key(item) ? 'selected' : ''; }
 
     // Register/unregister a global click event that toggles the selector
     onMounted(() => { document.addEventListener('click', toggle); });
@@ -111,6 +130,8 @@ export default defineComponent({
       open,
       toggle,
       select,
+      styles,
+      selected,
     };
   },
 });
@@ -130,12 +151,12 @@ export default defineComponent({
 }
 
 .select {
+  $fontColor: map.get($theme, button-secondary, font-color);
+
   position: relative;
   display: inline-block;
 
   &__selected {
-    position: relative;
-    min-width: 10rem;
     text-align: left;
     vertical-align: middle;
     margin: 0;
@@ -143,8 +164,18 @@ export default defineComponent({
     outline: 0;
     border: 1px solid colorStep(button-secondary, $step: 2);
     border-radius: 0.25rem;
-    color: map.get($theme, button-secondary, font-color);
+    color: $fontColor;
     background-color: map.get($theme, button-secondary, color);
+    user-select: none;
+
+    /* Bugfix: drop-down & modals. */
+      // min-width: 10rem;
+      line-height: 1.25em;
+      // width: 10rem;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    /* End Bugfix */
 
     &:after {
       position: absolute;
@@ -164,16 +195,24 @@ export default defineComponent({
 
   &__items {
     display: none;
-    position: absolute;
     z-index: 999;
     list-style: none;
     margin: 0;
-    width: 100%;
     max-height: clamp(150px, 30vh, 350px);
     overflow-y: auto;
+    user-select: none;
 
     background-color: map.get($theme, button-secondary, color);
     border: 1px solid colorStep(button-secondary, $step: 2);
+    border-radius: 0 0 0.25rem 0.25rem;
+
+    /* Bugfix: drop-down & modals. */
+      // position: absolute;
+      // width: 100%;
+      // min-width: 10rem;
+      position: fixed;
+      // width: 10rem;
+    /* End Bugfix */
 
     &__divider {
       height: auto;
@@ -191,6 +230,16 @@ export default defineComponent({
 
       &:hover {
         background-color: colorStep(button-secondary);
+      }
+
+      &.selected {
+        // color: colorStep(button-secondary, $step: 8, $darken: false, $colorMap: font-color);
+        color: rgba($fontColor, .3);
+        cursor: auto;
+
+        &:hover {
+          background-color: inherit;
+        }
       }
     }
   }

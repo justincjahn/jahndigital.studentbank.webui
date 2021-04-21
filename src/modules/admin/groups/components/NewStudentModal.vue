@@ -355,5 +355,9 @@ export default defineComponent({
   &__shares {
     margin: 0.5em;
   }
+
+  &__shareTypeSelector {
+    margin-right: 0.25em;
+  }
 }
 </style>
