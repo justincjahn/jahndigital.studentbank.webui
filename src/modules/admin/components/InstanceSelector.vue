@@ -90,7 +90,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType, ref, watchEffect } from 'vue';
+import { computed, defineComponent, PropType, ref } from 'vue';
 
 // Components
 import BaseSelect, { Search } from '@/components/BaseSelect.vue';
@@ -99,7 +99,6 @@ import Modal from '@/components/Modal.vue';
 // Stores
 import errorStore from '@/store/error';
 import { InstanceStore } from '@/modules/admin/stores/instance';
-import userStore from '@/store/user';
 
 // Utils
 import uuid4 from '@/utils/uuid4';
@@ -284,13 +283,6 @@ export default defineComponent({
       input.value = '';
       toggle();
     }
-
-    // Fetch instances if there are none, or the user just authenticated
-    watchEffect(() => {
-      if (userStore.isAuthenticated.value || props.instanceStore.instances.value.length === 0) {
-        props.instanceStore.fetchInstances();
-      }
-    });
 
     return {
       ModalState,

@@ -105,6 +105,13 @@ export default defineComponent({
       }
     });
 
+    // Watch for when the user authenticates and fetch instances if there are none
+    watchEffect(() => {
+      if (userStore.isAuthenticated.value && !instanceStore.selected.value) {
+        instanceStore.fetchInstances();
+      }
+    });
+
     return {
       groupsIndex: GroupRouteNames.index,
       studentsIndex: StudentRouteNames.index,

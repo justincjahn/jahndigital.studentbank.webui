@@ -387,13 +387,14 @@ export default defineComponent({
       bulkPostStore.setSelectedShareType(item);
     }
 
-    // Fetch the selected students when the modal is shown.
+    // Fetch the selected students and refresh share types when the modal is shown.
     watchEffect(() => {
       if (props.show) {
         bulkPostStore.reset();
         amountValue.value = '0.00';
         commentValue.value = '';
         bulkPostStore.fetchSelection();
+        props.shareTypeStore.fetch();
       }
     });
 

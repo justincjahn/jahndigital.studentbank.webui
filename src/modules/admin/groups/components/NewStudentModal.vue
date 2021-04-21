@@ -318,10 +318,11 @@ export default defineComponent({
       shareTemplates.templates.splice(index, 1);
     }
 
-    // Reset the form when the modal closes
+    // Reset the form when the modal opens and fetch share types
     watchEffect(() => {
-      if (props.show === false) {
+      if (props.show) {
         shareTemplates.templates = [];
+        shareTypeStore.fetch();
         resetForm();
       }
     });

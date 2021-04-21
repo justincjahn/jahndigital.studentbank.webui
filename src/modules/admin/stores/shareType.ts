@@ -25,6 +25,13 @@ type FetchOptions = {
 
 /**
  * Stores information about share types in the system.
+ *
+ * When the provided InstanceStore's currently selected Instance changes, the store will
+ * automatically fetch Share Types for the new instance if it changes and fetch wasn't already
+ * called with {FetchOptions.available}.
+ *
+ * @param {InstanceStore} instanceStore The InstanceStore to watch.
+ * @param {boolean} immediate If the store should immediatley try to fetch share types instead of waiting for change.
  */
 export function setup(instanceStore: InstanceStore, immediate = true) {
   const store = reactive({
@@ -82,7 +89,7 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
   /**
    * Fetch the initial list of shareTypes.
    *
-   * @param options
+   * @param {FetchOptions=} options
    */
   async function fetch(options?: FetchOptions) {
     const pageCount = options?.first ?? currentFetchCount.value;
@@ -184,7 +191,7 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
   /**
    * Create a new share type.
    *
-   * @param input
+   * @param {NewShareTypeRequest} input
    */
   async function newShareType(input: NewShareTypeRequest) {
     try {
@@ -216,7 +223,7 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
   /**
    * Update a share type.
    *
-   * @param input
+   * @param {UpdateShareTypeRequest} input
    */
   async function updateShareType(input: UpdateShareTypeRequest) {
     try {
@@ -243,13 +250,21 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
   /**
    * Link a share type to an instance.
    *
-   * @param input
+   * @param {LinkUnlinkShareTypeRequest} input
    */
   async function linkShareType(input: LinkUnlinkShareTypeRequest) {
     try {
       const res = await Apollo.mutate<LinkShareTypeResponse>({
         mutation: gqlLinkShareType,
         variables: input,
+        update(cache) {
+          cache.evict({
+            id: 'ROOT_QUERY',
+            fieldName: 'shareTypes',
+          });
+
+          cache.gc();
+        },
       });
 
       if (res.data) {
@@ -273,13 +288,22 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
   /**
    * Unlink a share type from an instance.
    *
-   * @param input
+   * @param {LinkUnlinkShareTypeRequest} input
    */
   async function unlinkShareType(input: LinkUnlinkShareTypeRequest) {
     try {
       const res = await Apollo.mutate<UnlinkShareTypeResponse>({
         mutation: gqlUnlinkShareType,
         variables: input,
+        update(cache) {
+          cache.evict({
+            id: 'ROOT_QUERY',
+            fieldName: 'shareTypes',
+            broadcast: false,
+          });
+
+          cache.gc();
+        },
       });
 
       if (res.data) {
@@ -303,13 +327,18 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
   /**
    * Delete a share type.
    *
-   * @param shareType
+   * @param {ShareType} shareType
    */
   async function deleteShareType(shareType: ShareType) {
     try {
       const res = await Apollo.mutate<DeleteShareTypeResponse>({
         mutation: gqlDeleteShareType,
         variables: { id: shareType.id },
+        update(cache) {
+          cache.evict({
+            id: cache.identify({ ...shareType }),
+          });
+        },
       });
 
       if (res.data && res.data.deleteShareType === true) {
@@ -326,11 +355,12 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
   }
 
   // If we're fetching by instance, re-fetch when it changes
-  watch(() => instanceStore.selected.value, () => {
+  watch(() => instanceStore.selected.value, (newValue, oldValue) => {
     if (!store.byInstance) return;
-    if (instanceStore.selected.value === null) {
+
+    if (!newValue) {
       store.shareTypes = [];
-    } else {
+    } else if (newValue.id !== (oldValue?.id ?? -1)) {
       fetch();
     }
   }, { immediate });

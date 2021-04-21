@@ -3,6 +3,7 @@ import gqlSearchAccounts from '@/modules/admin/graphql/queries/studentsByAccount
 import { StudentStore } from '@/modules/admin/stores/student';
 import { InstanceStore } from '@/modules/admin/stores/instance';
 import Money from './money';
+import Rate from './rate';
 
 /**
  * Ensure the account number is less than 10 digits, and only digits.
@@ -170,5 +171,20 @@ export function validateAmountNonzero(value: string): string | boolean {
  */
 export function validateTransactionComment(value: string): string | boolean {
   if (value && value.length > 255) return 'Comment can only be 255 characters.';
+  return true;
+}
+
+/**
+ * Ensures that the rate is valid
+ */
+export function validateRate(val: string): string|boolean {
+  if (!val || !val.trim()) return 'Rate is required.';
+
+  try {
+    Rate.fromString(`${val}%`);
+  } catch (e) {
+    return e.message;
+  }
+
   return true;
 }

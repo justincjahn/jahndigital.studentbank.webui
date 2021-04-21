@@ -28,10 +28,19 @@ export function setup(instanceStore: InstanceStore) {
   // GETs the loading state of the fetch operation
   const loading = computed(() => store.loading);
 
-  // SETs the selected group
+  /**
+   * SETs the selected group
+   *
+   * @param item
+   */
   function setSelected(item: Group|null) { store.selected = item; }
 
-  // Fetch the groups of a specific instance.
+  /**
+   * Fetch the groups of a specific instance.
+   *
+   * @param instanceId
+   * @param cache
+   */
   async function fetchGroups(instanceId: number, cache = true) {
     store.loading = true;
 
@@ -54,25 +63,22 @@ export function setup(instanceStore: InstanceStore) {
     }
   }
 
-  // Create a new instance using the GraphQL API and mutate state.
+  /**
+   * Create a new instance using the GraphQL API and mutate state.
+   *
+   * @param input
+   */
   async function newGroup(input: NewGroupRequest) {
     try {
       const res = await Apollo.mutate<NewGroupResponse>({
         mutation: gqlNewGroup,
         variables: input,
-        update(cache, data) {
-          const group = data.data?.newGroup;
-          if (!group) return;
-
-          cache.writeQuery<GroupResponse>({
-            query: gqlGroups,
-            data: {
-              groups: {
-                nodes: [...store.groups, ...group],
-              },
-            },
-          });
-        },
+        refetchQueries: [{
+          query: gqlGroups,
+          variables: {
+            instanceId: input.instanceId,
+          },
+        }],
       });
 
       if (res.data) {
@@ -87,28 +93,22 @@ export function setup(instanceStore: InstanceStore) {
     }
   }
 
-  // Create a new group using the GraphQL API and mutate state.
+  /**
+   * Create a new group using the GraphQL API and mutate state.
+   *
+   * @param input
+   */
   async function updateGroup(input: UpdateGroupRequest) {
     try {
       const res = await Apollo.mutate<UpdateGroupResponse>({
         mutation: gqlUpdateGroup,
         variables: input,
-        update(cache, data) {
-          const group = data.data?.updateGroup;
-          if (!group) return;
-
-          cache.writeQuery<GroupResponse>({
-            query: gqlGroups,
-            data: {
-              groups: {
-                nodes: [
-                  ...store.groups.filter((x: Group) => x.id !== group[0].id),
-                  ...group,
-                ],
-              },
-            },
-          });
-        },
+        refetchQueries: [{
+          query: gqlGroups,
+          variables: {
+            instanceId: input.instanceId,
+          },
+        }],
       });
 
       if (res.data) {
@@ -126,7 +126,11 @@ export function setup(instanceStore: InstanceStore) {
     }
   }
 
-  // Delete a group using the GraphQL API and mutate state.
+  /**
+   * Delete a group using the GraphQL API and mutate state.
+   *
+   * @param group
+   */
   async function deleteGroup(group: Group) {
     try {
       const res = await Apollo.mutate<DeleteGroupResponse>({
@@ -134,19 +138,12 @@ export function setup(instanceStore: InstanceStore) {
         variables: {
           id: group.id,
         },
-        update(cache, data) {
-          const wasDeleted = data.data?.deleteGroup;
-          if (!wasDeleted) return;
-
-          cache.writeQuery<GroupResponse>({
-            query: gqlGroups,
-            data: {
-              groups: {
-                nodes: store.groups.filter((x: Group) => x.id !== group.id),
-              },
-            },
-          });
-        },
+        refetchQueries: [{
+          query: gqlGroups,
+          variables: {
+            instanceId: group.instanceId,
+          },
+        }],
       });
 
       if (res.data && res.data.deleteGroup === true) {

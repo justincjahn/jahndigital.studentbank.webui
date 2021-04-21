@@ -68,6 +68,9 @@ export function setup() {
       const res = await Apollo.mutate<NewInstanceResponse>({
         mutation: gqlNewInstance,
         variables: input,
+        refetchQueries: [{
+          query: gqlInstances,
+        }],
       });
 
       if (res.data) {
@@ -87,6 +90,9 @@ export function setup() {
       const res = await Apollo.mutate<UpdateInstanceResponse>({
         mutation: gqlUpdateInstance,
         variables: input,
+        refetchQueries: [{
+          query: gqlInstances,
+        }],
       });
 
       if (res.data) {
@@ -122,19 +128,9 @@ export function setup() {
         variables: {
           id: instance.id,
         },
-        update(cache, data) {
-          const wasDeleted = data.data?.deleteInstance;
-          if (!wasDeleted) return;
-
-          cache.writeQuery<InstanceResponse>({
-            query: gqlInstances,
-            data: {
-              instances: {
-                nodes: instanceCache.instances.filter((x: Instance) => x.id !== instance.id),
-              },
-            },
-          });
-        },
+        refetchQueries: [{
+          query: gqlInstances,
+        }],
       });
 
       if (res.data && res.data.deleteInstance === true) {

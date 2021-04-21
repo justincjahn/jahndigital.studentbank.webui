@@ -1,5 +1,6 @@
 <template>
   <base-select
+    ref="test"
     prompt="Select a share type..."
     class="share-type-selector"
     v-bind="$attrs"
@@ -22,19 +23,17 @@
       </li>
       <li
         :class="className"
-        @click.prevent="startAdd"
+        @click.prevent="toggleAddLinkModal"
       >
         Add...
       </li>
       <li
         :class="className"
-        @click.prevent="startEdit"
       >
         Rename...
       </li>
       <li
         :class="className"
-        @click.prevent="startDelete"
       >
         Delete...
       </li>
@@ -45,7 +44,7 @@
     <add-link-modal
       :show="showAddLink"
       :share-type-store="shareTypeStore"
-      @ok="startAdd"
+      @ok="toggleAddLinkModal"
     />
   </suspense>
 </template>
@@ -58,11 +57,6 @@ import BaseSelect, { Search } from '@/components/BaseSelect.vue';
 
 // Stores
 import { ShareTypeStore } from '../stores/shareType';
-
-enum ModalState {
-  EDIT,
-  DELETE,
-}
 
 /**
  * A component that allows users to select a Share Type linked to the currently
@@ -88,33 +82,31 @@ export default defineComponent({
     'update:modelValue',
   ],
   setup(props, { emit }) {
-    const modalState = ref<ModalState>(ModalState.EDIT);
-
+    // True the AddLinkModal is displayed
     const showAddLink = ref(false);
+
+    const test = ref<HTMLElement|null>(null);
 
     // Returns the name of the share type to the base-select component
     const value: Search = (x) => (typeof x === 'object' ? x?.name ?? x : x);
 
-    // When an item is selected, update our parent
+    /**
+     * When an item is selected, update our parent
+     */
     function update(item: ShareType) { emit('update:modelValue', item); }
 
-    // Set the modal state to 'ADD' and show it
-    function startAdd() { showAddLink.value = !showAddLink.value; }
-
-    // Set the modal state to 'EDIT' and show it
-    function startEdit() { modalState.value = ModalState.EDIT; }
-
-    // Set the modal state to 'DELETE' and show it
-    function startDelete() { modalState.value = ModalState.DELETE; }
+    /**
+     * When the user clicks Add..., open the AddLinkModal
+     */
+    function toggleAddLinkModal() { showAddLink.value = !showAddLink.value; }
 
     return {
       options: props.shareTypeStore.shareTypes,
       update,
       value,
-      startAdd,
-      startEdit,
-      startDelete,
       showAddLink,
+      toggleAddLinkModal,
+      test,
     };
   },
 });

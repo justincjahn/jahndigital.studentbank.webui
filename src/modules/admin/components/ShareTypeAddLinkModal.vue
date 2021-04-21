@@ -93,6 +93,7 @@ import ShareTypeMultiselect from '@/modules/admin/components/ShareTypeMultiselec
 
 // Utils
 import uuid4 from '@/utils/uuid4';
+import { validateRate } from '@/utils/validators';
 import Rate from '@/utils/rate';
 
 // Stores
@@ -129,7 +130,7 @@ export default defineComponent({
     'ok',
   ],
   setup(props, { emit }) {
-    // Use a bespoke ShareTypeStore for the available share types list so we don't muddle global state.
+    // Use a bespoke ShareTypeStore for the available share types list so we don't muddle parent state.
     const shareTypeStore = setupShareTypeStore(props.shareTypeStore.instanceStore, false);
 
     // True if a share type add operation is awaiting the server.
@@ -152,23 +153,12 @@ export default defineComponent({
       return filtered;
     });
 
-    // Ensures that the share type's name is valid
+    /**
+     * Ensures that the share type's name is valid
+     */
     function validateName(val: string): string|boolean {
       if (val && val.trim()) return true;
       return 'Name is required.';
-    }
-
-    // Ensures that the rate is valid
-    function validateRate(val: string): string|boolean {
-      if (!val || !val.trim()) return 'Rate is required.';
-
-      try {
-        Rate.fromString(`${val}%`);
-      } catch (e) {
-        return e.message;
-      }
-
-      return true;
     }
 
     // Configure a form for vee-validate and hook up validation
@@ -190,7 +180,9 @@ export default defineComponent({
       validateOnMount: true,
     });
 
-    // Reset the form back to defaults
+    /**
+     * Reset the form back to defaults
+     */
     function reset() {
       resetForm();
       validate();
@@ -202,13 +194,19 @@ export default defineComponent({
     // True if the link button should be enabled
     const canLink = computed(() => selected.value.length > 0);
 
-    // Tell the parent to close the modal
+    /**
+     * Tell the parent to close the modal
+     */
     function handleOk() { reset(); emit('ok'); }
 
-    // Fetch a list of available share types using our custom store.
+    /**
+     * Fetch a list of available share types using our custom store.
+     */
     async function fetchAvailableShareTypes() { await shareTypeStore.fetch({ available: true, cache: false }); }
 
-    // Add a new share type and refresh available share types
+    /**
+     * Add a new share type and refresh available share types
+     */
     const handleAdd = handleSubmit(async () => {
       addLoading.value = true;
 
@@ -227,7 +225,9 @@ export default defineComponent({
       }
     });
 
-    // Link the selected share types
+    /**
+     * Link the selected share types
+     */
     async function handleLink() {
       if (!props.shareTypeStore.instanceStore.selected.value) return;
       const instanceId = props.shareTypeStore.instanceStore.selected.value.id;
@@ -255,7 +255,7 @@ export default defineComponent({
 
     // Perform initial fetch of available share types on show
     watchEffect(() => {
-      if (props.show === true) fetchAvailableShareTypes();
+      if (props.show) fetchAvailableShareTypes();
     });
 
     return {

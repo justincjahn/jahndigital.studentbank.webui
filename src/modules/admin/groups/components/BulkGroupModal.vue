@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, PropType } from 'vue';
+import { defineComponent, ref, computed, watch, PropType } from 'vue';
 
 // Components
 import Modal from '@/components/Modal.vue';
@@ -92,6 +92,15 @@ export default defineComponent({
       if (props.loading) return;
       emit('cancel');
     }
+
+    // When the modal opens, refresh the groups store
+    watch(() => props.show, () => {
+      if (props.show) {
+        const instanceId = props.groupStore.instanceStore.selected.value?.id ?? -1;
+        if (instanceId === -1) return;
+        props.groupStore.fetchGroups(instanceId);
+      }
+    });
 
     return {
       okLabel,

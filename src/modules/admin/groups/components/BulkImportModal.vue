@@ -1,10 +1,12 @@
 <template>
   <modal
-    :show="show"
     cancel-label="Cancel"
     ok-label="Ok"
     title="Bulk Import Tool"
     class="bit large"
+    :show="show"
+    :can-submit="!isPosting"
+    :can-cancel="!isPosting"
     :handle-enter="!isPosting"
     :handle-escape="!isPosting"
     @ok="handleOk"
@@ -229,7 +231,7 @@
 </template>
 
 <script lang="ts">
-import { ref, computed, defineComponent, watchEffect } from 'vue';
+import { ref, computed, defineComponent, watch } from 'vue';
 
 // Components
 import Modal from '@/components/Modal.vue';
@@ -419,10 +421,10 @@ export default defineComponent({
     }
 
     /**
-     * When the modal is closed, clear it
+     * When the modal is opened, clear it
      */
-    watchEffect(() => {
-      if (props.show === false) {
+    watch(() => props.show, () => {
+      if (props.show) {
         bulkImportStore.reset();
         shareTemplate.value = [];
       }
