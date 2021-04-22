@@ -23,7 +23,9 @@
           :disabled="!canUnlink"
           @click.prevent="handleUnlink"
         >
-          Unlink Selected
+          <loading-icon :show="linkedLoading">
+            Unlink Selected
+          </loading-icon>
         </button>
       </div>
 
@@ -32,7 +34,7 @@
 
         <share-type-multiselect
           v-model="deletableSelected"
-          prompt="There are no Share Types that can be deleted."
+          prompt="There are no Share Types that can be deleted.  Share Types must be unlinked from all instances to be deletable."
           :share-types="deletableShareTypes"
           :loading="deletableLoading"
         />
@@ -42,7 +44,9 @@
           :disabled="!canDelete"
           @click.prevent="handleDelete"
         >
-          Delete Selected
+          <loading-icon :show="deletableLoading">
+            Delete Selected
+          </loading-icon>
         </button>
       </div>
     </div>
@@ -64,6 +68,7 @@ export default defineComponent({
   components: {
     Modal,
     ShareTypeMultiselect,
+    LoadingIcon,
   },
   props: {
     show: {
@@ -97,6 +102,12 @@ export default defineComponent({
 
     // Array of selected share types to delete
     const deletableSelected = ref<ShareType[]>([]);
+
+    // Array of share types without any links.
+    const deletableShareTypes = computed(() => {
+      console.log(shareTypeStore.shareTypes.value);
+      return shareTypeStore.shareTypes.value.filter((x) => x.shareTypeInstances.length === 0);
+    });
 
     // True if the unlink button should be enabled
     const canDelete = computed(() => {
@@ -184,7 +195,7 @@ export default defineComponent({
       linkedLoading: props.shareTypeStore.loading,
       canUnlink,
       deletableSelected,
-      deletableShareTypes: shareTypeStore.shareTypes,
+      deletableShareTypes,
       deletableLoading: shareTypeStore.loading,
       canDelete,
       handleOk,
