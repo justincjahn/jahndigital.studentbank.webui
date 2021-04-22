@@ -1,13 +1,11 @@
 <template>
-  <Modal
+  <modal
     title="Add and Link Share Types"
     ok-label="Close"
     class="large"
-    ok-button-class=""
     :show="show"
     :handle-enter="false"
     @ok="handleOk"
-    @cancel="handleOk"
   >
     <form
       class="stf"
@@ -79,7 +77,7 @@
         Link Selected
       </button>
     </div>
-  </Modal>
+  </modal>
 </template>
 
 <script lang="ts">

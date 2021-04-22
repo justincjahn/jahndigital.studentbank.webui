@@ -1,6 +1,5 @@
 <template>
   <base-select
-    ref="test"
     prompt="Select a share type..."
     class="share-type-selector"
     v-bind="$attrs"
@@ -34,6 +33,7 @@
       </li>
       <li
         :class="className"
+        @click.prevent="toggleRemoveLinkModal"
       >
         Delete...
       </li>
@@ -45,6 +45,14 @@
       :show="showAddLink"
       :share-type-store="shareTypeStore"
       @ok="toggleAddLinkModal"
+    />
+  </suspense>
+
+  <suspense>
+    <remove-unlink-modal
+      :show="showRemoveLink"
+      :share-type-store="shareTypeStore"
+      @ok="toggleRemoveLinkModal"
     />
   </suspense>
 </template>
@@ -66,7 +74,8 @@ import { ShareTypeStore } from '../stores/shareType';
 export default defineComponent({
   components: {
     BaseSelect,
-    AddLinkModal: defineAsyncComponent(() => import(/* webpackChunkName: "st" */ '@/modules/admin/components/ShareTypeAddLinkModal.vue')),
+    AddLinkModal: defineAsyncComponent(() => import(/* webpackChunkName: "st" */ './ShareTypeAddLinkModal.vue')),
+    RemoveUnlinkModal: defineAsyncComponent(() => import(/* webpackChunkName: "st" */ './ShareTypeRemoveUnlinkModal.vue')),
   },
   props: {
     modelValue: {
@@ -85,7 +94,8 @@ export default defineComponent({
     // True the AddLinkModal is displayed
     const showAddLink = ref(false);
 
-    const test = ref<HTMLElement|null>(null);
+    // True when the RemoveLinkModal is displayed
+    const showRemoveLink = ref(false);
 
     // Returns the name of the share type to the base-select component
     const value: Search = (x) => (typeof x === 'object' ? x?.name ?? x : x);
@@ -100,13 +110,19 @@ export default defineComponent({
      */
     function toggleAddLinkModal() { showAddLink.value = !showAddLink.value; }
 
+    /**
+     * When the user clicks Delete..., open the RemoveLinkModal
+     */
+    function toggleRemoveLinkModal() { showRemoveLink.value = !showRemoveLink.value; }
+
     return {
       options: props.shareTypeStore.shareTypes,
       update,
       value,
       showAddLink,
       toggleAddLinkModal,
-      test,
+      showRemoveLink,
+      toggleRemoveLinkModal,
     };
   },
 });
