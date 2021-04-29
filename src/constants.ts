@@ -1,5 +1,8 @@
 // The endpoint URL for the API
-export const API_ENDPOINT = process.env.VUE_APP_API_URL || '/graphql';
+export const API_ENDPOINT: string = process.env.VUE_APP_API_URL || '/graphql';
+
+// Maximum number of mutations to run at once
+export const API_MAX_CONCURRENCY: number = process.env.API_MAX_CONCURRENCY || 5;
 
 // The localStorage key to use when storing the JWT token.
 export const AUTH_TOKEN = 'jwt-token';
@@ -25,6 +28,7 @@ export const FETCH_OPTIONS = {
 
 export default {
   API_ENDPOINT,
+  API_MAX_CONCURRENCY,
   AUTH_TOKEN,
   ERROR_CODES,
 };

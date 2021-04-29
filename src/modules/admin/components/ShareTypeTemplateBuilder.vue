@@ -13,16 +13,17 @@
       <currency-input
         v-model="item.initialDeposit"
         v-model:error="item.error"
+        :allowNegative="false"
         class="sttb__fieldset--currency"
       />
-
-      <span v-if="item.error" class="error">
-        {{ item.error }}
-      </span>
 
       <button @click="remove(index)">
         Remove
       </button>
+
+      <span v-if="item.error" class="error">
+        {{ item.error }}
+      </span>
     </div>
 
     <button @click="add">

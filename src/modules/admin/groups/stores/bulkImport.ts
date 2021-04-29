@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 
+import { API_MAX_CONCURRENCY } from '@/constants';
 import { computed, reactive } from 'vue';
 
 // Utils
@@ -11,7 +12,6 @@ import Money from '@/utils/money';
 // API
 import Apollo from '@/services/Apollo';
 import { gql } from '@apollo/client/core';
-import gqlNewBulkTransaction from '@/modules/admin/graphql/mutations/transactionBulk.gql';
 import { setup as defineInstanceStore } from '@/modules/admin/stores/instance';
 import { setup as defineStudentStore } from '@/modules/admin/stores/student';
 import { setup as defineShareStore } from '@/modules/admin/stores/share';
@@ -582,7 +582,7 @@ export function setup() {
       try {
         // eslint-disable-next-line no-await-in-loop
         const res = await Promise.all(
-          groupsToCreate.splice(0, 5).map((name) => groupStore.newGroup({ instanceId, name })),
+          groupsToCreate.splice(0, API_MAX_CONCURRENCY).map((name) => groupStore.newGroup({ instanceId, name })),
         );
 
         res.forEach((group) => {
@@ -607,7 +607,7 @@ export function setup() {
       try {
         // eslint-disable-next-line no-await-in-loop
         const res = await Promise.all(
-          studentsToCreate.splice(0, 5).map((studentInfo) => {
+          studentsToCreate.splice(0, API_MAX_CONCURRENCY).map((studentInfo) => {
             const groupId = resolveGroupId(studentInfo.group);
 
             return studentStore.newStudent({
@@ -649,7 +649,7 @@ export function setup() {
       try {
         // eslint-disable-next-line no-await-in-loop
         const res = await Promise.all(
-          sharesToCreate.splice(0, 5).map((newShareRequest) => shareStore.newShare(newShareRequest)),
+          sharesToCreate.splice(0, API_MAX_CONCURRENCY).map((newShareRequest) => shareStore.newShare(newShareRequest)),
         );
 
         res.forEach((share) => {
@@ -687,14 +687,8 @@ export function setup() {
     };
 
     try {
-      const res = await Apollo.mutate<NewBulkTransactionResponse>({
-        mutation: gqlNewBulkTransaction,
-        variables: bulkTransactionReq,
-      });
-
-      if (res.data) {
-        transactions.push(...res.data.newBulkTransaction);
-      }
+      const res = await shareStore.postBulkTransaction(bulkTransactionReq);
+      transactions.push(...res);
     } catch (e) {
       store.loading = false;
       throw new Error(`Unable to perform transaction bulk post: ${e?.message ?? e}.`);

@@ -33,9 +33,27 @@
       <span class="sub-menu__bulk-buttons__button">
         <button
           :disabled="!hasSelection"
+          @click.prevent="toggleBulkGroup"
+        >
+          Move Selected
+        </button>
+
+        <bulk-group-modal
+          :show="showBulkGroupModal"
+          :students="selectedStudents"
+          :loading="selectedStudentsResolving"
+          :group-store="groupStore"
+          @ok="handleBulkGroupModalOk"
+          @cancel="toggleBulkGroup"
+        />
+      </span>
+
+      <span class="sub-menu__bulk-buttons__button">
+        <button
+          :disabled="!hasSelection"
           @click.prevent="toggleBulkTransaction"
         >
-          Bulk Transaction
+          New Transaction
         </button>
 
         <bulk-post-modal
@@ -50,18 +68,15 @@
       <span class="sub-menu__bulk-buttons__button">
         <button
           :disabled="!hasSelection"
-          @click.prevent="toggleBulkGroup"
+          @click.prevent="toggleNewShare"
         >
-          Bulk Move
+          New Share
         </button>
 
-        <bulk-group-modal
-          :show="showBulkGroupModal"
-          :students="selectedStudents"
-          :loading="selectedStudentsResolving"
-          :group-store="groupStore"
-          @ok="handleBulkGroupModalOk"
-          @cancel="toggleBulkGroup"
+        <new-share-modal
+          :show="showNewShareModal"
+          :share-type-store="shareTypeStore"
+          @ok="handleNewShareModalOk"
         />
       </span>
 
@@ -82,7 +97,12 @@
       </span>
 
       <span class="sub-menu__bulk-buttons__button">
-        <button @click.prevent="toggleBulkImport">Bulk Import</button>
+        <button
+          @click.prevent="toggleBulkImport"
+        >
+          Bulk Import
+        </button>
+
         <bulk-import-modal
           :show="showBulkImportModal"
           @ok="handleBulkImportModalOk"
@@ -130,6 +150,10 @@ const BulkImportModal = defineAsyncComponent(
   () => import(/* webpackChunkName: "admin-groups" */ '../components/BulkImportModal.vue'),
 );
 
+const NewShareModal = defineAsyncComponent(
+  () => import(/* webpackChunkName: "admin-groups" */ '../components/NewShareModal.vue'),
+);
+
 const NewStudentModal = defineAsyncComponent(
   () => import(/* webpackChunkName: "admin-groups" */ '../components/NewStudentModal.vue'),
 );
@@ -150,6 +174,7 @@ export default {
     NewStudentModal,
     BulkGroupModal,
     BulkImportModal,
+    NewShareModal,
   },
   setup() {
     const groupStore = injectStrict(GROUP_STORE_SYMBOL);
@@ -157,6 +182,7 @@ export default {
     const shareTypeStore = injectStrict(SHARE_TYPE_STORE_SYMBOL);
     const showBulkTransactionModal = ref(false);
     const showNewStudentModal = ref(false);
+    const showNewShareModal = ref(false);
     const showBulkGroupModal = ref(false);
     const showBulkImportModal = ref(false);
     const hasSelection = computed(() => selection.length > 0);
@@ -182,6 +208,16 @@ export default {
      * Toggle the bulk transaction modal.
      */
     function toggleBulkTransaction() { showBulkTransactionModal.value = !showBulkTransactionModal.value; }
+
+    /**
+     * Toggle the new share type modal.
+     */
+    function toggleNewShare() { showNewShareModal.value = !showNewShareModal.value; }
+
+    /**
+     * Close the new share modal when the user presses Ok.
+     */
+    function handleNewShareModalOk() { toggleNewShare(); }
 
     /**
      * Toggle the new student modal.
@@ -271,6 +307,9 @@ export default {
       toggleBulkImport,
       handleBulkImportModalOk,
       showBulkImportModal,
+      showNewShareModal,
+      toggleNewShare,
+      handleNewShareModalOk,
       selectedInstance: groupStore.instanceStore.selected,
       groupStore,
       selectedGroup,

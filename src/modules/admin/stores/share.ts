@@ -8,6 +8,7 @@ import { StudentStore } from '@/modules/admin/stores/student';
 import Apollo from '@/services/Apollo';
 import gqlTransactions from '@/modules/admin/graphql/queries/transactionsByShare.gql';
 import gqlNewTransaction from '@/modules/admin/graphql/mutations/transactionCreate.gql';
+import gqlNewBulkTransaction from '@/modules/admin/graphql/mutations/transactionBulk.gql';
 import gqlNewShare from '@/modules/admin/graphql/mutations/shareCreate.gql';
 import gqlDeleteShare from '@/modules/admin/graphql/mutations/shareDelete.gql';
 
@@ -190,6 +191,26 @@ export function setup(studentStore: StudentStore) {
     }
   }
 
+  // Post a bulk transaction
+  async function postBulkTransaction(input: NewBulkTransactionRequest): Promise<Transaction[]> {
+    const tx: Transaction[] = [];
+
+    try {
+      const res = await Apollo.mutate<NewBulkTransactionResponse>({
+        mutation: gqlNewBulkTransaction,
+        variables: input,
+      });
+
+      if (res.data) {
+        tx.push(...res.data.newBulkTransaction);
+      }
+    } catch (e) {
+      throw new Error(`Unable to perform transaction bulk post: ${e?.message ?? e}.`);
+    }
+
+    return tx;
+  }
+
   // Create a new share
   async function newShare(input: NewShareRequest) {
     try {
@@ -254,6 +275,7 @@ export function setup(studentStore: StudentStore) {
     fetchPreviousTransactions,
     clearTransactions,
     postTransaction,
+    postBulkTransaction,
     newShare,
     deleteShare,
   };
