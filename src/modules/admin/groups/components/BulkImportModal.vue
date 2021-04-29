@@ -87,45 +87,10 @@
           to your <em>Instance</em>.
         </p>
 
-        <div
-          v-for="(share, index) in shareTemplate"
-          :key="index"
-          class="bit__shares__fieldset"
-        >
-          <share-type-selector
-            v-model="shareTemplate[index].shareType"
-            :share-type-store="shareTypeStore"
-            class="bit__shareTypeSelector"
-          />
-
-          <currency-input
-            :id="`bit__shares__initialDeposit__${index}`"
-            v-model="shareTemplate[index].initialDeposit"
-            v-model:error="shareTemplate[index].error"
-            :name="`initialDeposit[${index}]`"
-            :allow-zero="true"
-            :allow-negative="false"
-          />
-
-          <button
-            type="button"
-            class="bit__shares--remove-button"
-            @click="removeShareType(index)"
-          >
-            Remove
-          </button>
-
-          <p class="bit__shares__initialDeposit--error error">
-            {{ shareTemplate[index].error }}
-          </p>
-        </div>
-        <button
-          type="button"
-          class="bit__shares--add-button"
-          @click="addShareType()"
-        >
-          Add Share
-        </button>
+        <share-type-template-builder
+          v-model="shareTemplate"
+          :share-type-store="shareTypeStore"
+        />
       </div>
 
       <!-- Step 4: Validate and import -->
@@ -236,9 +201,8 @@ import { ref, computed, defineComponent, watch } from 'vue';
 // Components
 import Modal from '@/components/Modal.vue';
 import InstanceSelector from '@/modules/admin/components/InstanceSelector.vue';
-import ShareTypeSelector from '@/modules/admin/components/ShareTypeSelector.vue';
+import ShareTypeTemplateBuilder from '@/modules/admin/components/ShareTypeTemplateBuilder.vue';
 import LoadingIcon from '@/components/LoadingIcon.vue';
-import CurrencyInput from '@/components/CurrencyInput.vue';
 
 // Utils
 import Money from '@/utils/money';
@@ -246,16 +210,15 @@ import Money from '@/utils/money';
 // Stores
 import { setup as defineInstanceStore } from '@/modules/admin/stores/instance';
 import { setup as defineShareTypeStore } from '@/modules/admin/stores/shareType';
-import { setup as defineBulkImportStore, BulkImportStep, ShareTemplate } from '@/modules/admin/groups/stores/bulkImport';
+import { setup as defineBulkImportStore, BulkImportStep } from '@/modules/admin/groups/stores/bulkImport';
 import errorStore from '@/store/error';
 
 export default defineComponent({
   components: {
     Modal,
     InstanceSelector,
-    ShareTypeSelector,
     LoadingIcon,
-    CurrencyInput,
+    ShareTypeTemplateBuilder,
   },
   props: {
     show: {
@@ -284,7 +247,7 @@ export default defineComponent({
     const fileUploader = ref<HTMLInputElement|null>(null);
 
     // An array of new Share Types to create with initial values.  Also holds promise when they are submitted.
-    const shareTemplate = ref<ShareTemplate[]>([]);
+    const shareTemplate = ref<ShareTypeTemplate[]>([]);
 
     // Tells the UI that we are posting and to disable a bunch of stuff so the user doesn't close it
     const isPosting = ref(false);
@@ -396,31 +359,6 @@ export default defineComponent({
     }
 
     /**
-     * Add a new element to the shareTemplate array, triggering a share type selector.
-     */
-    function addShareType() {
-      shareTemplate.value = [
-        ...shareTemplate.value,
-
-        {
-          shareType: null,
-          initialDeposit: '0.00',
-          error: '',
-        },
-      ];
-    }
-
-    /**
-     * Remove the provided index from the array
-     */
-    function removeShareType(index: number) {
-      shareTemplate.value = [
-        ...shareTemplate.value.slice(0, index),
-        ...shareTemplate.value.slice(index + 1),
-      ];
-    }
-
-    /**
      * When the modal is opened, clear it
      */
     watch(() => props.show, () => {
@@ -444,8 +382,6 @@ export default defineComponent({
       handleIncrement,
       fileUploader,
       shareTemplate,
-      addShareType,
-      removeShareType,
       canContinue,
       BulkImportStep,
       ...bulkImportStore,

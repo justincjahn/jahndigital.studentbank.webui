@@ -104,10 +104,7 @@ export default defineComponent({
     const deletableSelected = ref<ShareType[]>([]);
 
     // Array of share types without any links.
-    const deletableShareTypes = computed(() => {
-      console.log(shareTypeStore.shareTypes.value);
-      return shareTypeStore.shareTypes.value.filter((x) => x.shareTypeInstances.length === 0);
-    });
+    const deletableShareTypes = computed(() => shareTypeStore.shareTypes.value.filter((x) => x.shareTypeInstances.length === 0));
 
     // True if the unlink button should be enabled
     const canDelete = computed(() => {

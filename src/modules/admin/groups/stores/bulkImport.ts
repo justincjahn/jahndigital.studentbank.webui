@@ -46,15 +46,6 @@ export const StudentImportColumns: StudentImportKeys = {
 };
 
 /**
- * The object used to describe what shares to create.
- */
-export interface ShareTemplate {
-  shareType: ShareType|null;
-  initialDeposit: string;
-  error: string | boolean;
-}
-
-/**
  * Represents the columns expected within the import CSV.
  */
 export interface StudentImport {
@@ -85,7 +76,7 @@ interface StudentInfo {
  * An interface for sampling students.
  */
 export interface BulkImportSample extends StudentInfo {
-  shares: ShareTemplate[];
+  shares: ShareTypeTemplate[];
 }
 
 /**
@@ -143,7 +134,7 @@ export function setup() {
     studentsToCreate: {} as StudentInfoMap,
 
     // Share Types that will be created for each student
-    shareTypes: [] as ShareTemplate[],
+    shareTypes: [] as ShareTypeTemplate[],
 
     // Sampling
     samples: [] as BulkImportSample[],
@@ -512,7 +503,7 @@ export function setup() {
    *
    * @param value
    */
-  function setShareTypeTemplate(value: ShareTemplate[]) {
+  function setShareTypeTemplate(value: ShareTypeTemplate[]) {
     store.shareTypes = value;
   }
 

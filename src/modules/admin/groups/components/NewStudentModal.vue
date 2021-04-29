@@ -85,40 +85,10 @@
         <h2>Share Types</h2>
         <p>Specify the share types you want to open for this student.</p>
 
-        <div
-          v-for="(share, index) in shareTemplate"
-          :key="index"
-          class="nsm__shares__fieldset"
-        >
-          <share-type-selector
-            v-model="shareTemplate[index].shareType"
-            :share-type-store="shareTypeStore"
-            class="nsm__shareTypeSelector"
-          />
-
-          <currency-input
-            v-model="shareTemplate[index].initialDeposit"
-            v-model:error="shareTemplate[index].error"
-            :allow-negative="false"
-          />
-
-          <button
-            type="button"
-            @click="removeShareType(index)"
-          >
-            Remove
-          </button>
-
-          <span v-if="shareTemplate[index].error" class="error">
-            {{ shareTemplate[index].error }}
-          </span>
-        </div>
-        <button
-          type="button"
-          @click="addShareType()"
-        >
-          Add Share
-        </button>
+        <share-type-template-builder
+          v-model="shareTemplate"
+          :share-type-store="shareTypeStore"
+        />
       </div>
     </template>
     <template #okLabel="{okLabel}">
@@ -130,12 +100,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, watchEffect, computed, PropType, toRef } from 'vue';
+import { defineComponent, ref, watchEffect, computed, PropType } from 'vue';
 
 // Components
 import LoadingIcon from '@/components/LoadingIcon.vue';
-import ShareTypeSelector from '@/modules/admin/components/ShareTypeSelector.vue';
-import CurrencyInput from '@/components/CurrencyInput.vue';
+import ShareTypeTemplateBuilder from '@/modules/admin/components/ShareTypeTemplateBuilder.vue';
 import Modal from '@/components/Modal.vue';
 
 // Utils
@@ -157,22 +126,14 @@ interface NewStudentForm {
   email: string;
   firstName: string;
   lastName: string;
-  initialDeposit: string[]|undefined;
-}
-
-interface ShareTemplate {
-  shareType: ShareType|null;
-  initialDeposit: string;
-  error: string;
 }
 
 export default defineComponent({
   components: {
     Modal,
     Field,
-    ShareTypeSelector,
     LoadingIcon,
-    CurrencyInput,
+    ShareTypeTemplateBuilder,
   },
   props: {
     show: {
@@ -204,10 +165,8 @@ export default defineComponent({
     // Pass in the instanceStore so the validator can check for existing students
     const validateAccount = validateAccountUnique({ instanceStore: props.groupStore.instanceStore });
 
-    // An array of new Share Types to create with initial values.  Also holds promise when they are submitted.
-    const shareTemplates = reactive({
-      templates: [] as ShareTemplate[],
-    });
+    // An array of new Share Types to create with initial values.
+    const shareTemplate = ref<ShareTypeTemplate[]>([]);
 
     // A unique ID for the form
     const id = uuid4();
@@ -226,7 +185,7 @@ export default defineComponent({
     const shareTemplateValid = computed(() => {
       let i = 0;
 
-      shareTemplates.templates.forEach((x) => {
+      shareTemplate.value.forEach((x) => {
         if (x.error !== '') i += 1;
         if (x.shareType === null) i += 1;
       });
@@ -243,7 +202,6 @@ export default defineComponent({
 
       // Vee-validate is shoving initialDeposit form items in here too, delete them.
       const filtered = { ...values };
-      delete filtered.initialDeposit;
 
       const newValues: NewStudentRequest = {
         ...filtered,
@@ -255,8 +213,8 @@ export default defineComponent({
         const student = await studentStore.newStudent(newValues);
 
         const sharePromises: Promise<Share>[] = [];
-        for (let i = 0; i < shareTemplates.templates.length; i += 1) {
-          const tpl = shareTemplates.templates[i];
+        for (let i = 0; i < shareTemplate.value.length; i += 1) {
+          const tpl = shareTemplate.value[i];
           if (tpl === null || tpl.shareType === null) return;
 
           sharePromises.push(
@@ -267,13 +225,13 @@ export default defineComponent({
           );
         }
 
-        // Luckilly, promises are returned in-order
+        // Promises are returned in-order
         const shares = await Promise.all(sharePromises);
 
         // Loop through and post transactions, even 0 dollar transactions so there's an initial deposit.
         const transactions: Promise<void>[] = [];
         for (let i = 0; i < shares.length; i += 1) {
-          const tpl = shareTemplates.templates[i];
+          const tpl = shareTemplate.value[i];
           const share = shares[i];
 
           if (!tpl.initialDeposit || Number.isNaN(+tpl.initialDeposit)) {
@@ -304,24 +262,10 @@ export default defineComponent({
     // Just close the form
     function handleCancel() { emit('cancel'); }
 
-    // Add a new element to the shareTemplate array, triggering a share type selector
-    function addShareType() {
-      shareTemplates.templates.push({
-        shareType: null,
-        initialDeposit: '0.00',
-        error: '',
-      });
-    }
-
-    // Remove the provided index from the array
-    function removeShareType(index: number) {
-      shareTemplates.templates.splice(index, 1);
-    }
-
     // Reset the form when the modal opens and fetch share types
     watchEffect(() => {
       if (props.show) {
-        shareTemplates.templates = [];
+        shareTemplate.value = [];
         shareTypeStore.fetch();
         resetForm();
       }
@@ -334,10 +278,8 @@ export default defineComponent({
       handleOk,
       handleCancel,
       canSubmit,
-      shareTemplate: toRef(shareTemplates, 'templates'),
+      shareTemplate,
       validateAmount: validateAmountNotNegative,
-      removeShareType,
-      addShareType,
       loading,
       shareTypeStore,
     };
@@ -355,10 +297,6 @@ export default defineComponent({
 
   &__shares {
     margin: 0.5em;
-  }
-
-  &__shareTypeSelector {
-    margin-right: 0.25em;
   }
 }
 </style>

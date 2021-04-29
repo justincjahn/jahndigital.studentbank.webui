@@ -89,6 +89,16 @@ interface ShareType {
   shareTypeInstances: ShareTypeInstances[];
 }
 
+/**
+ * Used to describe a Share Type that should be created for a specific Student
+ * or group of Students.
+ */
+interface ShareTypeTemplate {
+  shareType: ShareType|null;
+  initialDeposit: string; // Form input
+  error: string;
+}
+
 /// <reference path="./requests.d.ts" />
 /// <reference path="./responses.d.ts" />
 /// <reference path="./state.d.ts" />
