@@ -434,23 +434,8 @@ export default defineComponent({
         flex-direction: column;
         margin-bottom: 1em;
 
-        &__amount-wrapper {
-          min-width: 100%;
-          position: relative;
-
-          input {
-            width: 100%;
-            padding-left: 3ch !important;
-          }
-
-          &__currency {
-            position: absolute;
-            font-size: 0.9em;
-            top: .35em;
-            left: 1ch;
-            user-select: none;
-            color: #999;
-          }
+        .currency-input input {
+          width: 100%;
         }
 
         &__item {

@@ -1,5 +1,5 @@
 <template>
-  <div class="rate-input__percent-wrapper">
+  <div class="rate-input" :class="$attrs.class">
     <input
       :id="$attrs.id ?? id"
       v-model="rate"
@@ -8,9 +8,11 @@
       :placeholder="$attrs.placeholder ?? '0.0000'"
       @focus="$event.target.select()"
     />
-    <span class="rate-input__percent-wrapper__percent">%</span>
+
+    <span class="rate-input__percent">%</span>
   </div>
 </template>
+
 <script lang="ts">
 import { defineComponent, PropType, watch, onMounted, computed } from 'vue';
 
@@ -22,6 +24,7 @@ import { validateRate, validateRateNonzero, validateRateNotNegative } from '@/ut
 import useValidation from '@/composables/useValidation';
 
 export default defineComponent({
+  inheritAttrs: false,
   props: {
     modelValue: {
       type: String,
@@ -122,25 +125,24 @@ export default defineComponent({
   },
 });
 </script>
+
 <style lang="scss">
 .rate-input {
-  &__percent-wrapper {
-    display: inline-block;
-    position: relative;
+  display: inline-block;
+  position: relative;
 
-    input {
-      width: 12ch;
-      padding-right: 3ch !important;
-    }
+  input {
+    width: 12ch;
+    padding-right: 3ch !important;
+  }
 
-    &__percent {
-      position: absolute;
-      font-size: 0.9em;
-      top: .35em;
-      right: 1ch;
-      user-select: none;
-      color: #999;
-    }
+  &__percent {
+    position: absolute;
+    font-size: 0.9em;
+    top: .35em;
+    right: 1ch;
+    user-select: none;
+    color: #999;
   }
 }
 </style>

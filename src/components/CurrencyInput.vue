@@ -1,6 +1,6 @@
 <template>
-  <div class="currency-input__amount-wrapper" :class="$attrs.class">
-    <span class="currency-input__amount-wrapper__currency">$</span>
+  <div class="currency-input" :class="$attrs.class">
+    <span class="currency-input__currency">$</span>
     <input
       :id="$attrs.id ?? `currency-input--${id}`"
       v-model="amount"
@@ -22,6 +22,7 @@ import { validateAmount, validateAmountNonzero, validateAmountNotNegative } from
 import useValidation from '@/composables/useValidation';
 
 export default defineComponent({
+  inheritAttrs: false,
   props: {
     modelValue: {
       type: String,
@@ -108,22 +109,20 @@ export default defineComponent({
 
 <style lang="scss">
 .currency-input {
-  &__amount-wrapper {
-    display: inline-block;
-    position: relative;
+  display: inline-block;
+  position: relative;
 
-    input {
-      padding-left: 3ch !important;
-    }
+  input {
+    padding-left: 3ch !important;
+  }
 
-    &__currency {
-      position: absolute;
-      font-size: 0.9em;
-      top: .35em;
-      left: 1ch;
-      user-select: none;
-      color: #999;
-    }
+  &__currency {
+    position: absolute;
+    font-size: 0.9em;
+    top: .35em;
+    left: 1ch;
+    user-select: none;
+    color: #999;
   }
 }
 </style>
