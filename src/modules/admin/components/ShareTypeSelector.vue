@@ -28,8 +28,9 @@
       </li>
       <li
         :class="className"
+        @click.prevent="toggleEditModal"
       >
-        Rename...
+        Edit...
       </li>
       <li
         :class="className"
@@ -55,6 +56,15 @@
       @ok="toggleRemoveLinkModal"
     />
   </suspense>
+
+  <suspense>
+    <edit-modal
+      :show="showEdit"
+      :share-type-store="shareTypeStore"
+      :share-type="modelValue"
+      @ok="toggleEditModal"
+    />
+  </suspense>
 </template>
 
 <script lang="ts">
@@ -75,6 +85,7 @@ export default defineComponent({
   components: {
     BaseSelect,
     AddLinkModal: defineAsyncComponent(() => import(/* webpackChunkName: "st" */ './ShareTypeAddLinkModal.vue')),
+    EditModal: defineAsyncComponent(() => import(/* webpackChunkName: "st" */ './ShareTypeEditModal.vue')),
     RemoveUnlinkModal: defineAsyncComponent(() => import(/* webpackChunkName: "st" */ './ShareTypeRemoveUnlinkModal.vue')),
   },
   props: {
@@ -97,6 +108,9 @@ export default defineComponent({
     // True when the RemoveLinkModal is displayed
     const showRemoveLink = ref(false);
 
+    // True when the edit modal is displayed
+    const showEdit = ref(false);
+
     // Returns the name of the share type to the base-select component
     const value: Search = (x) => (typeof x === 'object' ? x?.name ?? x : x);
 
@@ -111,6 +125,14 @@ export default defineComponent({
     function toggleAddLinkModal() { showAddLink.value = !showAddLink.value; }
 
     /**
+     * When the user clicks Edit..., open the Edit modal.
+     */
+    function toggleEditModal() {
+      if (!props.modelValue) return;
+      showEdit.value = !showEdit.value;
+    }
+
+    /**
      * When the user clicks Delete..., open the RemoveLinkModal
      */
     function toggleRemoveLinkModal() { showRemoveLink.value = !showRemoveLink.value; }
@@ -121,6 +143,8 @@ export default defineComponent({
       value,
       showAddLink,
       toggleAddLinkModal,
+      showEdit,
+      toggleEditModal,
       showRemoveLink,
       toggleRemoveLinkModal,
     };

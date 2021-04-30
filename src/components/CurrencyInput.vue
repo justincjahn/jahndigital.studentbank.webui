@@ -1,18 +1,21 @@
 <template>
   <div class="currency-input" :class="$attrs.class">
     <span class="currency-input__currency">$</span>
+
     <input
-      :id="$attrs.id ?? `currency-input--${id}`"
+      :id="id"
       v-model="amount"
       type="text"
+      :class="amountError.length > 0 ? 'error' : ''"
       :name="$attrs.name ?? 'amount'"
       :placeholder="$attrs.placeholder ?? '0.00'"
       @focus="$event.target.select()"
     />
   </div>
 </template>
+
 <script lang="ts">
-import { defineComponent, PropType, computed, watch, onMounted } from 'vue';
+import { defineComponent, PropType, computed, watch } from 'vue';
 
 // Utils
 import uuid4 from '@/utils/uuid4';
@@ -49,8 +52,14 @@ export default defineComponent({
     'update:modelValue',
     'update:error',
   ],
-  setup(props, { emit }) {
-    const id = uuid4();
+  setup(props, { emit, attrs }) {
+    const uuid = uuid4();
+
+    // Unique identifier for this particular input box
+    const id = computed(() => {
+      if (attrs.id) return attrs.id as string;
+      return `currency-input--${uuid}`;
+    });
 
     // Calculate what validation function(s) to use
     const validationFunc = computed(() => {
@@ -84,24 +93,32 @@ export default defineComponent({
 
     const { value: amount, error: amountError } = useValidation(validationFunc, normalize);
 
+    // When the input's value changes, pass the new value to the parent's v-model.
     watch(() => amount.value, (newAmount) => {
       if (typeof props.modelValue === 'undefined') return;
       emit('update:modelValue', normalize(newAmount));
     });
 
+    // When the input's error changes, pass the new value to the parent's v-model.
     watch(() => amountError.value, (newError) => {
       if (typeof props.error === 'undefined') return;
       emit('update:error', newError);
     });
 
-    // One-time sync of the modelValue to the validated method, everything else flows up
-    onMounted(() => {
-      amount.value = props.modelValue;
+    // If the props updates, syncronize with our local value
+    watch(() => props.modelValue, (newValue) => {
+      if (amount.value !== newValue) amount.value = newValue;
     });
+
+    // When the parent's v-model changes, update the input value
+    watch(() => props.modelValue, (newValue) => {
+      if (amount.value !== newValue) amount.value = newValue;
+    }, { immediate: true });
 
     return {
       id,
       amount,
+      amountError,
     };
   },
 });

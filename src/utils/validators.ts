@@ -229,3 +229,16 @@ export function validateTransactionComment(value: string): string | boolean {
   if (value && value.length > 255) return 'Comment can only be 255 characters.';
   return true;
 }
+
+/**
+ * Ensures that the provided string is a valid transaction comment.
+ *
+ * @param {string} value
+ * @returns true or an error messsage
+ */
+export function validateShareTypeName(value: string): string | boolean {
+  if (!value || value.trim().length === 0) return 'Share Type Name is required.';
+  if (value.length < 3) return 'Share Type Name must be at least 3 characters.';
+  if (value.length > 64) return 'Share Type Name can only be 64 characters.';
+  return true;
+}

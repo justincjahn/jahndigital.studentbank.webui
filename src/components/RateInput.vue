@@ -1,9 +1,10 @@
 <template>
   <div class="rate-input" :class="$attrs.class">
     <input
-      :id="$attrs.id ?? id"
+      :id="id"
       v-model="rate"
       type="text"
+      :class="rateError.length > 0 ? 'error' : ''"
       :name="$attrs.name ?? 'amount'"
       :placeholder="$attrs.placeholder ?? '0.0000'"
       @focus="$event.target.select()"
@@ -14,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, watch, onMounted, computed } from 'vue';
+import { defineComponent, PropType, watch, computed } from 'vue';
 
 // Utils
 import uuid4 from '@/utils/uuid4';
@@ -51,9 +52,14 @@ export default defineComponent({
     'update:modelValue',
     'update:error',
   ],
-  setup(props, { emit }) {
+  setup(props, { emit, attrs }) {
+    const uuid = uuid4();
+
     // Unique identifier for this particular input box
-    const id = `currency-input--${uuid4()}`;
+    const id = computed(() => {
+      if (attrs.id) return attrs.id as string;
+      return `currency-input--${uuid}`;
+    });
 
     // Calculate what validation function(s) to use
     const validationFunc = computed(() => {
@@ -102,20 +108,22 @@ export default defineComponent({
 
     const { value: rate, error: rateError } = useValidation(validationFunc, normalize);
 
+    // When the input's value changes, pass the new value to the parent's v-model.
     watch(() => rate.value, (newRate) => {
       if (typeof props.modelValue === 'undefined') return;
       emit('update:modelValue', normalize(newRate));
     });
 
+    // When the input's error changes, pass the new value to the parent's v-model.
     watch(() => rateError.value, (newError) => {
       if (typeof props.error === 'undefined') return;
       emit('update:error', newError);
     });
 
-    onMounted(() => {
-      if (typeof props.modelValue === 'undefined') return;
-      rate.value = denormalize(props.modelValue);
-    });
+    // When the parent's v-model changes, update the input value
+    watch(() => props.modelValue, (newValue) => {
+      if (rate.value !== newValue) rate.value = denormalize(newValue);
+    }, { immediate: true });
 
     return {
       id,

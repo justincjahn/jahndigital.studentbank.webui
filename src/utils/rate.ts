@@ -92,6 +92,17 @@ export default class Rate {
     return Math.round(num * p) / p;
   }
 
+  /**
+   * Calculate the number of decimal places in the provided number.
+   *
+   * @param value
+   * @returns Integer representing the number of decimal places in the number.
+   */
+  static numberOfDecimals(value: number) {
+    if (Math.floor(value) === value) return 0;
+    return value.toString().split('.')[1].length || 0;
+  }
+
   // The actual rate as a float
   private rate: number;
 
@@ -111,10 +122,19 @@ export default class Rate {
   }
 
   /**
-   * Returns the rate as a float. Use toLocaleString to make into a percentage.
+   * Returns the rate as a float.
    */
   getRate(): number {
     return this.rate;
+  }
+
+  /**
+   * Returns the rate as a percentage.
+   */
+  getPercent(): string {
+    const decimals = Rate.numberOfDecimals(this.rate);
+    const percent = Number.parseFloat((this.rate * 100).toFixed(decimals));
+    return `${percent}%`;
   }
 
   /**
@@ -145,20 +165,11 @@ export default class Rate {
   }
 
   /**
-   * Converts the object to a percent.
-   *
-   * @returns The rate as a percent.
-   */
-  toPercent(locale = 'en-US'): string {
-    return this.rate.toLocaleString(locale, { style: 'percent' });
-  }
-
-  /**
    * Converts the object to a string.
    *
    * @returns The rate as a percentage.
    */
   toString(): string {
-    return this.toPercent(navigator.language);
+    return this.getPercent();
   }
 }

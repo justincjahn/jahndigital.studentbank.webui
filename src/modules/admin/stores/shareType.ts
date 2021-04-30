@@ -226,10 +226,16 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
    * @param {UpdateShareTypeRequest} input
    */
   async function updateShareType(input: UpdateShareTypeRequest) {
+    console.log(input);
+
     try {
       const res = await Apollo.mutate<UpdateShareTypeResponse>({
         mutation: gqlUpdateShareType,
-        variables: input,
+        variables: {
+          ...input,
+          // Apollo doesn't send this variable if its a number and I don't know why!
+          dividendRate: input.dividendDate ? input.dividendDate.toString() : undefined,
+        },
       });
 
       if (res.data) {
