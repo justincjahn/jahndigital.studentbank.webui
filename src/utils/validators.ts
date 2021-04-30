@@ -164,6 +164,62 @@ export function validateAmountNonzero(value: string): string | boolean {
 }
 
 /**
+ * Ensures that the rate is valid.
+ *
+ * @param {string} value
+ * @returns true or an error message.
+ */
+export function validateRate(value: string): string|boolean {
+  if (!value || !value.trim()) return 'Rate is required.';
+
+  try {
+    Rate.fromString(value);
+  } catch (e) {
+    return e.message;
+  }
+
+  return true;
+}
+
+/**
+ * Ensures that thge provided string is a valid rate with a non-zero value.
+ *
+ * @param {string} value
+ * @returns true or an error message.
+ */
+export function validateRateNonzero(value: string): string | boolean {
+  if (!value || value.trim().length === 0) return 'Specify a rate.';
+
+  try {
+    const rate = Rate.fromString(value);
+    if (rate.getRate() === 0) return 'Rate cannot be zero.';
+  } catch (e) {
+    return e.message;
+  }
+
+  return true;
+}
+
+/**
+ * Ensures that the provided string is a valid rate greater than zero.
+ *
+ * @param {string} value
+ * @returns true or an error message.
+ */
+export function validateRateNotNegative(value: string): string | boolean {
+  if (!value || value.trim().length === 0) return 'Specify a rate.';
+
+  try {
+    const rate = Rate.fromString(value);
+    if (rate.getRate() < 0.0) return 'Rate cannot be negative.';
+  } catch (e) {
+    return e.message;
+  }
+
+  return true;
+}
+
+/**
  * Ensures that the provided string is a valid transaction comment.
  *
  * @param value
@@ -171,20 +227,5 @@ export function validateAmountNonzero(value: string): string | boolean {
  */
 export function validateTransactionComment(value: string): string | boolean {
   if (value && value.length > 255) return 'Comment can only be 255 characters.';
-  return true;
-}
-
-/**
- * Ensures that the rate is valid
- */
-export function validateRate(val: string): string|boolean {
-  if (!val || !val.trim()) return 'Rate is required.';
-
-  try {
-    Rate.fromString(`${val}%`);
-  } catch (e) {
-    return e.message;
-  }
-
   return true;
 }

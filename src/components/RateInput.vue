@@ -1,22 +1,22 @@
 <template>
-  <div class="currency-input__amount-wrapper" :class="$attrs.class">
-    <span class="currency-input__amount-wrapper__currency">$</span>
+  <div class="rate-input__percent-wrapper">
     <input
-      :id="$attrs.id ?? `currency-input--${id}`"
-      v-model="amount"
+      :id="$attrs.id ?? id"
+      v-model="rate"
       type="text"
       :name="$attrs.name ?? 'amount'"
-      :placeholder="$attrs.placeholder ?? '0.00'"
+      :placeholder="$attrs.placeholder ?? '0.0000'"
       @focus="$event.target.select()"
     />
+    <span class="rate-input__percent-wrapper__percent">%</span>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, PropType, computed, watch, onMounted } from 'vue';
+import { defineComponent, PropType, watch, onMounted, computed } from 'vue';
 
 // Utils
 import uuid4 from '@/utils/uuid4';
-import { validateAmount, validateAmountNonzero, validateAmountNotNegative } from '@/utils/validators';
+import { validateRate, validateRateNonzero, validateRateNotNegative } from '@/utils/validators';
 
 // Composables
 import useValidation from '@/composables/useValidation';
@@ -49,25 +49,26 @@ export default defineComponent({
     'update:error',
   ],
   setup(props, { emit }) {
-    const id = uuid4();
+    // Unique identifier for this particular input box
+    const id = `currency-input--${uuid4()}`;
 
     // Calculate what validation function(s) to use
     const validationFunc = computed(() => {
       if (props.validator) return props.validator;
 
-      let func = validateAmount;
+      let func = validateRate;
       if (!props.allowZero) {
-        func = validateAmountNonzero;
+        func = validateRateNonzero;
 
         if (!props.allowNegative) {
           func = (value) => {
-            const nz = validateAmountNonzero(value);
+            const nz = validateRateNonzero(value);
             if (nz !== true) return nz;
-            return validateAmountNotNegative(value);
+            return validateRateNotNegative(value);
           };
         }
       } else if (!props.allowNegative) {
-        func = validateAmountNotNegative;
+        func = validateRateNotNegative;
       }
 
       return func;
@@ -77,50 +78,66 @@ export default defineComponent({
      * Normalize the value into a percentage.
      */
     const normalize = (value: string): string => {
-      if (!value || value.trim().length === 0) return '0.00';
+      if (!value || value.trim().length === 0) return '0.0%';
+      if (value.indexOf('%') === -1) return `${value}%`;
       return value;
     };
 
-    const { value: amount, error: amountError } = useValidation(validationFunc, normalize);
+    /**
+     * Denormalize the value into a string without a percentage.
+     */
+    const denormalize = (value: string): string => {
+      if (!value || value.trim().length === 0) return '';
+      const idx = value.lastIndexOf('%');
 
-    watch(() => amount.value, (newAmount) => {
+      if (idx >= 0) {
+        return value.substring(0, idx);
+      }
+
+      return value;
+    };
+
+    const { value: rate, error: rateError } = useValidation(validationFunc, normalize);
+
+    watch(() => rate.value, (newRate) => {
       if (typeof props.modelValue === 'undefined') return;
-      emit('update:modelValue', normalize(newAmount));
+      emit('update:modelValue', normalize(newRate));
     });
 
-    watch(() => amountError.value, (newError) => {
+    watch(() => rateError.value, (newError) => {
       if (typeof props.error === 'undefined') return;
       emit('update:error', newError);
     });
 
-    // One-time sync of the modelValue to the validated method, everything else flows up
     onMounted(() => {
-      amount.value = props.modelValue;
+      if (typeof props.modelValue === 'undefined') return;
+      rate.value = denormalize(props.modelValue);
     });
 
     return {
       id,
-      amount,
+      rate,
+      rateError,
     };
   },
 });
 </script>
-
 <style lang="scss">
-.currency-input {
-  &__amount-wrapper {
+.rate-input {
+  &__percent-wrapper {
     display: inline-block;
     position: relative;
 
     input {
-      padding-left: 3ch !important;
+      width: 12ch;
+      padding-right: 3ch !important;
     }
 
-    &__currency {
+    &__percent {
       position: absolute;
       font-size: 0.9em;
       top: .35em;
-      left: 1ch;
+      right: 1ch;
       user-select: none;
       color: #999;
     }

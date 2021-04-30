@@ -29,7 +29,8 @@ export default class Rate {
    * @param rate
    */
   static fromString(rate: string): Rate {
-    const s = rate.trim()
+    const s = rate
+      .replace(' ', '') // Replace all spaces (38 % -> 38%)
       .replace(',', '') // Replace thousands separator
       .replace(/[%]{2,}/, '%') // Replace redundant percentage characters
       .replace(/[.]+/, '.') // Replace repeated periods
@@ -43,7 +44,7 @@ export default class Rate {
     }
 
     // Make sure the string contains valid characters
-    if (!/^[0-9]+(\.?[0-9]+)?[%]?$/.test(s)) {
+    if (!/^-?[0-9]+(\.?[0-9]+)?[%]?$/.test(s)) {
       throw new Error(
         'Rates cannot contain alpha characters or special characters other than period and percent.',
       );
@@ -64,6 +65,31 @@ export default class Rate {
     // The rate didn't contain a percent, so it is probably a float already
     const r = Number.parseFloat(s);
     return new Rate(r);
+  }
+
+  /**
+   * Tries to convert the provided string to a Rate, or returns a new rate of 0.
+   *
+   * @param {string} rate String representation of the rate to try and convert.
+   * @returns A rate representing the input, or a default of 0%
+   */
+  static fromStringOrDefault(rate: string): Rate {
+    try {
+      return this.fromString(rate);
+    } catch {
+      return new Rate(0);
+    }
+  }
+
+  /**
+   * Rounds the rate to the nearest .125.
+   *
+   * @param num
+   * @param precision
+   */
+  static round(num: number, precision = 0.125): number {
+    const p = 1 / precision;
+    return Math.round(num * p) / p;
   }
 
   // The actual rate as a float
@@ -119,13 +145,20 @@ export default class Rate {
   }
 
   /**
-   * Rounds the rate to the nearest .125.
+   * Converts the object to a percent.
    *
-   * @param num
-   * @param precision
+   * @returns The rate as a percent.
    */
-  static round(num: number, precision = 0.125): number {
-    const p = 1 / precision;
-    return Math.round(num * p) / p;
+  toPercent(locale = 'en-US'): string {
+    return this.rate.toLocaleString(locale, { style: 'percent' });
+  }
+
+  /**
+   * Converts the object to a string.
+   *
+   * @returns The rate as a percentage.
+   */
+  toString(): string {
+    return this.toPercent(navigator.language);
   }
 }

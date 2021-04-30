@@ -5,7 +5,7 @@ import studentSelection from '@/services/StudentSelectionService';
 
 // Utils
 import Money from '@/utils/money';
-import { validateAmountNonzero, validateTransactionComment } from '@/utils/validators';
+import { validateAmount, validateTransactionComment } from '@/utils/validators';
 import debounce from '@/utils/debounce';
 import sample from '@/utils/sample';
 
@@ -135,8 +135,12 @@ export function setup() {
     }
 
     if (store.currentStep >= 2) {
-      const validAmount = validateAmountNonzero(store.amount.getAmount().toString());
+      const validAmount = validateAmount(store.amount.getAmount().toString());
       if (validAmount !== true) return validAmount.toString();
+
+      if (store.amount.getAmount() === 0 && store.comment.length === 0) {
+        return 'Transactions of $0.00 must have a transaction comment.';
+      }
 
       const validComment = validateTransactionComment(store.comment);
       if (validComment !== true) return validComment.toString();
@@ -269,19 +273,28 @@ export function setup() {
   /**
    * Ensure that the current amount complies with the selected posting policy.
    */
-  function validateAmount() {
+  function validatePostingPolicy() {
+    const amt = store.amount.getAmount();
+
     // Posting policies only affect withdrawals
-    if (store.amount.getAmount() >= 0) {
-      setError(2, null);
+    if (amt >= 0) {
       store.noncompliantShares = [];
       store.loading = false;
+
+      if (amt === 0 && store.comment.length === 0) {
+        setError(2, 'Error: Transactions of $0.00 must have a transaction comment.');
+        return;
+      }
+
+      setError(2, null);
       return;
     }
 
     // Get a list of shares that will be taken negative
     const shares: Share[] = [];
     store.selectedShares.forEach((share) => {
-      if (share.balance < store.amount.getAmount()) shares.push(share);
+      const newBalance = share.balance + amt;
+      if (newBalance < 0) shares.push(share);
     });
 
     store.noncompliantShares = shares;
@@ -318,7 +331,7 @@ export function setup() {
   /**
    * Called every time setAmount is called, which may be every keystroke.
    */
-  const validateAmountDebounced = debounce(validateAmount, 200);
+  const validateAmountDebounced = debounce(validatePostingPolicy, 200);
 
   /**
    * Set the amount and validate that it won't cause an error when posting.
@@ -327,9 +340,9 @@ export function setup() {
    * @throws {Error} If the amount is invalid.
    */
   function setAmount(value: string) {
-    const valid = validateAmountNonzero(value);
+    const valid = validateAmount(value);
     if (valid !== true) throw new Error(valid.toString());
-    store.amount = Money.fromNumber(+value);
+    store.amount = Money.fromStringOrDefault(value);
     store.loading = true;
     validateAmountDebounced();
   }
@@ -344,6 +357,7 @@ export function setup() {
     const valid = validateTransactionComment(value);
     if (valid !== true) throw new Error(valid.toString());
     store.comment = value;
+    validateAmountDebounced();
   }
 
   /**

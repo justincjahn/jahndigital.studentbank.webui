@@ -13,7 +13,7 @@
       <currency-input
         v-model="item.initialDeposit"
         v-model:error="item.error"
-        :allowNegative="false"
+        :allow-negative="false"
         class="sttb__fieldset--currency"
       />
 

@@ -58,19 +58,14 @@
 
         <div class="bpm__step-2__fieldset">
           <label for="bpm__step-2--amount">Amount</label>
-          <div class="bpm__step-2__fieldset__amount-wrapper">
-            <span class="bpm__step-2__fieldset__amount-wrapper__currency">$</span>
-            <input
-              id="bpm__step-2--amount"
-              v-model="amountValue"
-              type="text"
-              name="amount"
-              @update:modelValue="trySetAmount"
-              @focus="$event.target.select()"
-            />
-          </div>
+          <currency-input
+            id="bpm__step-2--amount"
+            v-model="amountValue"
+            v-model:error="amountError"
+            :validator="validateAmount"
+          />
           <p
-            v-if="amountError"
+            v-if="amountError && amountError.length > 0"
             class="error"
           >
             {{ amountError }}
@@ -232,6 +227,7 @@ import { defineComponent, watchEffect, computed, ref, PropType } from 'vue';
 // Components
 import Modal from '@/components/Modal.vue';
 import ShareTypeSelector from '@/modules/admin/components/ShareTypeSelector.vue';
+import CurrencyInput from '@/components/CurrencyInput.vue';
 import LoadingIcon from '@/components/LoadingIcon.vue';
 
 // Stores
@@ -244,6 +240,7 @@ export default defineComponent({
   components: {
     Modal,
     ShareTypeSelector,
+    CurrencyInput,
     LoadingIcon,
   },
   props: {
@@ -286,15 +283,14 @@ export default defineComponent({
     /**
      * Tries to set the amount and sets an error if it's invalid.
      */
-    function trySetAmount(value: string) {
-      amountValue.value = value;
-
+    function validateAmount(value: string): string|boolean {
       try {
         bulkPostStore.setAmount(value);
-        amountError.value = '';
       } catch (e) {
-        amountError.value = e?.message ?? e;
+        return (e?.message ?? e) as string;
       }
+
+      return true;
     }
 
     /**
@@ -408,7 +404,7 @@ export default defineComponent({
       shareTypeName,
       amountValue,
       amountError,
-      trySetAmount,
+      validateAmount,
       commentValue,
       commentError,
       trySetComment,
