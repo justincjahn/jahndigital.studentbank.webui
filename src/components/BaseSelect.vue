@@ -153,29 +153,29 @@ export default defineComponent({
 .select {
   $fontColor: map.get($theme, button-secondary, font-color);
 
-  position: relative;
+  position: static;
   display: inline-block;
 
   &__selected {
+    position: relative;
+    margin: 0;
+    outline: 0;
+
+    line-height: 1.25em;
     text-align: left;
     vertical-align: middle;
-    margin: 0;
     padding-right: 2em;
-    outline: 0;
+    color: $fontColor;
+
+    // Overflow turns into ...
+    user-select: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    background-color: map.get($theme, button-secondary, color);
     border: 1px solid colorStep(button-secondary, $step: 2);
     border-radius: 0.25rem;
-    color: $fontColor;
-    background-color: map.get($theme, button-secondary, color);
-    user-select: none;
-
-    /* Bugfix: drop-down & modals. */
-      // min-width: 10rem;
-      line-height: 1.25em;
-      // width: 10rem;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    /* End Bugfix */
 
     &:after {
       position: absolute;
@@ -186,16 +186,25 @@ export default defineComponent({
       height: 0;
       border: 5px solid transparent;
       border-color:
-        map.get($theme, button-secondary, font-color)
+        rgba(map.get($theme, button-secondary, font-color), 0.7)
         transparent
         transparent
         transparent;
+
+      transition: transform 0.1s ease-in-out, top 0.1s ease-in-out;
+      transform-origin: center;
+    }
+
+    &--open:after {
+      transform: rotate(180deg);
+      top: 0.5rem;
     }
   }
 
   &__items {
+    position: absolute;
     display: none;
-    z-index: 999;
+    z-index: 800;
     list-style: none;
     margin: 0;
     max-height: clamp(150px, 30vh, 350px);
@@ -205,14 +214,6 @@ export default defineComponent({
     background-color: map.get($theme, button-secondary, color);
     border: 1px solid colorStep(button-secondary, $step: 2);
     border-radius: 0 0 0.25rem 0.25rem;
-
-    /* Bugfix: drop-down & modals. */
-      // position: absolute;
-      // width: 100%;
-      // min-width: 10rem;
-      position: fixed;
-      // width: 10rem;
-    /* End Bugfix */
 
     &__divider {
       height: auto;
@@ -233,7 +234,6 @@ export default defineComponent({
       }
 
       &.selected {
-        // color: colorStep(button-secondary, $step: 8, $darken: false, $colorMap: font-color);
         color: rgba($fontColor, .3);
         cursor: auto;
 
