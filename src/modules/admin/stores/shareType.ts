@@ -13,6 +13,7 @@ import gqlUpdateShareType from '@/modules/admin/graphql/mutations/shareTypeUpdat
 import gqlLinkShareType from '@/modules/admin/graphql/mutations/shareTypeLink.gql';
 import gqlUnlinkShareType from '@/modules/admin/graphql/mutations/shareTypeUnlink.gql';
 import gqlDeleteShareType from '@/modules/admin/graphql/mutations/shareTypeDelete.gql';
+import gqlDividendPosting from '@/modules/admin/graphql/mutations/shareTypeDividend.gql';
 
 /**
  * Options used on the initial fetch.
@@ -360,6 +361,28 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
     }
   }
 
+  /**
+   * Post dividends for the given shareTypeId and instance(s).
+   *
+   * @param {DividendPostingRequest} input
+   */
+  async function postDividends(input: DividendPostingRequest) {
+    try {
+      const res = await Apollo.mutate<DividendPostingResponse>({
+        mutation: gqlDividendPosting,
+        variables: input,
+      });
+
+      if (res.data && res.data.postDividends === true) {
+        return true;
+      }
+
+      throw new Error('Unable to post dividends: unknown reason.');
+    } catch (e) {
+      throw e?.message ?? e;
+    }
+  }
+
   // If we're fetching by instance, re-fetch when it changes
   watch(() => instanceStore.selected.value, (newValue, oldValue) => {
     if (!store.byInstance) return;
@@ -386,6 +409,7 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
     linkShareType,
     unlinkShareType,
     deleteShareType,
+    postDividends,
   };
 }
 

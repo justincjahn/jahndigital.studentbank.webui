@@ -167,3 +167,11 @@ interface UnlinkShareTypeResponse {
 interface DeleteShareTypeResponse {
   deleteShareType: boolean;
 }
+
+/*
+ * DIVIDENDS
+ */
+
+interface DividendPostingResponse {
+  postDividends: boolean;
+}

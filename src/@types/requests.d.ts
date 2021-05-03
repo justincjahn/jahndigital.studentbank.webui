@@ -96,3 +96,12 @@ interface LinkUnlinkShareTypeRequest {
   shareTypeId: number;
   instanceId: number;
 }
+
+/*
+ * DIVIDENDS
+ */
+
+interface DividendPostingRequest {
+  instances: number[];
+  shareTypeId: number;
+}

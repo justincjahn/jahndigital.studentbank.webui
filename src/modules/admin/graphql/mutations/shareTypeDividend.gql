@@ -1,0 +1,6 @@
+mutation postDividends($shareTypeId: Long!, $instances: [Long]!) {
+  postDividends(input: {
+    instances: $instances,
+    shareTypeId: $shareTypeId
+  })
+}

@@ -57,6 +57,15 @@
       >
         Activate...
       </li>
+      <li class="select__items__divider">
+        <hr />
+      </li>
+      <li
+        :class="className"
+        @click.prevent="toggleDividendPostingModal"
+      >
+        Post Dividends...
+      </li>
     </template>
   </base-select>
 
@@ -87,10 +96,19 @@
       </div>
     </template>
   </modal>
+
+  <suspense>
+    <dividend-posting-modal
+      :show="showDividendPostingModal"
+      :share-type-store="shareTypeStore"
+      :instance="modelValue"
+      @ok="toggleDividendPostingModal"
+    />
+  </suspense>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, defineAsyncComponent, defineComponent, PropType, ref } from 'vue';
 
 // Components
 import BaseSelect, { Search } from '@/components/BaseSelect.vue';
@@ -99,6 +117,7 @@ import Modal from '@/components/Modal.vue';
 // Stores
 import errorStore from '@/store/error';
 import { InstanceStore } from '@/modules/admin/stores/instance';
+import { setup as defineShareTypeStore } from '@/modules/admin/stores/shareType';
 
 // Utils
 import uuid4 from '@/utils/uuid4';
@@ -118,6 +137,7 @@ export default defineComponent({
   components: {
     BaseSelect,
     Modal,
+    DividendPostingModal: defineAsyncComponent(() => import('./DividendPostingModal.vue')),
   },
   props: {
     modelValue: {
@@ -136,6 +156,9 @@ export default defineComponent({
     // If the modal is open.
     const showModal = ref(false);
 
+    // If the dividend posting modal is open.
+    const showDividendPostingModal = ref(false);
+
     // The input to add/rename an instance
     const input = ref('');
 
@@ -144,6 +167,9 @@ export default defineComponent({
 
     // The current state of the modal
     const modalState = ref<ModalState>(ModalState.ADD);
+
+    // The ShareTypeStore used to post dividends
+    const shareTypeStore = defineShareTypeStore(props.instanceStore);
 
     // The title of the modal window
     const modalTitle = computed(() => {
@@ -179,6 +205,9 @@ export default defineComponent({
 
     // Open or close the New Instance form.
     function toggle() { showModal.value = !showModal.value; }
+
+    // Open or close the Dividend Posting Modal
+    function toggleDividendPostingModal() { showDividendPostingModal.value = !showDividendPostingModal.value; }
 
     // Begin the make active process and open the modal.
     function startActive() {
@@ -285,12 +314,15 @@ export default defineComponent({
     }
 
     return {
+      showDividendPostingModal,
       ModalState,
+      shareTypeStore,
       options: props.instanceStore.instances,
       modalTitle,
       modalClass,
       modalState,
       showModal,
+      toggleDividendPostingModal,
       startActive,
       startAdd,
       startEdit,
