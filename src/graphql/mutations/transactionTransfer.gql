@@ -1,0 +1,23 @@
+#import "../fragments/transaction.gql"
+
+mutation newTransfer(
+  $sourceShareId: Long!,
+  $destinationShareId: Long!,
+  $amount: Money!,
+  $comment: String,
+) {
+  newTransfer(input: {
+    sourceShareId: $sourceShareId,
+    destinationShareId: $destinationShareId,
+    amount: $amount,
+    comment: $comment
+  }) {
+    item1 {
+      ...TransactionParts
+    }
+
+    item2 {
+      ...TransactionParts
+    }
+  }
+}

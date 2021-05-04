@@ -1,0 +1,19 @@
+#import "@/graphql/fragments/stock.gql"
+
+mutation updateStock(
+  $id: Long!,
+  $name: String,
+  $symbol: String,
+  $totalShares: Long,
+  $currentValue: Money,
+) {
+  updateStock(input: {
+    id: $id,
+    name: $name,
+    symbol: $symbol,
+    totalShares: $totalShares,
+    currentValue: $currentValue
+  }) {
+    ...stock
+  }
+}

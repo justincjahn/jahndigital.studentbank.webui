@@ -1,0 +1,13 @@
+#import "@/graphql/fragments/stock.gql"
+
+mutation linkStock(
+  $stockId: Long!,
+  $instanceId: Long!
+) {
+  linkStock(input: {
+    stockId: $stockId,
+    instanceId: $instanceId
+  }) {
+    ...StockParts
+  }
+}

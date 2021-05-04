@@ -1,5 +1,5 @@
 #import "@/graphql/fragments/pageInfo.gql"
-#import "../fragments/shareType.gql"
+#import "@/graphql/fragments/shareType.gql"
 
 query availableShareTypes($first: PaginationAmount) {
   availableShareTypes(first: $first) {

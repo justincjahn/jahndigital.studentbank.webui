@@ -1,0 +1,11 @@
+#import "../fragments/studentStock.gql"
+
+mutation newStockPurchase($stockId: Long!, $shareId: Long!, $count: Int!) {
+  newStockPurchase(input: {
+    stockId: $stockId,
+    shareId: $shareId,
+    count: $count
+  }) {
+    ...StudentStockParts
+  }
+}

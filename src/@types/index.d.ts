@@ -99,6 +99,40 @@ interface ShareTypeTemplate {
   error: string;
 }
 
+interface Stock {
+  id: number;
+  name: string;
+  symbol: string;
+  availableShares: number;
+  totalShares: number;
+  currentValue: number;
+  stockInstances: Instance[];
+}
+
+interface StockHistory {
+  id: number;
+  stockId: number;
+  dateChanged: string;
+  value: number;
+}
+
+interface StudentStock {
+  id: number;
+  stockId: number;
+  studentId: number;
+  sharesOwned: number;
+  dateCreated: string;
+  dateLastActive: string;
+}
+
+interface StudentStockHistory {
+  id: number;
+  count: number;
+  amount: number;
+  datePosted: string;
+  transaction: Transaction;
+}
+
 /// <reference path="./requests.d.ts" />
 /// <reference path="./responses.d.ts" />
 /// <reference path="./state.d.ts" />

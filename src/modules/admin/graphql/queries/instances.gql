@@ -1,4 +1,4 @@
-#import "../fragments/instance.gql"
+#import "@/graphql/fragments/instance.gql"
 
 query allInstances {
   instances(order_by: {description: ASC}) {

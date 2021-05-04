@@ -1,0 +1,9 @@
+mutation linkStock(
+  $stockId: Long!,
+  $instanceId: Long!
+) {
+  unlinkStock(input: {
+    stockId: $stockId,
+    instanceId: $instanceId
+  })
+}

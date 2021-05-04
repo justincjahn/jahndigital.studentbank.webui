@@ -12,6 +12,10 @@ interface UpdateInstanceRequest {
   isActive?: boolean;
 }
 
+interface DeleteRestoreInstanceRequest {
+  id: number;
+}
+
 /*
  * GROUPS
  */
@@ -25,6 +29,10 @@ interface UpdateGroupRequest {
   id: number;
   name?: string;
   instanceId?: number;
+}
+
+interface DeleteRestoreGroupRequest {
+  id: number;
 }
 
 /*
@@ -41,6 +49,13 @@ interface NewTransactionRequest {
 interface NewBulkTransactionRequest {
   shares: NewTransactionRequest[];
   skipNegative: boolean;
+}
+
+interface NewTransferRequest {
+  sourceShareId: number;
+  destinationShareId: number;
+  amount: number;
+  comment?: string;
 }
 
 /*
@@ -68,6 +83,10 @@ interface NewStudentRequest {
 
 type UpdateBulkStudentRequest = UpdateStudentRequest[];
 
+interface DeleteRestoreStudentRequest {
+  id: number;
+}
+
 /*
  * SHARES
  */
@@ -75,6 +94,15 @@ type UpdateBulkStudentRequest = UpdateStudentRequest[];
 interface NewShareRequest {
   shareTypeId: number;
   studentId: number;
+}
+
+interface UpdateShareRequest {
+  id: number;
+  shareTypeId: number;
+}
+
+interface DeleteRestoreShareRequest {
+  id: number;
 }
 
 /*
@@ -97,6 +125,10 @@ interface LinkUnlinkShareTypeRequest {
   instanceId: number;
 }
 
+interface DeleteRestoreShareTypeRequest {
+  id: number;
+}
+
 /*
  * DIVIDENDS
  */
@@ -104,4 +136,38 @@ interface LinkUnlinkShareTypeRequest {
 interface DividendPostingRequest {
   instances: number[];
   shareTypeId: number;
+}
+
+/*
+ * STOCKS
+ */
+
+interface NewStockRequest {
+  name: string;
+  symbol: string;
+  totalShares: number;
+  currentValue: number;
+}
+
+interface UpdateStockRequest {
+  id: number;
+  name?: string;
+  symbol?: string;
+  totalShares?: number;
+  currentValue?: number;
+}
+
+interface LinkUnlinkStockRequest {
+  stockId: number;
+  instanceId: number;
+}
+
+interface DeleteRestoreStockRequest {
+  id: number;
+}
+
+interface NewStockPurchaseRequest {
+  shareId: number;
+  stockId: number;
+  quantity: number;
 }

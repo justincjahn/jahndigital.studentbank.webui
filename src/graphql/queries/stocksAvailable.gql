@@ -1,0 +1,14 @@
+#import "../fragments/pageInfo.gql"
+#import "../fragments/stock.gql"
+
+query stocks {
+  stocks {
+    pageInfo {
+      ...PageInfoParts
+    }
+    totalCount
+    nodes {
+      ...StockParts
+    }
+  }
+}

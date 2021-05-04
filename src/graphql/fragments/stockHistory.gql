@@ -1,0 +1,6 @@
+fragment StockHistoryParts on StockHistory {
+  id
+  stockId
+  dateChanged
+  value
+}

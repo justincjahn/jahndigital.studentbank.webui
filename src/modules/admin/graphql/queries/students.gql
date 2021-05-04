@@ -1,5 +1,5 @@
 #import "@/graphql/fragments/pageInfo.gql"
-#import "../fragments/student.gql"
+#import "@/graphql/fragments/student.gql"
 
 query studentsWithShares($groupId: Long, $first: PaginationAmount, $after: String) {
   students(where: {groupId: $groupId}, first: $first, after: $after, order_by: {accountNumber: ASC}) {

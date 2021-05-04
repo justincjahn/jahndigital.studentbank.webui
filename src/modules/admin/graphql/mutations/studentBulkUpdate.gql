@@ -1,4 +1,4 @@
-#import "../fragments/student.gql"
+#import "@/graphql/fragments/student.gql"
 
 mutation updateBulkStudent($students: [UpdateStudentRequestInput!]!) {
   updateBulkStudent(input: $students) {

@@ -1,4 +1,4 @@
-#import "../fragments/instance.gql"
+#import "@/graphql/fragments/instance.gql"
 
 mutation updateInstance($id: Long!, $description: String, $isActive: Boolean) {
   updateInstance(input: { id: $id, description: $description, isActive: $isActive }) {

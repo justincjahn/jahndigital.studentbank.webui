@@ -1,0 +1,14 @@
+#import "./stockHistory.gql"
+#import "./instance.gql"
+
+fragment StockParts on Stock {
+  id
+  name
+  symbol
+  availableShares
+  totalShares
+  currentValue
+  stockInstances {
+    ...InstanceParts
+  }
+}

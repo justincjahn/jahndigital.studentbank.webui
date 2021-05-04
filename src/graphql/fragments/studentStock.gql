@@ -1,0 +1,8 @@
+fragment StudentStockParts on StudentStock {
+  id
+  stockId
+  studentId
+  sharesOwned
+  dateCreated
+  dateLastActive
+}

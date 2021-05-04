@@ -1,4 +1,4 @@
-#import "../fragments/group.gql"
+#import "@/graphql/fragments/group.gql"
 
 mutation updateGroup($id: Long!, $name: String!) {
   updateGroup(input: { id: $id, name: $name }) {

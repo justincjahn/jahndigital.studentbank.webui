@@ -14,6 +14,10 @@ interface UserLoginResponse {
   userLogin: AuthenticateResponse;
 }
 
+interface StudentLoginResponse {
+  studentLogin: AuthenticateResponse;
+}
+
 /*
  * INSTANCES
  */
@@ -34,6 +38,10 @@ interface UpdateInstanceResponse {
 
 interface DeleteInstanceResponse {
   deleteInstance: boolean;
+}
+
+interface RestoreInstanceResponse {
+  restoreInstance: Instance[];
 }
 
 /*
@@ -63,6 +71,10 @@ interface UpdateGroupResponse {
 
 interface DeleteGroupResponse {
   deleteGroup: boolean;
+}
+
+interface RestoreGroupResponse {
+  restoreGroup: Group[];
 }
 
 /*
@@ -99,6 +111,10 @@ interface DeleteStudentResponse {
   deleteStudent: boolean;
 }
 
+interface RestoreStudentResponse {
+  restoreStudent: Student[];
+}
+
 /*
  * TRANSACTIONS
  */
@@ -119,6 +135,13 @@ interface NewBulkTransactionResponse {
   newBulkTransaction: Transaction[];
 }
 
+interface NewTransferResponse {
+  newTransfer: {
+    item1: Transaction;
+    item2: Transaction;
+  };
+}
+
 /*
  * SHARES
  */
@@ -126,8 +149,16 @@ interface NewShareResponse {
   newShare: Share[];
 }
 
+interface UpdateShareResponse {
+  updateShare: Share[];
+}
+
 interface DeleteShareResponse {
   deleteShare: boolean;
+}
+
+interface RestoreShareResponse {
+  restoreShare: Share[];
 }
 
 /*
@@ -168,10 +199,62 @@ interface DeleteShareTypeResponse {
   deleteShareType: boolean;
 }
 
+interface RestoreShareTypeResponse {
+  restoreShareType: ShareType[];
+}
+
 /*
  * DIVIDENDS
  */
 
 interface DividendPostingResponse {
   postDividends: boolean;
+}
+
+/*
+ * STOCKS
+ */
+
+interface NewStockReqsponse {
+  newStock: Stock[];
+}
+
+interface PagedStockResponse {
+  stocks: {
+    pageInfo: PageInfo;
+    totalCount: number;
+    nodes: Stock[];
+  };
+}
+
+interface PagedStockHistoryResponse {
+  stockHistory: {
+    pageInfo: PageInfo;
+    totalCount: number;
+    nodes: StockHistory[];
+  };
+}
+
+interface NewStockPurchaseResponse {
+  newStockPurchase: StudentStock[];
+}
+
+interface UpdateStockResponse {
+  updateStock: Stock[];
+}
+
+interface LinkStockResponse {
+  linkStock: Stock[];
+}
+
+interface UnlinkStockResponse {
+  unlinkStock: boolean;
+}
+
+interface DeleteStockResponse {
+  deleteStock: boolean;
+}
+
+interface RestoreStockResponse {
+  restoreStock: Stock[];
 }
