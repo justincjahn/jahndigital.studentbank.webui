@@ -72,8 +72,10 @@
   border-radius: 0.25rem;
 }
 
-@mixin table($selectable: true) {
-  @include round-border();
+@mixin table($selectable: true, $border: true) {
+  @if $border {
+    @include round-border();
+  }
 
   width: 100%;
   border-spacing: 0;

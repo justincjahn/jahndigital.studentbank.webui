@@ -1,8 +1,15 @@
 #import "../fragments/pageInfo.gql"
 #import "../fragments/stock.gql"
 
-query stocks {
-  stocks {
+query stocks(
+  $first: PaginationAmount! = 25,
+  $after: String,
+) {
+  stocks(
+    first: $first,
+    after: $after,
+    order_by: { name: ASC }
+  ) {
     pageInfo {
       ...PageInfoParts
     }

@@ -215,7 +215,7 @@ interface DividendPostingResponse {
  * STOCKS
  */
 
-interface NewStockReqsponse {
+interface NewStockResponse{
   newStock: Stock[];
 }
 

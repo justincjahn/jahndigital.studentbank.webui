@@ -2,6 +2,7 @@ import {
   ApolloClient,
   ApolloLink,
   createHttpLink,
+  DocumentNode,
   InMemoryCache,
   Operation,
   ServerParseError,
@@ -212,5 +213,34 @@ const defaultClient = new ApolloClient({
   link: ApolloLink.from([errorLink, tokenLink, authLink, httpLink]),
   cache: new InMemoryCache(),
 });
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ApolloVariables = Record<string, any>;
+
+/**
+ * Convienience method to call Apollo queries or reject if no data was returned.
+ *
+ * @param qry The GraphQL DocumentNode to send to the server.
+ * @param variables The variables, if any, to send to the server for the provided query.
+ * @returns The server result, or a rejected promise.
+ */
+export async function query<TReturn, TOptions = ApolloVariables>(qry: DocumentNode, variables?: TOptions) {
+  const res = await defaultClient.query<TReturn>({ query: qry, variables });
+  if (res.data) return Promise.resolve(res.data);
+  return Promise.reject(new Error('An unknown error has occurred.'));
+}
+
+/**
+ * Convienience method to call Apollo mutations or reject if no data was returned.
+ *
+ * @param mutation The GraphQL DocumentNode to send to the server.
+ * @param variables The variables, if any, to send to the server.
+ * @returns An Apollo result object of the TReturn type.
+ */
+export async function mutate<TReturn, TOptions = ApolloVariables>(mutation: DocumentNode, variables?: TOptions) {
+  const res = await defaultClient.mutate<TReturn>({ mutation, variables });
+  if (res.data) return Promise.resolve(res.data);
+  return Promise.reject(new Error('An unknown error has occurred.'));
+}
 
 export default defaultClient;

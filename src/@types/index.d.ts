@@ -99,6 +99,11 @@ interface ShareTypeTemplate {
   error: string;
 }
 
+interface StockInstance {
+  instanceId: number;
+  instance: Instance;
+}
+
 interface Stock {
   id: number;
   name: string;
@@ -106,7 +111,7 @@ interface Stock {
   availableShares: number;
   totalShares: number;
   currentValue: number;
-  stockInstances: Instance[];
+  stockInstances: StockInstance[];
 }
 
 interface StockHistory {

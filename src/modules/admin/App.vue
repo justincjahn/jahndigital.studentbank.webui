@@ -64,7 +64,7 @@ import { useRouter } from 'vue-router';
 import { RouteNames as GroupRouteNames } from '@/modules/admin/groups/routes';
 import { RouteNames as StudentRouteNames } from '@/modules/admin/students/routes';
 import { RouteNames as PurchasesRouteNames } from '@/modules/admin/purchases/routes';
-import { RouteNames as StocksRouteNames } from '@/modules/admin/stocks/routes';
+import StocksRouteNames from '@/modules/admin/stocks/routeNames';
 import { RouteNames as SettingsRouteNames } from '@/modules/admin/settings/routes';
 import { RouteNames as LoginRouteNames } from '@/modules/admin/login/routes';
 
