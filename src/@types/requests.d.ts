@@ -65,7 +65,7 @@ interface NewTransferRequest {
 interface UpdateStudentRequest {
   id: number;
   groupId?: number;
-  accountNumber?: number;
+  accountNumber?: string;
   email?: string;
   firstName?: string;
   lastName?: string;
@@ -117,7 +117,7 @@ interface NewShareTypeRequest {
 interface UpdateShareTypeRequest {
   id: number;
   name?: string;
-  dividendDate?: number;
+  dividendRate?: number;
 }
 
 interface LinkUnlinkShareTypeRequest {

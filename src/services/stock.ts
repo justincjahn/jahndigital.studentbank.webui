@@ -10,7 +10,7 @@ import { query, mutate } from './Apollo';
 /**
  * Options used to determine what stocks will be fetched.
  */
-export interface ShareListOptions {
+export interface StockListOptions {
   // The number of stock objects to fetch
   first?: number;
 
@@ -25,8 +25,8 @@ export interface ShareListOptions {
  * @returns A promise containing a list of stocks.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function GetStocks(options?: ShareListOptions) {
-  const opts: ShareListOptions = {
+export async function getStocks(options?: StockListOptions) {
+  const opts: StockListOptions = {
     first: 25,
     ...options,
   };
@@ -41,7 +41,7 @@ export async function GetStocks(options?: ShareListOptions) {
  * @returns A promise containing the new Stock object.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function NewStock(input: NewStockRequest) {
+export async function newStock(input: NewStockRequest) {
   return mutate<NewStockResponse>(gqlStockCreate, input);
 }
 
@@ -52,7 +52,7 @@ export async function NewStock(input: NewStockRequest) {
  * @returns A promise containing the updated Stock object.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function UpdateStock(input: UpdateStockRequest) {
+export async function updateStock(input: UpdateStockRequest) {
   return mutate<UpdateStockResponse>(gqlStockUpdate, input);
 }
 
@@ -63,7 +63,7 @@ export async function UpdateStock(input: UpdateStockRequest) {
  * @returns A promise containing the updated Stock object.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function LinkStock(input: LinkUnlinkStockRequest) {
+export async function linkStock(input: LinkUnlinkStockRequest) {
   return mutate<LinkStockResponse>(gqlStockLink, input);
 }
 
@@ -74,7 +74,7 @@ export async function LinkStock(input: LinkUnlinkStockRequest) {
  * @returns A promise containing the updated Stock object.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function UnlinkStock(input: LinkUnlinkStockRequest) {
+export async function unlinkStock(input: LinkUnlinkStockRequest) {
   return mutate<UnlinkStockResponse>(gqlStockUnlink, input);
 }
 
@@ -85,7 +85,7 @@ export async function UnlinkStock(input: LinkUnlinkStockRequest) {
  * @returns True if the object was deleted.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function DeleteStock(input: DeleteRestoreStockRequest) {
+export async function deleteStock(input: DeleteRestoreStockRequest) {
   return mutate<DeleteStockResponse>(gqlStockDelete, input);
 }
 
@@ -96,6 +96,6 @@ export async function DeleteStock(input: DeleteRestoreStockRequest) {
  * @returns A promise containing the updated Stock object.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function RestoreStock(input: DeleteRestoreStockRequest) {
+export async function restoreStock(input: DeleteRestoreStockRequest) {
   return mutate<RestoreStockResponse>(gqlStockRestore, input);
 }

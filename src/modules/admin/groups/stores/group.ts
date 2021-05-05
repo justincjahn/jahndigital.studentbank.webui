@@ -1,8 +1,4 @@
-import Apollo from '@/services/Apollo';
-import gqlGroups from '@/modules/admin/graphql/queries/groupsByInstance.gql';
-import gqlNewGroup from '@/modules/admin/graphql/mutations/groupCreate.gql';
-import gqlUpdateGroup from '@/modules/admin/graphql/mutations/groupUpdate.gql';
-import gqlDeleteGroup from '@/modules/admin/graphql/mutations/groupDelete.gql';
+import * as groupService from '@/services/group';
 import { InstanceStore } from '@/modules/admin/stores/instance';
 import { computed, reactive, watch } from 'vue';
 
@@ -45,19 +41,8 @@ export function setup(instanceStore: InstanceStore) {
     store.loading = true;
 
     try {
-      const res = await Apollo.query<GroupResponse>({
-        query: gqlGroups,
-        fetchPolicy: cache ? 'cache-first' : 'network-only',
-        variables: {
-          instanceId,
-        },
-      });
-
-      if (res.data) {
-        store.groups = res.data.groups.nodes;
-      }
-    } catch (e) {
-      throw e.message;
+      const data = await groupService.getGroups({ instanceId, cache });
+      store.groups = data.groups.nodes;
     } finally {
       store.loading = false;
     }
@@ -69,28 +54,10 @@ export function setup(instanceStore: InstanceStore) {
    * @param input
    */
   async function newGroup(input: NewGroupRequest) {
-    try {
-      const res = await Apollo.mutate<NewGroupResponse>({
-        mutation: gqlNewGroup,
-        variables: input,
-        refetchQueries: [{
-          query: gqlGroups,
-          variables: {
-            instanceId: input.instanceId,
-          },
-        }],
-      });
-
-      if (res.data) {
-        const [group] = res.data.newGroup;
-        store.groups = [...store.groups, group];
-        return group;
-      }
-
-      throw new Error('Unable to create group: unknown error.');
-    } catch (e) {
-      throw e?.message ?? e;
-    }
+    const data = await groupService.newGroup(input);
+    const [group] = data.newGroup;
+    store.groups = [...store.groups, group];
+    return group;
   }
 
   /**
@@ -99,31 +66,13 @@ export function setup(instanceStore: InstanceStore) {
    * @param input
    */
   async function updateGroup(input: UpdateGroupRequest) {
-    try {
-      const res = await Apollo.mutate<UpdateGroupResponse>({
-        mutation: gqlUpdateGroup,
-        variables: input,
-        refetchQueries: [{
-          query: gqlGroups,
-          variables: {
-            instanceId: input.instanceId,
-          },
-        }],
-      });
+    const data = await groupService.updateGroup(input);
+    store.groups = [
+      ...store.groups.filter((x: Group) => x.id !== data?.updateGroup[0].id),
+      ...data.updateGroup,
+    ];
 
-      if (res.data) {
-        store.groups = [
-          ...store.groups.filter((x: Group) => x.id !== res.data?.updateGroup[0].id),
-          ...res.data.updateGroup,
-        ];
-
-        return res.data.updateGroup[0];
-      }
-
-      throw new Error('Unable to create instance: unknown error.');
-    } catch (e) {
-      throw e?.message ?? e;
-    }
+    return data.updateGroup[0];
   }
 
   /**
@@ -132,30 +81,15 @@ export function setup(instanceStore: InstanceStore) {
    * @param group
    */
   async function deleteGroup(group: Group) {
-    try {
-      const res = await Apollo.mutate<DeleteGroupResponse>({
-        mutation: gqlDeleteGroup,
-        variables: {
-          id: group.id,
-        },
-        refetchQueries: [{
-          query: gqlGroups,
-          variables: {
-            instanceId: group.instanceId,
-          },
-        }],
-      });
+    const data = await groupService.deleteGroup(group);
 
-      if (res.data && res.data.deleteGroup === true) {
-        store.groups = store.groups.filter((x) => x.id !== group.id);
-        if (store.selected === group) { store.selected = null; }
-        return;
-      }
-
-      throw new Error('Unable to delete instance: unknown error.');
-    } catch (e) {
-      throw e?.message ?? e;
+    if (data.deleteGroup === true) {
+      store.groups = store.groups.filter((x) => x.id !== group.id);
+      if (store.selected === group) { store.selected = null; }
+      return;
     }
+
+    throw new Error('Unable to delete instance: unknown error.');
   }
 
   // Watch for selected instance changes and fetch new groups

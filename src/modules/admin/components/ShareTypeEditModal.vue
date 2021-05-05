@@ -133,7 +133,7 @@ export default defineComponent({
         await props.shareTypeStore.updateShareType({
           id: props.shareType.id,
           name: nameValue.value,
-          dividendDate: Rate.fromStringOrDefault(rateValue.value).getRate(),
+          dividendRate: Rate.fromStringOrDefault(rateValue.value).getRate(),
         });
       } catch (e) {
         errorStore.setCurrentError(e?.message ?? e);

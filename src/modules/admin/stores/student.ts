@@ -1,29 +1,6 @@
 import { FETCH_OPTIONS } from '@/constants';
 import { computed, reactive } from 'vue';
-import Apollo from '@/services/Apollo';
-import gqlStudentsByName from '@/modules/admin/graphql/queries/studentsByName.gql';
-import gqlStudentsByEmail from '@/modules/admin/graphql/queries/studentsByEmail.gql';
-import gqlStudentsByAccountNumber from '@/modules/admin/graphql/queries/studentsByAccountNumber.gql';
-import gqlStudentById from '../graphql/queries/studentById.gql';
-import gqlStudents from '../graphql/queries/students.gql';
-import gqlUpdateStudent from '../graphql/mutations/studentUpdate.gql';
-import gqlNewStudent from '../graphql/mutations/studentCreate.gql';
-import gqlDeleteStudent from '../graphql/mutations/studentDelete.gql';
-import gqlBulkGroup from '../graphql/mutations/studentBulkUpdate.gql';
-
-/**
- * Options used during the initial fetch.
- */
-type FetchOptions = {
-  // The Group ID to filter the list by
-  groupId: number;
-
-  // The number of students to skip for the initial fetch
-  first?: number;
-
-  // If the cache should be hit for the fetch operations
-  cache?: boolean;
-}
+import * as studentService from '@/services/student';
 
 /**
  * Stores information about students and the currently selected student.
@@ -80,22 +57,8 @@ export function setup() {
    */
   async function refreshSelected() {
     if (store.selected === null) return;
-
-    try {
-      const res = await Apollo.query<StudentResponse>({
-        query: gqlStudentById,
-        fetchPolicy: 'network-only',
-        variables: {
-          id: store.selected.id,
-        },
-      });
-
-      if (res.data) {
-        [store.selected] = res.data.students.nodes;
-      }
-    } catch (e) {
-      throw e?.message ?? e;
-    }
+    const data = await studentService.getStudentById({ id: store.selected.id, cache: false });
+    [store.selected] = data.students.nodes;
   }
 
   /**
@@ -103,29 +66,21 @@ export function setup() {
    *
    * @param {FetchOptions} options
    */
-  async function fetch(options: FetchOptions) {
-    const pageCount = options.first ?? currentFetchCount.value;
+  async function fetch(options: studentService.GetByGroupOptions) {
+    const opts = {
+      first: FETCH_OPTIONS.DEFAULT_COUNT,
+      ...options,
+    };
+
     store.loading = true;
 
     try {
-      const res = await Apollo.query<PagedStudentResponse>({
-        query: gqlStudents,
-        fetchPolicy: (options.cache === false) ? 'network-only' : 'cache-first',
-        variables: {
-          groupId: options.groupId,
-          first: pageCount,
-        },
-      });
-
-      if (res.data) {
-        store.students = res.data.students.nodes;
-        store.pageInfo = res.data.students.pageInfo;
-        store.totalCount = res.data.students.totalCount;
-        store.pageCount = pageCount;
-        store.cursorStack = [];
-      }
-    } catch (e) {
-      throw e?.message ?? e;
+      const data = await studentService.getStudentsByGroup(opts);
+      store.students = data.students.nodes;
+      store.pageInfo = data.students.pageInfo;
+      store.totalCount = data.students.totalCount;
+      store.pageCount = opts.first;
+      store.cursorStack = [];
     } finally {
       store.loading = false;
     }
@@ -139,24 +94,16 @@ export function setup() {
     store.loading = true;
 
     try {
-      const res = await Apollo.query<PagedStudentResponse>({
-        query: gqlStudents,
-        variables: {
-          groupId,
-          first: currentFetchCount.value,
-          after: store.pageInfo?.endCursor ?? null,
-        },
+      const data = await studentService.getStudentsByGroup({
+        groupId,
+        first: store.pageCount,
+        after: store.pageInfo?.endCursor ?? undefined,
       });
 
-      if (res.data) {
-        // Add the current end cursor to the stack before we overwrite it
-        store.cursorStack = [...store.cursorStack, store.pageInfo?.endCursor ?? ''];
-        store.students = res.data.students.nodes;
-        store.pageInfo = res.data.students.pageInfo;
-        store.totalCount = res.data.students.totalCount;
-      }
-    } catch (e) {
-      throw e?.message ?? e;
+      store.cursorStack = [...store.cursorStack, store.pageInfo?.endCursor ?? ''];
+      store.students = data.students.nodes;
+      store.pageInfo = data.students.pageInfo;
+      store.totalCount = data.students.totalCount;
     } finally {
       store.loading = false;
     }
@@ -173,23 +120,16 @@ export function setup() {
       const stack = [...store.cursorStack];
       stack.pop();
 
-      const res = await Apollo.query<PagedStudentResponse>({
-        query: gqlStudents,
-        variables: {
-          groupId,
-          first: currentFetchCount.value,
-          after: stack[stack.length - 1] ?? null,
-        },
+      const data = await studentService.getStudentsByGroup({
+        groupId,
+        first: store.pageCount,
+        after: stack[stack.length - 1] ?? undefined,
       });
 
-      if (res.data) {
-        store.students = res.data.students.nodes;
-        store.pageInfo = res.data.students.pageInfo;
-        store.totalCount = res.data.students.totalCount;
-        store.cursorStack = stack;
-      }
-    } catch (e) {
-      throw e?.message ?? e;
+      store.students = data.students.nodes;
+      store.pageInfo = data.students.pageInfo;
+      store.totalCount = data.students.totalCount;
+      store.cursorStack = stack;
     } finally {
       store.loading = false;
     }
@@ -211,26 +151,14 @@ export function setup() {
    * @throws {Error} If an issue was encountered while attempting to create the student.
    */
   async function newStudent(input: NewStudentRequest) {
-    try {
-      const res = await Apollo.mutate<NewStudentResponse>({
-        mutation: gqlNewStudent,
-        variables: input,
-      });
+    const data = await studentService.newStudent(input);
+    const [student] = data.newStudent;
 
-      if (res.data) {
-        const [student] = res.data.newStudent;
-
-        if (store.students[0]?.groupId === input.groupId ?? true) {
-          store.students = [...store.students, student];
-        }
-
-        return student;
-      }
-
-      throw new Error('Unable to create Student: unknown error.');
-    } catch (e) {
-      throw e?.message ?? e;
+    if (store.students[0]?.groupId === input.groupId ?? true) {
+      store.students = [...store.students, student];
     }
+
+    return student;
   }
 
   /**
@@ -241,15 +169,10 @@ export function setup() {
    * @throws {Error} If an error ocurred during the fetch operation.
    */
   async function getById(id: number): Promise<Student | null> {
-    const res = await Apollo.query<PagedStudentResponse>({
-      query: gqlStudentById,
-      variables: {
-        id,
-      },
-    });
+    const data = await studentService.getStudentById({ id });
 
-    if (res.data && res.data.students.nodes.length > 0) {
-      const [student] = res.data.students.nodes;
+    if (data.students.nodes.length > 0) {
+      const [student] = data.students.nodes;
       return student;
     }
 
@@ -263,25 +186,8 @@ export function setup() {
    * @throws {Error} If the account number provided was invalid or a GRAPHQL error occurs.
    */
   async function getByAccountNumber(accountNumber: string): Promise<Student[]> {
-    if (accountNumber.length > 10) {
-      throw new Error('Account numbers cannot be more than 10 characters.');
-    }
-
-    if (!/^[0-9]+$/.test(accountNumber)) {
-      throw new Error('Account numbers can only contain numbers.');
-    }
-
-    const res = await Apollo.query<PagedStudentResponse>({
-      query: gqlStudentsByAccountNumber,
-      variables: {
-        accountNumber,
-      },
-    });
-
-    if (res.data && res.data.students) {
-      return res.data.students.nodes;
-    }
-
+    const data = await studentService.getStudentsByAccountNumber({ accountNumber });
+    if (data.students) { return data.students.nodes; }
     return [];
   }
 
@@ -291,17 +197,8 @@ export function setup() {
    * @param email The email address of the student.
    */
   async function getByEmail(email: string): Promise<Student[]> {
-    const res = await Apollo.query<PagedStudentResponse>({
-      query: gqlStudentsByEmail,
-      variables: {
-        email,
-      },
-    });
-
-    if (res.data && res.data.students) {
-      return res.data.students.nodes;
-    }
-
+    const data = await studentService.getStudentsByEmail({ email });
+    if (data.students) { return data.students.nodes; }
     return [];
   }
 
@@ -311,17 +208,8 @@ export function setup() {
    * @param name The partial name of the student.
    */
   async function getByName(name: string): Promise<Student[]> {
-    const res = await Apollo.query<PagedStudentResponse>({
-      query: gqlStudentsByName,
-      variables: {
-        name,
-      },
-    });
-
-    if (res.data && res.data.students) {
-      return res.data.students.nodes;
-    }
-
+    const data = await studentService.getStudentsByName({ name });
+    if (data.students) { return data.students.nodes; }
     return [];
   }
 
@@ -332,36 +220,25 @@ export function setup() {
    * @throws {Error} If an issue was encountered while attempting the API call.
    */
   async function updateStudent(student: Student) {
-    try {
-      const res = await Apollo.mutate<UpdateStudentResponse>({
-        mutation: gqlUpdateStudent,
-        variables: {
-          id: student.id,
-          groupId: student.groupId,
-          accountNumber: student.accountNumber.padStart(10, '0'),
-          firstName: student.firstName,
-          lastName: student.lastName,
-          email: student.email,
-        },
-      });
+    const data = await studentService.updateStudent({
+      id: student.id,
+      groupId: student.groupId,
+      accountNumber: student.accountNumber.padStart(10, '0'),
+      firstName: student.firstName,
+      lastName: student.lastName,
+      email: student.email,
+    });
 
-      if (res.data) {
-        if (store.selected && store.selected.id === student.id) {
-          [store.selected] = res.data.updateStudent;
+    if (store.selected && store.selected.id === student.id) {
+      [store.selected] = data.updateStudent;
 
-          const index = store.students.findIndex((x) => x.id === student.id);
-          if (index >= 0) {
-            store.students = store.students.splice(index, 1, student);
-          }
-        }
-
-        return res.data.updateStudent;
+      const index = store.students.findIndex((x) => x.id === student.id);
+      if (index >= 0) {
+        store.students = store.students.splice(index, 1, student);
       }
-
-      throw new Error('Unable to update Student: unknown error.');
-    } catch (e) {
-      throw e?.message ?? e;
     }
+
+    return data.updateStudent;
   }
 
   /**
@@ -374,25 +251,7 @@ export function setup() {
     store.loading = true;
 
     try {
-      const res = await Apollo.mutate<UpdateBulkStudentResponse>({
-        mutation: gqlBulkGroup,
-        variables: {
-          students: s.map((x) => ({ id: x.id, groupId: g.id })),
-        },
-        update(cache) {
-          cache.evict({
-            id: 'ROOT_QUERY',
-            fieldName: 'students',
-            broadcast: false,
-          });
-
-          cache.gc();
-        },
-      });
-
-      if (!res.data) throw new Error('Unable post transaction: unknown error.');
-    } catch (e) {
-      throw e?.message ?? e;
+      await studentService.bulkMoveStudents(g, s);
     } finally {
       store.loading = false;
     }
@@ -405,27 +264,15 @@ export function setup() {
    * @throws {Error} If an issue was encountered while attempting to delete the student.
    */
   async function deleteStudent(student: Student) {
-    try {
-      const res = await Apollo.mutate<DeleteStudentResponse>({
-        mutation: gqlDeleteStudent,
-        variables: { id: student.id },
-        update(cache) {
-          cache.evict({
-            id: cache.identify({ ...student }),
-          });
-        },
-      });
+    const data = await studentService.deleteStudent(student);
 
-      if (res.data && res.data.deleteStudent === true) {
-        const isListed = store.students.findIndex((x) => x.id === student.id);
-        if (isListed >= 0) {
-          store.students = store.students.filter((x) => x.id !== student.id);
-        }
-      } else {
-        throw new Error('Unable to delete student: unknown reason.');
+    if (data.deleteStudent === true) {
+      const isListed = store.students.findIndex((x) => x.id === student.id);
+      if (isListed >= 0) {
+        store.students = store.students.filter((x) => x.id !== student.id);
       }
-    } catch (e) {
-      throw e?.message ?? e;
+    } else {
+      throw new Error('Unable to delete student: unknown reason.');
     }
   }
 

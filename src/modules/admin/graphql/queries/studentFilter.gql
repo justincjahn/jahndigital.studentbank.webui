@@ -1,0 +1,7 @@
+query students($where: StudentFilter) {
+  students(where: $where) {
+    nodes {
+      accountNumber
+    }
+  }
+}

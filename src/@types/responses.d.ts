@@ -95,6 +95,16 @@ interface PagedStudentResponse {
   };
 }
 
+interface StudentAccountNumber {
+  accountNumber: string;
+}
+
+interface StudentFilterResponse {
+  students: {
+    nodes: StudentAccountNumber[];
+  };
+}
+
 interface UpdateStudentResponse {
   updateStudent: Student[];
 }
@@ -169,18 +179,23 @@ interface NewShareTypeResponse {
   newShareType: ShareType[];
 }
 
-interface PagedShareTypeResponse {
-  shareTypes?: {
-    pageInfo: PageInfo;
-    totalCount: number;
-    nodes: ShareType[];
-  };
+interface PagedShareType {
+  pageInfo: PageInfo;
+  totalCount: number;
+  nodes: ShareType[];
+}
 
-  availableShareTypes?: {
-    pageInfo: PageInfo;
-    totalCount: number;
-    nodes: ShareType[];
-  };
+interface PagedShareTypeResponse {
+  shareTypes: PagedShareType;
+}
+
+interface PagedAvailableShareTypeResponse {
+  availableShareTypes: PagedShareType;
+}
+
+interface CombinedPagedShareTypeResponse {
+  shareTypes?: PagedShareType;
+  availableShareTypes?: PagedShareType;
 }
 
 interface UpdateShareTypeResponse {

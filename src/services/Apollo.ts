@@ -7,6 +7,9 @@ import {
   Operation,
   ServerParseError,
   throwServerError,
+  FetchPolicy,
+  MutationOptions,
+  OperationVariables,
 } from '@apollo/client/core';
 
 import { onError } from '@apollo/client/link/error';
@@ -214,9 +217,6 @@ const defaultClient = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ApolloVariables = Record<string, any>;
-
 /**
  * Convienience method to call Apollo queries or reject if no data was returned.
  *
@@ -224,8 +224,26 @@ type ApolloVariables = Record<string, any>;
  * @param variables The variables, if any, to send to the server for the provided query.
  * @returns The server result, or a rejected promise.
  */
-export async function query<TReturn, TOptions = ApolloVariables>(qry: DocumentNode, variables?: TOptions) {
-  const res = await defaultClient.query<TReturn>({ query: qry, variables });
+export async function query<TReturn, TOptions = OperationVariables>(
+  qry: DocumentNode,
+  variables?: TOptions,
+  fetchPolicy?: FetchPolicy,
+) {
+  const res = await defaultClient.query<TReturn>({ query: qry, variables, fetchPolicy });
+  if (res.data) return Promise.resolve(res.data);
+  return Promise.reject(new Error('An unknown error has occurred.'));
+}
+
+/**
+ * Convienience method to call Apollo queries or reject if no data was returned.
+ *
+ * @param options
+ * @returns The server result, or a rejected promise.
+ */
+export async function mutateCustom<TReturn, TVariables = OperationVariables>(
+  options: MutationOptions<TReturn, TVariables>,
+) {
+  const res = await defaultClient.mutate<TReturn, TVariables>(options);
   if (res.data) return Promise.resolve(res.data);
   return Promise.reject(new Error('An unknown error has occurred.'));
 }
@@ -237,10 +255,11 @@ export async function query<TReturn, TOptions = ApolloVariables>(qry: DocumentNo
  * @param variables The variables, if any, to send to the server.
  * @returns An Apollo result object of the TReturn type.
  */
-export async function mutate<TReturn, TOptions = ApolloVariables>(mutation: DocumentNode, variables?: TOptions) {
-  const res = await defaultClient.mutate<TReturn>({ mutation, variables });
-  if (res.data) return Promise.resolve(res.data);
-  return Promise.reject(new Error('An unknown error has occurred.'));
+export async function mutate<TReturn, TOptions = OperationVariables>(
+  mutation: DocumentNode,
+  variables?: TOptions,
+) {
+  return mutateCustom<TReturn, TOptions>({ mutation, variables });
 }
 
 export default defaultClient;

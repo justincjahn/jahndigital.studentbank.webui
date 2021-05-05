@@ -72,7 +72,8 @@
             "allowFirstLine": false
           }
         }
-      ]
+      ],
+      "import/no-named-as-default-member": "off"
     }
   },
   "browserslist": [

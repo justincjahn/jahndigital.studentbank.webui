@@ -10,8 +10,7 @@ import sample from '@/utils/sample';
 import Money from '@/utils/money';
 
 // API
-import Apollo from '@/services/Apollo';
-import { gql } from '@apollo/client/core';
+import { getStudentIdsByGroup } from '@/services/student';
 import { setup as defineInstanceStore } from '@/modules/admin/stores/instance';
 import { setup as defineStudentStore } from '@/modules/admin/stores/student';
 import { setup as defineShareStore } from '@/modules/admin/stores/share';
@@ -83,36 +82,6 @@ export interface BulkImportSample extends StudentInfo {
  * The format of the student information stored in state before it's imported.
  */
 type StudentInfoMap = Record<string, StudentInfo>;
-
-/**
- * Filter for group IDs
- */
-interface GroupIdFilter {
-  groupId: number;
-}
-
-/**
- * Used to build a graphql query that lists all students by groupId.
- */
-interface StudentFilter {
-  OR: GroupIdFilter[];
-}
-
-/**
- * Minimal student information for GQL
- */
-interface StudentAccountNumber {
-  accountNumber: string;
-}
-
-/**
- * Apollo res.data response
- */
-interface StudentFilterResponse {
-  students: {
-    nodes: StudentAccountNumber[];
-  };
-}
 
 /**
  * Store that handles the multi-step workflow to post transactions to students' shares.
@@ -318,30 +287,10 @@ export function setup() {
     // If there are no groups in the DB, there are no students
     if (store.dbGroups.length === 0) return csvStudents;
 
-    // Fetch instance students
-    const query = gql`
-      query students($where: StudentFilter) {
-        students(where: $where) {
-          nodes {
-            accountNumber
-          }
-        }
-      }
-    `;
+    const data = await getStudentIdsByGroup(store.dbGroups.map((x) => x.id));
 
-    const where: StudentFilter = {
-      OR: store.dbGroups.map((x) => ({ groupId: x.id })),
-    };
-
-    const sRes = await Apollo.query<StudentFilterResponse>({
-      query,
-      variables: {
-        where,
-      },
-    });
-
-    if (sRes.data) {
-      const dbStudents = sRes.data.students.nodes.map((x) => x.accountNumber);
+    if (data) {
+      const dbStudents = data.students.nodes.map((x) => x.accountNumber);
       const diff = dbStudents.filter((x) => Object.keys(csvStudents).includes(x));
 
       // If there are students in both the CSV and the database with the same account number,

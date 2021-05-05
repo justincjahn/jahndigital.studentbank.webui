@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import { RouteNames as LoginRouteNames } from '@/modules/admin/login/routes';
+import LoginRouteNames from '@/modules/admin/login/routeNames';
 import userStore from '@/store/user';
 import AuthenticationService from '@/services/AuthenticationService';
 import Apollo from '@/services/Apollo';

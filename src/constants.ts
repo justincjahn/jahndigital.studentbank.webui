@@ -31,4 +31,5 @@ export default {
   API_MAX_CONCURRENCY,
   AUTH_TOKEN,
   ERROR_CODES,
+  FETCH_OPTIONS,
 };

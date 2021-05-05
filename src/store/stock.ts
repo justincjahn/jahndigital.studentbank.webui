@@ -1,6 +1,6 @@
 import { FETCH_OPTIONS } from '@/constants';
 import { computed, reactive } from 'vue';
-import { GetStocks } from '@/services/StockService';
+import { getStocks } from '@/services/stock';
 
 interface FetchOptions {
   first?: number;
@@ -53,8 +53,7 @@ export function setup() {
     store.loading = true;
 
     try {
-      const res = await GetStocks(opts);
-
+      const res = await getStocks(opts);
       store.stocks = res.stocks.nodes;
       store.pageInfo = res.stocks.pageInfo;
       store.totalCount = res.stocks.totalCount;
@@ -73,7 +72,7 @@ export function setup() {
     store.loading = true;
 
     try {
-      const res = await GetStocks({
+      const res = await getStocks({
         first: store.pageCount,
         after: endCursor,
       });
@@ -96,7 +95,7 @@ export function setup() {
 
     store.loading = true;
     try {
-      const res = await GetStocks({
+      const res = await getStocks({
         first: store.pageCount,
         after: stack[stack.length - 1] ?? null,
       });

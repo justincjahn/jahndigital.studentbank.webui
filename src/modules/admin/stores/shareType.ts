@@ -5,23 +5,13 @@ import { FETCH_OPTIONS } from '@/constants';
 import { InstanceStore } from '@/modules/admin/stores/instance';
 
 // GraphQL
-import Apollo from '@/services/Apollo';
-import gqlAvailableShareTypes from '@/modules/admin/graphql/queries/shareTypesAvailable.gql';
-import gqlShareTypesByInstance from '@/modules/admin/graphql/queries/shareTypesByInstance.gql';
-import gqlNewShareType from '@/modules/admin/graphql/mutations/shareTypeCreate.gql';
-import gqlUpdateShareType from '@/modules/admin/graphql/mutations/shareTypeUpdate.gql';
-import gqlLinkShareType from '@/modules/admin/graphql/mutations/shareTypeLink.gql';
-import gqlUnlinkShareType from '@/modules/admin/graphql/mutations/shareTypeUnlink.gql';
-import gqlDeleteShareType from '@/modules/admin/graphql/mutations/shareTypeDelete.gql';
-import gqlDividendPosting from '@/modules/admin/graphql/mutations/shareTypeDividend.gql';
+import * as shareTypeService from '@/services/shareType';
 
 /**
  * Options used on the initial fetch.
  */
-type FetchOptions = {
+interface FetchOptions extends shareTypeService.FetchOptions {
   available?: boolean;
-  first?: number;
-  cache?: boolean;
 }
 
 /**
@@ -31,14 +21,13 @@ type FetchOptions = {
  * automatically fetch Share Types for the new instance if it changes and fetch wasn't already
  * called with {FetchOptions.available}.
  *
- * @param {InstanceStore} instanceStore The InstanceStore to watch.
- * @param {boolean} immediate If the store should immediatley try to fetch share types instead of waiting for change.
+ * @param instanceStore The InstanceStore to watch.
+ * @param immediate If the store should immediatley try to fetch share types instead of waiting for change.
  */
 export function setup(instanceStore: InstanceStore, immediate = true) {
   const store = reactive({
     loading: false,
     byInstance: true,
-    query: gqlShareTypesByInstance,
     totalCount: 0,
     pageInfo: null as PageInfo|null,
     pageCount: FETCH_OPTIONS.DEFAULT_COUNT,
@@ -46,22 +35,16 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
     shareTypes: [] as ShareType[],
   });
 
-  // GETs the loading state of the fetch operation
   const loading = computed(() => store.loading);
 
-  // GETs the total number of shares
   const totalCount = computed(() => store.totalCount);
 
-  // GETs the PageInfo property
   const pageInfo = computed(() => store.pageInfo);
 
-  // GETs the current list of transactions
   const shareTypes = computed(() => store.shareTypes);
 
-  // GETS the current number of items to fetch per operation
   const currentFetchCount = computed(() => store.pageCount ?? FETCH_OPTIONS.DEFAULT_COUNT);
 
-  // GETs the total number of pages for transaction
   const totalTransactionPages = computed(() => {
     if (store.totalCount > 0) {
       return Math.ceil(store.totalCount / currentFetchCount.value);
@@ -75,7 +58,7 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
    *
    * @param res
    */
-  function set(res: PagedShareTypeResponse) {
+  function set(res: CombinedPagedShareTypeResponse) {
     if (res.shareTypes) {
       store.shareTypes = res.shareTypes.nodes;
       store.pageInfo = res.shareTypes.pageInfo;
@@ -90,37 +73,31 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
   /**
    * Fetch the initial list of shareTypes.
    *
-   * @param {FetchOptions=} options
+   * @param options
    */
   async function fetch(options?: FetchOptions) {
-    const pageCount = options?.first ?? currentFetchCount.value;
-    store.loading = true;
-
-    // Switch the query to available if that's what was requested
-    if (options?.available ?? false) {
-      store.query = gqlAvailableShareTypes;
-      store.byInstance = false;
-    }
-
-    const variables = {
-      instanceId: instanceStore.selected.value?.id ?? -1,
-      first: pageCount,
+    const opts = {
+      first: store.pageCount,
+      available: false,
+      cache: true,
+      ...options,
     };
 
-    try {
-      const res = await Apollo.query<PagedShareTypeResponse>({
-        query: store.query,
-        variables,
-        fetchPolicy: ((options?.cache ?? true) === false) ? 'network-only' : 'cache-first',
-      });
+    store.loading = true;
 
-      if (res.data) {
-        set(res.data);
-        store.pageCount = options?.first ?? store.pageCount;
-        store.cursorStack = [];
+    try {
+      if (opts.available) {
+        const data = await shareTypeService.getAvailableShareTypes(opts);
+        store.byInstance = false;
+        set(data);
+      } else {
+        const data = await shareTypeService.getShareTypesByInstance({
+          ...opts,
+          instanceId: instanceStore.selected.value?.id ?? -1,
+        });
+
+        set(data);
       }
-    } catch (e) {
-      throw e?.message ?? e;
     } finally {
       store.loading = false;
     }
@@ -135,23 +112,20 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
 
     const variables = {
       instanceId: instanceStore.selected.value?.id ?? -1,
-      first: currentFetchCount.value,
+      first: store.pageCount,
       after: endCursor,
     };
 
     try {
-      const res = await Apollo.query<PagedShareTypeResponse>({
-        query: store.query,
-        variables,
-      });
-
-      if (res.data) {
-        // Add the current end cursor to the stack before we overwrite it
-        store.cursorStack = [...store.cursorStack, endCursor];
-        set(res.data);
+      let data: CombinedPagedShareTypeResponse;
+      if (store.byInstance) {
+        data = await shareTypeService.getShareTypesByInstance(variables);
+      } else {
+        data = await shareTypeService.getAvailableShareTypes(variables);
       }
-    } catch (e) {
-      throw e?.message ?? e;
+
+      store.cursorStack = [...store.cursorStack, endCursor];
+      set(data);
     } finally {
       store.loading = false;
     }
@@ -162,7 +136,6 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
    */
   async function fetchPrevious() {
     store.loading = true;
-
     const stack = [...store.cursorStack];
     stack.pop();
 
@@ -173,17 +146,15 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
     };
 
     try {
-      const res = await Apollo.query<PagedShareTypeResponse>({
-        query: store.query,
-        variables,
-      });
-
-      if (res.data) {
-        store.cursorStack = stack;
-        set(res.data);
+      let data: CombinedPagedShareTypeResponse;
+      if (store.byInstance) {
+        data = await shareTypeService.getShareTypesByInstance(variables);
+      } else {
+        data = await shareTypeService.getAvailableShareTypes(variables);
       }
-    } catch (e) {
-      throw e?.message ?? e;
+
+      store.cursorStack = stack;
+      set(data);
     } finally {
       store.loading = false;
     }
@@ -192,195 +163,97 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
   /**
    * Create a new share type.
    *
-   * @param {NewShareTypeRequest} input
+   * @param input
    */
   async function newShareType(input: NewShareTypeRequest) {
-    try {
-      const res = await Apollo.mutate<NewShareTypeResponse>({
-        mutation: gqlNewShareType,
-        variables: input,
-      });
+    const data = await shareTypeService.newShareType(input);
+    const [shareType] = data.newShareType;
+    const instanceId = instanceStore.selected.value?.id ?? -1;
+    const hasInstance = shareType?.shareTypeInstances.findIndex((x) => x.instanceId === instanceId) ?? false;
 
-      if (res.data) {
-        const [shareType] = res.data.newShareType;
-        const instanceId = instanceStore.selected.value?.id ?? -1;
-        const hasInstance = shareType?.shareTypeInstances.findIndex((x) => x.instanceId === instanceId) ?? false;
+    if (store.byInstance && hasInstance >= 0) {
+      store.shareTypes = [...store.shareTypes, shareType];
+    }
 
-        if (store.query === gqlShareTypesByInstance && hasInstance >= 0) {
-          store.shareTypes = [...store.shareTypes, shareType];
-        }
-
-        if (store.query === gqlAvailableShareTypes) {
-          store.shareTypes = [...store.shareTypes, shareType];
-        }
-      } else {
-        throw new Error('Unable to create Share Type: unknown error.');
-      }
-    } catch (e) {
-      throw e?.message ?? e;
+    if (!store.byInstance) {
+      store.shareTypes = [...store.shareTypes, shareType];
     }
   }
 
   /**
    * Update a share type.
    *
-   * @param {UpdateShareTypeRequest} input
+   * @param input
    */
   async function updateShareType(input: UpdateShareTypeRequest) {
-    console.log(input);
+    const data = await shareTypeService.updateShareType(input);
+    const [shareType] = data.updateShareType;
+    const isListed = store.shareTypes.findIndex((x) => x.id === input.id);
 
-    try {
-      const res = await Apollo.mutate<UpdateShareTypeResponse>({
-        mutation: gqlUpdateShareType,
-        variables: {
-          ...input,
-          // Apollo doesn't send this variable if its a number and I don't know why!
-          dividendRate: input.dividendDate ? input.dividendDate.toString() : undefined,
-        },
-      });
-
-      if (res.data) {
-        const [shareType] = res.data.updateShareType;
-        const isListed = store.shareTypes.findIndex((x) => x.id === input.id);
-
-        if (isListed >= 0) {
-          const newShareTypes = [...store.shareTypes];
-          newShareTypes[isListed] = shareType;
-          store.shareTypes = newShareTypes;
-        }
-      }
-    } catch (e) {
-      throw e?.message ?? e;
+    if (isListed >= 0) {
+      const newShareTypes = [...store.shareTypes];
+      newShareTypes[isListed] = shareType;
+      store.shareTypes = newShareTypes;
     }
   }
 
   /**
    * Link a share type to an instance.
    *
-   * @param {LinkUnlinkShareTypeRequest} input
+   * @param input
    */
   async function linkShareType(input: LinkUnlinkShareTypeRequest) {
-    try {
-      const res = await Apollo.mutate<LinkShareTypeResponse>({
-        mutation: gqlLinkShareType,
-        variables: input,
-        update(cache) {
-          cache.evict({
-            id: 'ROOT_QUERY',
-            fieldName: 'shareTypes',
-          });
-
-          cache.gc();
-        },
-      });
-
-      if (res.data) {
-        const isListed = store.shareTypes.findIndex((x) => x.id === input.shareTypeId);
-        if (isListed >= 0) {
-          const newShareTypes = [...store.shareTypes];
-          // eslint-disable-next-line prefer-destructuring
-          newShareTypes[isListed] = res.data.linkShareType[0];
-          store.shareTypes = newShareTypes;
-        }
-      }
-
-      if (!res.data) {
-        throw new Error('Unable to link share to the given instance: unknown error.');
-      }
-    } catch (e) {
-      throw e?.message ?? e;
+    const data = await shareTypeService.linkShareType(input);
+    const isListed = store.shareTypes.findIndex((x) => x.id === input.shareTypeId);
+    if (isListed >= 0) {
+      const newShareTypes = [...store.shareTypes];
+      // eslint-disable-next-line prefer-destructuring
+      newShareTypes[isListed] = data.linkShareType[0];
+      store.shareTypes = newShareTypes;
     }
   }
 
   /**
    * Unlink a share type from an instance.
    *
-   * @param {LinkUnlinkShareTypeRequest} input
+   * @param input
    */
   async function unlinkShareType(input: LinkUnlinkShareTypeRequest) {
-    try {
-      const res = await Apollo.mutate<UnlinkShareTypeResponse>({
-        mutation: gqlUnlinkShareType,
-        variables: input,
-        update(cache) {
-          cache.evict({
-            id: 'ROOT_QUERY',
-            fieldName: 'shareTypes',
-            broadcast: false,
-          });
-
-          cache.gc();
-        },
-      });
-
-      if (res.data) {
-        const isListed = store.shareTypes.findIndex((x) => x.id === input.shareTypeId);
-        if (isListed >= 0) {
-          const newShareTypes = [...store.shareTypes];
-          // eslint-disable-next-line prefer-destructuring
-          newShareTypes[isListed] = res.data.unlinkShareType[0];
-          store.shareTypes = newShareTypes;
-        }
-      }
-
-      if (!res.data) {
-        throw new Error('Unable to unlink share to the given instance: unknown error.');
-      }
-    } catch (e) {
-      throw e?.message ?? e;
+    const data = await shareTypeService.unlinkShareType(input);
+    const isListed = store.shareTypes.findIndex((x) => x.id === input.shareTypeId);
+    if (isListed >= 0) {
+      const newShareTypes = [...store.shareTypes];
+      // eslint-disable-next-line prefer-destructuring
+      newShareTypes[isListed] = data.unlinkShareType[0];
+      store.shareTypes = newShareTypes;
     }
   }
 
   /**
    * Delete a share type.
    *
-   * @param {ShareType} shareType
+   * @param shareType
    */
   async function deleteShareType(shareType: ShareType) {
-    try {
-      const res = await Apollo.mutate<DeleteShareTypeResponse>({
-        mutation: gqlDeleteShareType,
-        variables: { id: shareType.id },
-        update(cache) {
-          cache.evict({
-            id: cache.identify({ ...shareType }),
-          });
-        },
-      });
-
-      if (res.data && res.data.deleteShareType === true) {
-        const isListed = store.shareTypes.findIndex((x) => x.id === shareType.id);
-        if (isListed >= 0) {
-          store.shareTypes = store.shareTypes.filter((x) => x.id !== shareType.id);
-        }
-      } else {
-        throw new Error('Unable to delete Share Type: unknown reason.');
+    const data = await shareTypeService.deleteShareType(shareType);
+    if (data.deleteShareType === true) {
+      const isListed = store.shareTypes.findIndex((x) => x.id === shareType.id);
+      if (isListed >= 0) {
+        store.shareTypes = store.shareTypes.filter((x) => x.id !== shareType.id);
       }
-    } catch (e) {
-      throw e?.message ?? e;
+    } else {
+      throw new Error('Unable to delete Share Type: unknown reason.');
     }
   }
 
   /**
    * Post dividends for the given shareTypeId and instance(s).
    *
-   * @param {DividendPostingRequest} input
+   * @param input
    */
   async function postDividends(input: DividendPostingRequest) {
-    try {
-      const res = await Apollo.mutate<DividendPostingResponse>({
-        mutation: gqlDividendPosting,
-        variables: input,
-      });
-
-      if (res.data && res.data.postDividends === true) {
-        return true;
-      }
-
-      throw new Error('Unable to post dividends: unknown reason.');
-    } catch (e) {
-      throw e?.message ?? e;
-    }
+    const data = await shareTypeService.postDividends(input);
+    return data.postDividends;
   }
 
   // If we're fetching by instance, re-fetch when it changes

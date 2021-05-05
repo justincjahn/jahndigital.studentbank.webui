@@ -10,8 +10,7 @@ import debounce from '@/utils/debounce';
 import sample from '@/utils/sample';
 
 // API
-import Apollo from '@/services/Apollo';
-import gqlNewBulkTransaction from '@/modules/admin/graphql/mutations/transactionBulk.gql';
+import { newBulkTransaction } from '@/services/transaction';
 
 /**
  * Specifies how the system handles shares without funds to cover the transaction.
@@ -417,18 +416,8 @@ export function setup() {
     });
 
     try {
-      const res = await Apollo.mutate<NewBulkTransactionResponse>({
-        mutation: gqlNewBulkTransaction,
-        variables: req,
-      });
-
-      if (res.data) {
-        return res.data.newBulkTransaction;
-      }
-
-      throw new Error('Unable to post transaction: unknown error.');
-    } catch (e) {
-      throw e?.message ?? e;
+      const data = await newBulkTransaction(req);
+      return data.newBulkTransaction;
     } finally {
       store.loading = false;
     }
