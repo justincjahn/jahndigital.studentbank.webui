@@ -27,7 +27,7 @@ export interface FetchOptions {
  */
 export function getTransactions(options: FetchOptions) {
   const opts = {
-    first: FETCH_OPTIONS,
+    first: FETCH_OPTIONS.DEFAULT_COUNT,
     cache: true,
     ...options,
   };

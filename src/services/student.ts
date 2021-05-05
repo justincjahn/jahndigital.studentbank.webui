@@ -71,7 +71,7 @@ export async function getStudentById(options: GetByIdOptions) {
 export async function getStudentsByAccountNumber(options: GetByAccountNumberOptions) {
   const opts = {
     cache: true,
-    first: FETCH_OPTIONS,
+    first: FETCH_OPTIONS.DEFAULT_COUNT,
     ...options,
   };
 
@@ -96,7 +96,7 @@ export async function getStudentsByAccountNumber(options: GetByAccountNumberOpti
 export async function getStudentsByEmail(options: GetByEmailOptions) {
   const opts = {
     cache: true,
-    first: FETCH_OPTIONS,
+    first: FETCH_OPTIONS.DEFAULT_COUNT,
     ...options,
   };
 
@@ -113,7 +113,7 @@ export async function getStudentsByEmail(options: GetByEmailOptions) {
 export async function getStudentsByName(options: GetByNameOptions) {
   const opts = {
     cache: true,
-    first: FETCH_OPTIONS,
+    first: FETCH_OPTIONS.DEFAULT_COUNT,
     ...options,
   };
 
@@ -130,7 +130,7 @@ export async function getStudentsByName(options: GetByNameOptions) {
 export async function getStudentsByGroup(options: GetByGroupOptions) {
   const opts = {
     cache: true,
-    first: FETCH_OPTIONS,
+    first: FETCH_OPTIONS.DEFAULT_COUNT,
     ...options,
   };
 

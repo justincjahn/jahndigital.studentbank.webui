@@ -43,7 +43,7 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
 
   const shareTypes = computed(() => store.shareTypes);
 
-  const currentFetchCount = computed(() => store.pageCount ?? FETCH_OPTIONS.DEFAULT_COUNT);
+  const currentFetchCount = computed(() => store.pageCount);
 
   const totalTransactionPages = computed(() => {
     if (store.totalCount > 0) {
