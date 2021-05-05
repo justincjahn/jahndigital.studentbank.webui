@@ -75,7 +75,7 @@ import { defineComponent, PropType, ref, watchEffect } from 'vue';
 
 // Routing
 import { useRouter } from 'vue-router';
-import { RouteNames as StudentRouteNames } from '@/modules/admin/students/routes';
+import StudentRouteNames from '@/modules/admin/students/routeNames';
 
 // Services
 import selection from '@/services/StudentSelectionService';

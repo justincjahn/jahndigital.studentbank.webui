@@ -1,10 +1,11 @@
 import { RouteRecordRaw } from 'vue-router';
+
+// Route Names
+import RouteNames from './routeNames';
+
+// Components
 import GroupsModule from './GroupsModule.vue';
 import GroupsIndex from './pages/GroupsIndex.vue';
-
-export enum RouteNames {
-  index = 'groups',
-}
 
 const routes: RouteRecordRaw[] = [
   {

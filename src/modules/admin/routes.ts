@@ -1,5 +1,10 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import GroupRoutes, { RouteNames as GroupRouteNames } from '@/modules/admin/groups/routes';
+
+// Route names
+import GroupRouteNames from '@/modules/admin/groups/routeNames';
+
+// Routes
+import GroupRoutes from '@/modules/admin/groups/routes';
 import StudentRoutes from '@/modules/admin/students/routes';
 import PurchasesRoutes from '@/modules/admin/purchases/routes';
 import StocksRoutes from '@/modules/admin/stocks/routes';

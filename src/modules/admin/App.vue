@@ -61,12 +61,12 @@ import { defineAsyncComponent, defineComponent, watchEffect, computed, provide }
 import { useRouter } from 'vue-router';
 
 // Routes
-import { RouteNames as GroupRouteNames } from '@/modules/admin/groups/routes';
-import { RouteNames as StudentRouteNames } from '@/modules/admin/students/routes';
-import { RouteNames as PurchasesRouteNames } from '@/modules/admin/purchases/routes';
+import GroupRouteNames from '@/modules/admin/groups/routeNames';
+import StudentRouteNames from '@/modules/admin/students/routeNames';
+import PurchasesRouteNames from '@/modules/admin/purchases/routeNames';
 import StocksRouteNames from '@/modules/admin/stocks/routeNames';
-import { RouteNames as SettingsRouteNames } from '@/modules/admin/settings/routes';
-import { RouteNames as LoginRouteNames } from '@/modules/admin/login/routes';
+import SettingsRouteNames from '@/modules/admin/settings/routeNames';
+import LoginRouteNames from '@/modules/admin/login/routeNames';
 
 // Stores
 import routerStore from '@/store/router';

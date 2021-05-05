@@ -87,7 +87,7 @@ import { validateAccountUnique, validateEmail, validateName } from '@/utils/vali
 
 // Routes
 // eslint-disable-next-line import/no-cycle
-import { RouteNames as StudentRouteNames } from '@/modules/admin/students/routes';
+import StudentRouteNames from '@/modules/admin/students/routeNames';
 
 // Stores
 import errorStore from '@/store/error';

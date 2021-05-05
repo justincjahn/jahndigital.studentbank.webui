@@ -1,12 +1,10 @@
 import { RouteRecordRaw } from 'vue-router';
-import StudentsModule from './StudentsModule.vue';
 
-export enum RouteNames {
-  index = 'students',
-  transactions = 'students-transactions',
-  stocks = 'students-stocks',
-  purchases = 'students-purchases',
-}
+// Route Names
+import RouteNames from './routeNames';
+
+// Components
+import StudentsModule from './StudentsModule.vue';
 
 const routes: RouteRecordRaw[] = [
   {

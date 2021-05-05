@@ -1,9 +1,10 @@
 import { RouteRecordRaw } from 'vue-router';
-import PurchasesModule from './PurchasesModule.vue';
 
-export enum RouteNames {
-  index = 'purchases',
-}
+// Route Names
+import RouteNames from './routeNames';
+
+// Components
+import PurchasesModule from './PurchasesModule.vue';
 
 const routes: RouteRecordRaw[] = [
   {

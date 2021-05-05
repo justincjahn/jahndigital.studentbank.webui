@@ -1,9 +1,10 @@
 import { RouteRecordRaw } from 'vue-router';
-import SettingsModule from './SettingsModule.vue';
 
-export enum RouteNames {
-  index = 'settings',
-}
+// Route Names
+import RouteNames from './routeNames';
+
+// Components
+import SettingsModule from './SettingsModule.vue';
 
 const routes: RouteRecordRaw[] = [
   {
