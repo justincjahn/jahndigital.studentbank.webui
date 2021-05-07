@@ -86,7 +86,7 @@ export default defineComponent({
   ],
   setup(props, { emit }) {
     // Use a bespoke ShareTypeStore for the available share types list so we don't muddle parent state.
-    const shareTypeStore = defineShareTypeStore(props.shareTypeStore.instanceStore, false);
+    const shareTypeStore = defineShareTypeStore();
 
     // An array of selected share types
     const linkedSelected = ref<ShareType[]>([]);
@@ -123,13 +123,15 @@ export default defineComponent({
     /**
      * Fetch a list of available share types using our custom store.
      */
-    async function fetchAvailableShareTypes() { await shareTypeStore.fetch({ available: true, cache: false }); }
+    async function fetchAvailableShareTypes() {
+      await shareTypeStore.fetch({ cache: false });
+    }
 
     /**
      * Unlink the currently selected share types.
      */
     async function handleUnlink() {
-      const instanceId = props.shareTypeStore.instanceStore.selected.value?.id ?? -1;
+      const instanceId = props.shareTypeStore.instanceStore?.selected.value?.id ?? -1;
       if (instanceId === -1) return;
 
       const errors = [] as string[];

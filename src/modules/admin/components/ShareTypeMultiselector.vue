@@ -91,5 +91,6 @@ export default defineComponent({
 <style lang="scss">
   .share-type-list {
     @include table($selectable: true);
+    @include round-border;
   }
 </style>

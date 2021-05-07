@@ -128,8 +128,8 @@ export default defineComponent({
     'ok',
   ],
   setup(props, { emit }) {
-    // Use a bespoke ShareTypeStore for the available share types list so we don't muddle parent state.
-    const shareTypeStore = setupShareTypeStore(props.shareTypeStore.instanceStore, false);
+    // Use a new ShareTypeStore for the available share types list so we don't muddle parent state.
+    const availableShareTypeStore = setupShareTypeStore();
 
     // True if a share type add operation is awaiting the server.
     const addLoading = ref(false);
@@ -142,8 +142,8 @@ export default defineComponent({
 
     // Filter share types that are already in the selected instance
     const shareTypes = computed(() => {
-      const instanceId = shareTypeStore.instanceStore.selected?.value?.id ?? -1;
-      const filtered = shareTypeStore.shareTypes.value.filter((st) => {
+      const instanceId = props.shareTypeStore.instanceStore?.selected?.value?.id ?? -1;
+      const filtered = availableShareTypeStore.shareTypes.value.filter((st) => {
         const hasInstance = st.shareTypeInstances.find((instance) => instance.instanceId === instanceId);
         return !hasInstance;
       });
@@ -200,7 +200,9 @@ export default defineComponent({
     /**
      * Fetch a list of available share types using our custom store.
      */
-    async function fetchAvailableShareTypes() { await shareTypeStore.fetch({ available: true, cache: false }); }
+    async function fetchAvailableShareTypes() {
+      await availableShareTypeStore.fetch({ cache: false });
+    }
 
     /**
      * Add a new share type and refresh available share types
@@ -209,7 +211,7 @@ export default defineComponent({
       addLoading.value = true;
 
       try {
-        await shareTypeStore.newShareType({
+        await availableShareTypeStore.newShareType({
           name: values.name,
           dividendRate: Rate.fromString(`${values.rate}%`).getRate(),
         });
@@ -227,6 +229,7 @@ export default defineComponent({
      * Link the selected share types
      */
     async function handleLink() {
+      if (!props.shareTypeStore.instanceStore) return;
       if (!props.shareTypeStore.instanceStore.selected.value) return;
       const instanceId = props.shareTypeStore.instanceStore.selected.value.id;
       const errors = [] as string[];
@@ -259,7 +262,7 @@ export default defineComponent({
     return {
       selected,
       shareTypes,
-      loading: shareTypeStore.loading,
+      loading: availableShareTypeStore.loading,
       addLoading,
       handleOk,
       handleAdd,
@@ -277,7 +280,7 @@ export default defineComponent({
 $size: 35rem;
 
 .stf {
-  @include round-border();
+  @include round-border;
 
   display: flex;
   flex-direction: column;

@@ -1,6 +1,5 @@
 import { FETCH_OPTIONS } from '@/constants';
-import gqlAvailableShareTypes from '@/modules/admin/graphql/queries/shareTypesAvailable.gql';
-import gqlShareTypesByInstance from '@/modules/admin/graphql/queries/shareTypesByInstance.gql';
+import gqlShareTypes from '@/modules/admin/graphql/queries/shareTypes.gql';
 import gqlNewShareType from '@/modules/admin/graphql/mutations/shareTypeCreate.gql';
 import gqlUpdateShareType from '@/modules/admin/graphql/mutations/shareTypeUpdate.gql';
 import gqlLinkShareType from '@/modules/admin/graphql/mutations/shareTypeLink.gql';
@@ -9,47 +8,38 @@ import gqlDeleteShareType from '@/modules/admin/graphql/mutations/shareTypeDelet
 import gqlDividendPosting from '@/modules/admin/graphql/mutations/shareTypeDividend.gql';
 import { query, mutate, mutateCustom } from './Apollo';
 
+/**
+ * Options used to fetch Share Types from the API.
+ */
 export interface FetchOptions {
+  // A list of instances to use as a filter when returning Share Types
+  instances?: number[];
+
+  // The number of items to return
   first?: number;
+
+  // A string pointer to tell the server where to start returning Share Types
+  after?: string;
+
+  // True if the cache should be used, or to force a network call
   cache?: boolean;
 }
 
-export interface InstanceFetchOptions extends FetchOptions {
-  instanceId: number;
-}
-
 /**
- * Get all Share Types available to the current user.
+ * Get Share Types available to the current user, or optionally filtered by instance.
  *
  * @param options
  * @returns A promise containing a list of Share Type objects.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function getAvailableShareTypes(options?: FetchOptions) {
+export async function getShareTypes(options?: FetchOptions) {
   const opts = {
     first: FETCH_OPTIONS.DEFAULT_COUNT,
     cache: true,
     ...options,
   };
 
-  return query<PagedAvailableShareTypeResponse>(gqlAvailableShareTypes, opts, opts.cache ? 'cache-first' : 'network-only');
-}
-
-/**
- * Get all Share Types linked to the provided instance.
- *
- * @param options
- * @returns A promise containing a list of Share Type objects.
- * @throws {Error} If an error occurred during the network call.
- */
-export async function getShareTypesByInstance(options: InstanceFetchOptions) {
-  const opts = {
-    first: FETCH_OPTIONS.DEFAULT_COUNT,
-    cache: true,
-    ...options,
-  };
-
-  return query<PagedShareTypeResponse>(gqlShareTypesByInstance, opts, opts.cache ? 'cache-first' : 'network-only');
+  return query<PagedShareTypeResponse>(gqlShareTypes, opts, opts.cache ? 'cache-first' : 'network-only');
 }
 
 /**

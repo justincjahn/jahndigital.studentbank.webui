@@ -1,9 +1,14 @@
 import { FETCH_OPTIONS } from '@/constants';
 import { computed, reactive } from 'vue';
-import { getStocks, StockListOptions } from '@/services/stock';
+import { getStockHistory } from '@/services/stock';
+
+interface FetchOptions {
+  stockId: number;
+  first?: number;
+}
 
 /**
- * Stores information about stocks in the system and enables pagination.
+ * Stores information about the history of a stock in the system and enables pagination.
  */
 export function setup() {
   const store = reactive({
@@ -12,8 +17,8 @@ export function setup() {
     pageInfo: null as PageInfo | null,
     pageCount: FETCH_OPTIONS.DEFAULT_COUNT,
     cursorStack: [] as string[],
-    instances: [] as number[],
-    stocks: [] as Stock[],
+    stockId: -1,
+    history: [] as StockHistory[],
   });
 
   const loading = computed(() => store.loading);
@@ -34,29 +39,27 @@ export function setup() {
     return 0;
   });
 
-  const stocks = computed(() => store.stocks);
+  const history = computed(() => store.history);
 
   /**
    * Perform an initial fetch of data with the provided options.
    *
    * @param options
    */
-  async function fetch(options?: StockListOptions) {
+  async function fetch(options: FetchOptions) {
     const opts = {
-      instances: undefined,
       first: store.pageCount,
-      cache: true,
       ...options,
     };
 
-    store.instances = (opts.instances || false) ? opts.instances : [];
     store.loading = true;
 
     try {
-      const res = await getStocks(opts);
-      store.stocks = res.stocks.nodes;
-      store.pageInfo = res.stocks.pageInfo;
-      store.totalCount = res.stocks.totalCount;
+      const res = await getStockHistory(opts);
+      store.stockId = opts.stockId;
+      store.history = res.stockHistory.nodes;
+      store.pageInfo = res.stockHistory.pageInfo;
+      store.totalCount = res.stockHistory.totalCount;
       store.pageCount = opts.first;
       store.cursorStack = [];
     } finally {
@@ -68,19 +71,21 @@ export function setup() {
    * Fetch the next page of data, if available.
    */
   async function fetchNext() {
+    if (store.stockId === -1) throw new Error('[Stock History Store]: fetchNext was run before fetch.');
     const endCursor = store.pageInfo?.endCursor ?? '';
     store.loading = true;
 
     try {
-      const res = await getStocks({
+      const res = await getStockHistory({
+        stockId: store.stockId,
         first: store.pageCount,
         after: endCursor,
       });
 
       store.cursorStack = [...store.cursorStack, endCursor];
-      store.stocks = res.stocks.nodes;
-      store.pageInfo = res.stocks.pageInfo;
-      store.totalCount = res.stocks.totalCount;
+      store.history = res.stockHistory.nodes;
+      store.pageInfo = res.stockHistory.pageInfo;
+      store.totalCount = res.stockHistory.totalCount;
     } finally {
       store.loading = false;
     }
@@ -95,15 +100,16 @@ export function setup() {
 
     store.loading = true;
     try {
-      const res = await getStocks({
+      const res = await getStockHistory({
+        stockId: store.stockId,
         first: store.pageCount,
         after: stack[stack.length - 1] ?? null,
       });
 
       store.cursorStack = stack;
-      store.stocks = res.stocks.nodes;
-      store.pageInfo = res.stocks.pageInfo;
-      store.totalCount = res.stocks.totalCount;
+      store.history = res.stockHistory.nodes;
+      store.pageInfo = res.stockHistory.pageInfo;
+      store.totalCount = res.stockHistory.totalCount;
     } finally {
       store.loading = false;
     }
@@ -113,7 +119,8 @@ export function setup() {
    * Clear the data in this store.
    */
   function clear() {
-    store.stocks = [];
+    store.stockId = -1;
+    store.history = [];
     store.pageInfo = null;
     store.totalCount = 0;
   }
@@ -125,7 +132,7 @@ export function setup() {
     hasNextPage,
     hasPreviousPage,
     totalPages,
-    stocks,
+    history,
     fetch,
     fetchNext,
     fetchPrevious,

@@ -8,30 +8,19 @@ import { InstanceStore } from '@/modules/admin/stores/instance';
 import * as shareTypeService from '@/services/shareType';
 
 /**
- * Options used on the initial fetch.
- */
-interface FetchOptions extends shareTypeService.FetchOptions {
-  available?: boolean;
-}
-
-/**
  * Stores information about share types in the system.
  *
- * When the provided InstanceStore's currently selected Instance changes, the store will
- * automatically fetch Share Types for the new instance if it changes and fetch wasn't already
- * called with {FetchOptions.available}.
- *
- * @param instanceStore The InstanceStore to watch.
- * @param immediate If the store should immediatley try to fetch share types instead of waiting for change.
+ * @param instanceStore The {InstanceStore} to watch, if desired.
+ * @param immediate If the store should immediately try to fetch share types instead of waiting for change.
  */
-export function setup(instanceStore: InstanceStore, immediate = true) {
+export function setup(instanceStore?: InstanceStore) {
   const store = reactive({
     loading: false,
-    byInstance: true,
     totalCount: 0,
     pageInfo: null as PageInfo|null,
     pageCount: FETCH_OPTIONS.DEFAULT_COUNT,
     cursorStack: [] as string[],
+    instances: [] as number[],
     shareTypes: [] as ShareType[],
   });
 
@@ -58,46 +47,37 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
    *
    * @param res
    */
-  function set(res: CombinedPagedShareTypeResponse) {
-    if (res.shareTypes) {
-      store.shareTypes = res.shareTypes.nodes;
-      store.pageInfo = res.shareTypes.pageInfo;
-      store.totalCount = res.shareTypes.totalCount;
-    } else if (res.availableShareTypes) {
-      store.shareTypes = res.availableShareTypes.nodes;
-      store.pageInfo = res.availableShareTypes.pageInfo;
-      store.totalCount = res.availableShareTypes.totalCount;
-    }
+  function set(res: PagedShareTypeResponse) {
+    store.shareTypes = res.shareTypes.nodes;
+    store.pageInfo = res.shareTypes.pageInfo;
+    store.totalCount = res.shareTypes.totalCount;
   }
 
   /**
    * Fetch the initial list of shareTypes.
    *
+   * If no instances are provided in options, and an instanceStore was passed in via setup, then
+   * fetch will retrieve the ShareTypes available to that instance.
+   *
    * @param options
    */
-  async function fetch(options?: FetchOptions) {
+  async function fetch(options?: shareTypeService.FetchOptions) {
     const opts = {
       first: store.pageCount,
-      available: false,
       cache: true,
+      instances: instanceStore ? [instanceStore.selected.value?.id ?? -1] : undefined,
       ...options,
     };
+
+    if (opts.instances) {
+      store.instances = opts.instances;
+    }
 
     store.loading = true;
 
     try {
-      if (opts.available) {
-        const data = await shareTypeService.getAvailableShareTypes(opts);
-        store.byInstance = false;
-        set(data);
-      } else {
-        const data = await shareTypeService.getShareTypesByInstance({
-          ...opts,
-          instanceId: instanceStore.selected.value?.id ?? -1,
-        });
-
-        set(data);
-      }
+      const data = await shareTypeService.getShareTypes(opts);
+      set(data);
     } finally {
       store.loading = false;
     }
@@ -110,19 +90,12 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
     store.loading = true;
     const endCursor = store.pageInfo?.endCursor ?? '';
 
-    const variables = {
-      instanceId: instanceStore.selected.value?.id ?? -1,
-      first: store.pageCount,
-      after: endCursor,
-    };
-
     try {
-      let data: CombinedPagedShareTypeResponse;
-      if (store.byInstance) {
-        data = await shareTypeService.getShareTypesByInstance(variables);
-      } else {
-        data = await shareTypeService.getAvailableShareTypes(variables);
-      }
+      const data = await shareTypeService.getShareTypes({
+        instances: store.instances.length > 0 ? store.instances : undefined,
+        first: store.pageCount,
+        after: endCursor,
+      });
 
       store.cursorStack = [...store.cursorStack, endCursor];
       set(data);
@@ -139,19 +112,12 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
     const stack = [...store.cursorStack];
     stack.pop();
 
-    const variables = {
-      instanceId: instanceStore.selected.value?.id ?? -1,
-      first: currentFetchCount.value,
-      after: stack[stack.length - 1] ?? null,
-    };
-
     try {
-      let data: CombinedPagedShareTypeResponse;
-      if (store.byInstance) {
-        data = await shareTypeService.getShareTypesByInstance(variables);
-      } else {
-        data = await shareTypeService.getAvailableShareTypes(variables);
-      }
+      const data = await shareTypeService.getShareTypes({
+        instances: store.instances.length > 0 ? store.instances : undefined,
+        first: currentFetchCount.value,
+        after: stack[stack.length - 1] ?? null,
+      });
 
       store.cursorStack = stack;
       set(data);
@@ -168,14 +134,14 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
   async function newShareType(input: NewShareTypeRequest) {
     const data = await shareTypeService.newShareType(input);
     const [shareType] = data.newShareType;
-    const instanceId = instanceStore.selected.value?.id ?? -1;
+    const instanceId = instanceStore?.selected.value?.id ?? -1;
     const hasInstance = shareType?.shareTypeInstances.findIndex((x) => x.instanceId === instanceId) ?? false;
 
-    if (store.byInstance && hasInstance >= 0) {
+    if (store.instances.length > 0 && hasInstance >= 0) {
       store.shareTypes = [...store.shareTypes, shareType];
     }
 
-    if (!store.byInstance) {
+    if (store.instances.length <= 0) {
       store.shareTypes = [...store.shareTypes, shareType];
     }
   }
@@ -257,15 +223,13 @@ export function setup(instanceStore: InstanceStore, immediate = true) {
   }
 
   // If we're fetching by instance, re-fetch when it changes
-  watch(() => instanceStore.selected.value, (newValue, oldValue) => {
-    if (!store.byInstance) return;
-
+  watch(() => instanceStore?.selected.value, (newValue, oldValue) => {
     if (!newValue) {
       store.shareTypes = [];
     } else if (newValue.id !== (oldValue?.id ?? -1)) {
       fetch();
     }
-  }, { immediate });
+  });
 
   return {
     instanceStore,

@@ -55,5 +55,8 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.share-list { @include table(); }
+.share-list {
+  @include table;
+  @include round-border;
+}
 </style>

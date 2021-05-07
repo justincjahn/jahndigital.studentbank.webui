@@ -1,12 +1,12 @@
-#import "../fragments/pageInfo.gql"
-#import "../fragments/stock.gql"
+#import "@/graphql/fragments/pageInfo.gql"
+#import "@/graphql/fragments/shareType.gql"
 
-query stocks(
+query shareTypes(
   $instances: [Long!],
   $first: PaginationAmount! = 25,
   $after: String,
 ) {
-  stocks(
+  shareTypes(
     instances: $instances,
     first: $first,
     after: $after,
@@ -17,7 +17,7 @@ query stocks(
     }
     totalCount
     nodes {
-      ...StockParts
+      ...ShareTypeParts
     }
   }
 }

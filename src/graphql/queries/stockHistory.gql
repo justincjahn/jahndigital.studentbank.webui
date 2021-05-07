@@ -17,7 +17,7 @@ query stockHistory(
     }
     totalCount
     nodes {
-      StockHistoryParts
+      ...StockHistoryParts
     }
   }
 }

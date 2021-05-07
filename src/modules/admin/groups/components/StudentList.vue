@@ -167,93 +167,11 @@ export default defineComponent({
 }
 
 .student-list__list {
-  width: 100%;
-  border-spacing: 0;
-
-  & tr {
-    text-align: left;
-  }
-
-  & th:last-child,
-  & td:last-child
-  {
-    text-align: right;
-  }
-
-  & thead th {
-    padding: 0.25em 0.25em;
-  }
-
-  & tbody tr {
-    cursor: pointer;
-
-    & td {
-      padding: 0.5em 0.25em;
-      user-select: none;
-
-      &.student-list__select-group {
-        text-align: left;
-      }
-    }
-
-    &:nth-child(even) {
-      $bgcolor: colorStep(secondary, $step: 0, $darken: false);
-      background-color: $bgcolor;
-
-      color: chooseColor(
-        $bgcolor,
-        map.get($theme, secondary, font-color),
-        map.get($theme, secondary, font-color-alt)
-      );
-    }
-
-    &:hover {
-      $bgcolor: colorStep(secondary, $step: 3, $darken: true);
-      background-color: $bgcolor;
-
-      color: chooseColor(
-        $bgcolor,
-        map.get($theme, secondary, font-color),
-        map.get($theme, secondary, font-color-alt)
-      );
-    }
-
-    &.student-list__student--selected {
-      $bgcolor: colorStep(accent1, $step: 6, $darken: false);
-      background-color: $bgcolor;
-
-      color: chooseColor(
-        $bgcolor,
-        map.get($theme, accent1, font-color),
-        map.get($theme, accent1, font-color-alt)
-      );
-
-      &:hover {
-        $bgcolor: colorStep(accent1, $step: 4, $darken: false);
-        background-color: $bgcolor;
-
-        color: chooseColor(
-          $bgcolor,
-          map.get($theme, accent1, font-color),
-          map.get($theme, accent1, font-color-alt)
-        );
-      }
-    }
-  }
+  @include table;
 }
 
 .student-list__pagination {
-  text-align: center;
-
-  & button {
-    outline: none;
-    border: none;
-    background: none;
-    cursor: pointer;
-    margin: 1em;
-    text-decoration: underline;
-    overflow: visible;
-  }
+  @include pagination-buttons;
 }
 
 // Collapse the table into rows instead of columns for small screens

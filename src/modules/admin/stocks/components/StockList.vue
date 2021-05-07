@@ -1,25 +1,24 @@
 <template>
-  <div v-if="stocks.length > 0" class="stock-list">
-    <table>
+  <div v-if="stocks.length > 0" class="stock-list" :class="loading ? 'loading' : ''">
+    <table
+      :class="!available ? 'selectable' : ''"
+    >
       <thead>
         <tr>
           <th>Symbol</th>
           <th>Name</th>
-          <th>Available Shares</th>
-          <th>Total Shares</th>
-          <th>Current Value</th>
+          <th>Value</th>
         </tr>
       </thead>
       <tbody>
         <tr
           v-for="stock in stocks"
           :key="stock.id"
+          :class="isSelected(stock) ? 'selected' : ''"
           @click="handleStockClick(stock)"
         >
           <td>{{ stock.symbol }}</td>
           <td>{{ stock.name }}</td>
-          <td>{{ stock.availableShares }}</td>
-          <td>{{ stock.totalShares }}</td>
           <td>
             {{
               new Intl.NumberFormat(
@@ -35,10 +34,13 @@
       </tbody>
     </table>
   </div>
+  <p v-else class="stock-list" :class="loading ? 'loading' : ''">
+    <em>There are no {{ available ? 'available' : 'linked' }} stocks to display.</em>
+  </p>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watchEffect } from 'vue';
+import { defineComponent, PropType, ref, computed, watchEffect } from 'vue';
 
 // Utils
 import injectStrict from '@/utils/injectStrict';
@@ -51,14 +53,43 @@ const delay = 300;
 let timer: number|null = null;
 
 export default defineComponent({
+  props: {
+    selected: {
+      type: Object as PropType<Stock|null>,
+      default: null,
+    },
+    available: {
+      type: Boolean,
+      default: false,
+      description: 'List only stocks available in the selected instance.',
+    },
+  },
   emits: [
+    'stock-click',
     'stock-dblclick',
   ],
-  setup(_, { emit }) {
+  setup(props, { emit }) {
     const stockStore = defineStockStore();
     const instanceStore = injectStrict(INSTANCE_STORE_SYMBOL);
     const prevClicked = ref<Stock|null>(null);
     const clickCount = ref(0);
+
+    // If we're listing available stocks, filter the ones already linked
+    const stocks = computed(() => {
+      if (props.available) {
+        const instanceId = instanceStore.selected.value?.id ?? -1;
+        return stockStore.stocks.value.filter((x) => x.stockInstances.findIndex((y) => y.instanceId !== instanceId) >= 0);
+      }
+
+      return stockStore.stocks.value;
+    });
+
+    /**
+     * True if the provided stock is currently selected.
+     */
+    function isSelected(stock: Stock) {
+      return stock.id === props.selected?.id ?? false;
+    }
 
     /**
      * When the user double-clicks on a specific stock, emit an event to the parent.
@@ -69,6 +100,7 @@ export default defineComponent({
       if (clickCount.value === 1) {
         timer = setTimeout(() => { clickCount.value = 0; }, delay);
         prevClicked.value = stock;
+        emit('stock-click', stock);
       } else {
         if (timer == null) return;
         if (prevClicked.value === stock) {
@@ -80,13 +112,17 @@ export default defineComponent({
     }
 
     watchEffect(() => {
-      if (instanceStore.selected !== null) {
+      if (instanceStore.selected.value !== null && !props.available) {
+        stockStore.fetch({ instances: [instanceStore.selected.value.id] });
+      } else if (props.available) {
         stockStore.fetch();
       }
     });
 
     return {
       ...stockStore,
+      stocks,
+      isSelected,
       handleStockClick,
     };
   },
@@ -94,11 +130,12 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.stock-list {
-  margin: 0 1em;
+.stock-list.loading {
+  opacity: 0.5;
+}
 
-  table {
-    @include table($border: false);
-  }
+.stock-list table {
+  @include table;
+  @include round-border;
 }
 </style>

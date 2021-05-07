@@ -458,6 +458,7 @@ export default defineComponent({
     &__step-3 {
       &__shares {
         @include table;
+        @include round-border;
       }
     }
   }

@@ -54,7 +54,7 @@
   }
 }
 
-@mixin input-reset() {
+@mixin input-reset {
   color: rgba(0,0,0,0.4);
   position: absolute;
   width: 25px;
@@ -67,16 +67,12 @@
   height: 100%;
 }
 
-@mixin round-border() {
+@mixin round-border {
   border: 1px solid colorStep(primary, $step: 8);
   border-radius: 0.25rem;
 }
 
-@mixin table($selectable: true, $border: true) {
-  @if $border {
-    @include round-border();
-  }
-
+@mixin table($selectable: true) {
   width: 100%;
   border-spacing: 0;
 
@@ -171,6 +167,29 @@
           map.get($theme, secondary, font-color-alt)
         );
       }
+    }
+  }
+}
+
+@mixin pagination-buttons {
+  text-align: center;
+
+  & button {
+    outline: none;
+    border: none;
+    background: none;
+    cursor: pointer;
+    margin: 1em;
+    text-decoration: underline;
+    overflow: visible;
+
+    &:hover {
+      background-color: colorStep('button-secondary');
+    }
+
+    &:disabled, &:disabled:hover {
+      cursor: auto;
+      background: none;
     }
   }
 }
