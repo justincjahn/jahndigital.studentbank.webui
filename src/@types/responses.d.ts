@@ -263,7 +263,7 @@ interface LinkStockResponse {
 }
 
 interface UnlinkStockResponse {
-  unlinkStock: boolean;
+  unlinkStock: Stock[];
 }
 
 interface DeleteStockResponse {

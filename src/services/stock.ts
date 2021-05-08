@@ -7,7 +7,7 @@ import gqlStockLink from '@/modules/admin/graphql/mutations/stockLink.gql';
 import gqlStockUnlink from '@/modules/admin/graphql/mutations/stockUnlink.gql';
 import gqlStockDelete from '@/modules/admin/graphql/mutations/stockDelete.gql';
 import gqlStockRestore from '@/modules/admin/graphql/mutations/stockRestore.gql';
-import { query, mutate } from './Apollo';
+import { query, mutate, mutateCustom } from './Apollo';
 
 /**
  * Options used to determine what stocks will be fetched.
@@ -97,7 +97,18 @@ export async function updateStock(input: UpdateStockRequest) {
  * @throws {Error} If an error occurred during the network call.
  */
 export async function linkStock(input: LinkUnlinkStockRequest) {
-  return mutate<LinkStockResponse>(gqlStockLink, input);
+  return mutateCustom<LinkStockResponse>({
+    mutation: gqlStockLink,
+    variables: input,
+    update(cache) {
+      cache.evict({
+        id: 'ROOT_QUERY',
+        fieldName: 'stocks',
+      });
+
+      cache.gc();
+    },
+  });
 }
 
 /**
@@ -108,7 +119,18 @@ export async function linkStock(input: LinkUnlinkStockRequest) {
  * @throws {Error} If an error occurred during the network call.
  */
 export async function unlinkStock(input: LinkUnlinkStockRequest) {
-  return mutate<UnlinkStockResponse>(gqlStockUnlink, input);
+  return mutateCustom<UnlinkStockResponse>({
+    mutation: gqlStockUnlink,
+    variables: input,
+    update(cache) {
+      cache.evict({
+        id: 'ROOT_QUERY',
+        fieldName: 'stocks',
+      });
+
+      cache.gc();
+    },
+  });
 }
 
 /**
@@ -118,8 +140,16 @@ export async function unlinkStock(input: LinkUnlinkStockRequest) {
  * @returns True if the object was deleted.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function deleteStock(input: DeleteRestoreStockRequest) {
-  return mutate<DeleteStockResponse>(gqlStockDelete, input);
+export async function deleteStock(stock: Stock) {
+  return mutateCustom<DeleteStockResponse>({
+    mutation: gqlStockDelete,
+    variables: { id: stock.id },
+    update(cache) {
+      cache.evict({
+        id: cache.identify({ ...stock }),
+      });
+    },
+  });
 }
 
 /**

@@ -9,12 +9,14 @@
       <button
         type="button"
         :disabled="isLinked || !selected"
+        @click="handleLink"
       >
         Link Selected
       </button>
       <button
         type="button"
         :disabled="!isLinked || !selected"
+        @click="handleUnlink"
       >
         Unlink Selected
       </button>
@@ -27,14 +29,14 @@
     </section>
     <div class="stocks-index__body">
       <section class="stocks-index__main">
-        <h2>Linked Stocks</h2>
+        <h2>Linked</h2>
         <stock-list
           :selected="selected"
           @stock-dblclick="handleStockDoubleClick"
           @stock-click="handleStockClick"
         />
 
-        <h2>Available Stocks</h2>
+        <h2>Available</h2>
         <stock-list
           :selected="selected"
           :available="true"
@@ -43,15 +45,23 @@
         />
       </section>
       <section class="stocks-index__sidebar">
-        <stock-history-list :selected="selected" class="stocks-index__history" />
+        <h2>History</h2>
+        <stock-history-list
+          class="stocks-index__history"
+          :selected="selected"
+        />
       </section>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, computed } from 'vue';
 import { useRouter } from 'vue-router';
+
+// Stores
+import errorStore from '@/store/error';
+import { setup as defineStockStore } from '@/store/stock';
 
 // Utils
 import injectStrict from '@/utils/injectStrict';
@@ -71,21 +81,21 @@ export default defineComponent({
   },
   setup() {
     const router = useRouter();
-    const selected = ref<Stock|null>(null);
     const instanceStore = injectStrict(INSTANCE_STORE_SYMBOL);
+    const stockStore = defineStockStore();
 
     const isLinked = computed(() => {
-      if (!selected.value) return false;
-      const instances = selected.value.stockInstances.map((x) => x.instanceId);
+      if (!stockStore.selected.value) return false;
+      const instances = stockStore.selected.value.stockInstances.map((x) => x.instanceId);
       const instanceId = instanceStore.selected.value?.id ?? -1;
       return instances.includes(instanceId);
     });
 
     function handleStockClick(stock: Stock) {
-      if (selected.value === stock) {
-        selected.value = null;
+      if (stockStore.selected.value === stock) {
+        stockStore.selected.value = null;
       } else {
-        selected.value = stock;
+        stockStore.selected.value = stock;
       }
     }
 
@@ -98,11 +108,45 @@ export default defineComponent({
       });
     }
 
+    async function handleLink() {
+      if (!instanceStore.selected.value) return;
+      if (!stockStore.selected.value) return;
+
+      try {
+        await stockStore.link({
+          stockId: stockStore.selected.value.id,
+          instanceId: instanceStore.selected.value.id,
+        });
+
+        stockStore.selected.value = null;
+      } catch (e) {
+        errorStore.setCurrentError(e?.message ?? e);
+      }
+    }
+
+    async function handleUnlink() {
+      if (!instanceStore.selected.value) return;
+      if (!stockStore.selected.value) return;
+
+      try {
+        await stockStore.unlink({
+          stockId: stockStore.selected.value.id,
+          instanceId: instanceStore.selected.value.id,
+        });
+
+        stockStore.selected.value = null;
+      } catch (e) {
+        errorStore.setCurrentError(e?.message ?? e);
+      }
+    }
+
     return {
-      selected,
+      selected: stockStore.selected,
       isLinked,
       handleStockClick,
       handleStockDoubleClick,
+      handleLink,
+      handleUnlink,
     };
   },
 });
@@ -113,6 +157,10 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     gap: 1rem;
+
+    h2 {
+      margin-bottom: 0.5em;
+    }
 
     &__toolbar {
       padding: 1em;
@@ -137,10 +185,6 @@ export default defineComponent({
 
     &__sidebar {
       width: 100%;
-    }
-
-    &__history {
-      @include round-border;
     }
 
     @media screen and (min-width: 900px) {

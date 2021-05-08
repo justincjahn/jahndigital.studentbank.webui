@@ -76,6 +76,8 @@ export default defineComponent({
         stockHistoryStore.fetch({
           stockId: props.selected.id,
         });
+      } else {
+        stockHistoryStore.clear();
       }
     });
 
@@ -88,11 +90,6 @@ export default defineComponent({
 
 <style lang="scss">
   .stock-history {
-    min-height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-content: space-between;
-
     table {
       @include table($selectable: false);
     }

@@ -1,6 +1,11 @@
 import { FETCH_OPTIONS } from '@/constants';
 import { computed, reactive } from 'vue';
-import { getStocks, StockListOptions } from '@/services/stock';
+import { getStocks, updateStock, StockListOptions, linkStock, unlinkStock, deleteStock, newStock } from '@/services/stock';
+import { create as createEvent, publish, subscribe } from '@/services/eventBus';
+
+const stockCreate = createEvent<Stock>('stock.create');
+const stockUpdate = createEvent<Stock>('stock-update');
+const stockDelete = createEvent<Stock>('stock-delete');
 
 /**
  * Stores information about stocks in the system and enables pagination.
@@ -14,6 +19,7 @@ export function setup() {
     cursorStack: [] as string[],
     instances: [] as number[],
     stocks: [] as Stock[],
+    selected: null as Stock | null,
   });
 
   const loading = computed(() => store.loading);
@@ -35,6 +41,11 @@ export function setup() {
   });
 
   const stocks = computed(() => store.stocks);
+
+  const selected = computed({
+    get: () => store.selected,
+    set: (value) => { store.selected = value; },
+  });
 
   /**
    * Perform an initial fetch of data with the provided options.
@@ -118,6 +129,147 @@ export function setup() {
     store.totalCount = 0;
   }
 
+  /**
+   * Create a stock and return it.
+   *
+   * @param input
+   * @returns
+   */
+  async function create(input: NewStockRequest) {
+    const res = await newStock(input);
+
+    if (res.newStock[0]) {
+      publish(stockCreate, res.newStock[0]);
+      return res.newStock[0];
+    }
+
+    throw new Error('[Create Stock]: Stock object was not returned by the server!');
+  }
+
+  /**
+   * Update a stock and return it.
+   *
+   * @param input
+   */
+  async function update(input: UpdateStockRequest) {
+    const res = await updateStock(input);
+
+    if (res.updateStock[0]) {
+      publish(stockUpdate, res.updateStock[0]);
+      return res.updateStock[0];
+    }
+
+    throw new Error('[Update Stock]: Stock object was not returned by the server!');
+  }
+
+  /**
+   * Links a stock to an instance and return it.
+   *
+   * @param input
+   * @returns
+   */
+  async function link(input: LinkUnlinkStockRequest) {
+    const res = await linkStock(input);
+
+    if (res.linkStock[0]) {
+      publish(stockUpdate, res.linkStock[0]);
+      return res.linkStock[0];
+    }
+
+    throw new Error('[Link Stock]: Stock object was not returned by the server!');
+  }
+
+  /**
+   * Unlinks a stock from an instance and returns it.
+   *
+   * @param input
+   * @returns
+   */
+  async function unlink(input: LinkUnlinkStockRequest) {
+    const res = await unlinkStock(input);
+
+    if (res.unlinkStock[0]) {
+      publish(stockUpdate, res.unlinkStock[0]);
+      return res.unlinkStock[0];
+    }
+
+    throw new Error('[Unlink Stock]: Stock object was not returned by the server!');
+  }
+
+  /**
+   * Removes a stock from the database.
+   *
+   * @param stock
+   * @returns
+   */
+  async function remove(stock: Stock) {
+    const res = await deleteStock(stock);
+
+    if (res.deleteStock) {
+      publish(stockDelete, stock);
+      return;
+    }
+
+    throw new Error('[Remove Stock]: Stock was not deleted from the server!');
+  }
+
+  // If a stock object was created elsewhere, push it in
+  const unsubCreate = subscribe(stockCreate, (stock) => {
+    if (store.instances.length === 0) {
+      store.stocks = [...store.stocks, stock];
+      return;
+    }
+
+    const instanceIds = stock.stockInstances.map((x) => x.instanceId);
+    const hasInstance = store.instances.some((x) => instanceIds.includes(x));
+    if (hasInstance) { store.stocks = [...store.stocks, stock]; }
+  });
+
+  // If a stock object is updated elsewhere, splice it in
+  const unsubUpdate = subscribe(stockUpdate, (stock) => {
+    const isSelected = store.selected?.id === stock.id ?? false;
+    const idx = store.stocks.findIndex((x) => x.id === stock.id);
+    if (idx >= 0) {
+      const storeInstances = store.stocks[idx].stockInstances.map((x) => x.instanceId);
+      const wasUnlinked = stock.stockInstances.map((x) => x.instanceId).some((x) => storeInstances.includes(x));
+
+      const res = [...store.stocks];
+      if (wasUnlinked && store.instances.length > 0) {
+        res.splice(idx, 1);
+        if (isSelected) { store.selected = null; }
+      } else {
+        res.splice(idx, 1, stock);
+        if (isSelected) { store.selected = stock; }
+      }
+
+      store.stocks = res;
+    }
+
+    // Push stocks newly linked to the instances being tracked
+    if (store.instances.length > 0) {
+      const instanceIds = stock.stockInstances.map((x) => x.instanceId);
+      const wasLinked = store.instances.some((x) => instanceIds.includes(x));
+      if (wasLinked) { store.stocks = [...store.stocks, stock]; }
+    }
+  });
+
+  // If a stock object is deleted elsewhere, remove it from the list
+  const unsubDelete = subscribe(stockDelete, (stock) => {
+    store.stocks = store.stocks.filter((x) => x.id !== stock.id);
+    if (store.selected?.id === stock.id ?? false) {
+      store.selected = null;
+    }
+  });
+
+  /**
+   * Unsubscribe from global events in preparation for the store unmounting
+   */
+  function dispose() {
+    unsubCreate();
+    unsubUpdate();
+    unsubDelete();
+  }
+
   return {
     loading,
     pageCount,
@@ -126,10 +278,17 @@ export function setup() {
     hasPreviousPage,
     totalPages,
     stocks,
+    selected,
     fetch,
     fetchNext,
     fetchPrevious,
     clear,
+    create,
+    update,
+    link,
+    unlink,
+    remove,
+    dispose,
   };
 }
 
