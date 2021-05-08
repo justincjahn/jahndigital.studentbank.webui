@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="show"
-    class="loading"
+    class="loading-icon"
     :class="$attrs.class"
   >
     <svg
@@ -56,7 +56,7 @@ export default defineComponent({
   @return $result;
 }
 
-.loading {
+.loading-icon {
   margin: 0;
   padding: 0;
   display: flex;

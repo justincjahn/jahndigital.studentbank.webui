@@ -231,7 +231,8 @@ export function setup() {
     const idx = store.stocks.findIndex((x) => x.id === stock.id);
     if (idx >= 0) {
       const storeInstances = store.stocks[idx].stockInstances.map((x) => x.instanceId);
-      const wasUnlinked = stock.stockInstances.map((x) => x.instanceId).some((x) => storeInstances.includes(x));
+      const stockInstances = stock.stockInstances.map((x) => x.instanceId);
+      const wasUnlinked = !stockInstances.some((x) => storeInstances.includes(x));
 
       const res = [...store.stocks];
       if (wasUnlinked && store.instances.length > 0) {

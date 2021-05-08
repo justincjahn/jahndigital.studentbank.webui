@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref, computed, watchEffect } from 'vue';
+import { defineComponent, PropType, ref, computed, watchEffect, onUnmounted } from 'vue';
 
 // Utils
 import injectStrict from '@/utils/injectStrict';
@@ -76,9 +76,12 @@ export default defineComponent({
 
     // If we're listing available stocks, filter the ones already linked
     const stocks = computed(() => {
-      if (props.available) {
+      if (props.available === true) {
         const instanceId = instanceStore.selected.value?.id ?? -1;
-        return stockStore.stocks.value.filter((x) => x.stockInstances.findIndex((y) => y.instanceId !== instanceId) >= 0);
+        return stockStore.stocks.value.filter((stock) => {
+          const instances = stock.stockInstances.map((x) => x.instanceId);
+          return !instances.includes(instanceId);
+        });
       }
 
       return stockStore.stocks.value;
@@ -118,6 +121,8 @@ export default defineComponent({
         stockStore.fetch();
       }
     });
+
+    onUnmounted(() => stockStore.dispose());
 
     return {
       ...stockStore,

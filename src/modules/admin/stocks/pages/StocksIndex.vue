@@ -23,6 +23,7 @@
       <button
         type="button"
         :disabled="!selected || isLinked"
+        @click="handleDelete"
       >
         Delete Selected
       </button>
@@ -56,7 +57,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
+import { defineComponent, computed, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 
 // Stores
@@ -140,6 +141,19 @@ export default defineComponent({
       }
     }
 
+    async function handleDelete() {
+      if (!stockStore.selected.value) return;
+
+      try {
+        await stockStore.remove(stockStore.selected.value);
+        stockStore.selected.value = null;
+      } catch (e) {
+        errorStore.setCurrentError(e?.message ?? e);
+      }
+    }
+
+    onUnmounted(() => stockStore.dispose());
+
     return {
       selected: stockStore.selected,
       isLinked,
@@ -147,6 +161,7 @@ export default defineComponent({
       handleStockDoubleClick,
       handleLink,
       handleUnlink,
+      handleDelete,
     };
   },
 });
