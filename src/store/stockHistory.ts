@@ -1,10 +1,13 @@
 import { FETCH_OPTIONS } from '@/constants';
 import { computed, reactive } from 'vue';
 import { getStockHistory } from '@/services/stock';
+import { stockUpdate } from '@/events';
+import { subscribe } from '@/services/eventBus';
 
 interface FetchOptions {
   stockId: number;
   first?: number;
+  cache?: boolean;
 }
 
 /**
@@ -49,6 +52,7 @@ export function setup() {
   async function fetch(options: FetchOptions) {
     const opts = {
       first: store.pageCount,
+      cache: true,
       ...options,
     };
 
@@ -125,6 +129,26 @@ export function setup() {
     store.totalCount = 0;
   }
 
+  // When the currently fetched stock updates, refetch history
+  const unsubCreate = subscribe(stockUpdate, (stock) => {
+    if (store.stockId !== stock.id) return;
+
+    fetch({
+      first: store.pageCount,
+      stockId: store.stockId,
+      cache: false,
+    }).catch((error) => {
+      console.error(error);
+    });
+  });
+
+  /**
+   * Unsubscribe from events.
+   */
+  function dispose() {
+    unsubCreate();
+  }
+
   return {
     loading,
     pageCount,
@@ -137,6 +161,7 @@ export function setup() {
     fetchNext,
     fetchPrevious,
     clear,
+    dispose,
   };
 }
 

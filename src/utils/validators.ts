@@ -242,3 +242,46 @@ export function validateShareTypeName(value: string): string | boolean {
   if (value.length > 64) return 'Share Type Name can only be 64 characters.';
   return true;
 }
+
+/**
+ * Ensures that the provided string is a valid stock name.
+ *
+ * @param value
+ * @returns true or an error message
+ */
+export function validateStockName(value: string): string | boolean {
+  if (!value || value.trim().length === 0) return 'A Name is required';
+  if (value.length < 3) return 'Stock names should be at least three characters.';
+  if (value.length > 32) return 'Stock names can be a maximum of ten chatacters.';
+  return true;
+}
+
+/**
+ * Ensures that the provided string is a valid stock symbol.
+ *
+ * @param value
+ * @returns true or an error message
+ */
+export function validateStockSymbol(value: string): string | boolean {
+  if (!value || value.trim().length === 0) return 'A Symbol is required.';
+  if (value.length < 3) return 'Stock symbols should be at least three characters.';
+  if (value.length > 10) return 'Stock symbols can be a maximum of ten characters.';
+  if (!value.match(/^[a-zA-Z]{3,10}$/)) return 'Stock symbols can only be letters.';
+  return true;
+}
+
+/**
+ * Ensures that the provided string is a valid stock quantity.
+ *
+ * @param value
+ * @returns true or an error message
+ */
+export function validateStockSharesNotNegative(value: string): string | boolean {
+  if (!value || value.trim().length === 0) return 'Total Shares is required';
+
+  const num = Number.parseInt(value, 10);
+  if (Number.isNaN(num)) return 'Total Shares must be a number.';
+  if (num <= 0) return 'Total Shares must be a number greater than zero.';
+
+  return true;
+}

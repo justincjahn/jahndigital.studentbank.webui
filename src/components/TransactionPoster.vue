@@ -119,12 +119,6 @@ export default defineComponent({
       display: flex;
       flex-direction: column;
       margin-bottom: 0.5em;
-
-      p.error {
-        font-style: italic;
-        color: map.get($theme, button-destructive, color);
-        margin: 0.5em 0;
-      }
     }
 
     &__amount--wrapper {

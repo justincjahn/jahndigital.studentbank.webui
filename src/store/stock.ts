@@ -1,11 +1,8 @@
 import { FETCH_OPTIONS } from '@/constants';
 import { computed, reactive } from 'vue';
 import { getStocks, updateStock, StockListOptions, linkStock, unlinkStock, deleteStock, newStock } from '@/services/stock';
-import { create as createEvent, publish, subscribe } from '@/services/eventBus';
-
-const stockCreate = createEvent<Stock>('stock.create');
-const stockUpdate = createEvent<Stock>('stock-update');
-const stockDelete = createEvent<Stock>('stock-delete');
+import { publish, subscribe } from '@/services/eventBus';
+import { stockCreate, stockUpdate, stockDelete } from '@/events';
 
 /**
  * Stores information about stocks in the system and enables pagination.
@@ -234,20 +231,16 @@ export function setup() {
       const stockInstances = stock.stockInstances.map((x) => x.instanceId);
       const wasUnlinked = !stockInstances.some((x) => storeInstances.includes(x));
 
-      const res = [...store.stocks];
+      const newStocks = store.stocks.filter((x) => x.id !== stock.id);
       if (wasUnlinked && store.instances.length > 0) {
-        res.splice(idx, 1);
         if (isSelected) { store.selected = null; }
       } else {
-        res.splice(idx, 1, stock);
+        newStocks.push(stock);
         if (isSelected) { store.selected = stock; }
       }
 
-      store.stocks = res;
-    }
-
-    // Push stocks newly linked to the instances being tracked
-    if (store.instances.length > 0) {
+      store.stocks = newStocks;
+    } else if (store.instances.length > 0) {
       const instanceIds = stock.stockInstances.map((x) => x.instanceId);
       const wasLinked = store.instances.some((x) => instanceIds.includes(x));
       if (wasLinked) { store.stocks = [...store.stocks, stock]; }

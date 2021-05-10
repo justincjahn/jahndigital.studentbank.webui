@@ -108,7 +108,13 @@ header { margin: 0 1.5em; }
   }
 }
 
-main { flex-grow: 1; }
+main {
+  flex-grow: 1;
+
+  // Convienience for child elements wanting complex arrangement
+  display: flex;
+  flex-direction: column;
+}
 
 footer {
   font-size: 0.8em;

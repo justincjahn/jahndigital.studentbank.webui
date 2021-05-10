@@ -1,5 +1,8 @@
 <template>
-  <div class="stock-history">
+  <div
+    class="stock-history"
+    :class="loading ? 'loading' : ''"
+  >
     <table>
       <thead>
         <tr>
@@ -38,7 +41,7 @@
     </table>
 
     <div
-      v-if="totalPages > 0"
+      v-if="totalPages > 1"
       class="stock-history__pagination"
     >
       <button
@@ -58,7 +61,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, watchEffect } from 'vue';
+import { defineComponent, PropType, watchEffect, onUnmounted } from 'vue';
 import { setup as defineStockHistoryStore } from '@/store/stockHistory';
 
 export default defineComponent({
@@ -75,10 +78,15 @@ export default defineComponent({
       if (props.selected !== null) {
         stockHistoryStore.fetch({
           stockId: props.selected.id,
+          first: 10,
         });
       } else {
         stockHistoryStore.clear();
       }
+    });
+
+    onUnmounted(() => {
+      stockHistoryStore.dispose();
     });
 
     return {
@@ -90,6 +98,10 @@ export default defineComponent({
 
 <style lang="scss">
   .stock-history {
+    &.loading {
+      opacity: 0.5;
+    }
+
     table {
       @include table($selectable: false);
     }

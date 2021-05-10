@@ -87,7 +87,7 @@ export default defineComponent({
      * Normalize the value into a percentage.
      */
     const normalize = (value: string): string => {
-      if (!value || value.trim().length === 0) return '0.00';
+      if (typeof value !== 'string') return '0.00';
       return value;
     };
 

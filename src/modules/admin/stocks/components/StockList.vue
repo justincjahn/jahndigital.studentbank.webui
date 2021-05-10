@@ -33,6 +33,24 @@
         </tr>
       </tbody>
     </table>
+
+    <div
+      v-if="totalPages > 1"
+      class="stock-list__pagination"
+    >
+      <button
+        :disabled="!hasPreviousPage"
+        @click.passive="fetchPrevious"
+      >
+        Previous
+      </button>
+      <button
+        :disabled="!hasNextPage"
+        @click.passive="fetchNext"
+      >
+        Next
+      </button>
+    </div>
   </div>
   <p v-else class="stock-list" :class="loading ? 'loading' : ''">
     <em>There are no {{ available ? 'available' : 'linked' }} stocks to display.</em>
@@ -135,12 +153,18 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.stock-list.loading {
-  opacity: 0.5;
-}
+.stock-list {
+  &.loading {
+    opacity: 0.5;
+  }
 
-.stock-list table {
-  @include table;
-  @include round-border;
+  &__pagination {
+    @include pagination-buttons;
+  }
+
+  table {
+    @include table;
+    @include round-border;
+  }
 }
 </style>

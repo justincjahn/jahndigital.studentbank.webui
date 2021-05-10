@@ -12,6 +12,6 @@ mutation newStock(
     totalShares: $totalShares,
     currentValue: $currentValue
   }) {
-    ...stock
+    ...StockParts
   }
 }
