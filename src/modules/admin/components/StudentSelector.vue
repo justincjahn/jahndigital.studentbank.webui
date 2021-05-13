@@ -1,100 +1,47 @@
 <template>
-  <div class="student-search" :class="{open: isOpen}">
-    <form @submit.prevent="handleSelection" @reset="handleReset">
-      <label for="student-search__input__input">Search</label>
+  <div class="student-selector" :class="open ? 'open' : 'closed'">
+    <form @submit.prevent @reset.prevent="handleClear">
+      <label :for="formId">
+        <slot>Search</slot>
+      </label>
 
-      <div class="student-search__input">
-        <span class="student-search__input__reset-wrapper">
+      <div class="student-selector__input">
+        <span class="student-selector__input--wrapper">
           <input
-            id="student-search__input__input"
+            :id="formId"
+            ref="input"
             v-model="searchCriteria"
             type="text"
+            name="selected"
             autocomplete="off"
+            @keydown="handleKeydown"
             @keyup="handleKeypress"
-            @blur="handleClose"
-            @focus="handleOpen"
+            @blur="handleBlur"
+            @focus="handleFocus"
           />
+
           <input type="reset" value="X" />
         </span>
 
-        <ul ref="resultElements" class="student-search__input__results">
-          <li
-            v-if="instanceStudents.length === 0"
-            class="student-search__input__results__item"
-          >
-            <em>No students in active instance...</em>
-          </li>
+        <ul class="student-selector__student-list" :class="{ loading }">
+          <template v-if="instanceStudents.length > 0">
+            <student-selector-student
+              v-for="student in instanceStudents"
+              :key="student.id"
+              :student="student"
+              :highlighted="highlighted"
+              @click="handleClick"
+            />
+          </template>
 
-          <li
-            v-for="student in instanceStudents"
-            :key="student.id"
-            class="student-search__input__results__item selectable"
-            :class="{ selected: selection === student}"
-            @click="handleSelection(student)"
-          >
-            <span class="student-search__input__results__item--account-number">{{ student.accountNumber }}</span>
-            <span class="student-search__input__results__item--name">{{ student.lastName }}, {{ student.firstName }}</span>
-            <span class="student-search__input__results__item--email">{{ student.email }}</span>
-
-            <ul class="student-search__input__results__item__shares">
-              <li
-                v-for="share in getStudentShares(student)"
-                :key="share.id"
-                class="student-search__input__results__item__shares__item"
-              >
-                <span class="student-search__input__results__item__shares__item--name">
-                  {{ share.shareType?.name.substring(0, 3).toUpperCase() ?? 'UNK' }}
-                </span>
-                <span class="student-search__input__results__item__shares__item--balance">
-                  {{
-                    new Intl.NumberFormat(
-                      'en-US',
-                      {
-                        style: 'currency',
-                        currency: 'USD',
-                      }
-                    ).format(share.balance)
-                  }}
-                </span>
-              </li>
-            </ul>
-          </li>
-
-          <hr v-if="otherStudents.length > 0" />
-
-          <li
-            v-for="student in otherStudents"
-            :key="student.id"
-            class="student-search__input__results__item selectable"
-            :class="{ selected: selection === student}"
-            @click="handleSelection(student)"
-          >
-            <span class="student-search__input__results__item--account-number">{{ student.accountNumber }}</span>
-            <span class="student-search__input__results__item--name">{{ student.lastName }}, {{ student.firstName }}</span>
-            <span class="student-search__input__results__item--email">{{ student.email }}</span>
-
-            <ul class="student-search__input__results__item__shares">
-              <li
-                v-for="share in getStudentShares(student)"
-                :key="share.id"
-                class="student-search__input__results__item__shares__item"
-              >
-                <span class="student-search__input__results__item__shares__item--name">
-                  {{ share.shareType?.name.substring(0, 3).toUpperCase() ?? 'UNK' }}
-                </span>
-                <span class="student-search__input__results__item__shares__item--balance">
-                  {{
-                    new Intl.NumberFormat(
-                      'en-US',
-                      {
-                        style: 'currency',
-                        currency: 'USD',
-                      }
-                    ).format(share.balance)
-                  }}
-                </span>
-              </li>
-            </ul>
+          <li v-else class="student-selector__student-list--message">
+            <em v-if="loading">Loading...</em>
+            <em v-else-if="searchCriteria.trim().length === 0">
+              Enter a search term...
+            </em>
+            <em v-else>
+              No students found...
+            </em>
           </li>
         </ul>
       </div>
@@ -103,203 +50,231 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, PropType } from 'vue';
-import { setup as defineStudentStore } from '../stores/student';
+import { defineComponent, PropType, ref, computed, watch } from 'vue';
+
+// Utils
+import injectStrict from '@/utils/injectStrict';
+import uuid4 from '@/utils/uuid4';
+
+// Services
+import { getStudentsByAccountNumber, getStudentsByEmail, getStudentsByName } from '@/services/student';
+
+// Stores
+import { INSTANCE_STORE_SYMBOL } from '../symbols';
+
+// Components
+import StudentSelectorStudent from './StudentSelectorStudent.vue';
 
 export default defineComponent({
+  components: {
+    StudentSelectorStudent,
+  },
   props: {
-    selectedInstance: {
-      type: Object as PropType<Instance|null>,
+    modelValue: {
+      type: Object as PropType<Student|null>,
       default: null,
     },
   },
   emits: [
-    'select',
-    'clear',
+    'update:modelValue',
   ],
   setup(props, { emit }) {
+    let timerId = -1;
+    const input = ref<HTMLInputElement|null>(null);
+    const formId = `student-selector__student-input--${uuid4()}`;
     const searchCriteria = ref('');
-    const timerFunc = ref<number>(-1);
-    const isOpen = ref(false);
-    const instanceStudents = ref<Student[]>([]);
-    const otherStudents = ref<Student[]>([]);
-    const selection = ref<Student|null>(null);
-    const resultElements = ref<HTMLElement|null>(null);
-    const inputElement = ref<HTMLInputElement|null>(null);
+    const open = ref(false);
+    const students = ref<Student[]>([]);
+    const highlighted = ref<Student|null>(null);
+    const loading = ref(false);
+    const tabPressed = ref(false);
+
+    // The service returns all students, we just want our selected instance
+    const instanceStore = injectStrict(INSTANCE_STORE_SYMBOL);
+    const instanceStudents = computed<Student[]>(() => {
+      const selectedInstanceId = instanceStore.selected.value?.id ?? -1;
+      if (selectedInstanceId === -1) return [];
+
+      return students.value.filter((student) => {
+        const instanceId = student.group?.instanceId ?? -1;
+        return selectedInstanceId === instanceId;
+      });
+    });
 
     /**
-     * Split the student list into two arrays for our template.
+     * Reset the selector to a default state.
      */
-    function processStudents(students: Student[]) {
-      const iid = props.selectedInstance?.id || -1;
-      instanceStudents.value = students.filter((x) => x.group?.instanceId === iid ?? false);
-      otherStudents.value = students.filter((x) => x.group?.instanceId !== iid ?? true);
-
-      if (instanceStudents.value.length > 0) {
-        // eslint-disable-next-line prefer-destructuring
-        selection.value = instanceStudents.value[0];
-      } else if (otherStudents.value.length > 0) {
-        // eslint-disable-next-line prefer-destructuring
-        selection.value = otherStudents.value[0];
-      }
+    function clear() {
+      searchCriteria.value = '';
+      open.value = false;
+      tabPressed.value = false;
+      loading.value = false;
+      students.value = [];
+      highlighted.value = null;
     }
 
     /**
-     * Move the selection to the next student.
+     * Move the highlighted student up or down
      */
-    function incrementSelection() {
-      const scrollEl = resultElements.value?.querySelector('li.selected ~ li.selectable') ?? null;
+    function handleHighlight(increment = true) {
+      const { length } = instanceStudents.value;
+      if (length === 0) return;
 
-      let index = instanceStudents.value.findIndex((x) => x.id === selection.value?.id ?? -1);
-      if (index >= 0 && instanceStudents.value.length - 1 > index) {
-        selection.value = instanceStudents.value[index + 1];
-        if (scrollEl != null) scrollEl.scrollIntoView();
-        return;
-      }
+      const idx = instanceStudents.value
+        .findIndex((x) => x.id === highlighted.value?.id ?? -1);
 
-      index = otherStudents.value.findIndex((x) => x.id === selection.value?.id ?? -1);
-      if (index <= 0 && otherStudents.value.length > 0) {
-        // eslint-disable-next-line prefer-destructuring
-        selection.value = otherStudents.value[0];
-      }
-
-      if (index >= 0 && otherStudents.value.length - 1 > index) {
-        selection.value = otherStudents.value[index + 1];
-      }
-
-      if (scrollEl != null) scrollEl.scrollIntoView();
-    }
-
-    /**
-     * Move the selection to the previous student.
-     */
-    function decrementSelection() {
-      const scrollEl = resultElements.value?.querySelector('li.selected') ?? null;
-
-      let index = instanceStudents.value.findIndex((x) => x.id === selection.value?.id ?? -1);
-      if (index >= 0 && index - 1 >= 0) {
-        selection.value = instanceStudents.value[index - 1];
-
-        if (scrollEl != null) {
-          const sibling = scrollEl.previousElementSibling;
-          if (sibling != null) sibling.scrollIntoView();
+      if (idx < 0) {
+        if (length > 0) {
+          highlighted.value = (increment)
+            ? instanceStudents.value[0]
+            : instanceStudents.value[length - 1];
         }
 
         return;
       }
 
-      index = otherStudents.value.findIndex((x) => x.id === selection.value?.id ?? -1);
-
-      if (index < 0) {
-        return;
-      }
-
-      if (index >= 0 && index - 1 >= 0) {
-        selection.value = otherStudents.value[index - 1];
-      } else if (instanceStudents.value.length > 0) {
-        selection.value = instanceStudents.value[instanceStudents.value.length - 1];
-      }
-
-      if (scrollEl != null) {
-        const sibling = scrollEl.previousElementSibling;
-        if (sibling != null) sibling.scrollIntoView();
+      const i = increment ? 1 : -1;
+      const newIdx = idx + i;
+      if (newIdx < 0 || newIdx > length - 1) {
+        // Wrap back to beginning
+        [highlighted.value] = instanceStudents.value;
+      } else {
+        // Move forward/backward
+        highlighted.value = instanceStudents.value[newIdx];
       }
     }
 
     /**
-     * Query the API for students depending on the value in the search box (email, account number, name).
+     * Tell the parent to select the student.
      */
-    async function search() {
-      const studentStore = defineStudentStore();
-      isOpen.value = true;
+    function handleClick(student: Student) {
+      emit('update:modelValue', student);
+      open.value = false;
+    }
 
+    /**
+     * Tell the parent to clear the student.
+     */
+    function handleClear() {
+      emit('update:modelValue', null);
+    }
+
+    /**
+     * When the user clicks into the input, open the selection window.
+     */
+    function handleFocus(event: FocusEvent) {
+      if (event.target) {
+        (event.target as HTMLInputElement).select();
+      }
+
+      open.value = true;
+    }
+
+    /**
+     * When the user clicks away from the input, close the selection window.
+     */
+    function handleBlur() {
+      if (tabPressed.value) {
+        const highlighedId = highlighted.value?.id ?? -1;
+        const modelId = props.modelValue?.id ?? -1;
+
+        if (highlighted.value && highlighedId !== modelId) {
+          handleClick(highlighted.value);
+        }
+
+        open.value = false;
+        tabPressed.value = false;
+        return;
+      }
+
+      // Closing too quickly makes click events fail
+      window.setTimeout(() => { open.value = false; }, 250);
+    }
+
+    /**
+     * Fetch students by name, account number, or email address based on
+     * the contents of the form.
+     */
+    async function fetchStudents() {
+      let res: PagedStudentResponse|null = null;
       if (searchCriteria.value.indexOf('@') >= 0) {
         try {
-          const students = await studentStore.getByEmail(searchCriteria.value);
-          processStudents(students);
+          res = await getStudentsByEmail({
+            email: searchCriteria.value,
+          });
         } catch (e) {
           console.log(e);
         }
       } else if (/^[0-9]+$/.test(searchCriteria.value)) {
         try {
-          const students = await studentStore.getByAccountNumber(searchCriteria.value);
-          processStudents(students);
+          res = await getStudentsByAccountNumber({
+            accountNumber: searchCriteria.value,
+          });
         } catch (e) {
           console.log(e);
         }
       } else {
         try {
-          const students = await studentStore.getByName(searchCriteria.value);
-          processStudents(students);
+          res = await getStudentsByName({
+            name: searchCriteria.value,
+          });
         } catch (e) {
           console.log(e);
         }
       }
-    }
 
-    /**
-     * Open the results panel if the user clicks and there's a value.
-     */
-    function handleOpen() {
-      if (searchCriteria.value.length === 0) {
-        return;
-      }
-
-      if (instanceStudents.value.length > 0 || otherStudents.value.length > 0) {
-        isOpen.value = true;
+      loading.value = false;
+      if (res && res.students) {
+        students.value = res.students.nodes;
+        highlighted.value = null;
+        handleHighlight();
       }
     }
 
     /**
-     * Select students and update the store.
+     * When the user presses tab to leave the input box, capture it for later use
+     * in the onBlur event.
      */
-    function handleSelection(student?: Student) {
-      if (student && student.id) {
-        selection.value = student;
-        emit('select', student);
-      } else {
-        emit('select', selection.value);
+    function handleKeydown(e: KeyboardEvent) {
+      if (e.key === 'Tab') {
+        tabPressed.value = true;
       }
-
-      isOpen.value = false;
     }
 
     /**
-     * Close the results panel.
-     */
-    function handleClose() {
-      // If we close too quickly, the click event for selections won't work
-      setTimeout(() => {
-        isOpen.value = false;
-      }, 250);
-    }
-
-    /**
-     * Reset form text and clear selection.
-     */
-    function handleReset() {
-      searchCriteria.value = '';
-      selection.value = null;
-      emit('clear');
-    }
-
-    /**
-     * When the user stops typing, run the search.
+     * When the user is focused on the input element, and presses a key,
+     * move the highlight to another student, or fetch from the store.
      */
     function handleKeypress(e: KeyboardEvent) {
       if (e.altKey || e.ctrlKey) {
         return;
       }
 
-      if (e.key === 'ArrowUp' && isOpen.value) {
-        e.preventDefault();
-        decrementSelection();
+      if (e.key === 'Escape' && input.value) {
+        input.value.blur();
+        open.value = false;
+      }
+
+      if (e.key === 'Enter' && highlighted.value) {
+        if (highlighted.value.id !== (props.modelValue?.id ?? -1)) {
+          handleClick(highlighted.value);
+        } else if (input.value) {
+          input.value.blur();
+          open.value = false;
+        }
+
         return;
       }
 
-      if (e.key === 'ArrowDown' && isOpen.value) {
+      if (e.key === 'ArrowUp' && open.value) {
         e.preventDefault();
-        incrementSelection();
+        handleHighlight(false);
+        return;
+      }
+
+      if (e.key === 'ArrowDown' && open.value) {
+        e.preventDefault();
+        handleHighlight();
         return;
       }
 
@@ -307,159 +282,142 @@ export default defineComponent({
         return;
       }
 
-      window.clearTimeout(timerFunc.value);
+      if (timerId > 0) {
+        window.clearTimeout(timerId);
+        loading.value = false;
+      }
 
       if (searchCriteria.value.length > 0) {
-        timerFunc.value = window.setTimeout(search, 750);
+        loading.value = true;
+        timerId = window.setTimeout(fetchStudents, 750);
       }
     }
 
-    /**
-     * Returns a list of shares for the given student, or an empty array.
-     * NOTE: I was getting false-positive errors in the template, so I made this.
-     */
-    function getStudentShares(student: Student) {
-      return student.shares ?? ([] as Share[]);
-    }
+    watch(() => props.modelValue, (newValue) => {
+      clear();
+
+      if (!newValue) {
+        highlighted.value = null;
+      } else {
+        highlighted.value = newValue;
+        searchCriteria.value = newValue.accountNumber;
+
+        // Only fetch if the student isn't already listed
+        if (!students.value.find((x) => x.id === (highlighted.value?.id ?? -1))) {
+          fetchStudents();
+        }
+      }
+    });
 
     return {
-      handleKeypress,
-      handleClose,
-      handleOpen,
-      handleSelection,
-      handleReset,
+      input,
+      formId,
       searchCriteria,
-      isOpen,
+      open,
+      students,
+      highlighted,
+      loading,
       instanceStudents,
-      otherStudents,
-      getStudentShares,
-      selection,
-      resultElements,
-      inputElement,
+      handleClick,
+      handleClear,
+      handleFocus,
+      handleBlur,
+      handleKeydown,
+      handleKeypress,
     };
   },
 });
 </script>
 
 <style lang="scss">
-  .student-search {
-    margin: 0 1.5em;
+  .student-selector {
+    width: 100%;
+    padding: 0 0.5em;
 
-    label[for=student-search__input__input] {
-      padding-right: 1em;
-      margin: auto 0;
-    }
-
-    & form {
+    form {
       display: flex;
       flex-direction: column;
     }
 
     &__input {
       position: relative;
+      flex-grow: 1;
 
-      &__reset-wrapper {
-        width: 100%;
+      &--wrapper {
         display: inline-block;
+        position: relative;
+        width: 100%;
+
+        input[type=text] {
+          width: 100%;
+          padding-right: 3em;
+          outline: none;
+
+          &:focus {
+            border: 1px solid colorStep(button-secondary, $step: 4);
+          }
+        }
 
         input[type=reset] {
           @include input-reset;
-        }
-      }
-
-      &__results {
-        display: none;
-        position: absolute;
-        z-index: 1;
-        list-style: none;
-        margin: 0;
-        width: 100%;
-        max-height: 40vh;
-        overflow: auto;
-
-        background-color: map.get($theme, button-secondary, color);
-        border: 1px solid colorStep(button-secondary, $step: 2);
-
-        &__item {
-          font-size: 0.85em;
-          padding: 0.25em;
-
-          &.selectable {
-            cursor: pointer;
-
-            &:hover {
-              background-color: colorStep(button-secondary);
-            }
-          }
-
-          &.selected {
-            background-color: colorStep(button-secondary);
-          }
-
-          &--account-number {
-            font-family: Consolas, 'Courier New', Courier, monospace;
-
-            &:after {
-              content: ' ';
-            }
-          }
-
-          &--email {
-            display: block;
-            font-style: italic;
-          }
-
-          &__shares {
-            margin-top: 0.25em;
-            font-size: 0.9em;
-            list-style: none;
-
-            &__item {
-              padding-left: 1em;
-
-              &--name {
-                font-weight: 300;
-
-                &:after {
-                  content: ': ';
-                }
-              }
-            }
-          }
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 3em;
+          height: 100%;
         }
       }
     }
 
-    &.open {
-      & .student-search__input__results {
-        display: block;
+    &__student-list {
+      display: none;
+      position: absolute;
+      width: 100%;
+      z-index: 800;
+
+      max-height: 40vh;
+      overflow-y: auto;
+
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      font-size: 0.9em;
+      background-color: map.get($theme, button-secondary, color);
+      border: 1px solid colorStep(button-secondary, $step: 4);
+      border-top: none;
+      border-radius: 0 0 3px 3px;
+
+      &.loading li {
+        opacity: 0.5;
       }
 
-      & #student-search__input__input {
-        border-radius: 0.25rem 0.25rem 0px 0px;
+      &--message {
+        padding: 0.5em;
+      }
+
+      li + li {
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
       }
     }
-  }
 
-  #student-search__input__input {
-    width: 100%;
-    border-radius: 0.25em;
-    outline: none;
-
-    &:focus {
-      border-color: colorStep(button-primary, $darken: false, $step: 4);
+    &.open &__student-list {
+      display: block;
     }
-  }
 
-  @media only screen and (min-width: 760px) {
-    .student-search {
-      & form {
+    &.open input[type=text] {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-bottom: 1px solid colorStep(button-secondary, $step: 3);
+    }
+
+    @media only screen and (min-width: 760px) {
+      form {
         flex-direction: row;
-      }
+        align-items: center;
 
-      &__input {
-        &__reset-wrapper {
-          width: clamp(300px, 30vw, 400px);
+        label {
+          padding-right: 1em;
         }
       }
     }

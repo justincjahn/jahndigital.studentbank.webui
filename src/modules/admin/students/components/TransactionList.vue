@@ -110,5 +110,9 @@ export default defineComponent({
 <style lang="scss">
   .transaction-list {
     @include table($selectable: false);
+
+    &__pagination {
+      @include pagination-buttons;
+    }
   }
 </style>

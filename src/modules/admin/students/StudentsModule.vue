@@ -1,9 +1,9 @@
 <template>
   <suspense>
     <student-selector
-      :selected-instance="selectedInstance"
-      @select="handleSelection"
-      @clear="handleClear"
+      class="student-selector--fixed-width"
+      :model-value="selected"
+      @update:modelValue="handleSelection"
     />
   </suspense>
 
@@ -209,6 +209,7 @@ export default defineComponent({
     const params = computed(() => route.params);
 
     return {
+      selected: studentStore.selected,
       StudentRouteNames,
       studentStore,
       handleSelection,
@@ -257,6 +258,10 @@ export default defineComponent({
 
   .student-details {
     padding: 0 1.5em;
+  }
+
+  div.student-selector--fixed-width {
+    width: clamp(25rem, 35vw, 35rem);
   }
 
   @media only screen and (min-width: 760px) {
