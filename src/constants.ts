@@ -4,8 +4,8 @@ export const API_ENDPOINT: string = process.env.VUE_APP_API_URL || '/graphql';
 // Maximum number of mutations to run at once
 export const API_MAX_CONCURRENCY: number = process.env.API_MAX_CONCURRENCY || 5;
 
-// The localStorage key to use when storing the JWT token.
-export const AUTH_TOKEN = 'jwt-token';
+// The key to use when persisting data in localstorage
+export const PERSIST_TOKEN = 'sbi';
 
 // Potential types of users in the system.
 export const USER_TYPES = {
@@ -29,7 +29,7 @@ export const FETCH_OPTIONS = {
 export default {
   API_ENDPOINT,
   API_MAX_CONCURRENCY,
-  AUTH_TOKEN,
+  PERSIST_TOKEN,
   ERROR_CODES,
   FETCH_OPTIONS,
 };

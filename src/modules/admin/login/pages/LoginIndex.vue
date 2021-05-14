@@ -7,11 +7,11 @@
       <label for="password">Password</label>
       <input v-model="password" type="password" name="password" />
 
-      <p v-if="error.length > 0">
+      <p v-if="error" class="error">
         {{ error }}
       </p>
 
-      <input type="submit" value="Login" :disabled="userStore.loading.value" />
+      <input type="submit" value="Login" :disabled="loading" />
     </form>
   </div>
 </template>
@@ -19,9 +19,12 @@
 <script>
 import { ref, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
+
+// Stores
 import userStore from '@/store/user';
-import AuthenticationService from '@/services/AuthenticationService';
-import Apollo from '@/services/Apollo';
+
+// Services
+import { userLogin } from '@/services/auth';
 
 export default {
   setup() {
@@ -30,15 +33,16 @@ export default {
     const password = ref('');
     const error = ref('');
 
-    // TODO: Not a fan of the global userStore being manipulated by the auth service and the Apollo service.
     async function login() {
-      const auth = new AuthenticationService(Apollo);
-
       try {
-        await auth.login(username.value, password.value);
+        await userLogin({
+          username: username.value,
+          password: password.value,
+        });
+
         error.value = '';
       } catch (e) {
-        error.value = e;
+        error.value = 'Invalid username or password.';
       }
     }
 
@@ -53,7 +57,7 @@ export default {
       password,
       error,
       login,
-      userStore,
+      loading: userStore.loading,
     };
   },
 };

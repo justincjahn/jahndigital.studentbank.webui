@@ -42,6 +42,11 @@ interface Group {
   instance?: Instance;
 }
 
+interface PersistedData {
+  iss: boolean;
+  pre: boolean;
+}
+
 interface JwtData {
   // User ID
   nameid: string;
@@ -57,6 +62,9 @@ interface JwtData {
 
   // Type of user (user || student)
   utyp: string;
+
+  // Preauthentication flas (Y|N)
+  pre: string;
 
   // JWT Not Before
   nbf: number;

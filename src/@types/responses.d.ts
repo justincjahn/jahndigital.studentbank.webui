@@ -3,9 +3,6 @@
  */
 
 interface AuthenticateResponse {
-  // Unique ID of the user.
-  id: number;
-
   // JSON Web Token (JWT) for the user.
   jwtToken: string;
 }
@@ -16,6 +13,14 @@ interface UserLoginResponse {
 
 interface StudentLoginResponse {
   studentLogin: AuthenticateResponse;
+}
+
+interface StudentPreregistrationResponse {
+  studentPreregistration: string;
+}
+
+interface UserPreregistrationResponse {
+  userPreregistration: string;
 }
 
 /*

@@ -1,5 +1,4 @@
 import { createApp, h } from 'vue';
-import router from './routes';
 import App from './App.vue';
 
 createApp({
@@ -7,5 +6,4 @@ createApp({
     return h(App);
   },
 })
-  .use(router)
   .mount('#app');

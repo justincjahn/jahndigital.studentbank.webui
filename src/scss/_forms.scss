@@ -1,0 +1,21 @@
+label {
+  font-weight: bold;
+}
+
+input[type=text] {
+  padding: 0.5em 2em 0.5em 0.5em;
+  border: 1px solid colorStep(button-secondary, $step: 2);
+  border-radius: 3px;
+}
+
+button, input[type=submit] {
+  @include button(button-secondary);
+}
+
+button.primary, input[type=submit].primary {
+  @include button(button-primary);
+}
+
+button.destructive, input[type=submit].destructive {
+  @include button(button-destructive);
+}

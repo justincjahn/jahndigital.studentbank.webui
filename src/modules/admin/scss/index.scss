@@ -1,51 +1,11 @@
-* { padding: 0; margin: 0; }
-*, *::before, *::after { box-sizing: border-box; }
-ul, blockquote { margin-left: 1em; }
+@import "@/scss/_reset.scss";
+@import "@/scss/_common.scss";
+@import "@/scss/_forms.scss";
 
 body {
-  font-size:               12pt;
-  line-height:             1.5;
-  color:                   map.get($theme, primary, font-color);
-  font-family:             Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing:  antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color:        map.get($theme, secondary, color);
-  margin:                  0px auto;
-  max-width:               1200px;
-  overflow-y:              scroll; /* Show vertical scrollbar to prevent shifting of elements */
-}
-
-label {
-  font-weight: bold;
-}
-
-input[type=text] {
-  padding: 0.5em 2em 0.5em 0.5em;
-  border: 1px solid colorStep(button-secondary, $step: 2);
-  border-radius: 3px;
-}
-
-button, input[type=submit] {
-  @include button(button-secondary);
-}
-
-button.primary, input[type=submit].primary {
-  @include button(button-primary);
-}
-
-button.destructive, input[type=submit].destructive {
-  @include button(button-destructive);
-}
-
-p.error, span.error, strong.error, li.error, ul.errors li {
-  color: map.get($theme, button-destructive, color);
-}
-
-p.help-text {
-  font-size: 0.9em;
-  font-style: italic;
-  font-weight: lighter;
-  margin: 0;
+  margin:     0px auto;
+  max-width:  1200px;
+  overflow-y: scroll; /* Show vertical scrollbar to prevent shifting of elements */
 }
 
 #app {

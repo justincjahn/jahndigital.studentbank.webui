@@ -1,4 +1,18 @@
 /*
+ * USERS
+ */
+
+interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+interface StudentPreregistrationRequest {
+  inviteCode: string;
+  accountNumber: string;
+}
+
+/*
  * INSTANCES
  */
 

@@ -18,6 +18,14 @@ module.exports = {
       chunks: ['chunk-vendors', 'chunk-common', 'index'],
     },
 
+    register: {
+      entry: './src/modules/register/index.ts',
+
+      template: 'public/index.html',
+
+      title: 'StudentBank Registration',
+    },
+
     admin: {
       // entry for the page
       entry: './src/modules/admin/index.ts',

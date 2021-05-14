@@ -1,6 +1,6 @@
 <template>
-  <template v-if="userStore.isAuthenticated.value">
-    {{ userStore.username.value }}
+  <template v-if="isAuthenticated">
+    {{ username }}
     (<a href="#" @click="logout">Logout</a>)
   </template>
   <template v-else>
@@ -11,20 +11,22 @@
 </template>
 
 <script>
+// Routes
 import LoginRouteNames from '@/modules/admin/login/routeNames';
-import userStore from '@/store/user';
-import AuthenticationService from '@/services/AuthenticationService';
-import Apollo from '@/services/Apollo';
 
-const auth = new AuthenticationService(Apollo);
+// Stores
+import userStore from '@/store/user';
+
+// Services
+import { logout as userLogout } from '@/services/auth';
 
 export default {
   setup() {
-    const logout = () => auth.logout();
+    const logout = () => userLogout();
 
     return {
+      ...userStore,
       LoginRouteNames,
-      userStore,
       logout,
     };
   },

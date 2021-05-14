@@ -1,12 +1,11 @@
+import { ERROR_CODES, API_ENDPOINT } from '@/constants';
+
 import {
   ApolloClient,
   ApolloLink,
   createHttpLink,
   DocumentNode,
   InMemoryCache,
-  Operation,
-  ServerParseError,
-  throwServerError,
   FetchPolicy,
   MutationOptions,
   OperationVariables,
@@ -14,10 +13,12 @@ import {
 
 import { onError } from '@apollo/client/link/error';
 import { setContext } from '@apollo/client/link/context';
-import persistToken from '@/utils/persistToken';
-import { TokenRefreshLink } from '@/utils/tokenRefreshLink';
-import userStore from '@/store/user';
-import { ERROR_CODES, API_ENDPOINT } from '@/constants';
+
+// Stores
+import userStore from '../store/user';
+
+// Services
+import TokenRefreshService from './TokenRefreshService';
 
 /**
  * Extra logging for failed requests.
@@ -65,141 +66,14 @@ const errorLink = onError(({ networkError, graphQLErrors }: any) => {
 });
 
 /**
- * Automatically attempt to refresh the user's JWT token using the stored refresh token.
- */
-const tokenLink = new TokenRefreshLink({
-  accessTokenField: 'jwtToken',
-
-  isTokenValidOrUndefined: () => {
-    if (userStore.jwtToken.value === null) return true;
-    if (!userStore.isAuthenticated.value) return false;
-    if (userStore.tokenExpiration.value < Date.now()) return false;
-    return true;
-  },
-
-  fetchAccessToken: (): Promise<Response> => {
-    // Instead of using Apollo to fetch the refresh tokens, we use the fetch API because
-    // cyclic dependencies... and also the TokenRefreshLink doesn't support it.
-    // @note Refresh tokens are stored in an HttpOnly cookie.
-    let body = `
-      mutation userRefreshToken {
-        userRefreshToken {
-          id
-          jwtToken
-        }
-      }
-    `;
-
-    let operation = 'userRefreshToken';
-
-    if (userStore.isStudent.value) {
-      body = `
-        mutation studentRefreshToken {
-          studentRefreshToken {
-            id
-            jwtToken
-          }
-        }
-      `;
-
-      operation = 'studentRefreshToken';
-    }
-
-    return fetch(API_ENDPOINT, {
-      method: 'POST',
-
-      headers: {
-        Accepts: 'application/json',
-        'Content-Type': 'application/json',
-      },
-
-      body: JSON.stringify({
-        operationName: operation,
-        query: body,
-        variables: {},
-      }),
-    });
-  },
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, arrow-body-style
-  handleResponse: (operation: Operation, accessTokenField: string) => (response: Response) => {
-    return response
-      .text()
-      .then((bodyText) => {
-        if (typeof bodyText !== 'string' || !bodyText.length) {
-          return bodyText || '';
-        }
-
-        try {
-          return JSON.parse(bodyText);
-        } catch (err) {
-          const parseError = err as ServerParseError;
-          parseError.response = response;
-          parseError.statusCode = response.status;
-          parseError.bodyText = bodyText;
-          return Promise.reject(parseError);
-        }
-      })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .then((parsedBody: Record<string, any>) => {
-        if (response.status >= 300) {
-          throwServerError(
-            response,
-            parsedBody,
-            `Response not successful: Received status code ${response.status}`,
-          );
-        }
-
-        if (parsedBody && parsedBody.data) {
-          const data = parsedBody.data.userRefreshToken
-            || parsedBody.data.studentRefreshToken || null;
-
-          if (data == null || typeof data.jwtToken === 'undefined') {
-            throwServerError(
-              response,
-              parsedBody,
-              'Response not successful: no token returned.',
-            );
-          }
-
-          return data;
-        }
-
-        return throwServerError(
-          response,
-          parsedBody,
-          'Response not successful: no token returned.',
-        );
-      });
-  },
-
-  handleFetch: (accessToken) => {
-    persistToken(accessToken);
-  },
-
-  handleError: (err) => {
-    console.warn('Your refresh token is invalid. Try to re-login');
-    console.error(err);
-
-    // Clearing the JWT token will also trigger a state change in Vue because the user store
-    // module is also updated.
-    persistToken();
-  },
-});
-
-/**
  * Inject authentication headers into every query sent to the server.
  */
-const authLink = setContext((_, { headers }) => {
-  const token = userStore.jwtToken.value;
-
-  return {
-    headers: {
-      ...headers,
-      Authorization: token ? `Bearer ${token}` : '',
-    },
-  };
-});
+const authLink = setContext((_, { headers }) => ({
+  headers: {
+    ...headers,
+    Authorization: userStore.jwtToken.value ? `Bearer ${userStore.jwtToken.value}` : '',
+  },
+}));
 
 /**
  * The Apollo HTTP Link to use when querying the server.
@@ -213,7 +87,7 @@ const httpLink = createHttpLink({
  */
 const defaultClient = new ApolloClient({
   // @note Ordering is important here
-  link: ApolloLink.from([errorLink, tokenLink, authLink, httpLink]),
+  link: ApolloLink.from([errorLink, new TokenRefreshService(), authLink, httpLink]),
   cache: new InMemoryCache(),
 });
 

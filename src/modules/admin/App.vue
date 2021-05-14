@@ -100,7 +100,7 @@ export default defineComponent({
 
     // Force users to the login page if they aren't authenticated
     watchEffect(() => {
-      if (userStore.isAuthenticated.value === false && !userStore.jwtToken.value) {
+      if (userStore.isAnonymous.value) {
         router.push({ name: LoginRouteNames.index });
       }
     });
@@ -129,7 +129,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '@/scss/admin.scss';
+@import './scss/index.scss';
 </style>
 
 <style scoped>
