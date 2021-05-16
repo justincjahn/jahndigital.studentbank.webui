@@ -15,14 +15,12 @@ module.exports = {
 
       // chunks to include on this page, by default includes
       // extracted common chunks and vendor chunks.
-      chunks: ['chunk-vendors', 'chunk-common', 'index'],
+      // chunks: ['chunk-vendors', 'chunk-common', 'index'],
     },
 
     register: {
       entry: './src/modules/register/index.ts',
-
       template: 'public/index.html',
-
       title: 'StudentBank Registration',
     },
 
@@ -39,7 +37,7 @@ module.exports = {
 
       // chunks to include on this page, by default includes
       // extracted common chunks and vendor chunks.
-      chunks: ['chunk-vendors', 'chunk-common', 'admin'],
+      // chunks: ['chunk-vendors', 'chunk-common', 'admin'],
     },
   },
 

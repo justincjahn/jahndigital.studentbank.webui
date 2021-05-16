@@ -50,14 +50,14 @@
         class="primary"
         :disabled="addLoading || !canAdd"
       >
-        <loading-icon :show="addLoading">
+        <loading-label :show="addLoading">
           <template v-if="addLoading">
             Adding...
           </template>
           <template v-else>
             Add
           </template>
-        </loading-icon>
+        </loading-label>
       </button>
     </form>
 
@@ -86,7 +86,7 @@ import { useForm, Field } from 'vee-validate';
 
 // Components
 import Modal from '@/components/Modal.vue';
-import LoadingIcon from '@/components/LoadingIcon.vue';
+import LoadingLabel from '@/components/LoadingLabel.vue';
 import ShareTypeMultiselect from '@/modules/admin/components/ShareTypeMultiselector.vue';
 
 // Utils
@@ -111,7 +111,7 @@ export default defineComponent({
   components: {
     Modal,
     Field,
-    LoadingIcon,
+    LoadingLabel,
     ShareTypeMultiselect,
   },
   props: {

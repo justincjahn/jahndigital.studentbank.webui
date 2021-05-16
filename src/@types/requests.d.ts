@@ -12,6 +12,11 @@ interface StudentPreregistrationRequest {
   accountNumber: string;
 }
 
+interface StudentRegistrationRequest {
+  email: string;
+  password: string;
+}
+
 /*
  * INSTANCES
  */

@@ -1,9 +1,62 @@
+import { Ref } from 'vue';
 import Apollo from '@/services/Apollo';
 import gqlSearchAccounts from '@/modules/admin/graphql/queries/studentsByAccountNumber.gql';
 import { StudentStore } from '@/modules/admin/stores/student';
 import { InstanceStore } from '@/modules/admin/stores/instance';
 import Money from './money';
 import Rate from './rate';
+
+/**
+ * Ensure that the provided value is a valid password, and optionally matches the provided field.
+ *
+ * @param repeat The password ref to compare against.
+ * @returns A function that may be used to validate a password and a repeat password.
+ */
+export function validatePassword(repeat?: Ref<string>): (value: string) => string | boolean {
+  return (value: string) => {
+    if (!value) {
+      return 'Password is required.';
+    }
+
+    if (value.trim().length < 8) {
+      return 'Password must be at least 8 characters in length.';
+    }
+
+    if (!/[0-9]/.test(value)) {
+      return 'Password must contain at least one digit.';
+    }
+
+    if (!/[A-Z]/.test(value)) {
+      return 'Password must contain at least one uppercase letter.';
+    }
+
+    if (!repeat) return true;
+
+    if (!repeat.value || value !== repeat.value) {
+      return 'Passwords do not match.';
+    }
+
+    return true;
+  };
+}
+
+/**
+ * Ensure that the provided value is a valid invite code.
+ *
+ * @param value
+ * @returns true or an error message.
+ */
+export function validateInviteCode(value: string): string | boolean {
+  if (!value) {
+    return 'Invite code is required.';
+  }
+
+  if (!/^[0-9A-Za-z]+$/.test(value.trim())) {
+    return 'Invite codes can only contain letters and numbers.';
+  }
+
+  return true;
+}
 
 /**
  * Ensure the account number is less than 10 digits, and only digits.

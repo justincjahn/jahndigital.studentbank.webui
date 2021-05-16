@@ -18,7 +18,7 @@
         {{ okLabel }}
       </template>
       <template v-else>
-        <loading-icon>{{ okLabel }}</loading-icon>
+        <loading-label>{{ okLabel }}</loading-label>
       </template>
     </template>
   </modal>
@@ -30,7 +30,7 @@ import { defineComponent, ref, computed, watch, PropType } from 'vue';
 // Components
 import Modal from '@/components/Modal.vue';
 import GroupSelector from '@/modules/admin/components/GroupSelector.vue';
-import LoadingIcon from '@/components/LoadingIcon.vue';
+import LoadingLabel from '@/components/LoadingLabel.vue';
 
 // Stores
 import { GroupStore } from '../stores/group';
@@ -39,7 +39,7 @@ export default defineComponent({
   components: {
     Modal,
     GroupSelector,
-    LoadingIcon,
+    LoadingLabel,
   },
   props: {
     show: {

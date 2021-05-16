@@ -5,6 +5,7 @@ import gqlStudentsByAccountNumber from '@/modules/admin/graphql/queries/students
 import gqlStudentById from '@/modules/admin/graphql/queries/studentById.gql';
 import gqlStudents from '@/modules/admin/graphql/queries/students.gql';
 import gqlUpdateStudent from '@/modules/admin/graphql/mutations/studentUpdate.gql';
+import gqlRegisterStudent from '@/graphql/mutations/studentRegistration.gql';
 import gqlNewStudent from '@/modules/admin/graphql/mutations/studentCreate.gql';
 import gqlDeleteStudent from '@/modules/admin/graphql/mutations/studentDelete.gql';
 import gqlBulkGroup from '@/modules/admin/graphql/mutations/studentBulkUpdate.gql';
@@ -149,6 +150,18 @@ export async function getStudentIdsByGroup(groupIds: number[]) {
   };
 
   return query<StudentFilterResponse>(gqlStudentFilter, { where }, 'network-only');
+}
+
+/**
+ * Register a student with the provided information.  Requires a valid preregistration
+ * token, see services/auth:studentPreregistration.
+ *
+ * @param input
+ * @returns
+ * @throws {Error} If an error occurred during the network call.
+ */
+export async function registerStudent(input: StudentRegistrationRequest) {
+  return mutate<StudentRegistrationResponse>(gqlRegisterStudent, input);
 }
 
 /**

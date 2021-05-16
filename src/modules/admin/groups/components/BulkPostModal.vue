@@ -214,7 +214,7 @@
           {{ okLabel }}
         </template>
         <template v-else>
-          <loading-icon>Posting...</loading-icon>
+          <loading-label>Posting...</loading-label>
         </template>
       </button>
     </template>
@@ -228,7 +228,7 @@ import { defineComponent, watchEffect, computed, ref, PropType } from 'vue';
 import Modal from '@/components/Modal.vue';
 import ShareTypeSelector from '@/modules/admin/components/ShareTypeSelector.vue';
 import CurrencyInput from '@/components/CurrencyInput.vue';
-import LoadingIcon from '@/components/LoadingIcon.vue';
+import LoadingLabel from '@/components/LoadingLabel.vue';
 
 // Stores
 import errorStore from '@/store/error';
@@ -241,7 +241,7 @@ export default defineComponent({
     Modal,
     ShareTypeSelector,
     CurrencyInput,
-    LoadingIcon,
+    LoadingLabel,
   },
   props: {
     show: {

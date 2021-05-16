@@ -92,9 +92,9 @@
       </div>
     </template>
     <template #okLabel="{okLabel}">
-      <loading-icon :show="loading">
+      <loading-label :show="loading">
         {{ okLabel }}
-      </loading-icon>
+      </loading-label>
     </template>
   </modal>
 </template>
@@ -103,7 +103,7 @@
 import { defineComponent, ref, watchEffect, computed, PropType } from 'vue';
 
 // Components
-import LoadingIcon from '@/components/LoadingIcon.vue';
+import LoadingLabel from '@/components/LoadingLabel.vue';
 import ShareTypeTemplateBuilder from '@/modules/admin/components/ShareTypeTemplateBuilder.vue';
 import Modal from '@/components/Modal.vue';
 
@@ -132,7 +132,7 @@ export default defineComponent({
   components: {
     Modal,
     Field,
-    LoadingIcon,
+    LoadingLabel,
     ShareTypeTemplateBuilder,
   },
   props: {

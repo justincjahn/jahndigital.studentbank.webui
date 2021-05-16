@@ -149,10 +149,10 @@
           </table>
         </template>
         <template v-else>
-          <loading-icon :show="isPosting" class="bit__post-loading">
+          <loading-label :show="isPosting" class="bit__post-loading">
             Please wait while data is imported.  This may take a few minutes.
             Do not close or refresh your browser until the import is complete.
-          </loading-icon>
+          </loading-label>
         </template>
       </div>
     </template>
@@ -188,7 +188,7 @@
           {{ okLabel }}
         </template>
         <template v-else>
-          <loading-icon>Importing...</loading-icon>
+          <loading-label>Importing...</loading-label>
         </template>
       </button>
     </template>
@@ -202,7 +202,7 @@ import { ref, computed, defineComponent, watch } from 'vue';
 import Modal from '@/components/Modal.vue';
 import InstanceSelector from '@/modules/admin/components/InstanceSelector.vue';
 import ShareTypeTemplateBuilder from '@/modules/admin/components/ShareTypeTemplateBuilder.vue';
-import LoadingIcon from '@/components/LoadingIcon.vue';
+import LoadingLabel from '@/components/LoadingLabel.vue';
 
 // Utils
 import Money from '@/utils/money';
@@ -217,7 +217,7 @@ export default defineComponent({
   components: {
     Modal,
     InstanceSelector,
-    LoadingIcon,
+    LoadingLabel,
     ShareTypeTemplateBuilder,
   },
   props: {

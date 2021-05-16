@@ -23,6 +23,10 @@ interface UserPreregistrationResponse {
   userPreregistration: string;
 }
 
+interface StudentRegistrationResponse {
+  studentRegistration: boolean;
+}
+
 /*
  * INSTANCES
  */

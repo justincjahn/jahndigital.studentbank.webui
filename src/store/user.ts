@@ -31,6 +31,9 @@ export function setup() {
   // GETs the username of the user
   const username = computed(() => store.username);
 
+  // GETs the email of the user or student
+  const email = computed(() => store.email);
+
   // GETs the JWT token of the session
   const jwtToken = computed(() => store.token);
 
@@ -131,6 +134,7 @@ export function setup() {
     loading,
     id,
     username,
+    email,
     jwtToken,
     tokenExpiration,
     isStudent,

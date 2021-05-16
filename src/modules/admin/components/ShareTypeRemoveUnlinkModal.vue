@@ -23,9 +23,9 @@
           :disabled="!canUnlink"
           @click.prevent="handleUnlink"
         >
-          <loading-icon :show="linkedLoading">
+          <loading-label :show="linkedLoading">
             Unlink Selected
-          </loading-icon>
+          </loading-label>
         </button>
       </div>
 
@@ -44,9 +44,9 @@
           :disabled="!canDelete"
           @click.prevent="handleDelete"
         >
-          <loading-icon :show="deletableLoading">
+          <loading-label :show="deletableLoading">
             Delete Selected
-          </loading-icon>
+          </loading-label>
         </button>
       </div>
     </div>
@@ -57,7 +57,7 @@ import { defineComponent, PropType, ref, computed, watchEffect } from 'vue';
 
 // Components
 import Modal from '@/components/Modal.vue';
-import LoadingIcon from '@/components/LoadingIcon.vue';
+import LoadingLabel from '@/components/LoadingLabel.vue';
 import ShareTypeMultiselect from '@/modules/admin/components/ShareTypeMultiselector.vue';
 
 // Store
@@ -68,7 +68,7 @@ export default defineComponent({
   components: {
     Modal,
     ShareTypeMultiselect,
-    LoadingIcon,
+    LoadingLabel,
   },
   props: {
     show: {
