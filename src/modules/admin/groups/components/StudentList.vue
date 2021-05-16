@@ -17,6 +17,8 @@
           <th>First Name</th>
           <th>Last Name</th>
           <th>Email Address</th>
+          <th>Last Login</th>
+          <th>Registration</th>
         </tr>
       </thead>
       <tbody>
@@ -46,6 +48,8 @@
             <td>{{ student.firstName }}</td>
             <td>{{ student.lastName }}</td>
             <td>{{ student.email }}</td>
+            <td>{{ loginDateFormat(student.dateLastLogin) }}</td>
+            <td>{{ registrationStatus(student.dateRegistered) }}</td>
           </tr>
         </template>
       </tbody>
@@ -104,6 +108,16 @@ export default defineComponent({
     const prevInstance = ref<Instance|null>(null);
     const clicks = ref(0);
 
+    function loginDateFormat(date: string) {
+      if (!date || date.trim().length === 0) return 'Never';
+      return new Date(date).toLocaleDateString('en-US');
+    }
+
+    function registrationStatus(date: string) {
+      if (!date || date.trim().length === 0) return 'Unregistered';
+      return 'Registered';
+    }
+
     /**
      * Single or double-click on a student.
      */
@@ -150,6 +164,8 @@ export default defineComponent({
 
     return {
       selectedGroup: props.groupStore.selected,
+      loginDateFormat,
+      registrationStatus,
       studentClick,
       selection,
     };
@@ -218,8 +234,9 @@ export default defineComponent({
         white-space: nowrap;
       }
 
-      &:nth-of-type(1)::before {
+      &:nth-of-type(1):not(.student-list__select-group)::before {
         content: 'Select';
+        margin-left: 2em;
       }
 
       &:nth-of-type(2)::before {
@@ -237,12 +254,20 @@ export default defineComponent({
       &:nth-of-type(5)::before {
         content: 'Email';
       }
+
+      &:nth-of-type(6)::before {
+        content: 'Last Login';
+      }
+
+      &:nth-of-type(7)::before {
+        content: 'Reg. Status';
+      }
     }
 
     & th:last-child,
     & td:last-child
     {
-      text-align: left;
+      text-align: left !important;
     }
   }
 }

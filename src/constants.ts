@@ -7,6 +7,13 @@ export const API_MAX_CONCURRENCY: number = process.env.API_MAX_CONCURRENCY || 5;
 // The key to use when persisting data in localstorage
 export const PERSIST_TOKEN = 'sbi';
 
+// Base URLs for the application
+export const BASE_URLS = {
+  ADMIN: 'admin',
+  REGISTER: 'register',
+  STUDENT: '',
+};
+
 // Potential types of users in the system.
 export const USER_TYPES = {
   USER: 'user',

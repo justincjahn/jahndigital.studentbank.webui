@@ -29,6 +29,8 @@ interface Student {
   firstName: string;
   lastName: string;
   email: string;
+  dateLastLogin: string;
+  dateRegistered: string;
   groupId: number;
   shares?: Share[];
   group?: Group;
