@@ -45,14 +45,14 @@
   <footer>&copy; 2020 Jahn Digital</footer>
 
   <suspense>
-    <Modal
+    <modal
       :show="errorStore.error.value !== null"
       class="destructive"
       title="Error"
       @ok="errorStore.setCurrentError(null)"
     >
       {{ errorStore.error.value }}
-    </Modal>
+    </modal>
   </suspense>
 </template>
 

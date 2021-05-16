@@ -3,14 +3,11 @@ import { RouteRecordRaw } from 'vue-router';
 // Route Names
 import RouteNames from './routeNames';
 
-// Components
-import StudentsModule from './StudentsModule.vue';
-
 const routes: RouteRecordRaw[] = [
   {
     path: '/students/:studentId?',
     name: RouteNames.index,
-    component: StudentsModule,
+    component: () => import(/* webpackChunkName: "admin-students" */ './StudentsModule.vue'),
     children: [
       {
         path: 'transactions',

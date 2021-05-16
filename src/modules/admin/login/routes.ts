@@ -3,20 +3,16 @@ import { RouteRecordRaw } from 'vue-router';
 // Route Names
 import RouteNames from './routeNames';
 
-// Components
-import LoginModule from './LoginModule.vue';
-import LoginIndex from './pages/LoginIndex.vue';
-
 const routes: RouteRecordRaw[] = [
   {
     path: '/login',
-    component: LoginModule,
+    component: () => import(/* webpackChunkName: "admin-login" */ './LoginModule.vue'),
 
     children: [
       {
         path: '',
         name: RouteNames.index,
-        component: LoginIndex,
+        component: () => import(/* webpackChunkName: "admin-login" */ './pages/LoginIndex.vue'),
       },
     ],
   },

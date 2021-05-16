@@ -1,25 +1,22 @@
 import { RouteRecordRaw } from 'vue-router';
-import StocksModule from './StocksModule.vue';
-import StocksIndex from './pages/StocksIndex.vue';
-import StocksDetails from './pages/StocksDetails.vue';
 import RouteNames from './routeNames';
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/stocks',
-    component: StocksModule,
+    component: () => import(/* webpackChunkName: "admin-stocks" */ './StocksModule.vue'),
 
     children: [
       {
         path: '',
         name: RouteNames.index,
-        component: StocksIndex,
+        component: () => import(/* webpackChunkName: "admin-stocks" */ './pages/StocksIndex.vue'),
       },
 
       {
         path: ':id',
         name: RouteNames.stockDetails,
-        component: StocksDetails,
+        component: () => import(/* webpackChunkName: "admin-stocks" */ './pages/StocksDetails.vue'),
       },
     ],
   },

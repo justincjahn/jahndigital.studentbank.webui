@@ -3,20 +3,16 @@ import { RouteRecordRaw } from 'vue-router';
 // Route Names
 import RouteNames from './routeNames';
 
-// Components
-import GroupsModule from './GroupsModule.vue';
-import GroupsIndex from './pages/GroupsIndex.vue';
-
 const routes: RouteRecordRaw[] = [
   {
     path: '/groups',
-    component: GroupsModule,
+    component: () => import(/* webpackChunkName: "admin-groups" */ './GroupsModule.vue'),
 
     children: [
       {
         path: '',
         name: RouteNames.index,
-        component: GroupsIndex,
+        component: () => import(/* webpackChunkName: "admin-groups" */ './pages/GroupsIndex.vue'),
       },
     ],
   },
