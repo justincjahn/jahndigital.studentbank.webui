@@ -104,23 +104,21 @@
     </form>
   </div>
 
-  <modal
-    title="Whoops!"
-    class="destructive registration-modal"
-    :show="error !== null"
-    @ok="resetError"
-  >
-    {{ error }}
-  </modal>
+  <suspense>
+    <modal
+      title="Whoops!"
+      class="destructive registration-modal"
+      :show="error !== null"
+      @ok="resetError"
+    >
+      {{ error }}
+    </modal>
+  </suspense>
 </template>
 
 <script lang="ts">
 import { BASE_URLS } from '@/constants';
-import { defineComponent, ref, onMounted, computed } from 'vue';
-
-// Components
-import LoadingLabel from '@/components/LoadingLabel.vue';
-import Modal from '@/components/Modal.vue';
+import { defineAsyncComponent, defineComponent, ref, onMounted, computed } from 'vue';
 
 // Utils
 import { validateAccount, validateInviteCode, validateEmail, validatePassword } from '@/utils/validators';
@@ -143,8 +141,8 @@ enum Step {
 
 export default defineComponent({
   components: {
-    LoadingLabel,
-    Modal,
+    LoadingLabel: defineAsyncComponent(() => import('@/components/LoadingLabel.vue')),
+    Modal: defineAsyncComponent(() => import('@/components/Modal.vue')),
   },
   setup() {
     // Global state
@@ -270,17 +268,6 @@ export default defineComponent({
 <style lang="scss">
   @import "./scss/index.scss";
 
-  .registration-modal {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    .modal__container {
-      height: auto;
-    }
-  }
-
   .registration-card {
     width: 95vw;
     margin-top: 3em;
@@ -316,6 +303,19 @@ export default defineComponent({
     @media (min-width: 800px) {
       width: 600px;
       box-shadow: 5px 10px 10px 0px rgba(30, 30, 30, 0.1);
+    }
+  }
+
+  @media (min-width: 800px) {
+    .registration-modal {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      .modal__container {
+        height: auto;
+      }
     }
   }
 </style>

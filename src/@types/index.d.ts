@@ -5,22 +5,12 @@ interface Instance {
   isActive: boolean;
 }
 
-interface Transaction {
+interface Group {
   id: number;
-  targetShareId: number;
-  transactionType: string;
-  effectiveDate: string;
-  comment?: string;
-  amount: number;
-  newBalance: number;
-}
-
-interface Share {
-  id: number;
-  studentId: number;
-  shareTypeId: number;
-  balance: number;
-  shareType?: ShareType;
+  instanceId: number;
+  name: string;
+  students?: Student[];
+  instance?: Instance;
 }
 
 interface Student {
@@ -36,58 +26,6 @@ interface Student {
   group?: Group;
 }
 
-interface Group {
-  id: number;
-  instanceId: number;
-  name: string;
-  students?: Student[];
-  instance?: Instance;
-}
-
-interface PersistedData {
-  iss: boolean;
-  pre: boolean;
-}
-
-interface JwtData {
-  // User ID
-  nameid: string;
-
-  // Username
-  unique_name: string;
-
-  // Email address
-  email: string;
-
-  // User role (if user)
-  role?: string;
-
-  // Type of user (user || student)
-  utyp: string;
-
-  // Preauthentication flas (Y|N)
-  pre: string;
-
-  // JWT Not Before
-  nbf: number;
-
-  // JWT Expiration
-  exp: number;
-
-  // JWT Issued At
-  iat: number;
-
-  // JWT Issuer
-  iss: string;
-}
-
-interface PageInfo {
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-  startCursor: string;
-  endCursor: string;
-}
-
 interface ShareTypeInstances {
   instanceId: number;
 }
@@ -99,14 +37,28 @@ interface ShareType {
   shareTypeInstances: ShareTypeInstances[];
 }
 
-/**
- * Used to describe a Share Type that should be created for a specific Student
- * or group of Students.
- */
 interface ShareTypeTemplate {
-  shareType: ShareType|null;
-  initialDeposit: string; // Form input
-  error: string;
+ shareType: ShareType|null;
+ initialDeposit: string;
+ error: string;
+}
+
+interface Share {
+  id: number;
+  studentId: number;
+  shareTypeId: number;
+  balance: number;
+  shareType?: ShareType;
+}
+
+interface Transaction {
+  id: number;
+  targetShareId: number;
+  transactionType: string;
+  effectiveDate: string;
+  comment?: string;
+  amount: number;
+  newBalance: number;
 }
 
 interface StockInstance {
@@ -146,6 +98,92 @@ interface StudentStockHistory {
   amount: number;
   datePosted: string;
   transaction: Transaction;
+}
+
+/**
+ * AUTHENTICATION
+ */
+
+interface PersistedData {
+  // Is student?
+  iss: boolean;
+
+  // Is preauthenticated?
+  pre: boolean;
+}
+
+interface JwtData {
+  // User ID
+  nameid: string;
+
+  // Username
+  unique_name: string;
+
+  // Email address
+  email: string;
+
+  // User role (if user)
+  role?: string;
+
+  // Type of user (user || student)
+  utyp: 'user' | 'student';
+
+  // Preauthentication flag
+  pre?: 'Y' | 'N';
+
+  // JWT Not Before
+  nbf: number;
+
+  // JWT Expiration
+  exp: number;
+
+  // JWT Issued At
+  iat: number;
+
+  // JWT Issuer
+  iss: string;
+}
+
+/**
+ * AUTHORIZATION
+ */
+
+interface Privilege {
+  name: string;
+  description: string;
+}
+
+interface Role {
+  description: name;
+  rolePrivileges: Privilege[];
+}
+
+/**
+ * LOGIN INFORMATION
+ */
+
+interface UserInfo {
+  id: number;
+  email: string;
+  role: Role;
+}
+
+interface StudentInfo {
+  id: number;
+  accountNumber: string;
+  email: string;
+  group: Group;
+}
+
+/**
+ * PAGINATION
+ */
+
+interface PageInfo {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  startCursor: string;
+  endCursor: string;
 }
 
 /// <reference path="./requests.d.ts" />

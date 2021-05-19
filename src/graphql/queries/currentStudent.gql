@@ -1,0 +1,12 @@
+query currentStudent {
+  currentStudent {
+    id
+    accountNumber
+    email
+    group {
+      id
+      instanceId
+      name
+    }
+  }
+}

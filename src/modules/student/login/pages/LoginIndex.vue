@@ -9,8 +9,8 @@
     :handle-enter="canSubmit"
     @ok="login"
   >
-    <form class="admin-login" @submit.prevent="login">
-      <label for="username">Email Address</label>
+    <form class="student-login" @submit.prevent="login">
+      <label for="username">Student ID or Email</label>
       <input
         id="username"
         v-model="username"
@@ -43,7 +43,7 @@ import { useRouter } from 'vue-router';
 import userStore from '@/store/user';
 
 // Services
-import { userLogin } from '@/services/auth';
+import { studentLogin } from '@/services/auth';
 
 // Components
 import Modal from '@/components/Modal.vue';
@@ -69,7 +69,7 @@ export default {
       if (!canSubmit.value) return;
 
       try {
-        await userLogin({
+        await studentLogin({
           username: username.value,
           password: password.value,
         });
@@ -99,7 +99,7 @@ export default {
 </script>
 
 <style lang="scss">
-  .admin-login {
+  .student-login {
     display: flex;
     flex-direction: column;
 

@@ -3,7 +3,6 @@
  */
 
 interface AuthenticateResponse {
-  // JSON Web Token (JWT) for the user.
   jwtToken: string;
 }
 
@@ -25,6 +24,14 @@ interface UserPreregistrationResponse {
 
 interface StudentRegistrationResponse {
   studentRegistration: boolean;
+}
+
+interface CurrentUserResponse {
+  currentUser: UserInfo[];
+}
+
+interface CurrentStudentResponse {
+  currentStudent: StudentInfo[];
 }
 
 /*

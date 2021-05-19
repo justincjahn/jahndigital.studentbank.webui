@@ -1,52 +1,98 @@
 <template>
-  <h1>StudentBank</h1>
-  <router-view />
+  <header v-if="isAuthenticated">
+    <section class="main-nav">
+      <h1>Student Bank</h1>
+
+      <div class="main-nav__login">
+        <login-widget />
+      </div>
+    </section>
+
+    <nav class="sub-nav">
+      <a href="#">My Accounts</a>
+      <a href="#">My Stocks</a>
+    </nav>
+  </header>
+
+  <main v-if="!loading">
+    <router-view />
+  </main>
+
+  <main v-else class="loading">
+    <h1>Loading...</h1>
+  </main>
+
+  <footer>&copy; 2020 Jahn Digital</footer>
+
+  <suspense>
+    <modal
+      :show="error !== null"
+      class="destructive"
+      title="Error"
+      @ok="setCurrentError(null)"
+    >
+      {{ error }}
+    </modal>
+  </suspense>
 </template>
 
-<script lang="ts">
-import { ref } from 'vue';
+<script type="ts">
+import { defineComponent, defineAsyncComponent, provide, watchEffect, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
 
-export default {
-  props: {
-    msg: {
-      type: String,
-      default: '',
-    },
+// Services
+import { info } from '@/services/auth';
+
+// Stores
+import userStore from '@/store/user';
+import routerStore from '@/store/router';
+import errorStore from '@/store/error';
+import { setup as defineGlobalStore } from './stores/global';
+
+// Route Names
+import LoginRouteNames from './login/routeNames';
+
+// Symbols
+import { GLOBAL_STORE } from './symbols';
+
+export default defineComponent({
+  components: {
+    LoginWidget: defineAsyncComponent(() => import('./login/components/LoginWidget.vue')),
+    Modal: defineAsyncComponent(() => import('@/components/Modal.vue')),
   },
   setup() {
-    const count = ref(0);
+    const router = useRouter();
 
-    function increment() {
-      count.value += 1;
-    }
+    // Provide the Global Store to children
+    const globalStore = defineGlobalStore();
+    provide(GLOBAL_STORE, globalStore);
+
+    // Force users to the login page if they aren't authenticated
+    watchEffect(() => {
+      if (userStore.isAnonymous.value) {
+        router.push({ name: LoginRouteNames.index });
+      } else if (!userStore.hasInfo.value && !userStore.loading.value) {
+        info();
+      }
+    });
+
+    onUnmounted(() => globalStore.dispose());
 
     return {
-      count,
-      increment,
+      isAuthenticated: userStore.isAuthenticated,
+      loading: routerStore.loading,
+      ...errorStore,
     };
   },
-};
+});
 </script>
 
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@import "./scss/index.scss";
+
+main.loading {
+  font-size: 1.5em;
+  opacity: 0.8;
   text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
 }
 </style>

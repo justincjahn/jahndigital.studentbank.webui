@@ -1,0 +1,81 @@
+@import "@/scss/_reset.scss";
+@import "@/scss/_common.scss";
+@import "@/scss/_forms.scss";
+
+body {
+  margin:     0px auto;
+  max-width:  1200px;
+  overflow-y: scroll;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  background-color: map.get($theme, primary, color);
+  border-left: 1px solid colorStep(primary, $step: 3);
+  border-right: 1px solid colorStep(primary, $step: 3);
+}
+
+header {
+  margin: 1em 1.5em 0 1.5em;
+
+  .main-nav {
+    display: flex;
+    align-items: baseline;
+
+    h1 {
+      font-size: clamp(1.2rem, 3vw, 2rem);
+    }
+
+    &__login {
+      text-align: right;
+      flex-grow: 1;
+    }
+  }
+
+  .sub-nav {
+    display: flex;
+    margin: 2em 0;
+    gap: clamp(1.5em, 5vw, 3em);
+
+    a {
+      line-height: 1;
+
+      color: map.get($theme, primary, font-color);
+      text-decoration: none;
+      font-size: 1.2em;
+      font-weight: 100;
+
+      &:hover {
+        color: colorStep(primary, $darken: false, $step: 10, $colorMap: font-color);
+      }
+
+      &:visited {
+        color: map.get($theme, primary, font-color);
+      }
+
+      &.router-link-active {
+        color: map.get($theme, accent1, color);
+      }
+    }
+  }
+}
+
+main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+footer {
+  font-size: 0.8em;
+  font-weight: lighter;
+  font-style: italic;
+  text-align: center;
+  color: rgba(0,0,0,0.5);
+  user-select: none;
+}
+
+@media (min-width: 800px) {}

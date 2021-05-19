@@ -1,10 +1,10 @@
 <template>
-  <header>
+  <header v-if="isAuthenticated">
     <section class="main-nav">
       <h1>Student Bank Admin</h1>
 
       <div class="main-nav__instances">
-        <template v-if="userStore.isAuthenticated.value">
+        <template v-if="isAuthenticated">
           <suspense>
             <instance-selector
               v-model="selectedInstance"
@@ -38,25 +38,30 @@
     </section>
   </header>
 
-  <main>
+  <main v-if="!loading">
     <router-view />
+  </main>
+
+  <main v-else class="loading">
+    <h1>Loading...</h1>
   </main>
 
   <footer>&copy; 2020 Jahn Digital</footer>
 
   <suspense>
     <modal
-      :show="errorStore.error.value !== null"
+      :show="error !== null"
       class="destructive"
       title="Error"
-      @ok="errorStore.setCurrentError(null)"
+      @ok="setCurrentError(null)"
     >
-      {{ errorStore.error.value }}
+      {{ error }}
     </modal>
   </suspense>
 </template>
 
 <script lang="ts">
+import { BASE_URLS } from '@/constants';
 import { defineAsyncComponent, defineComponent, watchEffect, computed, provide } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -67,6 +72,9 @@ import PurchasesRouteNames from '@/modules/admin/purchases/routeNames';
 import StocksRouteNames from '@/modules/admin/stocks/routeNames';
 import SettingsRouteNames from '@/modules/admin/settings/routeNames';
 import LoginRouteNames from '@/modules/admin/login/routeNames';
+
+// Services
+import { info } from '@/services/auth';
 
 // Stores
 import routerStore from '@/store/router';
@@ -98,10 +106,14 @@ export default defineComponent({
       set: (item) => (instanceStore.selected.value !== item) && instanceStore.setSelected(item),
     });
 
-    // Force users to the login page if they aren't authenticated
+    // Force users to the login page if they aren't authenticated, also logs off students
     watchEffect(() => {
       if (userStore.isAnonymous.value) {
         router.push({ name: LoginRouteNames.index });
+      } else if (userStore.isStudent.value) {
+        window.location.href = `/${BASE_URLS.STUDENT}`;
+      } else if (!userStore.hasInfo.value) {
+        info();
       }
     });
 
@@ -120,9 +132,10 @@ export default defineComponent({
       settingsIndex: SettingsRouteNames.index,
       selectedInstance,
       instanceStore,
-      errorStore,
-      userStore,
+      error: errorStore.error,
+      setCurrentError: errorStore.setCurrentError,
       loading: routerStore.loading,
+      isAuthenticated: userStore.isAuthenticated,
     };
   },
 });
@@ -130,10 +143,10 @@ export default defineComponent({
 
 <style lang="scss">
 @import './scss/index.scss';
-</style>
 
-<style scoped>
-  .loading {
-    font-size: 2em;
-  }
+main.loading {
+  font-size: 1.5em;
+  opacity: 0.8;
+  text-align: center;
+}
 </style>

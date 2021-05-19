@@ -1,8 +1,9 @@
+import constants from '@/constants';
 import gqlUserLogin from '@/modules/admin/graphql/mutations/userLogin.gql';
 import gqlStudentPreregistration from '@/graphql/mutations/studentPreregistration.gql';
 import gqlStudentLogin from '@/graphql/mutations/studentLogin.gql';
 import userStore from '../store/user';
-import { mutate } from './Apollo';
+import { mutate, query } from './Apollo';
 
 /**
  * Instead of stores calling service functions, this service stores data within a store.
@@ -56,6 +57,30 @@ export async function studentPreregistration(input: StudentPreregistrationReques
   try {
     const res = await mutate<StudentPreregistrationResponse>(gqlStudentPreregistration, input);
     userStore.setToken(res.studentPreregistration);
+  } finally {
+    userStore.setLoading(false);
+  }
+}
+
+/**
+ * Fetch user or student information from the server.
+ */
+export async function info() {
+  if (!userStore.isAuthenticated.value) {
+    throw new Error(constants.ERROR_CODES.NOT_AUTHENTICATED);
+  }
+
+  userStore.setLoading(true);
+  try {
+    if (userStore.isStudent.value) {
+      const g = await import('@/graphql/queries/currentStudent.gql');
+      const res = await query<CurrentStudentResponse>(g);
+      userStore.setInfo(res.currentStudent[0]);
+    } else {
+      const g = await import('@/graphql/queries/currentUser.gql');
+      const res = await query<CurrentUserResponse>(g);
+      userStore.setInfo(res.currentUser[0]);
+    }
   } finally {
     userStore.setLoading(false);
   }

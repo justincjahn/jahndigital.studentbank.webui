@@ -20,6 +20,7 @@ export function setup() {
     hydrated: false,
     isStudent: false,
     isPreauth: false,
+    info: null as UserInfo | StudentInfo | null,
   });
 
   // GETs the loading state of the fetch
@@ -29,10 +30,19 @@ export function setup() {
   const id = computed(() => store.id);
 
   // GETs the username of the user
-  const username = computed(() => store.username);
+  const username = computed(() => {
+    if (store.username.length > 0) return store.username;
+    if (store.info === null) return '';
+
+    if (store.isStudent) {
+      return (store.info as StudentInfo).accountNumber;
+    }
+
+    return (store.info as UserInfo).email;
+  });
 
   // GETs the email of the user or student
-  const email = computed(() => store.email);
+  const email = computed(() => store.email || (store.info?.email ?? ''));
 
   // GETs the JWT token of the session
   const jwtToken = computed(() => store.token);
@@ -51,6 +61,9 @@ export function setup() {
 
   // True if the user is authenticated
   const isAuthenticated = computed(() => store.token !== null || store.hydrated);
+
+  // True if the user info has been provided by the auth service
+  const hasInfo = computed(() => store.info !== null);
 
   /**
    * Clear data from local storage to fully log users out.
@@ -103,10 +116,10 @@ export function setup() {
    *
    * @param token
    */
-  function setToken(token: string|null) {
+  function setToken(token: string | null) {
     store.token = token;
 
-    if (!token) {
+    if (token === null) {
       store.id = -1;
       store.username = '';
       store.email = '';
@@ -114,6 +127,7 @@ export function setup() {
       store.isPreauth = false;
       store.expiration = null;
       store.hydrated = false;
+      store.info = null;
       clear();
       return;
     }
@@ -123,9 +137,14 @@ export function setup() {
     store.username = data.unique_name;
     store.email = data.email;
     store.isStudent = data.utyp === 'student';
-    store.isPreauth = data.pre !== 'N';
+    store.isPreauth = (data?.pre ?? 'N') !== 'N';
     store.expiration = data.exp;
+    store.info = null;
     persist();
+  }
+
+  function setInfo(info: UserInfo | StudentInfo) {
+    store.info = info;
   }
 
   hydrate();
@@ -141,8 +160,10 @@ export function setup() {
     isPreauth,
     isAnonymous,
     isAuthenticated,
+    hasInfo,
     setLoading,
     setToken,
+    setInfo,
   };
 }
 
