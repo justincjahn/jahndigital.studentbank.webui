@@ -20,19 +20,19 @@
     </section>
 
     <section class="sub-nav">
-      <router-link :to="{name: studentsIndex }">
+      <router-link :to="{name: studentsIndex }" class="sub-nav--link">
         Students
       </router-link>
-      <router-link :to="{name: groupsIndex }">
+      <router-link :to="{name: groupsIndex }" class="sub-nav--link">
         Groups
       </router-link>
-      <router-link :to="{name: stocksIndex }">
+      <router-link :to="{name: stocksIndex }" class="sub-nav--link">
         Stocks
       </router-link>
-      <router-link :to="{name: purchasesIndex }">
+      <router-link :to="{name: purchasesIndex }" class="sub-nav--link">
         Purchases
       </router-link>
-      <router-link :to="{name: settingsIndex }">
+      <router-link :to="{name: settingsIndex }" class="sub-nav--link">
         Settings
       </router-link>
     </section>

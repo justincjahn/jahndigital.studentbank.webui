@@ -1,6 +1,33 @@
 import gqlNewShare from '@/modules/admin/graphql/mutations/shareCreate.gql';
 import gqlDeleteShare from '@/modules/admin/graphql/mutations/shareDelete.gql';
-import { mutate } from './Apollo';
+import gqlSharesByStudentId from '../graphql/queries/sharesByStudentId.gql';
+import { query, mutate } from './Apollo';
+
+export interface FetchOptions {
+  cache?: boolean;
+  first?: number;
+  after?: string;
+}
+
+export interface FetchOptionsByStudentId extends FetchOptions {
+  studentId: number;
+}
+
+/**
+ * Get a list of shares associated with the provided Student ID.
+ *
+ * @param options
+ * @returns
+ * @throws {Error} If an error occurred during the network call.
+ */
+export function getSharesByStudentId(options: FetchOptionsByStudentId) {
+  const opts = {
+    cache: true,
+    ...options,
+  };
+
+  return query<PagedShareResponse>(gqlSharesByStudentId, opts, opts.cache ? 'cache-first' : 'network-only');
+}
 
 /**
  * Create a new Share and return it from the server.

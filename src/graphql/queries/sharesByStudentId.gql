@@ -1,0 +1,20 @@
+#import "../fragments/pageInfo.gql"
+#import "../fragments/share.gql"
+
+query sharesByStudentId($studentId: Long!, $first: PaginationAmount, $after: String) {
+  shares(
+    first: $first,
+    after: $after,
+    where: {
+      studentId: $studentId,
+    }
+  ) {
+    pageInfo {
+      ...PageInfoParts
+    }
+    totalCount
+    nodes {
+      ...ShareParts
+    }
+  }
+}

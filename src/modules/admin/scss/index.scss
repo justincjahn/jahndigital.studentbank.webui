@@ -45,22 +45,9 @@ header { margin: 0 1.5em; }
   gap: clamp(1.5em, 5vw, 3em);
 
   a {
-    color: map.get($theme, primary, font-color);
     text-decoration: none;
     font-size: 1.2em;
     font-weight: 100;
-
-    &:hover {
-      color: colorStep(primary, $darken: false, $step: 10, $colorMap: font-color);
-    }
-
-    &:visited {
-      color: map.get($theme, primary, font-color);
-    }
-
-    &.router-link-active {
-      color: map.get($theme, accent1, color);
-    }
   }
 
   &--padded {
@@ -70,8 +57,6 @@ header { margin: 0 1.5em; }
 
 main {
   flex-grow: 1;
-
-  // Convienience for child elements wanting complex arrangement
   display: flex;
   flex-direction: column;
 }

@@ -9,7 +9,9 @@
     </section>
 
     <nav class="sub-nav">
-      <a href="#">My Accounts</a>
+      <router-link :to="{ name: accountIndex }">
+        My Accounts
+      </router-link>
       <a href="#">My Stocks</a>
     </nav>
   </header>
@@ -18,8 +20,8 @@
     <router-view />
   </main>
 
-  <main v-else class="loading">
-    <h1>Loading...</h1>
+  <main v-else>
+    <loading-label class="page-loading" />
   </main>
 
   <footer>&copy; 2020 Jahn Digital</footer>
@@ -40,6 +42,9 @@
 import { defineComponent, defineAsyncComponent, provide, watchEffect, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 
+// Components
+import LoadingLabel from '@/components/LoadingLabel.vue';
+
 // Services
 import { info } from '@/services/auth';
 
@@ -51,12 +56,14 @@ import { setup as defineGlobalStore } from './stores/global';
 
 // Route Names
 import LoginRouteNames from './login/routeNames';
+import AccountRouteNames from './accounts/routeNames';
 
 // Symbols
 import { GLOBAL_STORE } from './symbols';
 
 export default defineComponent({
   components: {
+    LoadingLabel,
     LoginWidget: defineAsyncComponent(() => import('./login/components/LoginWidget.vue')),
     Modal: defineAsyncComponent(() => import('@/components/Modal.vue')),
   },
@@ -67,12 +74,20 @@ export default defineComponent({
     const globalStore = defineGlobalStore();
     provide(GLOBAL_STORE, globalStore);
 
+    async function getInfo() {
+      try {
+        await info();
+      } catch (e) {
+        errorStore.setCurrentError(e?.message ?? e);
+      }
+    }
+
     // Force users to the login page if they aren't authenticated
     watchEffect(() => {
       if (userStore.isAnonymous.value) {
         router.push({ name: LoginRouteNames.index });
       } else if (!userStore.hasInfo.value && !userStore.loading.value) {
-        info();
+        getInfo();
       }
     });
 
@@ -82,6 +97,7 @@ export default defineComponent({
       isAuthenticated: userStore.isAuthenticated,
       loading: routerStore.loading,
       ...errorStore,
+      accountIndex: AccountRouteNames.index,
     };
   },
 });
@@ -89,10 +105,4 @@ export default defineComponent({
 
 <style lang="scss">
 @import "./scss/index.scss";
-
-main.loading {
-  font-size: 1.5em;
-  opacity: 0.8;
-  text-align: center;
-}
 </style>

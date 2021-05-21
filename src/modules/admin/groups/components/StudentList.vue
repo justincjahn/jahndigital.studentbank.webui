@@ -34,7 +34,7 @@
           <tr
             v-for="student in studentStore.students.value"
             :key="student.id"
-            :class="{ 'student-list__student--selected': selection.hasStudent(student) }"
+            :class="{ 'selected': selection.hasStudent(student) }"
             class="student-list__student"
             @click="studentClick(student)"
           >
@@ -197,10 +197,6 @@ export default defineComponent({
       display: block;
     }
 
-    & tr {
-      border: 1px solid colorStep(secondary, $step: 6);
-    }
-
     & thead th {
       display: none;
 
@@ -218,20 +214,30 @@ export default defineComponent({
       }
     }
 
-    & tbody tr td {
-      position: relative;
-      padding-left: 95px;
-      border: none;
-      border-bottom: 1px solid colorStep(secondary, $step: 2);
+    & tr + tr {
+      border-top: 2px solid colorStep(secondary, $step: 4);
+    }
 
+    & tbody tr td {
+      $size: 7em;
+
+      position: relative;
+      padding-left: $size;
+      border: none;
+      text-align: left !important;
       word-break: break-all;
+
+      & + td {
+        border-top: 1px solid colorStep(secondary, $step: 2);
+      }
 
       &::before {
         position: absolute;
         top: 0.5em;
         left: 0.25em;
-        width: 95px;
+        width: $size;
         white-space: nowrap;
+        font-weight: bold;
       }
 
       &:nth-of-type(1):not(.student-list__select-group)::before {
@@ -262,12 +268,6 @@ export default defineComponent({
       &:nth-of-type(7)::before {
         content: 'Reg. Status';
       }
-    }
-
-    & th:last-child,
-    & td:last-child
-    {
-      text-align: left !important;
     }
   }
 }

@@ -1,7 +1,7 @@
 body {
   font-size:               12pt;
   line-height:             1.5;
-  color:                   map.get($theme, primary, font-color);
+  // color:                   map.get($theme, primary, font-color);
   font-family:             Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing:  antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -13,9 +13,32 @@ p.error, span.error, strong.error, li.error, ul.errors li {
   color: map.get($theme, button-destructive, color);
 }
 
+a {
+  color: map.get($theme, primary, font-color);
+
+  &:hover {
+    // I have no idea why the !important adorner is needed here, there's nothing more specific?!
+    color: colorStep(primary, $darken: false, $step: 10, $colorMap: font-color) !important;
+  }
+
+  &:visited {
+    color: map.get($theme, primary, font-color);
+  }
+
+  &.router-link-active {
+    color: map.get($theme, accent1, color);
+  }
+}
+
 p.help-text {
   font-size: 0.9em;
   font-style: italic;
   font-weight: lighter;
   margin: 0;
+}
+
+div.page-loading {
+  font-size: 2em;
+  opacity: 0.8;
+  text-align: center;
 }

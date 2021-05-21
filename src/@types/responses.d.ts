@@ -187,6 +187,14 @@ interface RestoreShareResponse {
   restoreShare: Share[];
 }
 
+interface PagedShareResponse {
+  shares: {
+    pageInfo: PageInfo;
+    totalCount: number;
+    nodes: Share[];
+  };
+}
+
 /*
  * SHARE TYPES
  */

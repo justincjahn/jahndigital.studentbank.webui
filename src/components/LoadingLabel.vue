@@ -2,7 +2,6 @@
   <div
     v-if="show"
     class="loading-label"
-    :class="$attrs.class"
   >
     <dollar-icon />
 

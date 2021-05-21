@@ -2,15 +2,19 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import routerStore from '@/store/router';
 
 import LoginRoutes from './login/routes';
+import AccountsRoutes from './accounts/routes';
+
+import AccountsRoutesNames from './accounts/routeNames';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'index',
-    component: () => import('./pages/StudentIndex.vue'),
+    redirect: { name: AccountsRoutesNames.index },
   },
 
   ...LoginRoutes,
+  ...AccountsRoutes,
 ];
 
 const router = createRouter({
