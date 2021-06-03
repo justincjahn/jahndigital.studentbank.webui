@@ -396,8 +396,8 @@ export default defineComponent({
         padding: 0.5em;
       }
 
-      li + li {
-        border-top: 1px solid rgba(0, 0, 0, 0.1);
+      li + li.student-selector-student {
+        border-top: 1px solid rgba(0, 0, 0, 0.2);
       }
     }
 

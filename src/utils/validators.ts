@@ -319,7 +319,7 @@ export function validateStockSymbol(value: string): string | boolean {
   if (!value || value.trim().length === 0) return 'A Symbol is required.';
   if (value.length < 3) return 'Stock symbols should be at least three characters.';
   if (value.length > 10) return 'Stock symbols can be a maximum of ten characters.';
-  if (!value.match(/^[a-zA-Z]{3,10}$/)) return 'Stock symbols can only be letters.';
+  if (!value.match(/^[a-zA-Z0-9]{3,10}$/)) return 'Stock symbols can only be letters or numbers.';
   return true;
 }
 

@@ -24,8 +24,8 @@
       <tbody>
         <tr v-if="selectedGroup === null">
           <td
-            class="student-list__select-group"
-            colspan="5"
+            class="student-list__select-group center"
+            colspan="7"
           >
             Please select a group...
           </td>

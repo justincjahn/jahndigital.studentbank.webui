@@ -52,9 +52,10 @@ export function setup() {
    *
    * @throws {Error} If there was an error loading data from the API.
    */
-  async function fetchShares(studentId: number) {
+  async function fetchShares(studentId: number, cache = true) {
     const res = await getSharesByStudentId({
       studentId,
+      cache,
     });
 
     store.shares = res.shares.nodes;
@@ -154,7 +155,6 @@ export function setup() {
     shares,
     selectedShare,
     fetchShares,
-
     shareTransactions,
     shareTransactionsLoading,
     shareTransactionsFetchCount,

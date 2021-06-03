@@ -2,6 +2,7 @@ import { FETCH_OPTIONS } from '@/constants';
 import gqlTransactions from '@/modules/admin/graphql/queries/transactionsByShare.gql';
 import gqlNewTransaction from '@/modules/admin/graphql/mutations/transactionCreate.gql';
 import gqlNewBulkTransaction from '@/modules/admin/graphql/mutations/transactionBulk.gql';
+import gqlTransactionTransfer from '@/graphql/mutations/transactionTransfer.gql';
 import { query, mutate } from './Apollo';
 
 export interface FetchOptions {
@@ -55,4 +56,15 @@ export function newTransaction(input: NewTransactionRequest) {
  */
 export function newBulkTransaction(input: NewBulkTransactionRequest) {
   return mutate<NewBulkTransactionResponse>(gqlNewBulkTransaction, input);
+}
+
+/**
+ * Transfer funds from one share to another.
+ *
+ * @param input
+ * @returns A promise containing the two posted transactions.
+ * @throws {Error} If an error occurred during the network call.
+ */
+export function newTransfer(input: NewTransferRequest) {
+  return mutate<NewTransferResponse>(gqlTransactionTransfer, input);
 }
