@@ -1,0 +1,3 @@
+<template>
+  Available Stocks
+</template>

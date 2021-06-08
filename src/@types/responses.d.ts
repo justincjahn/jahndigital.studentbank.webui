@@ -274,6 +274,22 @@ interface PagedStockHistoryResponse {
   };
 }
 
+interface PagedStudentStockResponse {
+  studentStocks: {
+    pageInfo: PageInfo;
+    totalCount: number;
+    nodes: StudentStock[];
+  };
+}
+
+interface PagedStudentStockHistoryResponse {
+  studentStockHistory: {
+    pageInfo: PageInfo;
+    totalCount: number;
+    nodes: StudentStockHistory[];
+  };
+}
+
 interface NewStockPurchaseResponse {
   newStockPurchase: StudentStock[];
 }

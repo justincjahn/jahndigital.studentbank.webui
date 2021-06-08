@@ -102,7 +102,6 @@ export default defineComponent({
       if (globalStore.shares.value.length === 0) return;
 
       if (!globalStore.selectedShare.value) {
-        console.log(orderedShares.value);
         [globalStore.selectedShare.value] = orderedShares.value;
       }
 

@@ -3,6 +3,7 @@ import routerStore from '@/store/router';
 
 import LoginRoutes from './login/routes';
 import AccountsRoutes from './accounts/routes';
+import StocksRoutes from './stocks/routes';
 
 import AccountsRoutesNames from './accounts/routeNames';
 
@@ -15,6 +16,7 @@ const routes: Array<RouteRecordRaw> = [
 
   ...LoginRoutes,
   ...AccountsRoutes,
+  ...StocksRoutes,
 ];
 
 const router = createRouter({

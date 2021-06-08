@@ -1,0 +1,23 @@
+#import "../fragments/pageInfo.gql"
+#import "../fragments/studentStockHistory.gql"
+
+query studentStockHistory(
+  $studentStockId: Long!,
+  $first: PaginationAmount! = 25,
+  $after: String,
+) {
+  studentStockHistory(
+    instances: $instances,
+    first: $first,
+    after: $after,
+    order_by: { datePosted: DESC }
+  ) {
+    pageInfo {
+      ...PageInfoParts
+    }
+    totalCount
+    nodes {
+      ...StudentStockHistoryParts
+    }
+  }
+}

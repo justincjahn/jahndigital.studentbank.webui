@@ -34,31 +34,35 @@ header {
       flex-grow: 1;
     }
   }
+}
 
-  .sub-nav {
-    display: flex;
-    margin: 2em 0;
-    gap: clamp(1.5em, 5vw, 3em);
+.sub-nav {
+  display: flex;
+  margin: 2em 0;
+  gap: clamp(1.5em, 5vw, 3em);
 
-    a {
-      line-height: 1;
+  &--padded {
+    margin-left: 1.5rem;
+  }
 
+  a {
+    line-height: 1;
+
+    color: map.get($theme, primary, font-color);
+    text-decoration: none;
+    font-size: 1.2em;
+    font-weight: 100;
+
+    &:hover {
+      color: colorStep(primary, $darken: false, $step: 10, $colorMap: font-color);
+    }
+
+    &:visited {
       color: map.get($theme, primary, font-color);
-      text-decoration: none;
-      font-size: 1.2em;
-      font-weight: 100;
+    }
 
-      &:hover {
-        color: colorStep(primary, $darken: false, $step: 10, $colorMap: font-color);
-      }
-
-      &:visited {
-        color: map.get($theme, primary, font-color);
-      }
-
-      &.router-link-active {
-        color: map.get($theme, accent1, color);
-      }
+    &.router-link-active {
+      color: map.get($theme, accent1, color);
     }
   }
 }
@@ -67,6 +71,12 @@ main {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+
+  & > .sub-nav {
+    margin: 0 0 1.5em 0;
+    padding: 1.5em;
+    background-color: colorStep(secondary);
+  }
 }
 
 footer {

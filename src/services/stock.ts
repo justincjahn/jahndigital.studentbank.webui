@@ -7,6 +7,8 @@ import gqlStockLink from '@/modules/admin/graphql/mutations/stockLink.gql';
 import gqlStockUnlink from '@/modules/admin/graphql/mutations/stockUnlink.gql';
 import gqlStockDelete from '@/modules/admin/graphql/mutations/stockDelete.gql';
 import gqlStockRestore from '@/modules/admin/graphql/mutations/stockRestore.gql';
+import gqlStudentStocks from '@/graphql/queries/studentStocks.gql';
+import gqlStudentStockHistory from '@/graphql/queries/studentStockHistory.gql';
 import { query, mutate, mutateCustom } from './Apollo';
 
 /**
@@ -36,6 +38,20 @@ export interface StockHistoryListOptions extends FetchOptions {
 }
 
 /**
+ * Options used to determine what student's stock holdings will be fetched.
+ */
+export interface StudentStocksOptions extends FetchOptions {
+  studentId: number;
+}
+
+/**
+ * Options used to determine what student stock purchase history will be fetched.
+ */
+export interface StudentStockHistoryOptions extends FetchOptions {
+  studentStockId: number;
+}
+
+/**
  * Retrieve a list of stocks from the server.
  *
  * @param options
@@ -45,10 +61,11 @@ export interface StockHistoryListOptions extends FetchOptions {
 export async function getStocks(options?: StockListOptions) {
   const opts = {
     first: FETCH_OPTIONS.DEFAULT_COUNT,
+    cache: true,
     ...options,
   };
 
-  return query<PagedStockResponse>(gqlStocksAvailable, opts);
+  return query<PagedStockResponse>(gqlStocksAvailable, opts, opts.cache ? 'cache-first' : 'network-only');
 }
 
 /**
@@ -65,6 +82,38 @@ export async function getStockHistory(options: StockHistoryListOptions) {
   };
 
   return query<PagedStockHistoryResponse>(gqlStockHistory, opts, opts.cache ? 'cache-first' : 'network-only');
+}
+
+/**
+ * Retrieve a list of stocks held by the provided student from the server.
+ *
+ * @param options
+ * @returns A promise containing a list of stock history.
+ */
+export async function getStudentStocks(options: StudentStocksOptions) {
+  const opts = {
+    first: FETCH_OPTIONS.DEFAULT_COUNT,
+    cache: true,
+    ...options,
+  };
+
+  return query<PagedStudentStockResponse>(gqlStudentStocks, opts, opts.cache ? 'cache-first' : 'network-only');
+}
+
+/**
+ * Retrieve purchase history for a given student stock from the server.
+ *
+ * @param options
+ * @returns A promise containing a list of a student's purchase history for the holding provided.
+ */
+export async function getStudentStockHistory(options: StudentStockHistoryOptions) {
+  const opts = {
+    first: FETCH_OPTIONS.DEFAULT_COUNT,
+    cache: false,
+    ...options,
+  };
+
+  return query<PagedStudentStockHistoryResponse>(gqlStudentStockHistory, opts, opts.cache ? 'cache-first' : 'network-only');
 }
 
 /**

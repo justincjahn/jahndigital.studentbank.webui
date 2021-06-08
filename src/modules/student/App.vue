@@ -10,9 +10,12 @@
 
     <nav class="sub-nav">
       <router-link :to="{ name: accountIndex }">
-        My Accounts
+        Accounts
       </router-link>
-      <a href="#">My Stocks</a>
+
+      <router-link :to="{ name: stocksIndex }">
+        Stocks
+      </router-link>
     </nav>
   </header>
 
@@ -57,6 +60,7 @@ import { setup as defineGlobalStore } from './stores/global';
 // Route Names
 import LoginRouteNames from './login/routeNames';
 import AccountRouteNames from './accounts/routeNames';
+import StocksRouteNames from './stocks/routeNames';
 
 // Symbols
 import { GLOBAL_STORE } from './symbols';
@@ -98,6 +102,7 @@ export default defineComponent({
       loading: routerStore.loading,
       ...errorStore,
       accountIndex: AccountRouteNames.index,
+      stocksIndex: StocksRouteNames.holdings,
     };
   },
 });
