@@ -67,7 +67,7 @@
       </tr>
     </tbody>
   </table>
-  <div v-if="shareStore.pageInfo.value != null" class="transaction-list__pagination">
+  <div v-if="shareStore.pageInfo.value != null" class="pagination-buttons">
     <button
       :disabled="!shareStore.pageInfo.value.hasPreviousPage"
       @click.passive="shareStore.fetchPreviousTransactions"
@@ -106,13 +106,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss">
-  .transaction-list {
-    @include table($selectable: false);
-
-    &__pagination {
-      @include pagination-buttons;
-    }
-  }
-</style>

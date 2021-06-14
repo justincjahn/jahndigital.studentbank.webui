@@ -19,7 +19,7 @@ export function setup() {
     stocksAvailableLoading: false,
     stocksAvailableTotalCount: 0,
     stocksAvailablePageInfo: null as PageInfo | null,
-    stocksAvailableFetchCount: FETCH_OPTIONS.DEFAULT_COUNT,
+    stocksAvailableOptions: null as stockService.StockListOptions | null,
     stocksAvailableCursorStack: [] as string[],
     stocksAvailable: [] as Stock[],
 
@@ -66,7 +66,7 @@ export function setup() {
 
   const stocksAvailableLoading = computed(() => store.stocksAvailableLoading);
 
-  const stocksAvailableFetchCount = computed(() => store.stocksAvailableFetchCount);
+  const stocksAvailableFetchCount = computed(() => store.stocksAvailableOptions?.first ?? FETCH_OPTIONS.DEFAULT_COUNT);
 
   const stocksAvailablePageInfo = computed(() => store.stocksAvailablePageInfo);
 
@@ -78,7 +78,7 @@ export function setup() {
 
   const stocksAvailableTotalPages = computed(() => {
     if (store.stocksAvailableTotalCount > 0) {
-      return Math.ceil(store.stocksAvailableTotalCount / store.stocksAvailableFetchCount);
+      return Math.ceil(store.stocksAvailableTotalCount / stocksAvailableFetchCount.value);
     }
 
     return 0;
@@ -213,10 +213,11 @@ export function setup() {
   async function fetchStocksAvailable(options?: stockService.StockListOptions) {
     const opts = {
       cache: false,
-      first: store.stocksAvailableFetchCount,
+      first: FETCH_OPTIONS.DEFAULT_COUNT,
       ...options,
     };
 
+    store.stocksAvailableOptions = opts;
     store.stocksAvailableLoading = true;
 
     try {
@@ -224,7 +225,6 @@ export function setup() {
       store.stocksAvailable = data.stocks.nodes;
       store.stocksAvailablePageInfo = data.stocks.pageInfo;
       store.stocksAvailableTotalCount = data.stocks.totalCount;
-      store.stocksAvailableFetchCount = opts.first;
       store.stocksAvailableCursorStack = [];
     } finally {
       store.stocksAvailableLoading = false;
@@ -240,7 +240,7 @@ export function setup() {
 
     try {
       const data = await stockService.getStocks({
-        first: store.stocksAvailableFetchCount,
+        ...store.stocksAvailableOptions,
         after: endCursor,
       });
 
@@ -264,7 +264,7 @@ export function setup() {
       stack.pop();
 
       const data = await stockService.getStocks({
-        first: store.stocksAvailableFetchCount,
+        ...store.stocksAvailableOptions,
         after: stack[stack.length - 1] ?? null,
       });
 
@@ -322,7 +322,7 @@ export function setup() {
 
     try {
       const data = await stockService.getStudentStocks({
-        first: store.stocksAvailableFetchCount,
+        first: store.stocksHeldFetchCount,
         after: endCursor,
         studentId,
       });

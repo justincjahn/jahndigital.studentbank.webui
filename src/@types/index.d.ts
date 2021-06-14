@@ -1,3 +1,21 @@
+// Global typings for common objects throughout the application.
+
+/**
+ * GLOBAL OBJECTS
+ */
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type OneKey<K extends string, V = any> = {
+  [P in K]: (Record<P, V> &
+    Partial<Record<Exclude<K, P>, never>>) extends infer O
+    ? { [Q in keyof O]: O[Q] }
+    : never
+}[K];
+
+/**
+ * BASE OBJECTS
+ */
+
 interface Instance {
   id: number;
   inviteCode: string;
@@ -188,4 +206,4 @@ interface PageInfo {
 
 /// <reference path="./requests.d.ts" />
 /// <reference path="./responses.d.ts" />
-/// <reference path="./state.d.ts" />
+/// <reference path="./gql.d.ts" />

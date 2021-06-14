@@ -59,7 +59,7 @@
       </tr>
     </tbody>
   </table>
-  <div v-if="hasNext || hasPrevious" class="transaction-list__pagination">
+  <div v-if="hasNext || hasPrevious" class="pagination-buttons">
     <button
       :disabled="!hasPrevious"
       @click.passive="previous"
@@ -99,14 +99,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.transaction-list {
-  @include table($selectable: false);
-
-  &__pagination {
-    @include pagination-buttons;
-  }
-}
-
 // Collapse the table into rows instead of columns for small screens
 @media screen and (max-width: 800px) {
   .transaction-list {

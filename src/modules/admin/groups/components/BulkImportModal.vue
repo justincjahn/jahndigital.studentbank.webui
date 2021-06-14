@@ -446,8 +446,6 @@ export default defineComponent({
     }
 
     &__samples {
-      @include table($selectable: false);
-
       margin-top: 1em;
 
       &__share {

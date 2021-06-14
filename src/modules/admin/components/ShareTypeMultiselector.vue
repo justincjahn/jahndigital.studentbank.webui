@@ -1,5 +1,5 @@
 <template>
-  <table class="share-type-list" :class="{ loading: loading }">
+  <table class="share-type-list selectable" :class="{ loading: loading }">
     <thead>
       <tr>
         <th></th>
@@ -90,7 +90,6 @@ export default defineComponent({
 
 <style lang="scss">
   .share-type-list {
-    @include table($selectable: true);
     @include round-border;
   }
 </style>

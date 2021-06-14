@@ -3,7 +3,7 @@
     class="student-list"
     :class="{ 'student-list--loading': studentStore.loading.value }"
   >
-    <table class="student-list__list">
+    <table class="student-list__list selectable">
       <thead>
         <tr>
           <th>
@@ -56,7 +56,7 @@
     </table>
     <div
       v-if="studentStore.pageInfo.value != null"
-      class="student-list__pagination"
+      class="pagination-buttons"
     >
       <button
         :disabled="!studentStore.pageInfo.value.hasPreviousPage"
@@ -180,14 +180,6 @@ export default defineComponent({
   &--loading {
     opacity: 0.4;
   }
-}
-
-.student-list__list {
-  @include table;
-}
-
-.student-list__pagination {
-  @include pagination-buttons;
 }
 
 // Collapse the table into rows instead of columns for small screens

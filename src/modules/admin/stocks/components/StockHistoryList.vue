@@ -42,7 +42,7 @@
 
     <div
       v-if="totalPages > 1"
-      class="stock-history__pagination"
+      class="pagination-buttons"
     >
       <button
         :disabled="!hasPreviousPage"
@@ -100,14 +100,6 @@ export default defineComponent({
   .stock-history {
     &.loading {
       opacity: 0.5;
-    }
-
-    table {
-      @include table($selectable: false);
-    }
-
-    &__pagination {
-      @include pagination-buttons;
     }
   }
 </style>

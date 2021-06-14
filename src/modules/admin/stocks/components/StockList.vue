@@ -1,6 +1,7 @@
 <template>
   <div v-if="stocks.length > 0" class="stock-list" :class="loading ? 'loading' : ''">
     <table
+      class="selectable"
       :class="!available ? 'selectable' : ''"
     >
       <thead>
@@ -36,7 +37,7 @@
 
     <div
       v-if="totalPages > 1"
-      class="stock-list__pagination"
+      class="pagination-buttons"
     >
       <button
         :disabled="!hasPreviousPage"
@@ -158,12 +159,7 @@ export default defineComponent({
     opacity: 0.5;
   }
 
-  &__pagination {
-    @include pagination-buttons;
-  }
-
   table {
-    @include table;
     @include round-border;
   }
 }

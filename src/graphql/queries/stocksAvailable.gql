@@ -5,12 +5,15 @@ query stocks(
   $instances: [Long!],
   $first: PaginationAmount! = 25,
   $after: String,
+  $where: StockFilter,
+  $order_by: StockSort! = { name: ASC },
 ) {
   stocks(
     instances: $instances,
     first: $first,
     after: $after,
-    order_by: { name: ASC }
+    where: $where,
+    order_by: $order_by
   ) {
     pageInfo {
       ...PageInfoParts

@@ -1,3 +1,5 @@
+// Objects mirroring GraphQL responses for queries and mutations.
+
 /*
  * USERS
  */

@@ -14,7 +14,7 @@ import { query, mutate, mutateCustom } from './Apollo';
 /**
  * Options used to determine what stocks will be fetched.
  */
-interface FetchOptions {
+interface FetchOptionsBase {
   // The number of stock objects to fetch
   first?: number;
 
@@ -25,29 +25,38 @@ interface FetchOptions {
   cache?: boolean;
 }
 
-export interface StockListOptions extends FetchOptions {
+/**
+ * Options used to query for a list of stocks.
+ */
+export interface StockListOptions extends FetchOptionsBase {
   // A list of instances to use as a filter when returning Share Types
   instances?: number[];
+
+  // A list of filters for optional searching
+  where?: StockFilter;
+
+  // Sort operation
+  order_by?: StockSort;
 }
 
 /**
  * Options used to determine what stock history will be fetched.
  */
-export interface StockHistoryListOptions extends FetchOptions {
+export interface StockHistoryListOptions extends FetchOptionsBase {
   stockId: number;
 }
 
 /**
  * Options used to determine what student's stock holdings will be fetched.
  */
-export interface StudentStocksOptions extends FetchOptions {
+export interface StudentStocksOptions extends FetchOptionsBase {
   studentId: number;
 }
 
 /**
  * Options used to determine what student stock purchase history will be fetched.
  */
-export interface StudentStockHistoryOptions extends FetchOptions {
+export interface StudentStockHistoryOptions extends FetchOptionsBase {
   studentStockId: number;
 }
 

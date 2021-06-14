@@ -1,5 +1,5 @@
 <template>
-  <table class="share-list">
+  <table class="share-list selectable">
     <thead>
       <tr>
         <th>Name</th>
@@ -56,7 +56,6 @@ export default defineComponent({
 
 <style lang="scss">
 .share-list {
-  @include table;
   @include round-border;
 }
 </style>

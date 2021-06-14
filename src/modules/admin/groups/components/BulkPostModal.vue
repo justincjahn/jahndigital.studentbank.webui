@@ -144,7 +144,7 @@
       >
         <h2>Step 3: Review</h2>
 
-        <table class="bpm__step-3__shares">
+        <table class="bpm__step-3__shares selectable">
           <thead>
             <tr>
               <th>Group</th>
@@ -457,7 +457,6 @@ export default defineComponent({
 
     &__step-3 {
       &__shares {
-        @include table;
         @include round-border;
       }
     }

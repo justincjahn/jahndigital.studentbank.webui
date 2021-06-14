@@ -1,16 +1,16 @@
+//
+// 00 GLOBAL STYLES
+//
+
 body {
   font-size:               12pt;
   line-height:             1.5;
-  // color:                   map.get($theme, primary, font-color);
+  color:                   map.get($theme, primary, font-color);
   font-family:             Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing:  antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color:        map.get($theme, secondary, color);
   margin:                  0;
-}
-
-p.error, span.error, strong.error, li.error, ul.errors li {
-  color: map.get($theme, button-destructive, color);
 }
 
 a {
@@ -30,15 +30,134 @@ a {
   }
 }
 
-p.help-text {
-  font-size: 0.9em;
-  font-style: italic;
-  font-weight: lighter;
-  margin: 0;
+table {
+  width: 100%;
+  border-spacing: 0;
+
+  &.loading {
+    opacity: 0.5;
+  }
+
+  &.selectable tbody tr {
+    cursor: pointer;
+
+    &.selected {
+      $bgcolor: colorStep(accent1, $step: 6, $darken: false);
+      background-color: $bgcolor;
+
+      color: chooseColor(
+        $bgcolor,
+        map.get($theme, accent1, font-color),
+        map.get($theme, accent1, font-color-alt)
+      );
+
+      &:hover {
+        $bgcolor: colorStep(accent1, $step: 4, $darken: false);
+        background-color: $bgcolor;
+
+        color: chooseColor(
+          $bgcolor,
+          map.get($theme, accent1, font-color),
+          map.get($theme, accent1, font-color-alt)
+        );
+      }
+    }
+
+    &:hover {
+      $bgcolor: colorStep(secondary, $step: 3, $darken: true);
+      background-color: $bgcolor;
+
+      color: chooseColor(
+        $bgcolor,
+        map.get($theme, secondary, font-color),
+        map.get($theme, secondary, font-color-alt)
+      );
+    }
+
+    td {
+      user-select: none;
+    }
+  }
+
+  tr :first-child {
+    padding-left: 0.5em;
+  }
+
+  td, th {
+    text-align: left;
+  
+    &.right {
+      text-align: right;
+    }
+  
+    &.center {
+      text-align: center;
+    }
+
+    &:last-child:not(.left, .center) {
+      text-align: right;
+      padding-right: 0.5em;
+    }
+  }
+
+  tbody tr {
+    td {
+      padding: 0.5em 0.25em;
+    }
+
+    &:nth-child(even) {
+      $bgcolor: colorStep(secondary, $step: 0, $darken: false);
+      background-color: $bgcolor;
+
+      color: chooseColor(
+        $bgcolor,
+        map.get($theme, secondary, font-color),
+        map.get($theme, secondary, font-color-alt)
+      );
+    }
+  }
 }
+
+//
+// 01 SITUATIONAL STYLES
+//
 
 div.page-loading {
   font-size: 2em;
   opacity: 0.8;
   text-align: center;
+}
+
+div.pagination-buttons {
+  text-align: center;
+
+  & button {
+    outline: none;
+    border: none;
+    background: none;
+    cursor: pointer;
+    margin: 1em;
+    text-decoration: underline;
+    overflow: visible;
+
+    &:hover {
+      background-color: colorStep('button-secondary');
+    }
+
+    &:disabled, &:disabled:hover {
+      cursor: auto;
+      background: none;
+    }
+  }
+}
+
+p.error, span.error, strong.error, li.error, ul.errors li {
+  color: map.get($theme, button-destructive, color);
+}
+
+p.help-text {
+  font-size: 0.9em;
+  font-style: italic;
+  font-weight: lighter;
+  margin: 0;
 }
