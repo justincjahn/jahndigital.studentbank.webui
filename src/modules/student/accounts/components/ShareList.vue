@@ -10,7 +10,7 @@
           :to="{ name: transactionRoute, params: { shareId: share.id } }"
           class="share-list__item--name"
         >
-          {{ share.shareType.name }} ({{ accountNumber }}S{{ share.id }})
+          {{ share?.shareType?.name }} ({{ accountNumber }}S{{ share.id }})
         </router-link>
 
         <span class="share-list__item--balance">

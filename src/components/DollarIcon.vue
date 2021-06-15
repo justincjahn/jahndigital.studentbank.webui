@@ -63,7 +63,7 @@
 @keyframes dollar-icon-wobble {
   @for $i from 1 through 100 {
     #{$i * 1%} {
-      transform: scale(spring-wobbly($i / 30), spring-wobbly($i / 20));
+      transform: scale(spring-wobbly(math.div($i, 30)), spring-wobbly(math.div($i, 20)));
     }
   }
 }

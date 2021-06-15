@@ -100,7 +100,7 @@ import useValidation from '@/composables/useValidation';
 // Components
 import Modal from '@/components/Modal.vue';
 import CurrencyInput from '@/components/CurrencyInput.vue';
-import ShareSelector from './ShareSelector.vue';
+import ShareSelector from '../../components/ShareSelector.vue';
 
 export default defineComponent({
   components: {
@@ -118,8 +118,8 @@ export default defineComponent({
       default: null,
     },
     shares: {
-      type: Array as PropType<Share[]>,
-      default: [],
+      type: Object as PropType<Share[]>,
+      default: [] as Share[],
     },
   },
   emits: [

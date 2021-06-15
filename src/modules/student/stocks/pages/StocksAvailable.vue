@@ -38,7 +38,10 @@
           }}
         </td>
         <td>
-          <button class="secondary">
+          <button
+            class="secondary"
+            @click.passive="handlePurchaseShow(stock)"
+          >
             Buy
           </button>
         </td>
@@ -68,16 +71,58 @@
       Next
     </button>
   </div>
+
+  <stock-purchase-modal
+    :show="showPurchaseModal"
+    :loading="purchaseLoading"
+    :stock="purchaseSelectedStock"
+    :shares="shares"
+    @ok="handlePurchaseOk"
+    @cancel="handlePurchaseCancel"
+  />
 </template>
 
 <script lang="ts">
+import { defineComponent, defineAsyncComponent, ref, onMounted } from 'vue';
+
 import injectStrict from '@/utils/injectStrict';
-import { defineComponent, onMounted } from 'vue';
+
+import userStore from '@/store/user';
 import { GLOBAL_STORE } from '../../symbols';
 
 export default defineComponent({
+  components: {
+    StockPurchaseModal: defineAsyncComponent(() => import('../components/StockPurchaseModal.vue')),
+  },
   setup() {
     const globalStore = injectStrict(GLOBAL_STORE);
+
+    const showPurchaseModal = ref(false);
+
+    const purchaseLoading = ref(false);
+
+    const purchaseSelectedStock = ref<Stock|null>(null);
+
+    async function handlePurchaseShow(stock: Stock) {
+      purchaseSelectedStock.value = stock;
+      showPurchaseModal.value = true;
+
+      try {
+        purchaseLoading.value = true;
+        await globalStore.fetchShares(userStore.id.value, false);
+      } finally {
+        purchaseLoading.value = false;
+      }
+    }
+
+    function handlePurchaseOk({ shareId, quantity }: { shareId: number; quantity: number }) {
+      showPurchaseModal.value = false;
+      console.log(shareId, quantity);
+    }
+
+    function handlePurchaseCancel() {
+      showPurchaseModal.value = false;
+    }
 
     onMounted(() => {
       globalStore.fetchStocksAvailable();
@@ -85,12 +130,20 @@ export default defineComponent({
 
     return {
       loading: globalStore.stocksAvailableLoading,
+      shares: globalStore.shares,
       stocks: globalStore.stocksAvailable,
       hasNext: globalStore.stocksAvailableHasNextPage,
       hasPrevious: globalStore.stocksAvailableHasPreviousPage,
       pages: globalStore.stocksAvailableTotalPages,
       fetchNext: globalStore.fetchNextStocksAvailable,
       fetchPrevious: globalStore.fetchPreviousStocksAvailable,
+
+      showPurchaseModal,
+      purchaseLoading,
+      purchaseSelectedStock,
+      handlePurchaseShow,
+      handlePurchaseOk,
+      handlePurchaseCancel,
     };
   },
 });

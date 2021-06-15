@@ -51,6 +51,8 @@ export interface StockHistoryListOptions extends FetchOptionsBase {
  */
 export interface StudentStocksOptions extends FetchOptionsBase {
   studentId: number;
+
+  where?: StudentStockFilter;
 }
 
 /**

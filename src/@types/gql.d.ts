@@ -28,3 +28,18 @@ type StockFilterFilters = OneKey<StockFilterOptions, string>;
 interface StockFilterOr { OR: StockFilterFilters[] }
 interface StockFilterAnd { AND: StockFilterFilters[] }
 type StockFilter = StockFilterFilters | StockFilterOr | StockFilterAnd;
+
+type StudentStockFilterOptions =
+  'id'
+  | 'id_not'
+  | 'id_in'
+  | 'id_not_in'
+  | 'stockId'
+  | 'stockId_not'
+  | 'stockId_in'
+  | 'stockId_not_in';
+
+type StudentStockFilterFilters = OneKey<StudentStockFilterOptions, int | int[]>;
+interface StudentStockFilterOr { OR: StudentStockFilterFilters[] }
+interface StudentStockFilterAnd { AND: StudentStockFilterFilters[] }
+type StudentStockFilter = StudentStockFilterFilters | StudentStockFilterOr | StudentStockFilterAnd;

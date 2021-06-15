@@ -85,7 +85,7 @@ $theme: (
   $backLum: luminance($back) + .05;
   $foreLum: luminance($front) + .05;
 
-  @return max($backLum, $foreLum) / min($backLum, $foreLum);
+  @return math.div(max($backLum, $foreLum), min($backLum, $foreLum));
 }
 
 /**

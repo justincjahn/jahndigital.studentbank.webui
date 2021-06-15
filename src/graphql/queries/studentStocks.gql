@@ -5,11 +5,13 @@ query studentStocks(
   $studentId: Long!,
   $first: PaginationAmount! = 25,
   $after: String,
+  $where: StudentStockFilter
 ) {
   studentStocks(
     studentId: $studentId,
     first: $first,
     after: $after,
+    where: $where,
     order_by: { sharesOwned: DESC }
   ) {
     pageInfo {

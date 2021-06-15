@@ -24,8 +24,8 @@ export default defineComponent({
   },
   props: {
     shares: {
-      type: Array as PropType<Share[]>,
-      default: [],
+      type: Object as PropType<Share[]>,
+      default: [] as Share[],
     },
     modelValue: {
       type: Object as PropType<Share|null>,
@@ -42,7 +42,13 @@ export default defineComponent({
     const value: Search = (x) => {
       if (x === null) return 'Unknown';
       if (typeof x !== 'object') return 'Unknown';
-      return `${x.shareType?.name ?? 'Unknown'} (${accountNumber.value}S${x.id})`;
+
+      const balance = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(x.balance);
+
+      return `${x.shareType?.name ?? 'Unknown'} (${accountNumber.value}S${x.id}) ${balance}`;
     };
 
     function update(share: Share) {
