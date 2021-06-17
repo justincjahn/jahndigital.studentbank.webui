@@ -125,7 +125,7 @@ export default defineComponent({
 
     const isLinked = computed(() => {
       if (!stockStore.selected.value) return false;
-      const instances = stockStore.selected.value.stockInstances.map((x) => x.instanceId);
+      const instances = (stockStore.selected.value?.stockInstances ?? []).map((x) => x.instanceId);
       const instanceId = instanceStore.selected.value?.id ?? -1;
       return instances.includes(instanceId);
     });

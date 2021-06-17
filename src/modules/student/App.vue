@@ -102,7 +102,7 @@ export default defineComponent({
       loading: routerStore.loading,
       ...errorStore,
       accountIndex: AccountRouteNames.index,
-      stocksIndex: StocksRouteNames.holdings,
+      stocksIndex: StocksRouteNames.index,
     };
   },
 });

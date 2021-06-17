@@ -35,7 +35,7 @@
       </li>
       <li>
         <span>Current Holdings Quantity</span>
-        {{ sharesOwned }}
+        {{ sharesOwned.toLocaleString('en-US', {minimumFractionDigits: 0}) }}
       </li>
     </ul>
 
@@ -249,8 +249,6 @@ export default defineComponent({
               stockId: props.stock.id,
             },
           });
-
-          console.log(res.studentStocks.nodes);
 
           if (res.studentStocks.nodes.length > 0) {
             // eslint-disable-next-line prefer-destructuring

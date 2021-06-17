@@ -91,7 +91,7 @@ interface Stock {
   availableShares: number;
   totalShares: number;
   currentValue: number;
-  stockInstances: StockInstance[];
+  stockInstances?: StockInstance[];
 }
 
 interface StockHistory {
@@ -108,6 +108,7 @@ interface StudentStock {
   sharesOwned: number;
   dateCreated: string;
   dateLastActive: string;
+  stock: Stock;
 }
 
 interface StudentStockHistory {

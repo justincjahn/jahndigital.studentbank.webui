@@ -1,12 +1,9 @@
+#import "./stockBase.gql"
 #import "./instance.gql"
 
 fragment StockParts on Stock {
-  id
-  name
-  symbol
-  availableShares
-  totalShares
-  currentValue
+  ...StockBaseParts
+
   stockInstances {
     instanceId
     instance {

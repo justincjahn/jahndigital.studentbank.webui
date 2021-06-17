@@ -172,6 +172,6 @@ export default defineComponent({
 
 <style lang="scss">
 .available-stocks-list {
-  padding: 0 1em;
+  padding: 0 2em;
 }
 </style>

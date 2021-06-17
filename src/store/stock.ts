@@ -217,7 +217,7 @@ export function setup() {
       return;
     }
 
-    const instanceIds = stock.stockInstances.map((x) => x.instanceId);
+    const instanceIds = (stock?.stockInstances ?? []).map((x) => x.instanceId);
     const hasInstance = store.instances.some((x) => instanceIds.includes(x));
     if (hasInstance) { store.stocks = [...store.stocks, stock]; }
   });
@@ -227,8 +227,8 @@ export function setup() {
     const isSelected = store.selected?.id === stock.id ?? false;
     const idx = store.stocks.findIndex((x) => x.id === stock.id);
     if (idx >= 0) {
-      const storeInstances = store.stocks[idx].stockInstances.map((x) => x.instanceId);
-      const stockInstances = stock.stockInstances.map((x) => x.instanceId);
+      const storeInstances = (store.stocks[idx]?.stockInstances ?? []).map((x) => x.instanceId);
+      const stockInstances = (stock?.stockInstances ?? []).map((x) => x.instanceId);
       const wasUnlinked = !stockInstances.some((x) => storeInstances.includes(x));
 
       const newStocks = store.stocks.filter((x) => x.id !== stock.id);
@@ -241,7 +241,7 @@ export function setup() {
 
       store.stocks = newStocks;
     } else if (store.instances.length > 0) {
-      const instanceIds = stock.stockInstances.map((x) => x.instanceId);
+      const instanceIds = (stock?.stockInstances ?? []).map((x) => x.instanceId);
       const wasLinked = store.instances.some((x) => instanceIds.includes(x));
       if (wasLinked) { store.stocks = [...store.stocks, stock]; }
     }

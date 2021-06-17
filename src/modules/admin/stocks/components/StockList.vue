@@ -98,7 +98,7 @@ export default defineComponent({
       if (props.available === true) {
         const instanceId = instanceStore.selected.value?.id ?? -1;
         return stockStore.stocks.value.filter((stock) => {
-          const instances = stock.stockInstances.map((x) => x.instanceId);
+          const instances = (stock?.stockInstances ?? []).map((x) => x.instanceId);
           return !instances.includes(instanceId);
         });
       }

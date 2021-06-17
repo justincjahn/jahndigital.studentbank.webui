@@ -53,6 +53,8 @@ export default defineComponent({
 
     const transferShares = computed(() => orderedShares.value.filter((x) => x.id !== sourceShare.value?.id ?? -1));
 
+    const currentShareId = computed(() => +(router.currentRoute.value.params.shareId ?? -1));
+
     /**
      * Set provided share as the source and open the transfer modal.
      */
@@ -90,9 +92,13 @@ export default defineComponent({
 
         await globalStore.fetchShares(sourceShare.value.studentId, false);
 
-        showTransferModal.value = false;
+        await globalStore.fetchShareTransactions({
+          shareId: currentShareId.value,
+        });
       } catch (e) {
         errorStore.setCurrentError(e?.message ?? e);
+      } finally {
+        showTransferModal.value = false;
       }
     }
 

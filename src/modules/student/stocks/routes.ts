@@ -6,6 +6,7 @@ import RouteNames from './routeNames';
 const routes: RouteRecordRaw[] = [
   {
     path: '/stocks',
+    name: RouteNames.index,
     component: () => import(/* webpackChunkName: "student-stocks" */ './StocksModule.vue'),
     redirect: { name: RouteNames.holdings },
 
