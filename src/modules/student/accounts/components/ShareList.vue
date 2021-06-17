@@ -13,7 +13,7 @@
           {{ share?.shareType?.name }} ({{ accountNumber }}S{{ share.id }})
         </router-link>
 
-        <span class="share-list__item--balance">
+        <span class="share-list__item--info">
           Available Balance:
 
           {{
@@ -26,6 +26,26 @@
             ).format(share.balance)
           }}
         </span>
+
+        <template v-if="(share.shareType?.withdrawalLimitCount ?? -1) > 0">
+          <span class="share-list__item--info">
+            Withdrawal Limit:
+
+            {{ share.shareType?.withdrawalLimitCount ?? -1 }}
+          </span>
+
+          <span class="share-list__item--info">
+            Withdrawal Period:
+
+            {{ share.shareType?.withdrawalLimitPeriod ?? 'Unknown' }}
+          </span>
+
+          <span class="share-list__item--info">
+            Withdrawals this Period:
+
+            {{ share.limitedWithdrawalCount }}
+          </span>
+        </template>
       </div>
 
       <button
@@ -105,7 +125,7 @@ export default defineComponent({
       text-decoration: none;
     }
 
-    &--balance {
+    &--info {
       width: 100%;
       display: block;
       text-align: left;

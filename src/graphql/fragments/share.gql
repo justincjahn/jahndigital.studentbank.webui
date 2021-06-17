@@ -5,6 +5,7 @@ fragment ShareParts on Share {
   shareTypeId
   balance
   studentId
+  limitedWithdrawalCount
   shareType {
     ...ShareTypeParts
   }

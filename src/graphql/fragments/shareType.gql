@@ -2,6 +2,11 @@ fragment ShareTypeParts on ShareType {
   id
   name
   dividendRate
+  withdrawalLimitCount
+  withdrawalLimitPeriod
+  withdrawalLimitLastReset
+  withdrawalLimitShouldFee
+  withdrawalLimitFee
   shareTypeInstances {
     instanceId
   }
