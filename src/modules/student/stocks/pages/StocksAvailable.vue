@@ -85,8 +85,14 @@
 <script lang="ts">
 import { defineComponent, defineAsyncComponent, ref, onMounted } from 'vue';
 
+// Utils
 import injectStrict from '@/utils/injectStrict';
 
+// Services
+import { newStockPurchase } from '@/services/transaction';
+
+// Stores
+import errorStore from '@/store/error';
 import userStore from '@/store/user';
 import { GLOBAL_STORE } from '../../symbols';
 
@@ -115,9 +121,24 @@ export default defineComponent({
       }
     }
 
-    function handlePurchaseOk({ shareId, quantity }: { shareId: number; quantity: number }) {
-      showPurchaseModal.value = false;
-      console.log(shareId, quantity);
+    async function handlePurchaseOk({ shareId, quantity }: { shareId: number; quantity: number }) {
+      if (!purchaseSelectedStock.value) return;
+
+      try {
+        purchaseLoading.value = true;
+
+        await newStockPurchase({
+          shareId,
+          stockId: purchaseSelectedStock.value.id,
+          quantity,
+        });
+
+        showPurchaseModal.value = false;
+      } catch (e) {
+        errorStore.setCurrentError(e?.message ?? e);
+      } finally {
+        purchaseLoading.value = false;
+      }
     }
 
     function handlePurchaseCancel() {

@@ -3,6 +3,7 @@ import gqlTransactions from '@/modules/admin/graphql/queries/transactionsByShare
 import gqlNewTransaction from '@/modules/admin/graphql/mutations/transactionCreate.gql';
 import gqlNewBulkTransaction from '@/modules/admin/graphql/mutations/transactionBulk.gql';
 import gqlTransactionTransfer from '@/graphql/mutations/transactionTransfer.gql';
+import gqlNewStockPurchase from '@/graphql/mutations/newStockPurchase.gql';
 import { query, mutate } from './Apollo';
 
 export interface FetchOptions {
@@ -67,4 +68,15 @@ export function newBulkTransaction(input: NewBulkTransactionRequest) {
  */
 export function newTransfer(input: NewTransferRequest) {
   return mutate<NewTransferResponse>(gqlTransactionTransfer, input);
+}
+
+/**
+ * Buy or sell stocks.
+ *
+ * @param input
+ * @returns A promise containing the new StudentStock object.
+ * @throws {Error} If an error occurred during the network call.
+ */
+export function newStockPurchase(input: NewStockPurchaseRequest) {
+  return mutate<NewStockPurchaseResponse>(gqlNewStockPurchase, input);
 }

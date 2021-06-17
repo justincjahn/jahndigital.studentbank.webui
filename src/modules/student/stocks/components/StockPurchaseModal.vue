@@ -108,7 +108,7 @@ import useValidation from '@/composables/useValidation';
 import uuid4 from '@/utils/uuid4';
 
 // Services
-import * as stockService from '@/services/stock';
+import { getStudentStocks } from '@/services/stock';
 
 // Stores
 import errorStore from '@/store/error';
@@ -242,7 +242,7 @@ export default defineComponent({
         try {
           loading.value = true;
 
-          const res = await stockService.getStudentStocks({
+          const res = await getStudentStocks({
             cache: false,
             studentId: userStore.id.value,
             where: {
@@ -250,8 +250,11 @@ export default defineComponent({
             },
           });
 
+          console.log(res.studentStocks.nodes);
+
           if (res.studentStocks.nodes.length > 0) {
-            [studentStock.value] = res.studentStocks.nodes;
+            // eslint-disable-next-line prefer-destructuring
+            studentStock.value = res.studentStocks.nodes[0];
           } else {
             studentStock.value = null;
           }
