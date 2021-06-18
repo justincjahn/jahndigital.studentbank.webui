@@ -95,7 +95,7 @@ import { validateRate } from '@/utils/validators';
 import Rate from '@/utils/rate';
 
 // Stores
-import errorStore from '@/store/error';
+import errorStore from '@/stores/error';
 import { setup as setupShareTypeStore, ShareTypeStore } from '@/modules/admin/stores/shareType';
 
 interface NewShareTypeForm {

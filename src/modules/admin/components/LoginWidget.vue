@@ -15,7 +15,7 @@
 import LoginRouteNames from '@/modules/admin/login/routeNames';
 
 // Stores
-import userStore from '@/store/user';
+import userStore from '@/stores/user';
 
 // Services
 import { logout as userLogout } from '@/services/auth';

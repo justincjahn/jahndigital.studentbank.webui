@@ -131,8 +131,8 @@ import { studentPreregistration } from '@/services/auth';
 import { registerStudent } from '@/services/student';
 
 // Stores
-import errorStore from '@/store/error';
-import userStore from '@/store/user';
+import errorStore from '@/stores/error';
+import userStore from '@/stores/user';
 
 enum Step {
   step1,

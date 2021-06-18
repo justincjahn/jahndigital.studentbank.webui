@@ -115,7 +115,7 @@ import generatePassword from '@/utils/generatePassword';
 import Money from '@/utils/money';
 
 // Store
-import errorStore from '@/store/error';
+import errorStore from '@/stores/error';
 import { setup as defineStudentStore } from '@/modules/admin/stores/student';
 import { setup as defineShareStore } from '@/modules/admin/stores/share';
 import { setup as defineShareTypeStore } from '@/modules/admin/stores/shareType';

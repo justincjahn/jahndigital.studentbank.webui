@@ -93,8 +93,8 @@ import { defineAsyncComponent, defineComponent, ref, computed, onUnmounted } fro
 import { useRouter } from 'vue-router';
 
 // Stores
-import errorStore from '@/store/error';
-import { setup as defineStockStore } from '@/store/stock';
+import errorStore from '@/stores/error';
+import { setup as defineStockStore } from '@/stores/stock';
 
 // Utils
 import injectStrict from '@/utils/injectStrict';

@@ -61,7 +61,7 @@ import LoadingLabel from '@/components/LoadingLabel.vue';
 import ShareTypeMultiselect from '@/modules/admin/components/ShareTypeMultiselector.vue';
 
 // Store
-import errorStore from '@/store/error';
+import errorStore from '@/stores/error';
 import { setup as defineShareTypeStore, ShareTypeStore } from '../stores/shareType';
 
 export default defineComponent({

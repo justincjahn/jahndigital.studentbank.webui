@@ -35,7 +35,7 @@ import injectStrict from '@/utils/injectStrict';
 
 // Stores
 import { setup as defineShareStore } from '@/modules/admin/stores/share';
-import errorStore from '@/store/error';
+import errorStore from '@/stores/error';
 
 import { STUDENT_STORE_SYMBOL } from '../symbols';
 

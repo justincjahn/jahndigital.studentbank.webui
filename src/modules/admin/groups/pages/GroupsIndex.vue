@@ -131,7 +131,7 @@ import injectStrict from '@/utils/injectStrict';
 
 // Stores
 import { setup as defineStudentStore } from '@/modules/admin/stores/student';
-import errorStore from '@/store/error';
+import errorStore from '@/stores/error';
 
 // Symbols
 import { SHARE_TYPE_STORE_SYMBOL } from '@/modules/admin/symbols';

@@ -77,9 +77,9 @@ import LoginRouteNames from '@/modules/admin/login/routeNames';
 import { info } from '@/services/auth';
 
 // Stores
-import routerStore from '@/store/router';
-import errorStore from '@/store/error';
-import userStore from '@/store/user';
+import routerStore from '@/stores/router';
+import errorStore from '@/stores/error';
+import userStore from '@/stores/user';
 import { setup as defineInstanceStore } from './stores/instance';
 import { setup as defineShareTypeStore } from './stores/shareType';
 import * as symbols from './symbols';

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import routerStore from '@/store/router';
+import routerStore from '@/stores/router';
 
 import LoginRoutes from './login/routes';
 import AccountsRoutes from './accounts/routes';

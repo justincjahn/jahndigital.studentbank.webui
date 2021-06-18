@@ -10,7 +10,7 @@ import PurchasesRoutes from '@/modules/admin/purchases/routes';
 import StocksRoutes from '@/modules/admin/stocks/routes';
 import SettingsRoutes from '@/modules/admin/settings/routes';
 import LoginRoutes from '@/modules/admin/login/routes';
-import routerStore from '@/store/router';
+import routerStore from '@/stores/router';
 
 const routes: Array<RouteRecordRaw> = [
   {

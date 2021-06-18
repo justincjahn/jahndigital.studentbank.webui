@@ -167,7 +167,7 @@ import BaseSelect, { Search } from '@/components/BaseSelect.vue';
 import Modal from '@/components/Modal.vue';
 
 // Stores
-import errorStore from '@/store/error';
+import errorStore from '@/stores/error';
 import { InstanceStore } from '@/modules/admin/stores/instance';
 import { setup as defineShareTypeStore } from '@/modules/admin/stores/shareType';
 

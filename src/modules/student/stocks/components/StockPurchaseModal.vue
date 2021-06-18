@@ -111,8 +111,8 @@ import uuid4 from '@/utils/uuid4';
 import { getStudentStocks } from '@/services/stock';
 
 // Stores
-import errorStore from '@/store/error';
-import userStore from '@/store/user';
+import errorStore from '@/stores/error';
+import userStore from '@/stores/user';
 
 export default defineComponent({
   components: {

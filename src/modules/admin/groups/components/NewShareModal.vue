@@ -75,7 +75,7 @@ import ShareTypeTemplateBuilder from '@/modules/admin/components/ShareTypeTempla
 import { ShareTypeStore } from '@/modules/admin/stores/shareType';
 import { setup as defineStudentStore } from '@/modules/admin/stores/student';
 import { setup as defineShareStore } from '@/modules/admin/stores/share';
-import errorStore from '@/store/error';
+import errorStore from '@/stores/error';
 
 export default defineComponent({
   components: {

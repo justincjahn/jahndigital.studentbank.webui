@@ -92,8 +92,8 @@ import injectStrict from '@/utils/injectStrict';
 import { newStockPurchase } from '@/services/transaction';
 
 // Stores
-import errorStore from '@/store/error';
-import userStore from '@/store/user';
+import errorStore from '@/stores/error';
+import userStore from '@/stores/user';
 import { GLOBAL_STORE } from '../../symbols';
 
 export default defineComponent({

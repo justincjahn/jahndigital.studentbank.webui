@@ -70,7 +70,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, onUnmounted, ref, watchEffect } from 'vue';
-import modalStore from '@/store/modal';
+import modalStore from '@/stores/modal';
 import debounce from '@/utils/debounce';
 
 /**

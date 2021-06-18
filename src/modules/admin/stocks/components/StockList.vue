@@ -66,7 +66,7 @@ import injectStrict from '@/utils/injectStrict';
 
 // Stores
 import { INSTANCE_STORE_SYMBOL } from '@/modules/admin/symbols';
-import { setup as defineStockStore } from '@/store/stock';
+import { setup as defineStockStore } from '@/stores/stock';
 
 const delay = 300;
 let timer: number|null = null;

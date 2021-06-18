@@ -211,7 +211,7 @@ import Money from '@/utils/money';
 import { setup as defineInstanceStore } from '@/modules/admin/stores/instance';
 import { setup as defineShareTypeStore } from '@/modules/admin/stores/shareType';
 import { setup as defineBulkImportStore, BulkImportStep } from '@/modules/admin/groups/stores/bulkImport';
-import errorStore from '@/store/error';
+import errorStore from '@/stores/error';
 
 export default defineComponent({
   components: {

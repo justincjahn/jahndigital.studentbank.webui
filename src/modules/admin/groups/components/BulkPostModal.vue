@@ -231,7 +231,7 @@ import CurrencyInput from '@/components/CurrencyInput.vue';
 import LoadingLabel from '@/components/LoadingLabel.vue';
 
 // Stores
-import errorStore from '@/store/error';
+import errorStore from '@/stores/error';
 import { setup as defineBulkPostStore, PostingPolicy } from '@/modules/admin/groups/stores/bulkPost';
 import { ShareTypeStore } from '@/modules/admin/stores/shareType';
 import { GroupStore } from '../stores/group';

@@ -62,7 +62,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType, watchEffect, onUnmounted } from 'vue';
-import { setup as defineStockHistoryStore } from '@/store/stockHistory';
+import { setup as defineStockHistoryStore } from '@/stores/stockHistory';
 
 export default defineComponent({
   props: {

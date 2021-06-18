@@ -63,7 +63,7 @@
 import { defineComponent, PropType } from 'vue';
 
 // Stores
-import userStore from '@/store/user';
+import userStore from '@/stores/user';
 
 // Route Names
 import AccountsRouteNames from '../routeNames';

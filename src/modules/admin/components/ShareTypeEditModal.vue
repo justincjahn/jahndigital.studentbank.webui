@@ -62,7 +62,7 @@ import useValidation from '@/composables/useValidation';
 
 // Stores
 import { ShareTypeStore } from '@/modules/admin/stores/shareType';
-import errorStore from '@/store/error';
+import errorStore from '@/stores/error';
 
 export default defineComponent({
   components: {

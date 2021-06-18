@@ -9,8 +9,8 @@
 import { defineComponent, ref, watch } from 'vue';
 
 // Stores
-import errorStore from '@/store/error';
-import userStore from '@/store/user';
+import errorStore from '@/stores/error';
+import userStore from '@/stores/user';
 
 // Utils
 import injectStrict from '@/utils/injectStrict';

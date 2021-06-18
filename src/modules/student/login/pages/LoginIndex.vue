@@ -40,7 +40,7 @@ import { ref, computed, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
 
 // Stores
-import userStore from '@/store/user';
+import userStore from '@/stores/user';
 
 // Services
 import { studentLogin } from '@/services/auth';

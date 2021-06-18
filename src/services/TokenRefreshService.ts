@@ -8,7 +8,7 @@ import {
   FetchResult,
 } from '@apollo/client/core';
 
-import userStore from '../store/user';
+import userStore from '../stores/user';
 
 interface Subscriber {
   next?: (result: FetchResult) => void;

@@ -92,7 +92,7 @@ import {
 } from '@/utils/validators';
 
 // Stores
-import userStore from '@/store/user';
+import userStore from '@/stores/user';
 
 // Composables
 import useValidation from '@/composables/useValidation';

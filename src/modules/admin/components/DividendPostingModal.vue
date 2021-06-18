@@ -46,7 +46,7 @@ import ShareTypeSelector from './ShareTypeSelector.vue';
 
 // Stores
 // eslint-disable-next-line import/order
-import errorStore from '@/store/error';
+import errorStore from '@/stores/error';
 import { ShareTypeStore } from '../stores/shareType';
 
 export default defineComponent({

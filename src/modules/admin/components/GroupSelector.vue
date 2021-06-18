@@ -68,7 +68,7 @@ import Modal from '@/components/Modal.vue';
 import uuid4 from '@/utils/uuid4';
 
 // Stores
-import errorStore from '@/store/error';
+import errorStore from '@/stores/error';
 import { GroupStore } from '../groups/stores/group';
 
 enum ModalState {

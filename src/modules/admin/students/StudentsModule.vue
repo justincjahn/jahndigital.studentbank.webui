@@ -90,7 +90,7 @@ import { validateAccountUnique, validateEmail, validateName } from '@/utils/vali
 import StudentRouteNames from '@/modules/admin/students/routeNames';
 
 // Stores
-import errorStore from '@/store/error';
+import errorStore from '@/stores/error';
 import { setup as defineStudentStore } from '../stores/student';
 
 // Symbols

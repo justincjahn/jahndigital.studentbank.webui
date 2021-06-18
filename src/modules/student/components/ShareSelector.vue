@@ -16,7 +16,7 @@ import { defineComponent, PropType, computed } from 'vue';
 import BaseSelect, { Search } from '@/components/BaseSelect.vue';
 
 // Stores
-import userStore from '@/store/user';
+import userStore from '@/stores/user';
 
 export default defineComponent({
   components: {

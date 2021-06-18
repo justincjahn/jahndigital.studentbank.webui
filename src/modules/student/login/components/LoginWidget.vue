@@ -20,7 +20,7 @@
 
 <script>
 // Stores
-import userStore from '@/store/user';
+import userStore from '@/stores/user';
 
 // Services
 import { logout as studentLogout } from '@/services/auth';

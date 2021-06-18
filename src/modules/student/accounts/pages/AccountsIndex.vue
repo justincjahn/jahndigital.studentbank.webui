@@ -27,7 +27,7 @@ import { useRouter } from 'vue-router';
 import { newTransfer } from '@/services/transaction';
 
 // Store
-import errorStore from '@/store/error';
+import errorStore from '@/stores/error';
 import injectStrict from '@/utils/injectStrict';
 import { GLOBAL_STORE } from '../../symbols';
 

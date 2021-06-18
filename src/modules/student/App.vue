@@ -52,9 +52,9 @@ import LoadingLabel from '@/components/LoadingLabel.vue';
 import { info } from '@/services/auth';
 
 // Stores
-import userStore from '@/store/user';
-import routerStore from '@/store/router';
-import errorStore from '@/store/error';
+import userStore from '@/stores/user';
+import routerStore from '@/stores/router';
+import errorStore from '@/stores/error';
 import { setup as defineGlobalStore } from './stores/global';
 
 // Route Names

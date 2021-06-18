@@ -15,7 +15,7 @@ import { onError } from '@apollo/client/link/error';
 import { setContext } from '@apollo/client/link/context';
 
 // Stores
-import userStore from '../store/user';
+import userStore from '../stores/user';
 
 // Services
 import TokenRefreshService from './TokenRefreshService';

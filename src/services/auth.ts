@@ -2,7 +2,7 @@ import constants from '@/constants';
 import gqlUserLogin from '@/graphql/mutations/userLogin.gql';
 import gqlStudentPreregistration from '@/graphql/mutations/studentPreregistration.gql';
 import gqlStudentLogin from '@/graphql/mutations/studentLogin.gql';
-import userStore from '../store/user';
+import userStore from '../stores/user';
 import { mutate, query } from './Apollo';
 
 /**
