@@ -32,11 +32,3 @@ export const FETCH_OPTIONS = {
   // The default amount of items to fetch when pagination is in use
   DEFAULT_COUNT: 25,
 };
-
-export default {
-  API_ENDPOINT,
-  API_MAX_CONCURRENCY,
-  PERSIST_TOKEN,
-  ERROR_CODES,
-  FETCH_OPTIONS,
-};

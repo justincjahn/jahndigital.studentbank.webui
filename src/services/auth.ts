@@ -1,4 +1,4 @@
-import constants from '@/constants';
+import { ERROR_CODES } from '@/constants';
 import gqlUserLogin from '@/graphql/mutations/userLogin.gql';
 import gqlStudentPreregistration from '@/graphql/mutations/studentPreregistration.gql';
 import gqlStudentLogin from '@/graphql/mutations/studentLogin.gql';
@@ -67,7 +67,7 @@ export async function studentPreregistration(input: StudentPreregistrationReques
  */
 export async function info() {
   if (!userStore.isAuthenticated.value) {
-    throw new Error(constants.ERROR_CODES.NOT_AUTHENTICATED);
+    throw new Error(ERROR_CODES.NOT_AUTHENTICATED);
   }
 
   userStore.setLoading(true);
