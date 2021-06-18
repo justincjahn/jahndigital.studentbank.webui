@@ -1,7 +1,7 @@
-import gqlInstances from '@/modules/admin/graphql/queries/instances.gql';
-import gqlNewInstance from '@/modules/admin/graphql/mutations/instanceCreate.gql';
-import gqlUpdateInstance from '@/modules/admin/graphql/mutations/instanceUpdate.gql';
-import gqlDeleteInstance from '@/modules/admin/graphql/mutations/instanceDelete.gql';
+import gqlInstances from '@/graphql/queries/instances.gql';
+import gqlNewInstance from '@/graphql/mutations/instanceCreate.gql';
+import gqlUpdateInstance from '@/graphql/mutations/instanceUpdate.gql';
+import gqlDeleteInstance from '@/graphql/mutations/instanceDelete.gql';
 import { query, mutateCustom } from './Apollo';
 
 /**

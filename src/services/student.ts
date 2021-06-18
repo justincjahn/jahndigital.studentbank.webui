@@ -1,15 +1,15 @@
 import { FETCH_OPTIONS } from '@/constants';
-import gqlStudentsByName from '@/modules/admin/graphql/queries/studentsByName.gql';
-import gqlStudentsByEmail from '@/modules/admin/graphql/queries/studentsByEmail.gql';
-import gqlStudentsByAccountNumber from '@/modules/admin/graphql/queries/studentsByAccountNumber.gql';
-import gqlStudentById from '@/modules/admin/graphql/queries/studentById.gql';
-import gqlStudents from '@/modules/admin/graphql/queries/students.gql';
-import gqlUpdateStudent from '@/modules/admin/graphql/mutations/studentUpdate.gql';
+import gqlStudentsByName from '@/graphql/queries/studentsByName.gql';
+import gqlStudentsByEmail from '@/graphql/queries/studentsByEmail.gql';
+import gqlStudentsByAccountNumber from '@/graphql/queries/studentsByAccountNumber.gql';
+import gqlStudentById from '@/graphql/queries/studentById.gql';
+import gqlStudents from '@/graphql/queries/students.gql';
+import gqlUpdateStudent from '@/graphql/mutations/studentUpdate.gql';
 import gqlRegisterStudent from '@/graphql/mutations/studentRegistration.gql';
-import gqlNewStudent from '@/modules/admin/graphql/mutations/studentCreate.gql';
-import gqlDeleteStudent from '@/modules/admin/graphql/mutations/studentDelete.gql';
-import gqlBulkGroup from '@/modules/admin/graphql/mutations/studentBulkUpdate.gql';
-import gqlStudentFilter from '@/modules/admin/graphql/queries/studentFilter.gql';
+import gqlNewStudent from '@/graphql/mutations/studentCreate.gql';
+import gqlDeleteStudent from '@/graphql/mutations/studentDelete.gql';
+import gqlBulkGroup from '@/graphql/mutations/studentBulkUpdate.gql';
+import gqlStudentFilter from '@/graphql/queries/studentFilter.gql';
 import { query, mutate, mutateCustom } from './Apollo';
 
 interface FetchOptionsBase {

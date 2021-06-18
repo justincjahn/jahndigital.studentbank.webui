@@ -1,6 +1,6 @@
-import gqlNewShare from '@/modules/admin/graphql/mutations/shareCreate.gql';
-import gqlDeleteShare from '@/modules/admin/graphql/mutations/shareDelete.gql';
-import gqlSharesByStudentId from '../graphql/queries/sharesByStudentId.gql';
+import gqlNewShare from '@/graphql/mutations/shareCreate.gql';
+import gqlDeleteShare from '@/graphql/mutations/shareDelete.gql';
+import gqlSharesByStudentId from '@/graphql/queries/sharesByStudentId.gql';
 import { query, mutate } from './Apollo';
 
 export interface FetchOptions {

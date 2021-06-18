@@ -1,12 +1,12 @@
 import { FETCH_OPTIONS } from '@/constants';
 import gqlStocksAvailable from '@/graphql/queries/stocksAvailable.gql';
 import gqlStockHistory from '@/graphql/queries/stockHistory.gql';
-import gqlStockCreate from '@/modules/admin/graphql/mutations/stockCreate.gql';
-import gqlStockUpdate from '@/modules/admin/graphql/mutations/stockUpdate.gql';
-import gqlStockLink from '@/modules/admin/graphql/mutations/stockLink.gql';
-import gqlStockUnlink from '@/modules/admin/graphql/mutations/stockUnlink.gql';
-import gqlStockDelete from '@/modules/admin/graphql/mutations/stockDelete.gql';
-import gqlStockRestore from '@/modules/admin/graphql/mutations/stockRestore.gql';
+import gqlStockCreate from '@/graphql/mutations/stockCreate.gql';
+import gqlStockUpdate from '@/graphql/mutations/stockUpdate.gql';
+import gqlStockLink from '@/graphql/mutations/stockLink.gql';
+import gqlStockUnlink from '@/graphql/mutations/stockUnlink.gql';
+import gqlStockDelete from '@/graphql/mutations/stockDelete.gql';
+import gqlStockRestore from '@/graphql/mutations/stockRestore.gql';
 import gqlStudentStocks from '@/graphql/queries/studentStocks.gql';
 import gqlStudentStockHistory from '@/graphql/queries/studentStockHistory.gql';
 import { query, mutate, mutateCustom } from './Apollo';

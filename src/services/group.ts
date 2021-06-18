@@ -1,7 +1,7 @@
-import gqlGroups from '@/modules/admin/graphql/queries/groupsByInstance.gql';
-import gqlNewGroup from '@/modules/admin/graphql/mutations/groupCreate.gql';
-import gqlUpdateGroup from '@/modules/admin/graphql/mutations/groupUpdate.gql';
-import gqlDeleteGroup from '@/modules/admin/graphql/mutations/groupDelete.gql';
+import gqlGroups from '@/graphql/queries/groupsByInstance.gql';
+import gqlNewGroup from '@/graphql/mutations/groupCreate.gql';
+import gqlUpdateGroup from '@/graphql/mutations/groupUpdate.gql';
+import gqlDeleteGroup from '@/graphql/mutations/groupDelete.gql';
 import { query, mutateCustom } from './Apollo';
 
 export interface FetchOptions {

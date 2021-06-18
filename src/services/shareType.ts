@@ -1,11 +1,11 @@
 import { FETCH_OPTIONS } from '@/constants';
-import gqlShareTypes from '@/modules/admin/graphql/queries/shareTypes.gql';
-import gqlNewShareType from '@/modules/admin/graphql/mutations/shareTypeCreate.gql';
-import gqlUpdateShareType from '@/modules/admin/graphql/mutations/shareTypeUpdate.gql';
-import gqlLinkShareType from '@/modules/admin/graphql/mutations/shareTypeLink.gql';
-import gqlUnlinkShareType from '@/modules/admin/graphql/mutations/shareTypeUnlink.gql';
-import gqlDeleteShareType from '@/modules/admin/graphql/mutations/shareTypeDelete.gql';
-import gqlDividendPosting from '@/modules/admin/graphql/mutations/shareTypeDividend.gql';
+import gqlShareTypes from '@/graphql/queries/shareTypes.gql';
+import gqlNewShareType from '@/graphql/mutations/shareTypeCreate.gql';
+import gqlUpdateShareType from '@/graphql/mutations/shareTypeUpdate.gql';
+import gqlLinkShareType from '@/graphql/mutations/shareTypeLink.gql';
+import gqlUnlinkShareType from '@/graphql/mutations/shareTypeUnlink.gql';
+import gqlDeleteShareType from '@/graphql/mutations/shareTypeDelete.gql';
+import gqlDividendPosting from '@/graphql/mutations/shareTypeDividend.gql';
 import { query, mutate, mutateCustom } from './Apollo';
 
 /**

@@ -1,7 +1,7 @@
 import { FETCH_OPTIONS } from '@/constants';
-import gqlTransactions from '@/modules/admin/graphql/queries/transactionsByShare.gql';
-import gqlNewTransaction from '@/modules/admin/graphql/mutations/transactionCreate.gql';
-import gqlNewBulkTransaction from '@/modules/admin/graphql/mutations/transactionBulk.gql';
+import gqlTransactions from '@/graphql/queries/transactionsByShare.gql';
+import gqlNewTransaction from '@/graphql/mutations/transactionCreate.gql';
+import gqlNewBulkTransaction from '@/graphql/mutations/transactionBulk.gql';
 import gqlTransactionTransfer from '@/graphql/mutations/transactionTransfer.gql';
 import gqlNewStockPurchase from '@/graphql/mutations/newStockPurchase.gql';
 import { query, mutate } from './Apollo';

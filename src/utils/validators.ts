@@ -1,6 +1,6 @@
 import { Ref } from 'vue';
 import Apollo from '@/services/Apollo';
-import gqlSearchAccounts from '@/modules/admin/graphql/queries/studentsByAccountNumber.gql';
+import gqlSearchAccounts from '@/graphql/queries/studentsByAccountNumber.gql';
 import { StudentStore } from '@/modules/admin/stores/student';
 import { InstanceStore } from '@/modules/admin/stores/instance';
 import Money from './money';

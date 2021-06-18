@@ -1,6 +1,6 @@
 import Apollo from '@/services/Apollo';
 import { reactive } from 'vue';
-import gqlStudentsWithShares from '@/modules/admin/graphql/queries/students.gql';
+import gqlStudentsWithShares from '@/graphql/queries/students.gql';
 
 /**
  * Possible types for the IStudentSelection object.

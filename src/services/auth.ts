@@ -1,5 +1,5 @@
 import constants from '@/constants';
-import gqlUserLogin from '@/modules/admin/graphql/mutations/userLogin.gql';
+import gqlUserLogin from '@/graphql/mutations/userLogin.gql';
 import gqlStudentPreregistration from '@/graphql/mutations/studentPreregistration.gql';
 import gqlStudentLogin from '@/graphql/mutations/studentLogin.gql';
 import userStore from '../store/user';
