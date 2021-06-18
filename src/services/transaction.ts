@@ -6,7 +6,7 @@ import gqlTransactionTransfer from '@/graphql/mutations/transactionTransfer.gql'
 import gqlNewStockPurchase from '@/graphql/mutations/newStockPurchase.gql';
 import { query, mutate } from './Apollo';
 
-export interface FetchOptions {
+export interface TransactionFetchOptions {
   // The Share ID for which to fetch transactions
   shareId: number;
 
@@ -27,7 +27,7 @@ export interface FetchOptions {
  * @returns A promise containing a list of transactions.
  * @throws {Error} If an error occurred during the network call.
  */
-export function getTransactions(options: FetchOptions) {
+export function getTransactions(options: TransactionFetchOptions) {
   const opts = {
     first: FETCH_OPTIONS.DEFAULT_COUNT,
     cache: true,

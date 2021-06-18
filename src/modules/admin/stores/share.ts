@@ -56,7 +56,7 @@ export function setup(studentStore: StudentStore) {
    *
    * @param options
    */
-  async function fetchShareTransactions(options: transactionService.FetchOptions) {
+  async function fetchShareTransactions(options: transactionService.TransactionFetchOptions) {
     const opts = {
       cache: false,
       first: store.pageCount,

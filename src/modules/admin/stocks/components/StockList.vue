@@ -97,13 +97,13 @@ export default defineComponent({
     const stocks = computed(() => {
       if (props.available === true) {
         const instanceId = instanceStore.selected.value?.id ?? -1;
-        return stockStore.stocks.value.filter((stock) => {
+        return stockStore.items.value.filter((stock) => {
           const instances = (stock?.stockInstances ?? []).map((x) => x.instanceId);
           return !instances.includes(instanceId);
         });
       }
 
-      return stockStore.stocks.value;
+      return stockStore.items.value;
     });
 
     /**

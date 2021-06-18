@@ -1,5 +1,5 @@
-import { PERSIST_TOKEN } from '@/constants';
 import { reactive, computed } from 'vue';
+import { PERSIST_TOKEN } from '@/constants';
 
 // Utils
 import parseJwt from '@/utils/parseJwt';

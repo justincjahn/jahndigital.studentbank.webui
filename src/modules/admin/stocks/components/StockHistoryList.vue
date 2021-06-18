@@ -11,8 +11,8 @@
         </tr>
       </thead>
       <tbody>
-        <template v-if="history.length > 0">
-          <tr v-for="item in history" :key="item.id">
+        <template v-if="items.length > 0">
+          <tr v-for="item in items" :key="item.id">
             <td>
               {{ new Date(item.dateChanged).toLocaleDateString('en-US') }}
               {{ new Date(item.dateChanged).toLocaleTimeString('en-US') }}

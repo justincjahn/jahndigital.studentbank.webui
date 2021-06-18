@@ -2,23 +2,19 @@ import { computed, reactive } from 'vue';
 import { FETCH_OPTIONS } from '@/constants';
 
 // Services
-import { StockHistoryListOptions, getStockHistory } from '@/services/stock';
-
-// Events
-import { stockUpdate } from '@/events';
-import { subscribe } from '@/services/eventBus';
+import { StudentStocksOptions, getStudentStocks } from '@/services/stock';
 
 /**
- * Stores information about the history of a stock in the system and enables pagination.
+ * Stores information about a student's purchased stocks.
  */
 export function setup() {
   const store = reactive({
     loading: false,
     totalCount: 0,
     pageInfo: null as PageInfo | null,
-    options: null as StockHistoryListOptions | null,
+    options: null as StudentStocksOptions | null,
     cursorStack: [] as string[],
-    items: [] as StockHistory[],
+    items: [] as StudentStock[],
   });
 
   const loading = computed(() => store.loading);
@@ -46,7 +42,7 @@ export function setup() {
    *
    * @param options
    */
-  async function fetch(options: StockHistoryListOptions) {
+  async function fetch(options: StudentStocksOptions) {
     const opts = {
       cache: true,
       first: FETCH_OPTIONS.DEFAULT_COUNT,
@@ -57,10 +53,10 @@ export function setup() {
     store.loading = true;
 
     try {
-      const res = await getStockHistory(opts);
-      store.items = res.stockHistory.nodes;
-      store.pageInfo = res.stockHistory.pageInfo;
-      store.totalCount = res.stockHistory.totalCount;
+      const res = await getStudentStocks(opts);
+      store.items = res.studentStocks.nodes;
+      store.pageInfo = res.studentStocks.pageInfo;
+      store.totalCount = res.studentStocks.totalCount;
       store.cursorStack = [];
     } finally {
       store.loading = false;
@@ -71,20 +67,20 @@ export function setup() {
    * Fetch the next page of data, if available.
    */
   async function fetchNext() {
-    if (store.options === null) throw new Error('[Stock History Store]: fetchNext was run before fetch.');
+    if (store.options === null) throw new Error('[Student Stock Store]: fetchNext was run before fetch.');
     const endCursor = store.pageInfo?.endCursor ?? '';
     store.loading = true;
 
     try {
-      const res = await getStockHistory({
+      const res = await getStudentStocks({
         ...store.options,
         after: endCursor,
       });
 
       store.cursorStack = [...store.cursorStack, endCursor];
-      store.items = res.stockHistory.nodes;
-      store.pageInfo = res.stockHistory.pageInfo;
-      store.totalCount = res.stockHistory.totalCount;
+      store.items = res.studentStocks.nodes;
+      store.pageInfo = res.studentStocks.pageInfo;
+      store.totalCount = res.studentStocks.totalCount;
     } finally {
       store.loading = false;
     }
@@ -94,21 +90,21 @@ export function setup() {
    * Fetch the previous page of data, if available.
    */
   async function fetchPrevious() {
-    if (store.options === null) throw new Error('[Stock History Store]: fetchPrevious was run before fetch.');
+    if (store.options === null) throw new Error('[Student Stock Store]: fetchPrevious was run before fetch.');
     const stack = [...store.cursorStack];
     stack.pop();
 
     store.loading = true;
     try {
-      const res = await getStockHistory({
+      const res = await getStudentStocks({
         ...store.options,
         after: stack[stack.length - 1] ?? null,
       });
 
       store.cursorStack = stack;
-      store.items = res.stockHistory.nodes;
-      store.pageInfo = res.stockHistory.pageInfo;
-      store.totalCount = res.stockHistory.totalCount;
+      store.items = res.studentStocks.nodes;
+      store.pageInfo = res.studentStocks.pageInfo;
+      store.totalCount = res.studentStocks.totalCount;
     } finally {
       store.loading = false;
     }
@@ -124,25 +120,10 @@ export function setup() {
     store.totalCount = 0;
   }
 
-  // When the currently fetched stock updates, refetch history
-  const unsubCreate = subscribe(stockUpdate, (stock) => {
-    if (store.options === null) return;
-    if (store.options.stockId !== stock.id) return;
-
-    fetch({
-      ...store.options,
-      cache: false,
-    }).catch((error) => {
-      console.error(error);
-    });
-  });
-
   /**
    * Unsubscribe from events.
    */
-  function dispose() {
-    unsubCreate();
-  }
+  function dispose() { /* NOT IMPLEMENTED */ }
 
   return {
     loading,
@@ -160,4 +141,4 @@ export function setup() {
   };
 }
 
-export type StockHistoryStore = ReturnType<typeof setup>;
+export type StudentStockStore = ReturnType<typeof setup>;

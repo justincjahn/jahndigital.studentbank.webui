@@ -167,7 +167,7 @@ export default defineComponent({
       }
 
       try {
-        await globalStore.fetchStocksHeld({ studentId: userStore.id.value });
+        await globalStore.stocksHeld.fetch({ studentId: userStore.id.value });
       } catch (e) {
         errorStore.setCurrentError('Unable to refresh holdings, please try again later.');
       }
@@ -185,7 +185,7 @@ export default defineComponent({
     watch(() => userStore.id.value, async (newId, oldId) => {
       if (newId !== -1 && oldId !== newId) {
         try {
-          await globalStore.fetchStocksHeld({ studentId: newId });
+          await globalStore.stocksHeld.fetch({ cache: false, studentId: newId });
         } catch (e) {
           errorStore.setCurrentError(e?.message ?? e);
         }
@@ -193,14 +193,14 @@ export default defineComponent({
     }, { immediate: true });
 
     return {
-      loading: globalStore.stocksHeldLoading,
+      loading: globalStore.stocksHeld.loading,
       shares: globalStore.shares,
-      stocks: globalStore.stocksHeld,
-      hasNext: globalStore.stocksHeldHasNextPage,
-      hasPrevious: globalStore.stocksHeldHasPreviousPage,
-      pages: globalStore.stocksHeldTotalPages,
-      fetchNext: globalStore.fetchNextStocksHeld,
-      fetchPrevious: globalStore.fetchPreviousStocksHeld,
+      stocks: globalStore.stocksHeld.items,
+      hasNext: globalStore.stocksHeld.hasNextPage,
+      hasPrevious: globalStore.stocksHeld.hasPreviousPage,
+      pages: globalStore.stocksHeld.totalPages,
+      fetchNext: globalStore.stocksHeld.fetchNext,
+      fetchPrevious: globalStore.stocksHeld.fetchPrevious,
 
       showPurchaseModal,
       purchaseLoading,

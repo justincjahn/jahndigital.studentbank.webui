@@ -146,18 +146,18 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      globalStore.fetchStocksAvailable();
+      globalStore.stocksAvailable.fetch({ cache: false });
     });
 
     return {
-      loading: globalStore.stocksAvailableLoading,
       shares: globalStore.shares,
-      stocks: globalStore.stocksAvailable,
-      hasNext: globalStore.stocksAvailableHasNextPage,
-      hasPrevious: globalStore.stocksAvailableHasPreviousPage,
-      pages: globalStore.stocksAvailableTotalPages,
-      fetchNext: globalStore.fetchNextStocksAvailable,
-      fetchPrevious: globalStore.fetchPreviousStocksAvailable,
+      loading: globalStore.stocksAvailable.loading,
+      stocks: globalStore.stocksAvailable.items,
+      hasNext: globalStore.stocksAvailable.hasNextPage,
+      hasPrevious: globalStore.stocksAvailable.hasPreviousPage,
+      pages: globalStore.stocksAvailable.totalPages,
+      fetchNext: globalStore.stocksAvailable.fetchNext,
+      fetchPrevious: globalStore.stocksAvailable.fetchPrevious,
 
       showPurchaseModal,
       purchaseLoading,

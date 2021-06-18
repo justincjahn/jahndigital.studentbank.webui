@@ -1,6 +1,18 @@
-import { FETCH_OPTIONS } from '@/constants';
 import { computed, reactive } from 'vue';
-import { getStocks, updateStock, StockListOptions, linkStock, unlinkStock, deleteStock, newStock } from '@/services/stock';
+import { FETCH_OPTIONS } from '@/constants';
+
+// Services
+import {
+  StockListOptions,
+  getStocks,
+  updateStock,
+  linkStock,
+  unlinkStock,
+  deleteStock,
+  newStock,
+} from '@/services/stock';
+
+// Events
 import { publish, subscribe } from '@/services/eventBus';
 import { stockCreate, stockUpdate, stockDelete } from '@/events';
 
@@ -12,16 +24,16 @@ export function setup() {
     loading: false,
     totalCount: 0,
     pageInfo: null as PageInfo | null,
-    pageCount: FETCH_OPTIONS.DEFAULT_COUNT,
+    options: null as StockListOptions|null,
     cursorStack: [] as string[],
     instances: [] as number[],
-    stocks: [] as Stock[],
+    items: [] as Stock[],
     selected: null as Stock | null,
   });
 
   const loading = computed(() => store.loading);
 
-  const pageCount = computed(() => store.pageCount);
+  const pageCount = computed(() => store.options?.first ?? FETCH_OPTIONS.DEFAULT_COUNT);
 
   const totalCount = computed(() => store.totalCount);
 
@@ -31,13 +43,13 @@ export function setup() {
 
   const totalPages = computed(() => {
     if (store.totalCount > 0) {
-      return Math.ceil(store.totalCount / store.pageCount);
+      return Math.ceil(store.totalCount / pageCount.value);
     }
 
     return 0;
   });
 
-  const stocks = computed(() => store.stocks);
+  const items = computed(() => store.items);
 
   const selected = computed({
     get: () => store.selected,
@@ -52,20 +64,20 @@ export function setup() {
   async function fetch(options?: StockListOptions) {
     const opts = {
       instances: undefined,
-      first: store.pageCount,
       cache: true,
+      first: FETCH_OPTIONS.DEFAULT_COUNT,
       ...options,
     };
 
     store.instances = (opts.instances || false) ? opts.instances : [];
+    store.options = opts;
     store.loading = true;
 
     try {
       const res = await getStocks(opts);
-      store.stocks = res.stocks.nodes;
+      store.items = res.stocks.nodes;
       store.pageInfo = res.stocks.pageInfo;
       store.totalCount = res.stocks.totalCount;
-      store.pageCount = opts.first;
       store.cursorStack = [];
     } finally {
       store.loading = false;
@@ -81,12 +93,12 @@ export function setup() {
 
     try {
       const res = await getStocks({
-        first: store.pageCount,
+        ...store.options,
         after: endCursor,
       });
 
       store.cursorStack = [...store.cursorStack, endCursor];
-      store.stocks = res.stocks.nodes;
+      store.items = res.stocks.nodes;
       store.pageInfo = res.stocks.pageInfo;
       store.totalCount = res.stocks.totalCount;
     } finally {
@@ -104,12 +116,12 @@ export function setup() {
     store.loading = true;
     try {
       const res = await getStocks({
-        first: store.pageCount,
+        ...store.options,
         after: stack[stack.length - 1] ?? null,
       });
 
       store.cursorStack = stack;
-      store.stocks = res.stocks.nodes;
+      store.items = res.stocks.nodes;
       store.pageInfo = res.stocks.pageInfo;
       store.totalCount = res.stocks.totalCount;
     } finally {
@@ -121,9 +133,10 @@ export function setup() {
    * Clear the data in this store.
    */
   function clear() {
-    store.stocks = [];
+    store.items = [];
     store.pageInfo = null;
     store.totalCount = 0;
+    store.options = null;
   }
 
   /**
@@ -213,25 +226,25 @@ export function setup() {
   // If a stock object was created elsewhere, push it in
   const unsubCreate = subscribe(stockCreate, (stock) => {
     if (store.instances.length === 0) {
-      store.stocks = [...store.stocks, stock];
+      store.items = [...store.items, stock];
       return;
     }
 
     const instanceIds = (stock?.stockInstances ?? []).map((x) => x.instanceId);
     const hasInstance = store.instances.some((x) => instanceIds.includes(x));
-    if (hasInstance) { store.stocks = [...store.stocks, stock]; }
+    if (hasInstance) { store.items = [...store.items, stock]; }
   });
 
   // If a stock object is updated elsewhere, splice it in
   const unsubUpdate = subscribe(stockUpdate, (stock) => {
     const isSelected = store.selected?.id === stock.id ?? false;
-    const idx = store.stocks.findIndex((x) => x.id === stock.id);
+    const idx = store.items.findIndex((x) => x.id === stock.id);
     if (idx >= 0) {
-      const storeInstances = (store.stocks[idx]?.stockInstances ?? []).map((x) => x.instanceId);
+      const storeInstances = (store.items[idx]?.stockInstances ?? []).map((x) => x.instanceId);
       const stockInstances = (stock?.stockInstances ?? []).map((x) => x.instanceId);
       const wasUnlinked = !stockInstances.some((x) => storeInstances.includes(x));
 
-      const newStocks = store.stocks.filter((x) => x.id !== stock.id);
+      const newStocks = store.items.filter((x) => x.id !== stock.id);
       if (wasUnlinked && store.instances.length > 0) {
         if (isSelected) { store.selected = null; }
       } else {
@@ -239,17 +252,17 @@ export function setup() {
         if (isSelected) { store.selected = stock; }
       }
 
-      store.stocks = newStocks;
+      store.items = newStocks;
     } else if (store.instances.length > 0) {
       const instanceIds = (stock?.stockInstances ?? []).map((x) => x.instanceId);
       const wasLinked = store.instances.some((x) => instanceIds.includes(x));
-      if (wasLinked) { store.stocks = [...store.stocks, stock]; }
+      if (wasLinked) { store.items = [...store.items, stock]; }
     }
   });
 
   // If a stock object is deleted elsewhere, remove it from the list
   const unsubDelete = subscribe(stockDelete, (stock) => {
-    store.stocks = store.stocks.filter((x) => x.id !== stock.id);
+    store.items = store.items.filter((x) => x.id !== stock.id);
     if (store.selected?.id === stock.id ?? false) {
       store.selected = null;
     }
@@ -271,7 +284,7 @@ export function setup() {
     hasNextPage,
     hasPreviousPage,
     totalPages,
-    stocks,
+    items,
     selected,
     fetch,
     fetchNext,
@@ -286,4 +299,4 @@ export function setup() {
   };
 }
 
-export type ShareStore = ReturnType<typeof setup>;
+export type StockStore = ReturnType<typeof setup>;
