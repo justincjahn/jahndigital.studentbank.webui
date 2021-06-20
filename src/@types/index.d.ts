@@ -16,7 +16,7 @@ type OneKey<K extends string, V = any> = {
  * BASE OBJECTS
  */
 
-type Period = 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'QUARTERLY' | 'ANNUALLY';
+type PeriodStrings = 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'QUARTERLY' | 'ANNUALLY';
 
 interface Instance {
   id: number;
@@ -55,7 +55,7 @@ interface ShareType {
   name: string;
   dividendRate: number;
   withdrawalLimitCount: number;
-  withdrawalLimitPeriod: Period;
+  withdrawalLimitPeriod: PeriodStrings;
   withdrawalLimitLastReset: string;
   withdrawalLimitShouldFee: boolean;
   withdrawalLimitFee: number;

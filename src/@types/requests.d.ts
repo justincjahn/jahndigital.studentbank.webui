@@ -133,12 +133,20 @@ interface DeleteRestoreShareRequest {
 interface NewShareTypeRequest {
   name: string;
   dividendRate: number;
+  withdrawalLimitCount?: number;
+  withdrawalLimitPeriod?: Period;
+  withdrawalLimitShouldFee?: boolean;
+  withdrawalLimitFee?: number;
 }
 
 interface UpdateShareTypeRequest {
   id: number;
   name?: string;
   dividendRate?: number;
+  withdrawalLimitCount?: number;
+  withdrawalLimitPeriod?: Period;
+  withdrawalLimitShouldFee?: boolean;
+  withdrawalLimitFee?: number;
 }
 
 interface LinkUnlinkShareTypeRequest {
