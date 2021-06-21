@@ -10,7 +10,7 @@
         :share-type-store="shareTypeStore"
       />
 
-      <currency-input
+      <base-currency-input
         v-model="item.initialDeposit"
         v-model:error="item.error"
         :allow-negative="false"
@@ -35,7 +35,7 @@
 import { defineComponent, PropType } from 'vue';
 
 // Components
-import CurrencyInput from '@/components/CurrencyInput.vue';
+import BaseCurrencyInput from '@/components/BaseCurrencyInput.vue';
 import ShareTypeSelector from '@/modules/admin/components/ShareTypeSelector.vue';
 
 // Stores
@@ -44,7 +44,7 @@ import { ShareTypeStore } from '@/modules/admin/stores/shareType';
 export default defineComponent({
   components: {
     ShareTypeSelector,
-    CurrencyInput,
+    BaseCurrencyInput,
   },
   props: {
     modelValue: {

@@ -10,13 +10,13 @@
     @ok="handleOk"
     @cancel="handleCancel"
   >
-    <div class="transfer-modal__summary">
-      <p class="transfer-modal__summary--share-name">
+    <div class="transfer-modal__header">
+      <p class="transfer-modal__header--share-name">
         {{ shareName }}
       </p>
 
-      <p class="transfer-modal__summary--balance">
-        Available Balance:
+      <p class="transfer-modal__header--info">
+        <span>Available Balance</span>
 
         {{
           new Intl.NumberFormat(
@@ -28,24 +28,23 @@
           ).format(source?.balance ?? 0)
         }}
       </p>
-    </div>
 
-    <div class="transfer-modal__fieldset">
-      <label :for="`transfer-modal__input--${id}`">
-        Amount<span class="required">*</span>
-      </label>
+      <template v-if="source?.shareType?.withdrawalLimitCount ?? 0 > 0">
+        <p class="transfer-modal__header--info">
+          <span>Withdrawal Limit</span>
+          {{ source?.shareType?.withdrawalLimitCount ?? 0 }}
+        </p>
 
-      <currency-input
-        :id="`transfer-modal__input--${id}`"
-        v-model="amount"
-        v-model:error="amountError"
-        class="transfer-modal__input"
-        :validator="amountValid"
-      />
+        <p class="transfer-modal__header--info">
+          <span>Withdrawal Limit Period</span>
+          {{ source?.shareType?.withdrawalLimitPeriod ?? 'UNKNOWN' }}
+        </p>
 
-      <p v-if="amountError" class="error">
-        {{ amountError }}
-      </p>
+        <p class="transfer-modal__header--info">
+          <span>Withdrawals this Period</span>
+          {{ source?.limitedWithdrawalCount ?? 0 }}
+        </p>
+      </template>
     </div>
 
     <div class="transfer-modal__fieldset">
@@ -57,6 +56,24 @@
         v-model="selected"
         :shares="shares"
       />
+    </div>
+
+    <div class="transfer-modal__fieldset">
+      <label :for="`transfer-modal__input--${id}`">
+        Amount<span class="required">*</span>
+      </label>
+
+      <base-currency-input
+        :id="`transfer-modal__input--${id}`"
+        v-model="amount"
+        v-model:error="amountError"
+        class="transfer-modal__input"
+        :validator="amountValid"
+      />
+
+      <p v-if="amountError" class="error">
+        {{ amountError }}
+      </p>
     </div>
 
     <div class="transfer-modal__fieldset">
@@ -73,6 +90,36 @@
 
       <p v-if="commentError" class="error">
         {{ commentError }}
+      </p>
+    </div>
+
+    <div class="transfer-modal__summary">
+      <p v-if="feeAmount.getAmount() > 0">
+        <span>Excessive Transaction Fee:</span>
+
+        {{
+          new Intl.NumberFormat(
+            'en-US',
+            {
+              style: 'currency',
+              currency: 'USD',
+            }
+          ).format(feeAmount.getAmount())
+        }}
+      </p>
+
+      <p>
+        <span>Remaining Balance:</span>
+
+        {{
+          new Intl.NumberFormat(
+            'en-US',
+            {
+              style: 'currency',
+              currency: 'USD',
+            }
+          ).format(remainingBalance.getAmount())
+        }}
       </p>
     </div>
   </modal>
@@ -99,14 +146,14 @@ import useValidation from '@/composables/useValidation';
 
 // Components
 import Modal from '@/components/Modal.vue';
-import CurrencyInput from '@/components/CurrencyInput.vue';
+import BaseCurrencyInput from '@/components/BaseCurrencyInput.vue';
 import ShareSelector from '../../components/ShareSelector.vue';
 
 export default defineComponent({
   components: {
     Modal,
     ShareSelector,
-    CurrencyInput,
+    BaseCurrencyInput,
   },
   props: {
     show: {
@@ -144,6 +191,38 @@ export default defineComponent({
       return `${props.source.shareType?.name ?? 'Unknown'} (${accountNumber.value}S${props.source.id})`;
     });
 
+    const withdrawalLimitError = computed(() => {
+      if (!props.source) return false;
+      if (!props.source.shareType) return false;
+      if (props.source.shareType.withdrawalLimitCount <= 0) return false;
+
+      if (props.source.limitedWithdrawalCount >= props.source.shareType.withdrawalLimitCount) {
+        return true;
+      }
+
+      return false;
+    });
+
+    const withdrawalLimitFeeError = computed(() => {
+      if (!withdrawalLimitError.value) return false;
+      if (props.source?.shareType?.withdrawalLimitShouldFee ?? false) return true;
+      return false;
+    });
+
+    const feeAmount = computed(() => {
+      if (withdrawalLimitFeeError.value) {
+        return Money.fromNumber(props.source?.shareType?.withdrawalLimitFee ?? 0);
+      }
+
+      return Money.fromNumber(0);
+    });
+
+    const remainingBalance = computed(() => {
+      const transferAmount = Money.fromStringOrDefault(amount.value).add(feeAmount.value);
+      const shareBalance = Money.fromNumber(props.source?.balance ?? 0);
+      return shareBalance.sub(transferAmount);
+    });
+
     const isValid = computed(() => {
       if (selected.value === null) return false;
       if (amountError.value !== '') return false;
@@ -152,7 +231,7 @@ export default defineComponent({
     });
 
     /**
-     * Validate that the amount is not z
+     * Validate amount
      */
     function amountValid(value: string): boolean | string {
       if (props.source === null) return 'Unknown error';
@@ -163,8 +242,7 @@ export default defineComponent({
       valid = validateAmountNonzero(value);
       if (valid !== true) return valid;
 
-      const num = Money.fromString(value);
-      if (num.getAmount() > props.source.balance) {
+      if (remainingBalance.value.getAmount() < 0) {
         return 'Transfer amount exceeds available balance.';
       }
 
@@ -205,6 +283,10 @@ export default defineComponent({
       comment,
       commentError,
       shareName,
+      feeAmount,
+      remainingBalance,
+      withdrawalLimitError,
+      withdrawalLimitFeeError,
       isValid,
       amountValid,
       handleOk,
@@ -216,10 +298,24 @@ export default defineComponent({
 
 <style lang="scss">
   .transfer-modal {
-    &__summary {
+    &.large .modal__container {
+      max-width: 30rem;
+    }
+
+    &__header {
       &--share-name {
         font-weight: bold;
         font-size: 1.1em;
+      }
+
+      &--info {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+
+        &:nth-child(odd) {
+          background-color: colorStep('primary', $step: 2);
+        }
       }
     }
 
@@ -239,6 +335,16 @@ export default defineComponent({
 
     .share-name {
       font-weight: bold;
+    }
+
+    &__summary {
+      margin-top: 1em;
+
+      p {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+      }
     }
   }
 </style>

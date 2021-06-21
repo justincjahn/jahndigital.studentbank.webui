@@ -3,12 +3,20 @@
 mutation updateShareType(
   $id: Long!,
   $name: String,
-  $dividendRate: Rate
+  $dividendRate: Rate,
+  $withdrawalLimitCount: Int,
+  $withdrawalLimitPeriod: Period,
+  $withdrawalLimitShouldFee: Boolean,
+  $withdrawalLimitFee: Money
 ) {
   updateShareType(input: {
     id: $id,
     name: $name,
-    dividendRate: $dividendRate
+    dividendRate: $dividendRate,
+    withdrawalLimitCount: $withdrawalLimitCount,
+    withdrawalLimitPeriod: $withdrawalLimitPeriod,
+    withdrawalLimitShouldFee: $withdrawalLimitShouldFee,
+    withdrawalLimitFee: $withdrawalLimitFee
   }) {
     ...ShareTypeParts
   }

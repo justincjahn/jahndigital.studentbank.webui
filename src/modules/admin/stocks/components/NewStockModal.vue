@@ -54,7 +54,7 @@
 
       <div class="new-stock-modal--fieldset">
         <label :for="amountId">Initial Value<span class="required">*</span></label>
-        <currency-input
+        <base-currency-input
           :id="amountId"
           v-model="amount"
           v-model:error="amountError"
@@ -81,7 +81,7 @@ import useValidation from '@/composables/useValidation';
 
 // Components
 import Modal from '@/components/Modal.vue';
-import CurrencyInput from '@/components/CurrencyInput.vue';
+import BaseCurrencyInput from '@/components/BaseCurrencyInput.vue';
 
 /**
  * Prompts the user for input and emits an ok event with a valid NewStockRequest object.
@@ -89,7 +89,7 @@ import CurrencyInput from '@/components/CurrencyInput.vue';
 export default defineComponent({
   components: {
     Modal,
-    CurrencyInput,
+    BaseCurrencyInput,
   },
   props: {
     show: {

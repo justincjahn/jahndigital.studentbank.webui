@@ -41,7 +41,7 @@
 
     <div class="new-stock-modal--fieldset">
       <label :for="amountId">Initial Value<span class="required">*</span></label>
-      <currency-input
+      <base-currency-input
         :id="amountId"
         v-model="amount"
         v-model:error="amountError"
@@ -81,11 +81,11 @@ import Money from '@/utils/money';
 import useValidation from '@/composables/useValidation';
 
 // Components
-import CurrencyInput from '@/components/CurrencyInput.vue';
+import BaseCurrencyInput from '@/components/BaseCurrencyInput.vue';
 
 export default defineComponent({
   components: {
-    CurrencyInput,
+    BaseCurrencyInput,
   },
   props: {
     selected: {

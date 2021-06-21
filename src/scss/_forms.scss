@@ -23,3 +23,26 @@ button.primary, input[type=submit].primary {
 button.destructive, input[type=submit].destructive {
   @include button(button-destructive);
 }
+
+div.fieldset {
+  display: flex;
+  flex-direction: column;
+
+  input {
+    width: 100%;
+  }
+
+  &.inline {
+    flex-direction: row;
+    align-items: center;
+
+    input {
+      width: auto;
+      margin-left: 1em;
+    }
+  }
+
+  & + & {
+    margin-top: 1em;
+  }
+}

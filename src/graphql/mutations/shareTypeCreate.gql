@@ -1,7 +1,21 @@
 #import "@/graphql/fragments/shareType.gql"
 
-mutation newShareType($name: String, $dividendRate: Rate) {
-  newShareType(input: { name: $name, dividendRate: $dividendRate}) {
+mutation newShareType(
+  $name: String!,
+  $dividendRate: Rate!,
+  $withdrawalLimitCount: Int,
+  $withdrawalLimitPeriod: Period,
+  $withdrawalLimitShouldFee: Boolean,
+  $withdrawalLimitFee: Money
+) {
+  newShareType(input: {
+    name: $name,
+    dividendRate: $dividendRate,
+    withdrawalLimitCount: $withdrawalLimitCount,
+    withdrawalLimitPeriod: $withdrawalLimitPeriod,
+    withdrawalLimitShouldFee: $withdrawalLimitShouldFee,
+    withdrawalLimitFee: $withdrawalLimitFee
+  }) {
     ...ShareTypeParts
   }
 }

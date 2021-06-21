@@ -5,6 +5,7 @@
       class="select__selected"
       :class="{ 'select__selected--open': open }"
       :style="styles"
+      :disabled="disabled"
       @click="toggle"
     >
       <slot name="selected" :option="modelValue" :prompt="prompt">
@@ -41,7 +42,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUnmounted, ref, computed, PropType } from 'vue';
+import { defineComponent, onUnmounted, ref, computed, PropType, watchEffect } from 'vue';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Item = Record<string, any>|number|string|null;
@@ -98,6 +99,10 @@ export default defineComponent({
       required: false,
       default: '10rem',
     },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: [
     'update:modelValue',
@@ -113,7 +118,15 @@ export default defineComponent({
     const styles = computed(() => ({ width: props.width }));
 
     // Open and close the select when the user clicks on/off the button.
-    function toggle(e: Event) { open.value = !(e.target !== root.value); }
+    function toggle(e?: Event) {
+      if (!open.value && props.disabled) return;
+
+      if (!e) {
+        open.value = !open.value;
+      } else {
+        open.value = !(e?.target !== root.value);
+      }
+    }
 
     // Update the v-model when a new item is selected
     function select(item: Item) { emit('update:modelValue', item); }
@@ -121,8 +134,16 @@ export default defineComponent({
     // Determines if the provided item is currently selected
     function selected(item: Item) { return props.key(props.modelValue) === props.key(item) ? 'selected' : ''; }
 
-    // Register/unregister a global click event that toggles the selector
-    onMounted(() => { document.addEventListener('click', toggle); });
+    // Register global click event when the box is opened and unregister when it closes
+    watchEffect(() => {
+      if (open.value === true) {
+        document.addEventListener('click', toggle);
+      } else {
+        document.removeEventListener('click', toggle);
+      }
+    });
+
+    // Unregister a global click event that toggles the selector
     onUnmounted(() => { document.removeEventListener('click', toggle); });
 
     return {

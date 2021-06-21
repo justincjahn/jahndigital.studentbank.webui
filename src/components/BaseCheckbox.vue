@@ -1,24 +1,18 @@
 <template>
   <base-input
     v-bind="$props"
+    class="inline"
     @update:modelValue="value => $emit('update:modelValue', value)"
+    @update:error="value => $emit('update:error', value)"
   >
-    <template v-for="(_, name) in $slots" #[name]="slotData">
-      <slot :name="name" v-bind="slotData" />
-    </template>
-
-    <template #default="{ id: inputId, modelValue: val, update, error: err, inputName }">
-      <base-rate-input
+    <template #default="{ id: inputId, modelValue: val, update, inputName }">
+      <input
         :id="inputId"
         :name="inputName"
-        :model-value="val"
-        :error="err"
-        :validator="validator"
-        :allow-negative="allowNegative"
-        :allow-zero="allowZero"
+        :checked="val"
+        type="checkbox"
         v-bind="$attrs"
-        @update:modelValue="x => update(x)"
-        @update:error="x => $emit('update:error', x)"
+        @input="update($event.target.checked)"
       />
     </template>
   </base-input>
@@ -27,20 +21,23 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import BaseInput, { validationFunc } from './BaseInput.vue';
-import BaseRateInput from './BaseRateInput.vue';
 
 export default defineComponent({
   components: {
     BaseInput,
-    BaseRateInput,
   },
+  inheritAttrs: false,
   props: {
     id: {
       type: String,
       default: undefined,
     },
-    modelValue: {
+    name: {
       type: String,
+      default: undefined,
+    },
+    modelValue: {
+      type: [String, Boolean],
       default: '',
     },
     helpText: {
@@ -57,15 +54,7 @@ export default defineComponent({
     },
     validator: {
       type: Function as PropType<validationFunc>,
-      default: undefined,
-    },
-    allowNegative: {
-      type: Boolean,
-      default: true,
-    },
-    allowZero: {
-      type: Boolean,
-      default: true,
+      default: () => true,
     },
   },
   emits: [

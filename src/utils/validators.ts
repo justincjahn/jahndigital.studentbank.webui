@@ -164,6 +164,49 @@ export function validateName(value: string): string|boolean {
 }
 
 /**
+ * Ensure the count is valid.
+ */
+export function validateCount(value: string): string | boolean {
+  if (!value || value.trim().length === 0) {
+    return 'Count is required.';
+  }
+
+  if (value.indexOf('.') >= 0) {
+    return 'Count must be a whole number.';
+  }
+
+  if (Number.isNaN(+value)) {
+    return 'Count must be a number.';
+  }
+
+  return true;
+}
+
+/**
+ * Ensure the count is valid and greater than zero.
+ *
+ * @param value
+ */
+export function validateCountNotNegative(value: string): string | boolean {
+  const isValid = validateCount(value);
+  if (isValid !== true) return isValid;
+  if (+value < 0) return 'Count cannot be negative.';
+  return true;
+}
+
+/**
+ * Ensure the count is valid and not zero.
+ *
+ * @param value
+ */
+export function validateCountNonzero(value: string): string | boolean {
+  const isValid = validateCount(value);
+  if (isValid !== true) return isValid;
+  if (+value === 0) return 'Count cannot be zero.';
+  return true;
+}
+
+/**
  * Ensures that the provided string is a valid monetary value.
  *
  * @param value

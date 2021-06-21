@@ -7,48 +7,17 @@
     :handle-enter="false"
     @ok="handleOk"
   >
-    <form
-      class="stf"
-      @submit="handleAdd"
-    >
-      <div class="stf__fieldset stf__fieldset--name">
-        <label :for="`stf__fieldset--name--${id}`">Name<span class="required">*</span></label>
-        <Field
-          :id="`stf__fieldset--name--${id}`"
-          name="name"
-          type="text"
-        />
-        <p
-          v-if="formErrors['name']"
-          class="error"
-        >
-          {{ formErrors['name'] }}
-        </p>
-      </div>
-      <div class="stf__fieldset stf__fieldset--rate">
-        <label :for="`stf__fieldset--rate--${id}`">Dividend Rate<span class="required">*</span></label>
-        <p class="help-text">
-          Specify the dividend rate in percent.
-        </p>
-        <div class="stf__fieldset--adorner">
-          <Field
-            :id="`stf__fieldset--rate--${id}`"
-            name="rate"
-            type="text"
-          />
-          <span class="stf__fieldset--adorner--adornment">%</span>
-        </div>
-        <p
-          v-if="formErrors['rate']"
-          class="error"
-        >
-          {{ formErrors['rate'] }}
-        </p>
-      </div>
+    <form class="stf" @submit.prevent="handleAdd">
+      <share-type-add-edit-form
+        v-model="formData"
+        v-model:isValid="isValid"
+        v-model:shouldReset="shouldReset"
+      />
+
       <button
         type="submit"
         class="primary"
-        :disabled="addLoading || !canAdd"
+        :disabled="addLoading || !isValid"
       >
         <loading-label :show="addLoading">
           <template v-if="addLoading">
@@ -81,27 +50,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watchEffect, PropType } from 'vue';
-import { useForm, Field } from 'vee-validate';
-
-// Components
-import Modal from '@/components/Modal.vue';
-import LoadingLabel from '@/components/LoadingLabel.vue';
-import ShareTypeMultiselect from '@/modules/admin/components/ShareTypeMultiselector.vue';
+import { defineComponent, defineAsyncComponent, ref, computed, watchEffect, PropType } from 'vue';
 
 // Utils
-import uuid4 from '@/utils/uuid4';
-import { validateRate } from '@/utils/validators';
 import Rate from '@/utils/rate';
+import Money from '@/utils/money';
 
 // Stores
 import errorStore from '@/stores/error';
 import { setup as setupShareTypeStore, ShareTypeStore } from '@/modules/admin/stores/shareType';
 
-interface NewShareTypeForm {
-  name: string;
-  rate: string;
-}
+// Composables
+import { buildFormData } from '../composables/useShareTypeForm';
 
 /**
  * Allows users to create new Share Types and then link them to the currently selected
@@ -109,10 +69,10 @@ interface NewShareTypeForm {
  */
 export default defineComponent({
   components: {
-    Modal,
-    Field,
-    LoadingLabel,
-    ShareTypeMultiselect,
+    Modal: defineAsyncComponent(() => import('@/components/Modal.vue')),
+    LoadingLabel: defineAsyncComponent(() => import('@/components/LoadingLabel.vue')),
+    ShareTypeMultiselect: defineAsyncComponent(() => import('./ShareTypeMultiselector.vue')),
+    ShareTypeAddEditForm: defineAsyncComponent(() => import('./forms/ShareTypeAddEditForm.vue')),
   },
   props: {
     show: {
@@ -137,8 +97,14 @@ export default defineComponent({
     // An array of selected share types
     const selected = ref<ShareType[]>([]);
 
-    // A unique ID for the form elements
-    const id = uuid4();
+    // True if the share type add/edit form is valid
+    const isValid = ref(false);
+
+    // Set to true in order to trigger a share type add/edit form reset
+    const shouldReset = ref(false);
+
+    // Data for share type add/edit form
+    const formData = buildFormData();
 
     // Filter share types that are already in the selected instance
     const shareTypes = computed(() => {
@@ -151,46 +117,13 @@ export default defineComponent({
       return filtered;
     });
 
-    /**
-     * Ensures that the share type's name is valid
-     */
-    function validateName(val: string): string|boolean {
-      if (val && val.trim()) return true;
-      return 'Name is required.';
-    }
-
-    // Configure a form for vee-validate and hook up validation
-    const {
-      handleSubmit,
-      errors: formErrors,
-      resetForm,
-      validate,
-      values,
-    } = useForm<NewShareTypeForm>({
-      validationSchema: {
-        name: validateName,
-        rate: validateRate,
-      },
-      initialValues: {
-        name: '',
-        rate: '0',
-      },
-      validateOnMount: true,
-    });
+    // True if the link button should be enabled
+    const canLink = computed(() => selected.value.length > 0);
 
     /**
      * Reset the form back to defaults
      */
-    function reset() {
-      resetForm();
-      validate();
-    }
-
-    // True if the add button should be enabled
-    const canAdd = computed(() => !(formErrors.value.name || formErrors.value.rate));
-
-    // True if the link button should be enabled
-    const canLink = computed(() => selected.value.length > 0);
+    function reset() { shouldReset.value = true; }
 
     /**
      * Tell the parent to close the modal
@@ -207,13 +140,15 @@ export default defineComponent({
     /**
      * Add a new share type and refresh available share types
      */
-    const handleAdd = handleSubmit(async () => {
+    async function handleAdd() {
       addLoading.value = true;
 
       try {
         await availableShareTypeStore.newShareType({
-          name: values.name,
-          dividendRate: Rate.fromString(`${values.rate}%`).getRate(),
+          ...formData,
+          dividendRate: Rate.fromStringOrDefault(formData.dividendRate).getRate(),
+          withdrawalLimitCount: +formData.withdrawalLimitCount,
+          withdrawalLimitFee: Money.fromStringOrDefault(formData.withdrawalLimitFee).getAmount(),
         });
 
         reset();
@@ -223,7 +158,7 @@ export default defineComponent({
       } finally {
         addLoading.value = false;
       }
-    });
+    }
 
     /**
      * Link the selected share types
@@ -260,6 +195,9 @@ export default defineComponent({
     });
 
     return {
+      isValid,
+      shouldReset,
+      formData,
       selected,
       shareTypes,
       loading: availableShareTypeStore.loading,
@@ -267,10 +205,7 @@ export default defineComponent({
       handleOk,
       handleAdd,
       handleLink,
-      canAdd,
       canLink,
-      id,
-      formErrors,
     };
   },
 });

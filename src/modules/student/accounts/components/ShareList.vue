@@ -45,6 +45,22 @@
 
             {{ share.limitedWithdrawalCount }}
           </span>
+
+          <template v-if="share.shareType?.withdrawalLimitShouldFee ?? false">
+            <span class="share-list__item--info">
+              Excessive Withdrawal Fee:
+
+              {{
+                new Intl.NumberFormat(
+                  'en-US',
+                  {
+                    style: 'currency',
+                    currency: 'USD',
+                  }
+                ).format(share.shareType?.withdrawalLimitFee ?? 0)
+              }}
+            </span>
+          </template>
         </template>
       </div>
 

@@ -58,7 +58,7 @@
 
         <div class="bpm__step-2__fieldset">
           <label for="bpm__step-2--amount">Amount</label>
-          <currency-input
+          <base-currency-input
             id="bpm__step-2--amount"
             v-model="amountValue"
             v-model:error="amountError"
@@ -227,7 +227,7 @@ import { defineComponent, watchEffect, computed, ref, PropType } from 'vue';
 // Components
 import Modal from '@/components/Modal.vue';
 import ShareTypeSelector from '@/modules/admin/components/ShareTypeSelector.vue';
-import CurrencyInput from '@/components/CurrencyInput.vue';
+import BaseCurrencyInput from '@/components/BaseCurrencyInput.vue';
 import LoadingLabel from '@/components/LoadingLabel.vue';
 
 // Stores
@@ -240,7 +240,7 @@ export default defineComponent({
   components: {
     Modal,
     ShareTypeSelector,
-    CurrencyInput,
+    BaseCurrencyInput,
     LoadingLabel,
   },
   props: {
