@@ -39,35 +39,24 @@
       </li>
     </ul>
 
-    <div class="stock-purchase-modal--fieldset">
-      <label>
-        Funding Account
-      </label>
-
+    <base-input
+      label="Funding Account"
+      required
+    >
       <share-selector
         v-model="selectedShare"
         :shares="shares"
       />
-    </div>
+    </base-input>
 
-    <div class="stock-purchase-modal--fieldset">
-      <label :for="`stock-purchase-modal__quantity--${id}`">
-        Quantity to Buy or Sell
-      </label>
-
-      <input
-        :id="`stock-purchase-modal__quantity--${id}`"
-        v-model="quantity"
-        type="text"
-        placeholder="0"
-        pattern="^-?[0-9]+$"
-        required
-      />
-
-      <p v-if="quantityError" class="error">
-        {{ quantityError }}
-      </p>
-    </div>
+    <base-input
+      v-model="quantity"
+      v-model:error="quantityError"
+      label="Quantity to Buy or Sell"
+      placeholder="0"
+      pattern="^-?[0-9]+$"
+      required
+    />
 
     <ul class="stock-purchase-modal__total">
       <li>
@@ -82,17 +71,13 @@
           ).format(total)
         }}
       </li>
+      <li v-if="feeAmount.getAmount() > 0">
+        <span>Excess Withdrawal Fee</span>
+        {{ `-${feeAmount.toString()}` }}
+      </li>
       <li>
         <span>New Balance</span>
-        {{
-          new Intl.NumberFormat(
-            'en-US',
-            {
-              style: 'currency',
-              currency: 'USD',
-            }
-          ).format(newBalance)
-        }}
+        {{ remainingBalance.toString() }}
       </li>
     </ul>
   </modal>
@@ -104,9 +89,6 @@ import { defineComponent, defineAsyncComponent, PropType, ref, computed, watch }
 // Composables
 import useValidation from '@/composables/useValidation';
 
-// Utils
-import uuid4 from '@/utils/uuid4';
-
 // Services
 import { getStudentStocks } from '@/services/stock';
 
@@ -114,8 +96,11 @@ import { getStudentStocks } from '@/services/stock';
 import errorStore from '@/stores/error';
 import userStore from '@/stores/user';
 
+import useTransactionCalculations from '../../composables/useTransactionCalculations';
+
 export default defineComponent({
   components: {
+    BaseInput: defineAsyncComponent(() => import('@/components/BaseInput.vue')),
     Modal: defineAsyncComponent(() => import('@/components/Modal.vue')),
     ShareSelector: defineAsyncComponent(() => import('../../components/ShareSelector.vue')),
   },
@@ -143,8 +128,6 @@ export default defineComponent({
     'cancel',
   ],
   setup(props, { emit }) {
-    const id = uuid4();
-
     const loading = ref(false);
 
     const selectedShare = ref<Share|null>(null);
@@ -176,7 +159,7 @@ export default defineComponent({
         return 'Quantity is required and cannot be zero.';
       }
 
-      if (value.indexOf('.') >= 0) {
+      if (!value.trim().match(/^[0-9]+$/)) {
         return 'Quantity must be a whole number.';
       }
 
@@ -198,13 +181,17 @@ export default defineComponent({
 
     const { value: quantity, error: quantityError } = useValidation(validateQuantity);
 
+    const {
+      amount,
+      feeAmount,
+      remainingBalance,
+    } = useTransactionCalculations(() => selectedShare.value);
+
     const total = computed(() => {
-      const value = +quantity.value * currentValue.value * -1;
+      const value = +quantity.value.trim() * currentValue.value * -1;
       if (Number.isNaN(value)) return 0;
       return value;
     });
-
-    const newBalance = computed(() => (selectedShare.value?.balance ?? 0.0) + total.value);
 
     const okLabel = computed(() => {
       if (props.loading || loading.value) return 'Loading...';
@@ -231,6 +218,11 @@ export default defineComponent({
       emit('cancel');
     }
 
+    // Sync the amount with the calculated total
+    watch(() => total.value, (newValue) => {
+      amount.value = (-newValue).toString();
+    });
+
     // When the modal is shown, pull data from the server
     watch(() => props.show, async (newValue) => {
       if (newValue === true) {
@@ -251,8 +243,7 @@ export default defineComponent({
           });
 
           if (res.studentStocks.nodes.length > 0) {
-            // eslint-disable-next-line prefer-destructuring
-            studentStock.value = res.studentStocks.nodes[0];
+            [studentStock.value] = res.studentStocks.nodes;
           } else {
             studentStock.value = null;
           }
@@ -265,7 +256,6 @@ export default defineComponent({
     });
 
     return {
-      id,
       selectedShare,
       title,
       okLabel,
@@ -274,7 +264,8 @@ export default defineComponent({
       quantity,
       quantityError,
       total,
-      newBalance,
+      remainingBalance,
+      feeAmount,
       canSubmit,
       handleOk,
       handleCancel,
@@ -308,15 +299,6 @@ export default defineComponent({
         font-weight: bold;
         flex-grow: 1;
       }
-    }
-  }
-
-  &--fieldset {
-    display: flex;
-    flex-direction: column;
-
-    & + & {
-      margin-top: 1em;
     }
   }
 }

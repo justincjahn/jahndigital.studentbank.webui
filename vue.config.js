@@ -1,3 +1,6 @@
+process.env.VUE_APP_THEME = process.env.VUE_APP_THEME || '@/scss/_theme.scss';
+process.env.VUE_APP_SITE_NAME = process.env.VUE_APP_SITE_NAME || 'Student Bank';
+
 module.exports = {
   productionSourceMap: false,
 
@@ -11,7 +14,7 @@ module.exports = {
 
       // when using title option,
       // template title tag needs to be <title><%= htmlWebpackPlugin.options.title %></title>
-      title: 'StudentBank',
+      title: process.env.VUE_APP_SITE_NAME,
 
       // chunks to include on this page, by default includes
       // extracted common chunks and vendor chunks.
@@ -21,23 +24,13 @@ module.exports = {
     register: {
       entry: './src/modules/register/index.ts',
       template: 'public/index.html',
-      title: 'StudentBank Registration',
+      title: `${process.env.VUE_APP_SITE_NAME} Registration`,
     },
 
     admin: {
-      // entry for the page
       entry: './src/modules/admin/index.ts',
-
-      // the source template
       template: 'public/index.html',
-
-      // when using title option,
-      // template title tag needs to be <title><%= htmlWebpackPlugin.options.title %></title>
-      title: 'StudentBank Admin',
-
-      // chunks to include on this page, by default includes
-      // extracted common chunks and vendor chunks.
-      // chunks: ['chunk-vendors', 'chunk-common', 'admin'],
+      title: `${process.env.VUE_APP_SITE_NAME} Admin`,
     },
   },
 
@@ -47,7 +40,8 @@ module.exports = {
         prependData: `
           @use 'sass:map';
           @use 'sass:math';
-          @import "@/scss/_variables.scss";
+          @import "${process.env.VUE_APP_THEME}";
+          @import "@/scss/_functions.scss";
           @import "@/scss/_mixins.scss";
         `,
       },

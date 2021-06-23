@@ -1,0 +1,43 @@
+$theme: (
+  "primary": (
+    "color": rgb(255, 255, 255),
+    "step": 3%,
+    "font-color": #2c3e50,
+    "font-color-alt": #ABABAB
+  ),
+
+  "secondary": (
+    "color": hsl(0, 0%, 96%),
+    "step": 4%,
+    "font-color": #2c3e50,
+    "font-color-alt": #ABABAB
+  ),
+
+  "accent1": (
+    "color": hsl(211, 100%, 46%),
+    "step": 5.5%,
+    "font-color": #FFFFFF,
+    "font-color-alt": #000000
+  ),
+
+  "button-primary": (
+    "color": hsl(211, 100%, 43%),
+    "step": 5.5%,
+    "font-color": #FFFFFF,
+    "font-color-alt": #000000
+  ),
+
+  "button-secondary": (
+    "color": hsl(0, 0%, 96%),
+    "step": 8%,
+    "font-color": #000000,
+    "font-color-alt": #FFFFFF
+  ),
+
+  "button-destructive": (
+    "color": hsl(354, 70%, 54%),
+    "step": 8%,
+    "font-color": #FFFFFF,
+    "font-color-alt": #000000
+  )
+);

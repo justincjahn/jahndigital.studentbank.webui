@@ -1,5 +1,5 @@
 <template>
-  <div class="currency-input" :class="$attrs.class">
+  <div class="currency-input" :class="[$attrs.class, required ? 'required' : '']">
     <span class="currency-input__currency">$</span>
 
     <input
@@ -9,6 +9,7 @@
       :class="amountError.length > 0 ? 'error' : ''"
       :name="$attrs.name ?? 'amount'"
       :placeholder="$attrs.placeholder ?? '0.00'"
+      :required="required"
       v-bind="$attrs"
       @focus="$event.target.select()"
     />
@@ -43,6 +44,10 @@ export default defineComponent({
     allowZero: {
       type: Boolean,
       default: true,
+    },
+    required: {
+      type: Boolean,
+      default: false,
     },
     validator: {
       type: Function as PropType<(value: string) => string|boolean>,

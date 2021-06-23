@@ -1,7 +1,8 @@
 <template>
-  <div class="fieldset" :class="$attrs.class ?? ''">
+  <div class="fieldset" :class="[$attrs.class ?? '', required ? 'required' : '']">
     <slot
-      :id="id"
+      :id="inputId"
+      :inputName="name"
       name="label"
       className="help-text"
       :model-value="modelValue"
@@ -9,21 +10,29 @@
       :label="label"
       :help-text="helpText"
       :update="updateModelValue"
+      :attrs="$attrs"
     >
-      <label v-if="label" :for="id">
-        {{ label }}
+      <label v-if="label" :for="inputId">
+        <template v-if="required">
+          {{ label }}<span class="required">*</span>
+        </template>
+        <template v-else>
+          {{ label }}
+        </template>
       </label>
     </slot>
 
     <slot
-      :id="id"
+      :id="inputId"
       name="help"
       className="help-text"
       :model-value="modelValue"
       :error="error"
       :label="label"
+      :required="required"
       :help-text="helpText"
       :update="updateModelValue"
+      :attrs="$attrs"
     >
       <p v-if="helpText" class="help-text">
         {{ helpText }}
@@ -31,20 +40,23 @@
     </slot>
 
     <slot
-      :id="id"
+      :id="inputId"
       :inputName="name"
       :modelValue="modelValue"
       :error="error"
       :label="label"
+      :required="required"
       :helpText="helpText"
       :update="updateModelValue"
+      :attrs="$attrs"
     >
       <input
-        :id="id"
+        :id="inputId"
         type="text"
         :name="name"
         :value="modelValue"
-        :class="{ error }"
+        :class="{ error, required }"
+        :required="required"
         v-bind="$attrs"
         @input="updateModelValue($event.target.value)"
         @focus="$event.target.select()"
@@ -53,13 +65,15 @@
 
     <p v-if="error" class="error">
       <slot
-        :id="id"
+        :id="inputId"
         name="error"
+        :inputName="name"
         :model-value="modelValue"
         :error="error"
         :label="label"
         :help-text="helpText"
         :update="updateModelValue"
+        :attrs="$attrs"
       >
         {{ error }}
       </slot>
@@ -68,7 +82,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import { defineComponent, PropType, computed } from 'vue';
 import uuid4 from '@/utils/uuid4';
 
 export type validationFunc = (value: string) => string | boolean;
@@ -78,11 +92,11 @@ export default defineComponent({
   props: {
     id: {
       type: String,
-      default: uuid4(),
+      default: undefined,
     },
     name: {
       type: String,
-      default: uuid4(),
+      default: undefined,
     },
     modelValue: {
       type: [String, Boolean],
@@ -100,6 +114,10 @@ export default defineComponent({
       type: String,
       default: '',
     },
+    required: {
+      type: Boolean,
+      default: false,
+    },
     validator: {
       type: Function as PropType<validationFunc>,
       default: undefined,
@@ -110,6 +128,11 @@ export default defineComponent({
     'update:error',
   ],
   setup(props, { emit }) {
+    const inputId = computed(() => {
+      if (props.id) return props.id;
+      return uuid4();
+    });
+
     function updateModelValue(value: string) {
       emit('update:modelValue', value);
 
@@ -120,6 +143,7 @@ export default defineComponent({
     }
 
     return {
+      inputId,
       updateModelValue,
     };
   },

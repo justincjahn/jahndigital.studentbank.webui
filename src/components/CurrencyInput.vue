@@ -7,7 +7,7 @@
       <slot :name="name" v-bind="slotData" />
     </template>
 
-    <template #default="{ id: inputId, modelValue: val, update, error: err, inputName }">
+    <template #default="{ id: inputId, modelValue: val, update, error: err, inputName, required: isReq }">
       <base-currency-input
         :id="inputId"
         :name="inputName"
@@ -16,6 +16,7 @@
         :validator="validator"
         :allow-negative="allowNegative"
         :allow-zero="allowZero"
+        :required="isReq"
         v-bind="$attrs"
         @update:modelValue="x => update(x)"
         @update:error="x => $emit('update:error', x)"
@@ -42,19 +43,23 @@ export default defineComponent({
     },
     modelValue: {
       type: String,
-      default: '',
+      default: undefined,
     },
     helpText: {
       type: String,
-      default: '',
+      default: undefined,
     },
     error: {
       type: String,
-      default: '',
+      default: undefined,
     },
     label: {
       type: String,
-      default: '',
+      default: undefined,
+    },
+    required: {
+      type: Boolean,
+      default: false,
     },
     validator: {
       type: Function as PropType<validationFunc>,

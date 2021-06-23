@@ -5,11 +5,12 @@
     @update:modelValue="value => $emit('update:modelValue', value)"
     @update:error="value => $emit('update:error', value)"
   >
-    <template #default="{ id: inputId, modelValue: val, update, inputName }">
+    <template #default="{ id: inputId, modelValue: val, update, inputName, required: isReq }">
       <input
         :id="inputId"
         :name="inputName"
         :checked="val"
+        :required="isReq"
         type="checkbox"
         v-bind="$attrs"
         @input="update($event.target.checked)"

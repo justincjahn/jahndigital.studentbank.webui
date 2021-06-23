@@ -1,7 +1,7 @@
 <template>
   <header v-if="isAuthenticated">
     <section class="main-nav">
-      <h1>Student Bank</h1>
+      <h1>{{ SITE_NAME }}</h1>
 
       <div class="main-nav__login">
         <login-widget />
@@ -42,6 +42,7 @@
 </template>
 
 <script type="ts">
+import { SITE_NAME } from '@/constants';
 import { defineComponent, defineAsyncComponent, provide, watchEffect, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -98,6 +99,7 @@ export default defineComponent({
     onUnmounted(() => globalStore.dispose());
 
     return {
+      SITE_NAME,
       isAuthenticated: userStore.isAuthenticated,
       loading: routerStore.loading,
       ...errorStore,

@@ -132,12 +132,6 @@ export default defineComponent({
       user-select: none;
     }
 
-    label span.required {
-      font-size: 0.7em;
-      color: map.get($theme, button-destructive, color);
-      vertical-align: super;
-    }
-
     input[type=submit] {
       width: 100%;
     }

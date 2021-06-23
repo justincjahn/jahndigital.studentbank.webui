@@ -1,7 +1,7 @@
 <template>
   <header v-if="isAuthenticated">
     <section class="main-nav">
-      <h1>Student Bank Admin</h1>
+      <h1>{{ SITE_NAME }} Admin</h1>
 
       <div class="main-nav__instances">
         <template v-if="isAuthenticated">
@@ -61,7 +61,7 @@
 </template>
 
 <script lang="ts">
-import { BASE_URLS } from '@/constants';
+import { BASE_URLS, SITE_NAME } from '@/constants';
 import { defineAsyncComponent, defineComponent, watchEffect, computed, provide } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -125,6 +125,7 @@ export default defineComponent({
     });
 
     return {
+      SITE_NAME,
       groupsIndex: GroupRouteNames.index,
       studentsIndex: StudentRouteNames.index,
       purchasesIndex: PurchasesRouteNames.index,

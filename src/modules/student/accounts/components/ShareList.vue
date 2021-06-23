@@ -5,64 +5,16 @@
       :key="share.id"
       class="share-list__item"
     >
-      <div class="share-list__item--wrapper">
-        <router-link
-          :to="{ name: transactionRoute, params: { shareId: share.id } }"
-          class="share-list__item--name"
-        >
-          {{ share?.shareType?.name }} ({{ accountNumber }}S{{ share.id }})
-        </router-link>
-
-        <span class="share-list__item--info">
-          Available Balance:
-
-          {{
-            new Intl.NumberFormat(
-              'en-US',
-              {
-                style: 'currency',
-                currency: 'USD',
-              }
-            ).format(share.balance)
-          }}
-        </span>
-
-        <template v-if="(share.shareType?.withdrawalLimitCount ?? -1) > 0">
-          <span class="share-list__item--info">
-            Withdrawal Limit:
-
-            {{ share.shareType?.withdrawalLimitCount ?? -1 }}
-          </span>
-
-          <span class="share-list__item--info">
-            Withdrawal Period:
-
-            {{ share.shareType?.withdrawalLimitPeriod ?? 'Unknown' }}
-          </span>
-
-          <span class="share-list__item--info">
-            Withdrawals this Period:
-
-            {{ share.limitedWithdrawalCount }}
-          </span>
-
-          <template v-if="share.shareType?.withdrawalLimitShouldFee ?? false">
-            <span class="share-list__item--info">
-              Excessive Withdrawal Fee:
-
-              {{
-                new Intl.NumberFormat(
-                  'en-US',
-                  {
-                    style: 'currency',
-                    currency: 'USD',
-                  }
-                ).format(share.shareType?.withdrawalLimitFee ?? 0)
-              }}
-            </span>
-          </template>
+      <share-info :share="share">
+        <template #default="{ shareName, share: sh }">
+          <router-link
+            :to="{ name: transactionRoute, params: { shareId: sh.id } }"
+            class="share-list__item--name"
+          >
+            {{ shareName }}
+          </router-link>
         </template>
-      </div>
+      </share-info>
 
       <button
         type="button"
@@ -78,13 +30,16 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 
-// Stores
-import userStore from '@/stores/user';
+// Components
+import ShareInfo from '../../components/ShareInfo.vue';
 
 // Route Names
 import AccountsRouteNames from '../routeNames';
 
 export default defineComponent({
+  components: {
+    ShareInfo,
+  },
   props: {
     shares: {
       type: Object as PropType<Share[]>,
@@ -100,7 +55,6 @@ export default defineComponent({
     }
 
     return {
-      accountNumber: userStore.username,
       transactionRoute: AccountsRouteNames.transactions,
       startTransfer,
     };
@@ -139,12 +93,6 @@ export default defineComponent({
 
       // font-family: 'Consolas', 'Courier New', Courier, monospace;
       text-decoration: none;
-    }
-
-    &--info {
-      width: 100%;
-      display: block;
-      text-align: left;
     }
 
     &--transfer {

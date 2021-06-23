@@ -1,14 +1,22 @@
 label {
   font-weight: bold;
+
+  span.required {
+    font-size: 0.7em;
+    color: map.get($theme, button-destructive, color);
+    vertical-align: super;
+  }
 }
 
 input[type=text], input[type=password] {
   padding: 0.5em 2em 0.5em 0.5em;
+  outline-color: colorStep(button-primary, $darken: false, $step: 5);
   border: 1px solid colorStep(button-secondary, $step: 2);
   border-radius: 3px;
 
-  &:invalid {
-    border: 1px solid colorStep(button-destructive, $step: 3);
+  &:invalid, &.error {
+    outline-color: colorStep(button-destructive, $step: 2);
+    border: 1px solid colorStep(button-destructive, $step: 2);
   }
 }
 
