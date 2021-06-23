@@ -50,7 +50,7 @@ import { useRouter } from 'vue-router';
 import LoadingLabel from '@/components/LoadingLabel.vue';
 
 // Services
-import { info } from '@/services/auth';
+import { info, logout } from '@/services/auth';
 
 // Stores
 import userStore from '@/stores/user';
@@ -82,17 +82,22 @@ export default defineComponent({
     async function getInfo() {
       try {
         await info();
+
+        // Force a logout if the current user isn't a student
+        if (!userStore.isStudent.value) {
+          await logout();
+        }
       } catch (e) {
         errorStore.setCurrentError(e?.message ?? e);
       }
     }
 
     // Force users to the login page if they aren't authenticated
-    watchEffect(() => {
+    watchEffect(async () => {
       if (userStore.isAnonymous.value) {
         router.push({ name: LoginRouteNames.index });
       } else if (!userStore.hasInfo.value && !userStore.loading.value) {
-        getInfo();
+        await getInfo();
       }
     });
 

@@ -201,10 +201,6 @@ export default defineComponent({
       margin-bottom: 1em;
     }
 
-    .share-name {
-      font-weight: bold;
-    }
-
     &__summary {
       margin-top: 1em;
 

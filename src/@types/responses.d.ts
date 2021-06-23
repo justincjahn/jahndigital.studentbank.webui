@@ -36,6 +36,14 @@ interface CurrentStudentResponse {
   currentStudent: StudentInfo[];
 }
 
+interface RevokeStudentRefreshTokenResponse {
+  studentRevokeRefreshToken: boolean;
+}
+
+interface RevokeUserRefreshTokenResponse {
+  userRevokeRefreshToken: boolean;
+}
+
 /*
  * INSTANCES
  */

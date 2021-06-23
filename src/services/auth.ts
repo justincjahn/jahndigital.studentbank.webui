@@ -89,4 +89,22 @@ export async function info() {
 /**
  * Log the user or student out.
  */
-export function logout() { userStore.setToken(null); }
+export async function logout() {
+  if (userStore.isStudent.value) {
+    const g = await import('@/graphql/mutations/studentRevokeRefreshToken.gql');
+
+    try {
+      await mutate<RevokeStudentRefreshTokenResponse>(g);
+    } finally {
+      userStore.setToken(null);
+    }
+  } else {
+    const g = await import('@/graphql/mutations/userRevokeRefreshToken.gql');
+
+    try {
+      await mutate<RevokeUserRefreshTokenResponse>(g);
+    } finally {
+      userStore.setToken(null);
+    }
+  }
+}
