@@ -24,6 +24,7 @@
         :name="inputName"
         :model-value="val"
         :options="options"
+        :value="value"
         v-bind="$attrs"
         @update:modelValue="x => update(x)"
       />
@@ -38,6 +39,7 @@ import BaseInput, { validationFunc } from './BaseInput.vue';
 import BaseSelect from './BaseSelect.vue';
 
 const options = Object.keys(Period);
+const value = (option: PeriodStrings) => Period[option] ?? 'UNKNOWN';
 
 export default defineComponent({
   components: {
@@ -91,6 +93,7 @@ export default defineComponent({
 
     return {
       options,
+      value,
       input,
       openInput,
     };

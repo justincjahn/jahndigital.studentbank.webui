@@ -7,6 +7,7 @@
           v-model="data.name"
           v-model:error="errors.name"
           label="Name"
+          required
           :validator="validateShareTypeName"
         />
 
@@ -15,6 +16,7 @@
           v-model="data.dividendRate"
           v-model:error="errors.dividendRate"
           label="Dividend Rate"
+          required
           :allow-negative="false"
         >
           <template #help="{ className }">
