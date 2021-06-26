@@ -62,6 +62,8 @@ module.exports = {
   },
 
   devServer: {
+    https: true,
+    port: 8443,
     proxy: {
       '/graphql': {
         target: 'https://localhost:5001',

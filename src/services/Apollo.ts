@@ -80,6 +80,9 @@ const authLink = setContext((_, { headers }) => ({
  */
 const httpLink = createHttpLink({
   uri: API_ENDPOINT,
+
+  // Required for authentication to work across multiple origins
+  credentials: 'include',
 });
 
 /**

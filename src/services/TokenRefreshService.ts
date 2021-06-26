@@ -78,8 +78,13 @@ export default class TokenRefreshService extends ApolloLink {
     const res = await fetch(API_ENDPOINT, {
       method: 'POST',
 
+      credentials: 'include',
+
+      cache: 'no-cache',
+
+      mode: 'cors',
+
       headers: {
-        Accepts: 'application/json',
         'Content-Type': 'application/json',
       },
 
@@ -120,7 +125,7 @@ export default class TokenRefreshService extends ApolloLink {
       }).catch((e) => {
         console.warn('Your refresh token is invalid.  Please login again.');
         console.error(e);
-        userStore.setToken(null);
+        // userStore.setToken(null);
       }).finally(() => {
         this._fetching = false;
         this._run();
