@@ -2,11 +2,13 @@
 
 mutation updateStudent(
   $id: Long!,
-  $accountNumber: String!,
-  $firstName: String!,
-  $lastName: String!,
-  $email: String!,
-  $groupId: Long!
+  $accountNumber: String,
+  $firstName: String,
+  $lastName: String,
+  $email: String,
+  $currentPassword: String,
+  $password: String,
+  $groupId: Long
 ) {
   updateStudent(input: {
     id: $id,
@@ -14,6 +16,8 @@ mutation updateStudent(
     firstName: $firstName,
     lastName: $lastName,
     email: $email,
+    currentPassword: $currentPassword,
+    password: $password,
     groupId: $groupId
   }) {
     ...StudentParts

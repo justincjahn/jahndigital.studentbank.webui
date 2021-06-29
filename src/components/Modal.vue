@@ -180,7 +180,7 @@ export default defineComponent({
     watchEffect(() => {
       if (props.show === true) {
         closedBefore.value = true;
-        document.addEventListener('keyup', handleKeyPress);
+        setTimeout(() => document.addEventListener('keyup', handleKeyPress), 100);
 
         if (root.value !== null) {
           modalStore.open(root.value);
@@ -197,6 +197,10 @@ export default defineComponent({
     // When the modal is at the top level, emit a focus event.
     watchEffect(() => {
       if (root.value !== null && modalStore.topmost.value === root.value) {
+        if (document.activeElement) {
+          (document.activeElement as HTMLElement).blur();
+        }
+
         emit('focus', root.value);
       }
     });

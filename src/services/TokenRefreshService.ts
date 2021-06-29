@@ -125,7 +125,7 @@ export default class TokenRefreshService extends ApolloLink {
       }).catch((e) => {
         console.warn('Your refresh token is invalid.  Please login again.');
         console.error(e);
-        // userStore.setToken(null);
+        userStore.setToken(null);
       }).finally(() => {
         this._fetching = false;
         this._run();

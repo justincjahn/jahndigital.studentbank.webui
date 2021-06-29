@@ -16,6 +16,10 @@
       <router-link :to="{ name: stocksIndex }">
         Stocks
       </router-link>
+
+      <router-link :to="{ name: profileIndex }">
+        Profile
+      </router-link>
     </nav>
   </header>
 
@@ -62,6 +66,7 @@ import { setup as defineGlobalStore } from './stores/global';
 import LoginRouteNames from './login/routeNames';
 import AccountRouteNames from './accounts/routeNames';
 import StocksRouteNames from './stocks/routeNames';
+import ProfileRouteNames from './profile/routeNames';
 
 // Symbols
 import { GLOBAL_STORE } from './symbols';
@@ -110,6 +115,7 @@ export default defineComponent({
       ...errorStore,
       accountIndex: AccountRouteNames.index,
       stocksIndex: StocksRouteNames.index,
+      profileIndex: ProfileRouteNames.index,
     };
   },
 });

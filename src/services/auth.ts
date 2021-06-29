@@ -74,11 +74,11 @@ export async function info() {
   try {
     if (userStore.isStudent.value) {
       const g = await import('@/graphql/queries/currentStudent.gql');
-      const res = await query<CurrentStudentResponse>(g);
+      const res = await query<CurrentStudentResponse>(g, undefined, 'no-cache');
       userStore.setInfo(res.currentStudent[0]);
     } else {
       const g = await import('@/graphql/queries/currentUser.gql');
-      const res = await query<CurrentUserResponse>(g);
+      const res = await query<CurrentUserResponse>(g, undefined, 'no-cache');
       userStore.setInfo(res.currentUser[0]);
     }
   } finally {

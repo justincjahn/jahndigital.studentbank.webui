@@ -143,8 +143,16 @@ export function setup() {
     persist();
   }
 
+  /**
+   * Set user information from a {UserInfo} or {StudentInfo} object.
+   *
+   * @param info
+   */
   function setInfo(info: UserInfo | StudentInfo) {
     store.info = info;
+    store.email = info.email;
+    store.id = info.id;
+    store.username = (info as StudentInfo)?.accountNumber ?? info.id;
   }
 
   hydrate();

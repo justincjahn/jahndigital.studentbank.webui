@@ -91,6 +91,7 @@ interface UpdateStudentRequest {
   firstName?: string;
   lastName?: string;
   password?: string;
+  currentPassword?: string;
 }
 
 interface NewStudentRequest {

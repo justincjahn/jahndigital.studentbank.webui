@@ -82,7 +82,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed } from 'vue';
+import { defineComponent, PropType, computed, watchEffect } from 'vue';
 import uuid4 from '@/utils/uuid4';
 
 export type validationFunc = (value: string) => string | boolean;
@@ -135,12 +135,15 @@ export default defineComponent({
 
     function updateModelValue(value: string) {
       emit('update:modelValue', value);
-
-      if (props.validator) {
-        const isValid = props.validator(value);
-        emit('update:error', isValid === true ? '' : isValid);
-      }
     }
+
+    watchEffect(() => {
+      const { modelValue, validator } = props;
+      if (!validator) return;
+
+      const error = validator(modelValue.toString());
+      emit('update:error', error === true ? '' : error);
+    });
 
     return {
       inputId,

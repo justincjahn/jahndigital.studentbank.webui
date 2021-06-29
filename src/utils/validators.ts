@@ -30,8 +30,8 @@ export function validatePassword(repeat?: Ref<string>): (value: string) => strin
       return 'Password must contain at least one uppercase letter.';
     }
 
+    // Magic happens here whereby the input of repeat triggers this to run again!
     if (!repeat) return true;
-
     if (!repeat.value || value !== repeat.value) {
       return 'Passwords do not match.';
     }
