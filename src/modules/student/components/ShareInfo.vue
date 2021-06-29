@@ -33,6 +33,11 @@
         {{ share.shareType?.withdrawalLimitPeriod ?? 'UNKNOWN' }}
       </p>
 
+      <p class="share-info__item">
+        <span>Withdrawals this Period</span>
+        {{ share.limitedWithdrawalCount ?? 0 }}
+      </p>
+
       <template v-if="share.shareType?.withdrawalLimitShouldFee ?? false">
         <p class="share-info__item">
           <span>Excessive Withdrawal Fee</span>
