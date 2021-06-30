@@ -21,6 +21,11 @@ export function setup() {
   const stock = defineStockStore();
   const stockAvailable = defineStockStore();
 
+  function dispose() {
+    stock.dispose();
+    stockAvailable.dispose();
+  }
+
   return {
     error: errorStore,
     router: routerStore,
@@ -33,6 +38,7 @@ export function setup() {
     share,
     stock,
     stockAvailable,
+    dispose,
   };
 }
 

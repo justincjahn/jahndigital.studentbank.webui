@@ -31,7 +31,7 @@
     <loading-label class="page-loading" />
   </main>
 
-  <footer>&copy; 2020 Jahn Digital</footer>
+  <footer>&copy; 2020 Jahn Digital v{{ VERSION }}</footer>
 
   <suspense>
     <modal
@@ -46,7 +46,7 @@
 </template>
 
 <script type="ts">
-import { SITE_NAME } from '@/constants';
+import { SITE_NAME, VERSION } from '@/constants';
 import { defineComponent, defineAsyncComponent, provide, watchEffect, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -110,6 +110,7 @@ export default defineComponent({
 
     return {
       SITE_NAME,
+      VERSION,
       isAuthenticated: userStore.isAuthenticated,
       loading: routerStore.loading,
       ...errorStore,

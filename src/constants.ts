@@ -13,6 +13,10 @@ export const SITE_NAME: string = process.env.VUE_APP_SITE_NAME || 'ERROR';
 // NOTE: This is auto-imported by Webpack, so you probably don't need it.
 export const THEME: string = process.env.VUE_APP_THEME || 'ERROR';
 
+// The version number of this build
+// NOTE: The default for this variable is defined in the vue.config.js file.
+export const VERSION: string = process.env.VUE_APP_VERSION || 'ERROR';
+
 // The key to use when persisting data in localstorage
 export const PERSIST_TOKEN = 'sbi';
 

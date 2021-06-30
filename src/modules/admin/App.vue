@@ -46,7 +46,7 @@
     <h1>Loading...</h1>
   </main>
 
-  <footer>&copy; 2020 Jahn Digital</footer>
+  <footer>&copy; 2020 Jahn Digital v{{ VERSION }}</footer>
 
   <suspense>
     <modal
@@ -61,8 +61,8 @@
 </template>
 
 <script lang="ts">
-import { BASE_URLS, SITE_NAME } from '@/constants';
-import { defineAsyncComponent, defineComponent, watchEffect, provide } from 'vue';
+import { BASE_URLS, SITE_NAME, VERSION } from '@/constants';
+import { defineAsyncComponent, defineComponent, watchEffect, provide, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 
 // Routes
@@ -111,8 +111,11 @@ export default defineComponent({
       }
     });
 
+    onUnmounted(() => globalStore.dispose());
+
     return {
       SITE_NAME,
+      VERSION,
       globalStore,
       groupsIndex: GroupRouteNames.index,
       studentsIndex: StudentRouteNames.index,

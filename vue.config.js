@@ -1,6 +1,10 @@
 process.env.VUE_APP_THEME = process.env.VUE_APP_THEME || '@/scss/_theme.scss';
 process.env.VUE_APP_SITE_NAME = process.env.VUE_APP_SITE_NAME || 'Student Bank';
 
+// eslint-disable-next-line import/newline-after-import, @typescript-eslint/no-var-requires
+const { version } = require('./package.json');
+process.env.VUE_APP_VERSION = version || 'unknown';
+
 module.exports = {
   productionSourceMap: false,
 
