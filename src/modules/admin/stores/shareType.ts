@@ -22,9 +22,17 @@ export function setup(instanceStore?: InstanceStore) {
     cursorStack: [] as string[],
     instances: [] as number[],
     shareTypes: [] as ShareType[],
+    selected: null as ShareType|null,
   });
 
   const loading = computed(() => store.loading);
+
+  const selected = computed({
+    get: () => store.selected,
+    set: (value) => {
+      store.selected = value;
+    },
+  });
 
   const totalCount = computed(() => store.totalCount);
 
@@ -160,6 +168,10 @@ export function setup(instanceStore?: InstanceStore) {
       const newShareTypes = [...store.shareTypes];
       newShareTypes[isListed] = shareType;
       store.shareTypes = newShareTypes;
+
+      if (store.selected && store.selected.id === input.id) {
+        store.selected = shareType;
+      }
     }
   }
 
@@ -176,6 +188,10 @@ export function setup(instanceStore?: InstanceStore) {
       // eslint-disable-next-line prefer-destructuring
       newShareTypes[isListed] = data.linkShareType[0];
       store.shareTypes = newShareTypes;
+
+      if (store.selected && store.selected.id === input.shareTypeId) {
+        [store.selected] = data.linkShareType;
+      }
     }
   }
 
@@ -192,6 +208,10 @@ export function setup(instanceStore?: InstanceStore) {
       // eslint-disable-next-line prefer-destructuring
       newShareTypes[isListed] = data.unlinkShareType[0];
       store.shareTypes = newShareTypes;
+
+      if (store.selected && store.selected.id === input.shareTypeId) {
+        store.selected = null;
+      }
     }
   }
 
@@ -206,6 +226,10 @@ export function setup(instanceStore?: InstanceStore) {
       const isListed = store.shareTypes.findIndex((x) => x.id === shareType.id);
       if (isListed >= 0) {
         store.shareTypes = store.shareTypes.filter((x) => x.id !== shareType.id);
+      }
+
+      if (store.selected && store.selected.id === shareType.id) {
+        store.selected = null;
       }
     } else {
       throw new Error('Unable to delete Share Type: unknown reason.');
@@ -247,6 +271,7 @@ export function setup(instanceStore?: InstanceStore) {
     unlinkShareType,
     deleteShareType,
     postDividends,
+    selected,
   };
 }
 

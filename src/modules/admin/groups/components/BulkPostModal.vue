@@ -37,7 +37,7 @@
 
         <share-type-selector
           :model-value="selectedShareType"
-          :share-type-store="shareTypeStore"
+          :store="store"
           @update:modelValue="handleShareTypeSelection"
         />
 
@@ -231,10 +231,8 @@ import BaseCurrencyInput from '@/components/BaseCurrencyInput.vue';
 import LoadingLabel from '@/components/LoadingLabel.vue';
 
 // Stores
-import errorStore from '@/stores/error';
 import { setup as defineBulkPostStore, PostingPolicy } from '@/modules/admin/groups/stores/bulkPost';
-import { ShareTypeStore } from '@/modules/admin/stores/shareType';
-import { GroupStore } from '../stores/group';
+import { GlobalStore } from '../../stores/global';
 
 export default defineComponent({
   components: {
@@ -248,12 +246,8 @@ export default defineComponent({
       type: Boolean,
       required: true,
     },
-    groupStore: {
-      type: Object as PropType<GroupStore>,
-      required: true,
-    },
-    shareTypeStore: {
-      type: Object as PropType<ShareTypeStore>,
+    store: {
+      type: Object as PropType<GlobalStore>,
       required: true,
     },
   },
@@ -340,7 +334,7 @@ export default defineComponent({
       const student = bulkPostStore.studentMap.value.get(share.id);
 
       if (student) {
-        const group = props.groupStore.groups.value.find((x) => x.id === student.groupId);
+        const group = props.store.group.groups.value.find((x) => x.id === student.groupId);
         if (group) return group.name;
       }
 
@@ -365,7 +359,7 @@ export default defineComponent({
         const data = await bulkPostStore.post();
         emit('ok', data);
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        props.store.error.setCurrentError(e?.message ?? e);
       }
     }
 
@@ -390,7 +384,7 @@ export default defineComponent({
         amountValue.value = '0.00';
         commentValue.value = '';
         bulkPostStore.fetchSelection();
-        props.shareTypeStore.fetch();
+        props.store.shareType.fetch();
       }
     });
 

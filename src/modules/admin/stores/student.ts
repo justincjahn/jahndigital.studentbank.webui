@@ -22,8 +22,9 @@ export function setup() {
   // GETs the totalCount number of students
   const totalCount = computed(() => store.totalCount);
 
-  // GETs the PageInfo
-  const pageInfo = computed(() => store.pageInfo);
+  const hasNextPage = computed(() => store.pageInfo?.hasNextPage ?? false);
+
+  const hasPreviousPage = computed(() => store.pageInfo?.hasPreviousPage ?? false);
 
   // Gets the list of currently fetched students
   const students = computed(() => store.students);
@@ -279,7 +280,8 @@ export function setup() {
   return {
     loading,
     totalCount,
-    pageInfo,
+    hasNextPage,
+    hasPreviousPage,
     students,
     selected,
     totalPages,

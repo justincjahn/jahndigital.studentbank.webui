@@ -59,14 +59,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref, computed, watchEffect, onUnmounted } from 'vue';
-
-// Utils
-import injectStrict from '@/utils/injectStrict';
+/* eslint-disable arrow-body-style */
+import { defineComponent, PropType, ref, computed, watchEffect } from 'vue';
 
 // Stores
-import { INSTANCE_STORE_SYMBOL } from '@/modules/admin/symbols';
-import { setup as defineStockStore } from '@/stores/stock';
+import { GlobalStore } from '../../stores/global';
 
 const delay = 300;
 let timer: number|null = null;
@@ -80,7 +77,11 @@ export default defineComponent({
     available: {
       type: Boolean,
       default: false,
-      description: 'List only stocks available in the selected instance.',
+      description: 'List only stocks available to link for selected instance.',
+    },
+    store: {
+      type: Object as PropType<GlobalStore>,
+      required: true,
     },
   },
   emits: [
@@ -88,22 +89,21 @@ export default defineComponent({
     'stock-dblclick',
   ],
   setup(props, { emit }) {
-    const stockStore = defineStockStore();
-    const instanceStore = injectStrict(INSTANCE_STORE_SYMBOL);
     const prevClicked = ref<Stock|null>(null);
     const clickCount = ref(0);
+    const store = computed(() => ((props.available) ? props.store.stockAvailable : props.store.stock));
+    const instanceId = computed(() => props.store.instance.selected.value?.id ?? -1);
 
     // If we're listing available stocks, filter the ones already linked
     const stocks = computed(() => {
-      if (props.available === true) {
-        const instanceId = instanceStore.selected.value?.id ?? -1;
-        return stockStore.items.value.filter((stock) => {
+      if (props.available) {
+        return store.value.items.value.filter((stock) => {
           const instances = (stock?.stockInstances ?? []).map((x) => x.instanceId);
-          return !instances.includes(instanceId);
+          return !instances.includes(instanceId.value);
         });
       }
 
-      return stockStore.items.value;
+      return store.value.items.value;
     });
 
     /**
@@ -134,17 +134,15 @@ export default defineComponent({
     }
 
     watchEffect(() => {
-      if (instanceStore.selected.value !== null && !props.available) {
-        stockStore.fetch({ instances: [instanceStore.selected.value.id] });
+      if (instanceId.value !== -1 && !props.available) {
+        props.store.stock.fetch({ instances: [instanceId.value] });
       } else if (props.available) {
-        stockStore.fetch();
+        props.store.stockAvailable.fetch();
       }
     });
 
-    onUnmounted(() => stockStore.dispose());
-
     return {
-      ...stockStore,
+      ...store.value,
       stocks,
       isSelected,
       handleStockClick,

@@ -11,7 +11,7 @@
     @cancel="handleCancel"
   >
     <template #default>
-      <group-selector v-model="selectedGroup" :group-store="groupStore" />
+      <group-selector v-model="selectedGroup" :store="store" />
     </template>
     <template #okLabel="{ okLabel, canSubmit }">
       <template v-if="canSubmit || !loading">
@@ -33,7 +33,7 @@ import GroupSelector from '@/modules/admin/components/GroupSelector.vue';
 import LoadingLabel from '@/components/LoadingLabel.vue';
 
 // Stores
-import { GroupStore } from '../stores/group';
+import { GlobalStore } from '../../stores/global';
 
 export default defineComponent({
   components: {
@@ -54,8 +54,8 @@ export default defineComponent({
       type: Object as PropType<Student[]>,
       required: true,
     },
-    groupStore: {
-      type: Object as PropType<GroupStore>,
+    store: {
+      type: Object as PropType<GlobalStore>,
       required: true,
     },
   },
@@ -96,9 +96,9 @@ export default defineComponent({
     // When the modal opens, refresh the groups store
     watch(() => props.show, () => {
       if (props.show) {
-        const instanceId = props.groupStore.instanceStore.selected.value?.id ?? -1;
+        const instanceId = props.store.instance.selected.value?.id ?? -1;
         if (instanceId === -1) return;
-        props.groupStore.fetchGroups(instanceId);
+        props.store.group.fetchGroups(instanceId);
       }
     });
 

@@ -11,10 +11,7 @@ import Money from '@/utils/money';
 
 // API
 import { getStudentIdsByGroup } from '@/services/student';
-import { setup as defineInstanceStore } from '@/modules/admin/stores/instance';
-import { setup as defineStudentStore } from '@/modules/admin/stores/student';
-import { setup as defineShareStore } from '@/modules/admin/stores/share';
-import { setup as defineGroupStore } from './group';
+import { setup as defineGlobalStore } from '../../stores/global';
 
 /**
  * Enum that describes the steps for the Bulk Import multi-part form.
@@ -88,6 +85,7 @@ type StudentInfoMap = Record<string, StudentInfo>;
  */
 export function setup() {
   const stepCount = Object.keys(BulkImportStep).length / 2;
+  const globalStore = defineGlobalStore();
 
   const store = reactive({
     loading: false,
@@ -245,9 +243,8 @@ export function setup() {
     }
 
     try {
-      const groupStore = defineGroupStore(defineInstanceStore());
-      await groupStore.fetchGroups(store.instance.id, false);
-      store.dbGroups = [...groupStore.groups.value];
+      await globalStore.group.fetchGroups(store.instance.id, false);
+      store.dbGroups = [...globalStore.group.groups.value];
     } catch (e) {
       throw new Error(`Error fetching groups: '${e?.message ?? e}'.`);
     }
@@ -515,10 +512,6 @@ export function setup() {
     if (store.instance === null) throw new Error('Instance not selected.');
 
     const instanceId = store.instance.id;
-    const instanceStore = defineInstanceStore();
-    const groupStore = defineGroupStore(instanceStore);
-    const studentStore = defineStudentStore();
-    const shareStore = defineShareStore(studentStore);
 
     console.debug('[Bulk Import]: Starting post...');
     store.loading = true;
@@ -531,7 +524,7 @@ export function setup() {
       try {
         // eslint-disable-next-line no-await-in-loop
         const res = await Promise.all(
-          groupsToCreate.splice(0, API_MAX_CONCURRENCY).map((name) => groupStore.newGroup({ instanceId, name })),
+          groupsToCreate.splice(0, API_MAX_CONCURRENCY).map((name) => globalStore.group.newGroup({ instanceId, name })),
         );
 
         res.forEach((group) => {
@@ -559,7 +552,7 @@ export function setup() {
           studentsToCreate.splice(0, API_MAX_CONCURRENCY).map((studentInfo) => {
             const groupId = resolveGroupId(studentInfo.group);
 
-            return studentStore.newStudent({
+            return globalStore.student.newStudent({
               groupId,
               accountNumber: studentInfo.accountNumber,
               firstName: studentInfo.firstName,
@@ -598,7 +591,7 @@ export function setup() {
       try {
         // eslint-disable-next-line no-await-in-loop
         const res = await Promise.all(
-          sharesToCreate.splice(0, API_MAX_CONCURRENCY).map((newShareRequest) => shareStore.newShare(newShareRequest)),
+          sharesToCreate.splice(0, API_MAX_CONCURRENCY).map((newShareRequest) => globalStore.share.newShare(newShareRequest)),
         );
 
         res.forEach((share) => {
@@ -636,7 +629,7 @@ export function setup() {
     };
 
     try {
-      const res = await shareStore.postBulkTransaction(bulkTransactionReq);
+      const res = await globalStore.share.postBulkTransaction(bulkTransactionReq);
       transactions.push(...res);
     } catch (e) {
       store.loading = false;

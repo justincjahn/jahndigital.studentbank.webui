@@ -1,8 +1,8 @@
 <template>
   <table
-    v-if="shareStore.selected.value !== null"
+    v-if="selectedShare !== null"
     class="transaction-list"
-    :class="{ loading: shareStore.loading.value }"
+    :class="{ loading }"
   >
     <thead>
       <tr>
@@ -23,8 +23,8 @@
         </th>
       </tr>
     </thead>
-    <tbody v-if="shareStore.transactions.value.length > 0">
-      <tr v-for="transaction in shareStore.transactions.value" :key="transaction.id">
+    <tbody v-if="transactions.length > 0">
+      <tr v-for="transaction in transactions" :key="transaction.id">
         <td>
           {{ new Date(transaction.effectiveDate).toLocaleDateString('en-US') }}
           {{ new Date(transaction.effectiveDate).toLocaleTimeString('en-US') }}
@@ -67,16 +67,16 @@
       </tr>
     </tbody>
   </table>
-  <div v-if="shareStore.pageInfo.value != null" class="pagination-buttons">
+  <div v-if="pageCount > 1" class="pagination-buttons">
     <button
-      :disabled="!shareStore.pageInfo.value.hasPreviousPage"
-      @click.passive="shareStore.fetchPreviousTransactions"
+      :disabled="!hasPreviousPage"
+      @click.passive="fetchPrevious"
     >
       Previous
     </button>
     <button
-      :disabled="!shareStore.pageInfo.value.hasNextPage"
-      @click.passive="shareStore.fetchNextTransactions"
+      :disabled="!hasNextPage"
+      @click.passive="fetchNext"
     >
       Next
     </button>
@@ -85,24 +85,35 @@
 
 <script lang="ts">
 import { defineComponent, watch, PropType } from 'vue';
-import { ShareStore } from '@/modules/admin/stores/share';
+import { GlobalStore } from '../../stores/global';
 
 export default defineComponent({
   props: {
-    shareStore: {
-      type: Object as PropType<ShareStore>,
+    store: {
+      type: Object as PropType<GlobalStore>,
       required: true,
     },
   },
   setup(props) {
     // When the selected share changes, fetch new transactions
-    watch(() => props.shareStore.selected.value, (newValue) => {
+    watch(() => props.store.share.selected.value, (newValue) => {
       if (newValue !== null) {
-        props.shareStore.fetchShareTransactions({ shareId: newValue.id });
+        props.store.share.fetchShareTransactions({ shareId: newValue.id, cache: false });
       } else {
-        props.shareStore.clearTransactions();
+        props.store.share.clearTransactions();
       }
     }, { immediate: true });
+
+    return {
+      loading: props.store.share.loading,
+      selectedShare: props.store.share.selected,
+      transactions: props.store.share.transactions,
+      pageCount: props.store.share.totalTransactionPages,
+      hasNextPage: props.store.share.hasNextPage,
+      hasPreviousPage: props.store.share.hasPreviousPage,
+      fetchNext: props.store.share.fetchNextTransactions,
+      fetchPrevious: props.store.share.fetchPreviousTransactions,
+    };
   },
 });
 </script>

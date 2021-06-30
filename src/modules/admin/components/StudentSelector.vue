@@ -53,14 +53,13 @@
 import { defineComponent, PropType, ref, computed, watch } from 'vue';
 
 // Utils
-import injectStrict from '@/utils/injectStrict';
 import uuid4 from '@/utils/uuid4';
 
 // Services
 import { getStudentsByAccountNumber, getStudentsByEmail, getStudentsByName } from '@/services/student';
 
 // Stores
-import { INSTANCE_STORE_SYMBOL } from '../symbols';
+import { GlobalStore } from '../stores/global';
 
 // Components
 import StudentSelectorStudent from './StudentSelectorStudent.vue';
@@ -73,6 +72,10 @@ export default defineComponent({
     modelValue: {
       type: Object as PropType<Student|null>,
       default: null,
+    },
+    store: {
+      type: Object as PropType<GlobalStore>,
+      required: true,
     },
   },
   emits: [
@@ -90,9 +93,8 @@ export default defineComponent({
     const tabPressed = ref(false);
 
     // The service returns all students, we just want our selected instance
-    const instanceStore = injectStrict(INSTANCE_STORE_SYMBOL);
     const instanceStudents = computed<Student[]>(() => {
-      const selectedInstanceId = instanceStore.selected.value?.id ?? -1;
+      const selectedInstanceId = props.store.instance.selected.value?.id ?? -1;
       if (selectedInstanceId === -1) return [];
 
       return students.value.filter((student) => {

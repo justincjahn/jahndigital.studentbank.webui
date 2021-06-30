@@ -21,7 +21,7 @@
 
     <share-type-selector
       v-model="selected"
-      :share-type-store="shareTypeStore"
+      :store="store"
     />
 
     <p v-if="selected && selected.dividendRate <= 0" class="error">
@@ -45,9 +45,7 @@ import Modal from '@/components/Modal.vue';
 import ShareTypeSelector from './ShareTypeSelector.vue';
 
 // Stores
-// eslint-disable-next-line import/order
-import errorStore from '@/stores/error';
-import { ShareTypeStore } from '../stores/shareType';
+import { GlobalStore } from '../stores/global';
 
 export default defineComponent({
   components: {
@@ -59,55 +57,57 @@ export default defineComponent({
       type: Boolean,
       required: true,
     },
-    shareTypeStore: {
-      type: Object as PropType<ShareTypeStore>,
+    store: {
+      type: Object as PropType<GlobalStore>,
       required: true,
-    },
-    instance: {
-      type: Object as PropType<Instance|null>,
-      default: null,
     },
   },
   emits: [
     'ok',
   ],
   setup(props, { emit }) {
+    const shareTypeStore = computed(() => props.store.shareType);
+
+    const setCurrentError = (value: string|null) => {
+      props.store.error.setCurrentError(value);
+    };
+
     const loading = ref(false);
-    const selected = ref<ShareType|null>(null);
+    const selectedInstance = computed(() => props.store.instance.selected.value);
+    const canPost = computed(() => !loading.value && props.store.shareType.selected.value !== null
+      && props.store.shareType.selected.value.dividendRate > 0);
 
-    // True if the dividends can be posted
-    const canPost = computed(() => !loading.value && selected.value !== null && selected.value.dividendRate > 0);
-
-    // Use the Rate util to generate the correct dividend rate.
     const rate = computed(() => {
-      if (!selected.value) return 'NA';
-      return Rate.fromNumber(selected.value.dividendRate).getPercent();
+      if (!props.store.shareType.selected.value) return 'NA';
+      return Rate.fromNumber(props.store.shareType.selected.value.dividendRate).getPercent();
     });
 
     /**
      * Reset the modal back to the default state.
      */
-    function reset() { selected.value = null; }
+    function reset() {
+      shareTypeStore.value.selected.value = null;
+    }
 
     /**
      * Post dividends and tell the parent to close this modal once finished.
      */
     async function handleOk() {
-      if (!selected.value) return;
-      if (!props.instance) return;
+      if (!props.store.shareType.selected.value) return;
+      if (!selectedInstance.value) return;
 
       loading.value = true;
       try {
-        await props.shareTypeStore.postDividends({
-          shareTypeId: selected.value.id,
+        await props.store.shareType.postDividends({
+          shareTypeId: props.store.shareType.selected.value.id,
           instances: [
-            props.instance.id,
+            selectedInstance.value.id,
           ],
         });
 
         emit('ok');
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        setCurrentError(e?.message ?? e);
       } finally {
         loading.value = false;
       }
@@ -123,7 +123,8 @@ export default defineComponent({
 
     return {
       loading,
-      selected,
+      selected: props.store.shareType.selected,
+      instance: selectedInstance,
       canPost,
       rate,
       handleOk,

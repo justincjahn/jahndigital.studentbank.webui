@@ -3,20 +3,18 @@
     <div class="student-transactions__sidebar">
       <share-selector
         v-model="selectedShare"
-        :shares="studentStore.selected.value?.shares"
+        :shares="studentShares"
       />
 
       <transaction-poster
-        :share="shareStore.selected"
+        :share="selectedShare"
         :loading="isPosting"
         @submit="postTransaction"
       />
     </div>
 
     <div class="student-transactions__main">
-      <transaction-list
-        :share-store="shareStore"
-      />
+      <transaction-list :store="globalStore" />
     </div>
   </div>
 </template>
@@ -34,10 +32,10 @@ import Money from '@/utils/money';
 import injectStrict from '@/utils/injectStrict';
 
 // Stores
-import { setup as defineShareStore } from '@/modules/admin/stores/share';
 import errorStore from '@/stores/error';
 
-import { STUDENT_STORE_SYMBOL } from '../symbols';
+// Symbols
+import { GLOBAL_STORE } from '../../symbols';
 
 export default defineComponent({
   components: {
@@ -46,14 +44,17 @@ export default defineComponent({
     TransactionPoster,
   },
   setup() {
-    const studentStore = injectStrict(STUDENT_STORE_SYMBOL);
-    const shareStore = defineShareStore(studentStore);
+    const globalStore = injectStrict(GLOBAL_STORE);
     const isPosting = ref<boolean>(false);
 
-    // Proxy get/set requests to the shareStore
     const selectedShare = computed<Share|null>({
-      get: () => shareStore.selected.value,
-      set: (item) => shareStore.setSelected(item),
+      get: () => globalStore.share.selected.value,
+      set: (item) => globalStore.share.setSelected(item),
+    });
+
+    const studentShares = computed(() => {
+      if (!globalStore.student.selected.value) return [] as Share[];
+      return globalStore.student.selected.value.shares ?? [] as Share[];
     });
 
     /**
@@ -66,16 +67,16 @@ export default defineComponent({
     async function postTransaction(amount: Money, comment?: string) {
       isPosting.value = true;
 
-      const shareId = shareStore.selected.value?.id ?? -1;
+      const shareId = globalStore.share.selected.value?.id ?? -1;
       try {
-        await shareStore.postTransaction({
+        await globalStore.share.postTransaction({
           shareId,
           amount: amount.round(),
           comment,
           takeNegative: true,
         });
 
-        await shareStore.studentStore.refreshSelected();
+        await globalStore.student.refreshSelected();
       } catch (e) {
         errorStore.setCurrentError(e?.message ?? e);
       } finally {
@@ -84,9 +85,9 @@ export default defineComponent({
     }
 
     return {
-      studentStore: shareStore.studentStore,
-      shareStore,
+      globalStore,
       selectedShare,
+      studentShares,
       postTransaction,
       isPosting,
     };

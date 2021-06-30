@@ -57,8 +57,7 @@ import Rate from '@/utils/rate';
 import Money from '@/utils/money';
 
 // Stores
-import errorStore from '@/stores/error';
-import { setup as setupShareTypeStore, ShareTypeStore } from '@/modules/admin/stores/shareType';
+import { GlobalStore } from '../stores/global';
 
 // Composables
 import { buildFormData } from '../composables/useShareTypeForm';
@@ -79,8 +78,8 @@ export default defineComponent({
       type: Boolean,
       required: true,
     },
-    shareTypeStore: {
-      type: Object as PropType<ShareTypeStore>,
+    store: {
+      type: Object as PropType<GlobalStore>,
       required: true,
     },
   },
@@ -88,9 +87,6 @@ export default defineComponent({
     'ok',
   ],
   setup(props, { emit }) {
-    // Use a new ShareTypeStore for the available share types list so we don't muddle parent state.
-    const availableShareTypeStore = setupShareTypeStore();
-
     // True if a share type add operation is awaiting the server.
     const addLoading = ref(false);
 
@@ -108,8 +104,8 @@ export default defineComponent({
 
     // Filter share types that are already in the selected instance
     const shareTypes = computed(() => {
-      const instanceId = props.shareTypeStore.instanceStore?.selected?.value?.id ?? -1;
-      const filtered = availableShareTypeStore.shareTypes.value.filter((st) => {
+      const instanceId = props.store.shareType.instanceStore?.selected?.value?.id ?? -1;
+      const filtered = props.store.shareTypeAvailable.shareTypes.value.filter((st) => {
         const hasInstance = st.shareTypeInstances.find((instance) => instance.instanceId === instanceId);
         return !hasInstance;
       });
@@ -134,7 +130,7 @@ export default defineComponent({
      * Fetch a list of available share types using our custom store.
      */
     async function fetchAvailableShareTypes() {
-      await availableShareTypeStore.fetch({ cache: false });
+      await props.store.shareTypeAvailable.fetch({ cache: false });
     }
 
     /**
@@ -144,7 +140,7 @@ export default defineComponent({
       addLoading.value = true;
 
       try {
-        await availableShareTypeStore.newShareType({
+        await props.store.shareTypeAvailable.newShareType({
           ...formData,
           dividendRate: Rate.fromStringOrDefault(formData.dividendRate).getRate(),
           withdrawalLimitCount: +formData.withdrawalLimitCount,
@@ -154,7 +150,7 @@ export default defineComponent({
         reset();
         await fetchAvailableShareTypes();
       } catch (e) {
-        errorStore.setCurrentError('Unable to add the Share Type.  Does it already exist?');
+        props.store.error.setCurrentError('Unable to add the Share Type.  Does it already exist?');
       } finally {
         addLoading.value = false;
       }
@@ -164,14 +160,14 @@ export default defineComponent({
      * Link the selected share types
      */
     async function handleLink() {
-      if (!props.shareTypeStore.instanceStore) return;
-      if (!props.shareTypeStore.instanceStore.selected.value) return;
-      const instanceId = props.shareTypeStore.instanceStore.selected.value.id;
+      if (!props.store.shareType.instanceStore) return;
+      if (!props.store.shareType.instanceStore.selected.value) return;
+      const instanceId = props.store.shareType.instanceStore.selected.value.id;
       const errors = [] as string[];
 
       await Promise.all(selected.value.map(async (shareType) => {
         try {
-          await props.shareTypeStore.linkShareType({
+          await props.store.shareType.linkShareType({
             shareTypeId: shareType.id,
             instanceId,
           });
@@ -181,11 +177,11 @@ export default defineComponent({
       }));
 
       if (errors.length > 0) {
-        errorStore.setCurrentError(errors.join(', '));
+        props.store.error.setCurrentError(errors.join(', '));
       }
 
       // Refetch the share types from the API since we know they've changed on the server
-      await props.shareTypeStore.fetch({ cache: false });
+      await props.store.shareType.fetch({ cache: false });
       await fetchAvailableShareTypes();
     }
 
@@ -200,7 +196,7 @@ export default defineComponent({
       formData,
       selected,
       shareTypes,
-      loading: availableShareTypeStore.loading,
+      loading: props.store.shareTypeAvailable.loading,
       addLoading,
       handleOk,
       handleAdd,

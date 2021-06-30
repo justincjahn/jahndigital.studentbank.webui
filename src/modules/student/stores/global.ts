@@ -26,19 +26,12 @@ export function setup() {
     shares: [] as Share[],
     selectedShare: null as Share | null,
 
-    shareTransactionsLoading: false,
-    shareTransactionsTotalCount: 0,
-    shareTransactionsPageInfo: null as PageInfo|null,
-    shareTransactionsFetchCount: FETCH_OPTIONS.DEFAULT_COUNT,
-    shareTransactionCursorStack: [] as string[],
     shareTransactions: [] as Transaction[],
-
-    stocksHeldLoading: false,
-    stocksHeldTotalCount: 0,
-    stocksHeldPageInfo: null as PageInfo | null,
-    stocksHeldFetchCount: FETCH_OPTIONS.DEFAULT_COUNT,
-    stocksHeldCursorStack: [] as string[],
-    stocksHeld: [] as StudentStock[],
+    shareTransactionsLoading: false,
+    shareTransactionsFetchCount: FETCH_OPTIONS.DEFAULT_COUNT,
+    shareTransactionsPageInfo: null as PageInfo|null,
+    shareTransactionsTotalCount: 0,
+    shareTransactionCursorStack: [] as string[],
   });
 
   const shares = computed(() => store.shares);

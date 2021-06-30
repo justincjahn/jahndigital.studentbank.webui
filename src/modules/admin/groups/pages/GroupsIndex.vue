@@ -4,23 +4,13 @@
       <suspense>
         <group-selector
           v-model="selectedGroup"
-          :group-store="groupStore"
+          :store="globalStore"
         />
       </suspense>
     </template>
     <template v-else>
       <p>Please select an instance...</p>
     </template>
-
-    <!--<div class="sub-menu__filter">
-      <form @submit.prevent>
-        <input type="text"
-          aria-label="Filter Students"
-          placeholder="Filter..." />
-
-        <input class="sub-menu__filter__reset" type="reset" value="X" />
-      </form>
-    </div>-->
 
     <div class="sub-menu__bulk-buttons">
       <button
@@ -42,7 +32,7 @@
           :show="showBulkGroupModal"
           :students="selectedStudents"
           :loading="selectedStudentsResolving"
-          :group-store="groupStore"
+          :store="globalStore"
           @ok="handleBulkGroupModalOk"
           @cancel="toggleBulkGroup"
         />
@@ -58,8 +48,7 @@
 
         <bulk-post-modal
           :show="showBulkTransactionModal"
-          :group-store="groupStore"
-          :share-type-store="shareTypeStore"
+          :store="globalStore"
           @ok="toggleBulkTransaction"
           @cancel="toggleBulkTransaction"
         />
@@ -75,7 +64,7 @@
 
         <new-share-modal
           :show="showNewShareModal"
-          :share-type-store="shareTypeStore"
+          :store="globalStore"
           @ok="handleNewShareModalOk"
         />
       </span>
@@ -90,7 +79,7 @@
 
         <new-student-modal
           :show="showNewStudentModal"
-          :group-store="groupStore"
+          :store="globalStore"
           @ok="handleNewStudentModalOk"
           @cancel="toggleNewStudent"
         />
@@ -113,10 +102,7 @@
   </div>
 
   <suspense>
-    <StudentList
-      :group-store="groupStore"
-      :student-store="studentStore"
-    />
+    <student-list :store="globalStore" />
   </suspense>
 </template>
 
@@ -129,13 +115,8 @@ import selection from '@/services/StudentSelectionService';
 // Utils
 import injectStrict from '@/utils/injectStrict';
 
-// Stores
-import { setup as defineStudentStore } from '@/modules/admin/stores/student';
-import errorStore from '@/stores/error';
-
 // Symbols
-import { SHARE_TYPE_STORE_SYMBOL } from '@/modules/admin/symbols';
-import { GROUP_STORE_SYMBOL } from '../symbols';
+import { GLOBAL_STORE } from '@/modules/admin/symbols';
 import { BulkImportStore } from '../stores/bulkImport';
 
 const BulkPostModal = defineAsyncComponent(
@@ -177,9 +158,11 @@ export default {
     NewShareModal,
   },
   setup() {
-    const groupStore = injectStrict(GROUP_STORE_SYMBOL);
-    const studentStore = defineStudentStore();
-    const shareTypeStore = injectStrict(SHARE_TYPE_STORE_SYMBOL);
+    const globalStore = injectStrict(GLOBAL_STORE);
+    const errorStore = globalStore.error;
+    const groupStore = globalStore.group;
+    const studentStore = globalStore.student;
+    const shareTypeStore = globalStore.shareType;
     const showBulkTransactionModal = ref(false);
     const showNewStudentModal = ref(false);
     const showNewShareModal = ref(false);
@@ -282,7 +265,7 @@ export default {
 
       // Force an instance refresh and set the selected instance
       await instanceStore.fetchInstances(false);
-      instanceStore.setSelected(bulkImportStore.instance.value);
+      instanceStore.selected.value = bulkImportStore.instance.value;
 
       // Force a group refresh and select the first group
       await groupStore.fetchGroups(instanceStore.selected.value?.id ?? -1, false);
@@ -311,10 +294,11 @@ export default {
       toggleNewShare,
       handleNewShareModalOk,
       selectedInstance: groupStore.instanceStore.selected,
+      shareTypeStore,
       groupStore,
       selectedGroup,
       studentStore,
-      shareTypeStore,
+      globalStore,
       selectedStudents,
       selectedStudentsResolving,
     };

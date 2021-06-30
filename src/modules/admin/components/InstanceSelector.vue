@@ -151,7 +151,7 @@
   <suspense>
     <dividend-posting-modal
       :show="showDividendPostingModal"
-      :share-type-store="shareTypeStore"
+      :store="store"
       :instance="modelValue"
       @ok="toggleDividendPostingModal"
     />
@@ -166,13 +166,11 @@ import { computed, defineAsyncComponent, defineComponent, PropType, ref } from '
 import BaseSelect, { Search } from '@/components/BaseSelect.vue';
 import Modal from '@/components/Modal.vue';
 
-// Stores
-import errorStore from '@/stores/error';
-import { InstanceStore } from '@/modules/admin/stores/instance';
-import { setup as defineShareTypeStore } from '@/modules/admin/stores/shareType';
-
 // Utils
 import uuid4 from '@/utils/uuid4';
+
+// Stores
+import { GlobalStore } from '../stores/global';
 
 export enum ModalState {
   ADD,
@@ -197,8 +195,8 @@ export default defineComponent({
       type: Object as PropType<Instance>,
       default: undefined,
     },
-    instanceStore: {
-      type: Object as PropType<InstanceStore>,
+    store: {
+      type: Object as PropType<GlobalStore>,
       required: true,
     },
   },
@@ -206,6 +204,9 @@ export default defineComponent({
     'update:modelValue',
   ],
   setup(props, { emit }) {
+    const errorStore = computed(() => props.store.error);
+    const instanceStore = computed(() => props.store.instance);
+
     // If the modal is open.
     const showModal = ref(false);
 
@@ -222,7 +223,7 @@ export default defineComponent({
     const modalState = ref<ModalState>(ModalState.ADD);
 
     // The current invite code
-    const inviteCode = computed(() => props.instanceStore.selected.value?.inviteCode ?? 'UNKNOWN');
+    const inviteCode = computed(() => props.store.instance.selected.value?.inviteCode ?? 'UNKNOWN');
 
     // The input element containing the invite code
     const inviteCodeInput = ref<HTMLInputElement|null>(null);
@@ -235,9 +236,6 @@ export default defineComponent({
 
     // The input element containing the invite code url
     const inviteCodeUrlInput = ref<HTMLInputElement|null>(null);
-
-    // The ShareTypeStore used to post dividends
-    const shareTypeStore = defineShareTypeStore(props.instanceStore);
 
     // The title of the modal window
     const modalTitle = computed(() => {
@@ -336,29 +334,29 @@ export default defineComponent({
     async function handleOk() {
       if (modalState.value === ModalState.ADD) {
         if (input.value.length < 3) {
-          errorStore.setCurrentError('Instance must have a description!');
+          errorStore.value.setCurrentError('Instance must have a description!');
           return;
         }
 
         try {
-          const instance = await props.instanceStore.newInstance({ description: input.value });
+          const instance = await instanceStore.value.newInstance({ description: input.value });
           update(instance);
           toggle();
         } catch (e) {
-          errorStore.setCurrentError(e?.message ?? e);
+          errorStore.value.setCurrentError(e?.message ?? e);
         }
       }
 
       if (modalState.value === ModalState.EDIT) {
         if (input.value.length < 3) {
-          errorStore.setCurrentError('Instance must have a description!');
+          errorStore.value.setCurrentError('Instance must have a description!');
           return;
         }
 
         if (props.modelValue === null) return;
 
         try {
-          const instance = await props.instanceStore.updateInstance({
+          const instance = await instanceStore.value.updateInstance({
             id: props.modelValue?.id ?? -1,
             description: input.value,
           });
@@ -366,7 +364,7 @@ export default defineComponent({
           update(instance);
           toggle();
         } catch (e) {
-          errorStore.setCurrentError(e?.message ?? e);
+          errorStore.value.setCurrentError(e?.message ?? e);
         }
       }
 
@@ -374,7 +372,7 @@ export default defineComponent({
         if (props.modelValue === null) return;
 
         try {
-          const instance = await props.instanceStore.updateInstance({
+          const instance = await instanceStore.value.updateInstance({
             id: props.modelValue?.id ?? -1,
             isActive: true,
           });
@@ -382,7 +380,7 @@ export default defineComponent({
           update(instance);
           toggle();
         } catch (e) {
-          errorStore.setCurrentError(e?.message ?? e);
+          errorStore.value.setCurrentError(e?.message ?? e);
         }
       }
 
@@ -391,10 +389,10 @@ export default defineComponent({
 
         try {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          await props.instanceStore.deleteInstance(props.modelValue!);
+          await instanceStore.value.deleteInstance(props.modelValue!);
           update(null);
         } catch (e) {
-          errorStore.setCurrentError(e.message ?? e);
+          errorStore.value.setCurrentError(e.message ?? e);
         } finally {
           toggle();
         }
@@ -410,8 +408,7 @@ export default defineComponent({
     return {
       showDividendPostingModal,
       ModalState,
-      shareTypeStore,
-      options: props.instanceStore.instances,
+      options: instanceStore.value.instances,
       copyInviteCode,
       inviteCode,
       inviteCodeInput,

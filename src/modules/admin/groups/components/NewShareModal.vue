@@ -29,7 +29,7 @@
     <share-type-template-builder
       v-model="templates"
       class="nshm--fieldset"
-      :share-type-store="shareTypeStore"
+      :store="store"
     />
 
     <div class="nshm--fieldset">
@@ -72,10 +72,7 @@ import Modal from '@/components/Modal.vue';
 import ShareTypeTemplateBuilder from '@/modules/admin/components/ShareTypeTemplateBuilder.vue';
 
 // Stores
-import { ShareTypeStore } from '@/modules/admin/stores/shareType';
-import { setup as defineStudentStore } from '@/modules/admin/stores/student';
-import { setup as defineShareStore } from '@/modules/admin/stores/share';
-import errorStore from '@/stores/error';
+import { GlobalStore } from '../../stores/global';
 
 export default defineComponent({
   components: {
@@ -87,8 +84,8 @@ export default defineComponent({
       type: Boolean,
       required: true,
     },
-    shareTypeStore: {
-      type: Object as PropType<ShareTypeStore>,
+    store: {
+      type: Object as PropType<GlobalStore>,
       required: true,
     },
   },
@@ -96,8 +93,6 @@ export default defineComponent({
     'ok',
   ],
   setup(props, { emit }) {
-    const studentStore = defineStudentStore();
-    const shareStore = defineShareStore(studentStore);
     const loading = ref(false);
     const templates = ref<ShareTypeTemplate[]>([]);
     const students = ref<Student[]>([]);
@@ -153,7 +148,7 @@ export default defineComponent({
       try {
         students.value = await selection.resolve();
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        props.store.error.setCurrentError(e?.message ?? e);
       } finally {
         loading.value = false;
       }
@@ -203,7 +198,7 @@ export default defineComponent({
         try {
           // eslint-disable-next-line no-await-in-loop
           const res = await Promise.all(
-            shareRequests.splice(0, API_MAX_CONCURRENCY).map((newShareRequest) => shareStore.newShare(newShareRequest)),
+            shareRequests.splice(0, API_MAX_CONCURRENCY).map((newShareRequest) => props.store.share.newShare(newShareRequest)),
           );
 
           res.forEach((share) => {
@@ -242,10 +237,10 @@ export default defineComponent({
       };
 
       try {
-        const transactions = await shareStore.postBulkTransaction(bulkTransactionReq);
+        const transactions = await props.store.share.postBulkTransaction(bulkTransactionReq);
         console.debug('[New Share]: Share transactions posted.', transactions);
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        props.store.error.setCurrentError(e?.message ?? e);
       } finally {
         loading.value = false;
       }

@@ -30,7 +30,9 @@ export function setup(studentStore: StudentStore) {
 
   const selected = computed(() => store.selected);
 
-  const pageInfo = computed(() => store.pageInfo);
+  const hasNextPage = computed(() => store.pageInfo?.hasNextPage ?? false);
+
+  const hasPreviousPage = computed(() => store.pageInfo?.hasPreviousPage ?? false);
 
   const transactions = computed(() => store.transactions);
 
@@ -212,7 +214,8 @@ export function setup(studentStore: StudentStore) {
     loading,
     totalCount,
     selected,
-    pageInfo,
+    hasNextPage,
+    hasPreviousPage,
     transactions,
     totalTransactionPages,
     setSelected,

@@ -22,7 +22,7 @@
         <p>Select or create an instance that new groups and students will be created.</p>
         <instance-selector
           :model-value="instance"
-          :instance-store="instanceStore"
+          :store="globalStore"
           @update:modelValue="handleSetInstance"
         />
       </div>
@@ -89,7 +89,7 @@
 
         <share-type-template-builder
           v-model="shareTemplate"
-          :share-type-store="shareTypeStore"
+          :store="globalStore"
         />
       </div>
 
@@ -208,10 +208,8 @@ import LoadingLabel from '@/components/LoadingLabel.vue';
 import Money from '@/utils/money';
 
 // Stores
-import { setup as defineInstanceStore } from '@/modules/admin/stores/instance';
-import { setup as defineShareTypeStore } from '@/modules/admin/stores/shareType';
 import { setup as defineBulkImportStore, BulkImportStep } from '@/modules/admin/groups/stores/bulkImport';
-import errorStore from '@/stores/error';
+import { setup as defineGlobalStore } from '../../stores/global';
 
 export default defineComponent({
   components: {
@@ -231,11 +229,10 @@ export default defineComponent({
     'cancel',
   ],
   setup(props, { emit }) {
-    // A fresh InstanceStore we can use for the modal
-    const instanceStore = defineInstanceStore();
-
-    // A fresh ShareTypeStore we can use for the modal
-    const shareTypeStore = defineShareTypeStore(instanceStore);
+    const globalStore = defineGlobalStore();
+    const instanceStore = globalStore.instance;
+    const shareTypeStore = globalStore.shareType;
+    const setCurrentError = (value: string|null) => globalStore.error.setCurrentError(value);
 
     // The store we'll use to do the import
     const bulkImportStore = defineBulkImportStore();
@@ -272,7 +269,7 @@ export default defineComponent({
      * Set the selected instance for both stores.
      */
     function handleSetInstance(value: Instance|null) {
-      instanceStore.setSelected(value);
+      instanceStore.selected.value = value;
       bulkImportStore.setInstance(value);
     }
 
@@ -299,7 +296,7 @@ export default defineComponent({
         await bulkImportStore.post();
         emit('ok', bulkImportStore);
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        setCurrentError(e?.message ?? e);
       } finally {
         isPosting.value = false;
       }
@@ -327,7 +324,7 @@ export default defineComponent({
       try {
         bulkImportStore.processFile(fileInfo);
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        setCurrentError(e?.message ?? e);
       }
     }
 
@@ -372,7 +369,7 @@ export default defineComponent({
       Money,
       handleOk,
       handleCancel,
-      instanceStore,
+      globalStore,
       shareTypeStore,
       isDragging,
       handleSetInstance,

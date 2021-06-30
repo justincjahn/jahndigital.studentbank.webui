@@ -68,8 +68,7 @@ import Modal from '@/components/Modal.vue';
 import uuid4 from '@/utils/uuid4';
 
 // Stores
-import errorStore from '@/stores/error';
-import { GroupStore } from '../groups/stores/group';
+import { GlobalStore } from '../stores/global';
 
 enum ModalState {
   ADD,
@@ -92,8 +91,8 @@ export default defineComponent({
       type: Object as PropType<Group|null>,
       default: undefined,
     },
-    groupStore: {
-      type: Object as PropType<GroupStore>,
+    store: {
+      type: Object as PropType<GlobalStore>,
       required: true,
     },
   },
@@ -165,18 +164,18 @@ export default defineComponent({
     // Add a group or update and delete the selected group.
     async function handleOk() {
       if (modalState.value === ModalState.ADD) {
-        if (!props.groupStore.instanceStore.selected.value) return;
+        if (!props.store.instance.selected.value) return;
 
         try {
-          const group = await props.groupStore.newGroup({
-            instanceId: props.groupStore.instanceStore.selected.value.id,
+          const group = await props.store.group.newGroup({
+            instanceId: props.store.instance.selected.value.id,
             name: input.value,
           });
 
           update(group);
           toggle();
         } catch (e) {
-          errorStore.setCurrentError(e?.message ?? e);
+          props.store.error.setCurrentError(e?.message ?? e);
         }
       }
 
@@ -184,7 +183,7 @@ export default defineComponent({
         if (!props.modelValue) return;
 
         try {
-          const group = await props.groupStore.updateGroup({
+          const group = await props.store.group.updateGroup({
             id: props.modelValue.id,
             name: input.value,
           });
@@ -192,7 +191,7 @@ export default defineComponent({
           update(group);
           toggle();
         } catch (e) {
-          errorStore.setCurrentError(e?.message ?? e);
+          props.store.error.setCurrentError(e?.message ?? e);
         }
       }
 
@@ -200,10 +199,10 @@ export default defineComponent({
         if (!props.modelValue) return;
 
         try {
-          await props.groupStore.deleteGroup(props.modelValue);
+          await props.store.group.deleteGroup(props.modelValue);
           update(null);
         } catch (e) {
-          errorStore.setCurrentError(e?.message ?? e);
+          props.store.error.setCurrentError(e?.message ?? e);
         } finally {
           toggle();
         }
@@ -218,7 +217,7 @@ export default defineComponent({
 
     return {
       ModalState,
-      options: props.groupStore.groups,
+      options: props.store.group.groups,
       modalTitle,
       modalClass,
       modalState,

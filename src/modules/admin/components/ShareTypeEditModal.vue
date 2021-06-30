@@ -29,8 +29,7 @@ import Rate from '@/utils/rate';
 import Money from '@/utils/money';
 
 // Stores
-import { ShareTypeStore } from '@/modules/admin/stores/shareType';
-import errorStore from '@/stores/error';
+import { GlobalStore } from '../stores/global';
 
 // Composables
 import { buildFormData } from '../composables/useShareTypeForm';
@@ -41,8 +40,8 @@ export default defineComponent({
     ShareTypeAddEditForm: defineAsyncComponent(() => import('./forms/ShareTypeAddEditForm.vue')),
   },
   props: {
-    shareTypeStore: {
-      type: Object as PropType<ShareTypeStore>,
+    store: {
+      type: Object as PropType<GlobalStore>,
       required: true,
     },
     shareType: {
@@ -84,14 +83,14 @@ export default defineComponent({
       loading.value = true;
 
       try {
-        await props.shareTypeStore.updateShareType({
+        await props.store.shareType.updateShareType({
           ...formData,
           dividendRate: Rate.fromStringOrDefault(formData.dividendRate).getRate(),
           withdrawalLimitCount: +formData.withdrawalLimitCount,
           withdrawalLimitFee: Money.fromStringOrDefault(formData.withdrawalLimitFee).getAmount(),
         });
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        props.store.error.setCurrentError(e?.message ?? e);
       } finally {
         loading.value = false;
       }

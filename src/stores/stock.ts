@@ -242,7 +242,7 @@ export function setup() {
     if (idx >= 0) {
       const storeInstances = (store.items[idx]?.stockInstances ?? []).map((x) => x.instanceId);
       const stockInstances = (stock?.stockInstances ?? []).map((x) => x.instanceId);
-      const wasUnlinked = !stockInstances.some((x) => storeInstances.includes(x));
+      const wasUnlinked = !storeInstances.every((x) => stockInstances.includes(x));
 
       const newStocks = store.items.filter((x) => x.id !== stock.id);
       if (wasUnlinked && store.instances.length > 0) {

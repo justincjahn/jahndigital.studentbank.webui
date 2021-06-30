@@ -8,7 +8,7 @@
           <suspense>
             <instance-selector
               v-model="selectedInstance"
-              :instance-store="instanceStore"
+              :store="globalStore"
             />
           </suspense>
         </template>
@@ -62,7 +62,7 @@
 
 <script lang="ts">
 import { BASE_URLS, SITE_NAME } from '@/constants';
-import { defineAsyncComponent, defineComponent, watchEffect, computed, provide } from 'vue';
+import { defineAsyncComponent, defineComponent, watchEffect, provide } from 'vue';
 import { useRouter } from 'vue-router';
 
 // Routes
@@ -77,11 +77,7 @@ import LoginRouteNames from '@/modules/admin/login/routeNames';
 import { info } from '@/services/auth';
 
 // Stores
-import routerStore from '@/stores/router';
-import errorStore from '@/stores/error';
-import userStore from '@/stores/user';
-import { setup as defineInstanceStore } from './stores/instance';
-import { setup as defineShareTypeStore } from './stores/shareType';
+import { setup as defineGlobalStore } from './stores/global';
 import * as symbols from './symbols';
 
 export default defineComponent({
@@ -93,50 +89,41 @@ export default defineComponent({
   setup() {
     const router = useRouter();
 
-    // Create and provide the instance store to the child routes
-    const instanceStore = defineInstanceStore();
-    provide(symbols.INSTANCE_STORE_SYMBOL, instanceStore);
-
-    // Create and provide the share type store to the child routes
-    const shareTypeStore = defineShareTypeStore(instanceStore);
-    provide(symbols.SHARE_TYPE_STORE_SYMBOL, shareTypeStore);
-
-    const selectedInstance = computed<Instance|null>({
-      get: () => instanceStore.selected.value,
-      set: (item) => (instanceStore.selected.value !== item) && instanceStore.setSelected(item),
-    });
+    // Define a new GlobalStore for child pages to use
+    const globalStore = defineGlobalStore();
+    provide(symbols.GLOBAL_STORE, globalStore);
 
     // Force users to the login page if they aren't authenticated, also logs off students
     watchEffect(() => {
-      if (userStore.isAnonymous.value) {
+      if (globalStore.user.isAnonymous.value) {
         router.push({ name: LoginRouteNames.index });
-      } else if (userStore.isStudent.value) {
+      } else if (globalStore.user.isStudent.value) {
         window.location.href = `/${BASE_URLS.STUDENT}`;
-      } else if (!userStore.hasInfo.value) {
+      } else if (!globalStore.user.hasInfo.value) {
         info();
       }
     });
 
     // Watch for when the user authenticates and fetch instances if there are none
     watchEffect(() => {
-      if (userStore.isAuthenticated.value && !instanceStore.selected.value) {
-        instanceStore.fetchInstances();
+      if (globalStore.user.isAuthenticated.value && !globalStore.instance.selected.value) {
+        globalStore.instance.fetchInstances();
       }
     });
 
     return {
       SITE_NAME,
+      globalStore,
       groupsIndex: GroupRouteNames.index,
       studentsIndex: StudentRouteNames.index,
       purchasesIndex: PurchasesRouteNames.index,
       stocksIndex: StocksRouteNames.index,
       settingsIndex: SettingsRouteNames.index,
-      selectedInstance,
-      instanceStore,
-      error: errorStore.error,
-      setCurrentError: errorStore.setCurrentError,
-      loading: routerStore.loading,
-      isAuthenticated: userStore.isAuthenticated,
+      selectedInstance: globalStore.instance.selected,
+      error: globalStore.error.error,
+      setCurrentError: globalStore.error.setCurrentError,
+      loading: globalStore.router.loading,
+      isAuthenticated: globalStore.user.isAuthenticated,
     };
   },
 });

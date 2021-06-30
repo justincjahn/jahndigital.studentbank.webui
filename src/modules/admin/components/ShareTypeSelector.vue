@@ -44,7 +44,7 @@
   <suspense>
     <add-link-modal
       :show="showAddLink"
-      :share-type-store="shareTypeStore"
+      :store="store"
       @ok="toggleAddLinkModal"
     />
   </suspense>
@@ -52,7 +52,7 @@
   <suspense>
     <remove-unlink-modal
       :show="showRemoveLink"
-      :share-type-store="shareTypeStore"
+      :store="store"
       @ok="toggleRemoveLinkModal"
     />
   </suspense>
@@ -60,7 +60,7 @@
   <suspense>
     <edit-modal
       :show="showEdit"
-      :share-type-store="shareTypeStore"
+      :store="store"
       :share-type="modelValue"
       @ok="toggleEditModal"
     />
@@ -74,7 +74,7 @@ import { defineComponent, defineAsyncComponent, ref, PropType } from 'vue';
 import BaseSelect, { Search } from '@/components/BaseSelect.vue';
 
 // Stores
-import { ShareTypeStore } from '../stores/shareType';
+import { GlobalStore } from '../stores/global';
 
 /**
  * A component that allows users to select a Share Type linked to the currently
@@ -93,8 +93,8 @@ export default defineComponent({
       type: Object as PropType<ShareType|null>,
       default: undefined,
     },
-    shareTypeStore: {
-      type: Object as PropType<ShareTypeStore>,
+    store: {
+      type: Object as PropType<GlobalStore>,
       required: true,
     },
   },
@@ -138,7 +138,7 @@ export default defineComponent({
     function toggleRemoveLinkModal() { showRemoveLink.value = !showRemoveLink.value; }
 
     return {
-      options: props.shareTypeStore.shareTypes,
+      options: props.store.shareType.shareTypes,
       update,
       value,
       showAddLink,

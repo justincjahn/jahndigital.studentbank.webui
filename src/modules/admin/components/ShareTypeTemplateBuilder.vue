@@ -7,7 +7,7 @@
     >
       <share-type-selector
         v-model="item.shareType"
-        :share-type-store="shareTypeStore"
+        :store="store"
       />
 
       <base-currency-input
@@ -32,27 +32,23 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
-
-// Components
-import BaseCurrencyInput from '@/components/BaseCurrencyInput.vue';
-import ShareTypeSelector from '@/modules/admin/components/ShareTypeSelector.vue';
+import { defineComponent, defineAsyncComponent, PropType } from 'vue';
 
 // Stores
-import { ShareTypeStore } from '@/modules/admin/stores/shareType';
+import { GlobalStore } from '../stores/global';
 
 export default defineComponent({
   components: {
-    ShareTypeSelector,
-    BaseCurrencyInput,
+    BaseCurrencyInput: defineAsyncComponent(() => import('@/components/BaseCurrencyInput.vue')),
+    ShareTypeSelector: defineAsyncComponent(() => import('./ShareTypeSelector.vue')),
   },
   props: {
     modelValue: {
       type: Object as PropType<ShareTypeTemplate[]>,
       required: true,
     },
-    shareTypeStore: {
-      type: Object as PropType<ShareTypeStore>,
+    store: {
+      type: Object as PropType<GlobalStore>,
       required: true,
     },
   },

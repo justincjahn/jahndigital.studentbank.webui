@@ -40,6 +40,7 @@
 
           <stock-list
             :selected="selected"
+            :store="globalStore"
             @stock-dblclick="handleStockDoubleClick"
             @stock-click="handleStockClick"
           />
@@ -55,6 +56,7 @@
           <stock-list
             :selected="selected"
             :available="true"
+            :store="globalStore"
             @stock-dblclick="handleStockDoubleClick"
             @stock-click="handleStockClick"
           />
@@ -89,16 +91,12 @@
 </template>
 
 <script lang="ts">
-import { defineAsyncComponent, defineComponent, ref, computed, onUnmounted } from 'vue';
+import { defineAsyncComponent, defineComponent, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
-
-// Stores
-import errorStore from '@/stores/error';
-import { setup as defineStockStore } from '@/stores/stock';
 
 // Utils
 import injectStrict from '@/utils/injectStrict';
-import { INSTANCE_STORE_SYMBOL } from '../../symbols';
+import { GLOBAL_STORE } from '../../symbols';
 
 // Components
 import StockList from '../components/StockList.vue';
@@ -117,16 +115,15 @@ export default defineComponent({
   },
   setup() {
     const router = useRouter();
-    const instanceStore = injectStrict(INSTANCE_STORE_SYMBOL);
-    const stockStore = defineStockStore();
+    const globalStore = injectStrict(GLOBAL_STORE);
     const showNewStockModal = ref(false);
     const newStockPosting = ref(false);
     const updateStockPosting = ref(false);
 
     const isLinked = computed(() => {
-      if (!stockStore.selected.value) return false;
-      const instances = (stockStore.selected.value?.stockInstances ?? []).map((x) => x.instanceId);
-      const instanceId = instanceStore.selected.value?.id ?? -1;
+      if (!globalStore.stock.selected.value) return false;
+      const instances = (globalStore.stock.selected.value?.stockInstances ?? []).map((x) => x.instanceId);
+      const instanceId = globalStore.instance.selected.value?.id ?? -1;
       return instances.includes(instanceId);
     });
 
@@ -134,10 +131,10 @@ export default defineComponent({
      * Toggle the selected stock on click.
      */
     function handleStockClick(stock: Stock) {
-      if (stockStore.selected.value === stock) {
-        stockStore.selected.value = null;
+      if (globalStore.stock.selected.value === stock) {
+        globalStore.stock.selected.value = null;
       } else {
-        stockStore.selected.value = stock;
+        globalStore.stock.selected.value = stock;
       }
     }
 
@@ -166,10 +163,10 @@ export default defineComponent({
     async function handleNewStockModalOk(req: NewStockRequest) {
       newStockPosting.value = true;
       try {
-        await stockStore.create(req);
+        await globalStore.stock.create(req);
         toggleNewStockModal();
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        globalStore.error.setCurrentError(e?.message ?? e);
       } finally {
         newStockPosting.value = false;
       }
@@ -181,9 +178,9 @@ export default defineComponent({
     async function handleUpdateStock(req: UpdateStockRequest) {
       updateStockPosting.value = true;
       try {
-        await stockStore.update(req);
+        await globalStore.stock.update(req);
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        globalStore.error.setCurrentError(e?.message ?? e);
       } finally {
         updateStockPosting.value = false;
       }
@@ -193,18 +190,18 @@ export default defineComponent({
      * Attempt to link the currently selected stock to the currently selected instance.
      */
     async function handleLink() {
-      if (!instanceStore.selected.value) return;
-      if (!stockStore.selected.value) return;
+      if (!globalStore.instance.selected.value) return;
+      if (!globalStore.stock.selected.value) return;
 
       try {
-        await stockStore.link({
-          stockId: stockStore.selected.value.id,
-          instanceId: instanceStore.selected.value.id,
+        await globalStore.stock.link({
+          stockId: globalStore.stock.selected.value.id,
+          instanceId: globalStore.instance.selected.value.id,
         });
 
-        stockStore.selected.value = null;
+        globalStore.stock.selected.value = null;
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        globalStore.error.setCurrentError(e?.message ?? e);
       }
     }
 
@@ -212,18 +209,18 @@ export default defineComponent({
      * Attempt to unlink the currently selected stock from the currently selected instance.
      */
     async function handleUnlink() {
-      if (!instanceStore.selected.value) return;
-      if (!stockStore.selected.value) return;
+      if (!globalStore.instance.selected.value) return;
+      if (!globalStore.stock.selected.value) return;
 
       try {
-        await stockStore.unlink({
-          stockId: stockStore.selected.value.id,
-          instanceId: instanceStore.selected.value.id,
+        await globalStore.stock.unlink({
+          stockId: globalStore.stock.selected.value.id,
+          instanceId: globalStore.instance.selected.value.id,
         });
 
-        stockStore.selected.value = null;
+        globalStore.stock.selected.value = null;
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        globalStore.error.setCurrentError(e?.message ?? e);
       }
     }
 
@@ -231,24 +228,22 @@ export default defineComponent({
      * Attempt to soft-delete the currently selected stock.
      */
     async function handleDelete() {
-      if (!stockStore.selected.value) return;
+      if (!globalStore.stock.selected.value) return;
 
       try {
-        await stockStore.remove(stockStore.selected.value);
-        stockStore.selected.value = null;
+        await globalStore.stock.remove(globalStore.stock.selected.value);
+        globalStore.stock.selected.value = null;
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        globalStore.error.setCurrentError(e?.message ?? e);
       }
     }
-
-    // When the page is unmounted, tell the StockStore to unsubscribe
-    onUnmounted(() => stockStore.dispose());
 
     return {
       showNewStockModal,
       newStockPosting,
       updateStockPosting,
-      selected: stockStore.selected,
+      globalStore,
+      selected: globalStore.stock.selected,
       isLinked,
       toggleNewStockModal,
       handleNewStockModalOk,

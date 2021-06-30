@@ -1,7 +1,7 @@
 <template>
   <div
     class="student-list"
-    :class="{ 'student-list--loading': studentStore.loading.value }"
+    :class="{ 'student-list--loading': loading }"
   >
     <table class="student-list__list selectable">
       <thead>
@@ -32,7 +32,7 @@
         </tr>
         <template v-else>
           <tr
-            v-for="student in studentStore.students.value"
+            v-for="student in students"
             :key="student.id"
             :class="{ 'selected': selection.hasStudent(student) }"
             class="student-list__student"
@@ -55,18 +55,18 @@
       </tbody>
     </table>
     <div
-      v-if="studentStore.pageInfo.value != null"
+      v-if="totalPages > 1"
       class="pagination-buttons"
     >
       <button
-        :disabled="!studentStore.pageInfo.value.hasPreviousPage"
-        @click.passive="studentStore.fetchPrevious"
+        :disabled="!hasPrevious"
+        @click.passive="fetchPrevious"
       >
         Previous
       </button>
       <button
-        :disabled="!studentStore.pageInfo.value.hasNextPage"
-        @click.passive="studentStore.fetchNext"
+        :disabled="!hasNext"
+        @click.passive="fetchNext"
       >
         Next
       </button>
@@ -85,21 +85,15 @@ import StudentRouteNames from '@/modules/admin/students/routeNames';
 import selection from '@/services/StudentSelectionService';
 
 // Stores
-import { StudentStore } from '@/modules/admin/stores/student';
-import { GroupStore } from '../stores/group';
+import { GlobalStore } from '../../stores/global';
 
 const delay = 300;
 let timer: number|null = null;
 
 export default defineComponent({
   props: {
-    groupStore: {
-      type: Object as PropType<GroupStore>,
-      required: true,
-    },
-
-    studentStore: {
-      type: Object as PropType<StudentStore>,
+    store: {
+      type: Object as PropType<GlobalStore>,
       required: true,
     },
   },
@@ -145,29 +139,36 @@ export default defineComponent({
 
     // When the group changes, fetch students for the new group
     watchEffect(() => {
-      if (props.groupStore.selected.value !== null) {
-        props.studentStore.fetch({ groupId: props.groupStore.selected.value.id });
+      if (props.store.group.selected.value !== null) {
+        props.store.student.fetch({ groupId: props.store.group.selected.value.id });
       } else {
-        props.studentStore.clear();
+        props.store.student.clear();
       }
     });
 
     // When the instance changes, clear the selection
     watchEffect(() => {
-      if (props.groupStore.instanceStore.selected.value !== null) {
-        if (props.groupStore.instanceStore.selected.value.id !== prevInstance.value?.id ?? true) {
-          prevInstance.value = props.groupStore.instanceStore.selected.value;
+      if (props.store.instance.selected.value !== null) {
+        if (props.store.instance.selected.value.id !== prevInstance.value?.id ?? true) {
+          prevInstance.value = props.store.instance.selected.value;
           selection.clear();
         }
       }
     });
 
     return {
-      selectedGroup: props.groupStore.selected,
+      selectedGroup: props.store.group.selected,
       loginDateFormat,
       registrationStatus,
       studentClick,
       selection,
+      loading: props.store.student.loading,
+      students: props.store.student.students,
+      totalPages: props.store.student.totalPages,
+      hasPrevious: props.store.student.hasPreviousPage,
+      hasNext: props.store.student.hasNextPage,
+      fetchPrevious: props.store.student.fetchPrevious,
+      fetchNext: props.store.student.fetchNext,
     };
   },
 });

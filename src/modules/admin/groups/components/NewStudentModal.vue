@@ -87,7 +87,7 @@
 
         <share-type-template-builder
           v-model="shareTemplate"
-          :share-type-store="shareTypeStore"
+          :store="store"
         />
       </div>
     </template>
@@ -115,11 +115,7 @@ import generatePassword from '@/utils/generatePassword';
 import Money from '@/utils/money';
 
 // Store
-import errorStore from '@/stores/error';
-import { setup as defineStudentStore } from '@/modules/admin/stores/student';
-import { setup as defineShareStore } from '@/modules/admin/stores/share';
-import { setup as defineShareTypeStore } from '@/modules/admin/stores/shareType';
-import { GroupStore } from '../stores/group';
+import { GlobalStore } from '../../stores/global';
 
 interface NewStudentForm {
   accountNumber: string;
@@ -140,8 +136,8 @@ export default defineComponent({
       type: Boolean,
       required: true,
     },
-    groupStore: {
-      type: Object as PropType<GroupStore>,
+    store: {
+      type: Object as PropType<GlobalStore>,
       required: true,
     },
   },
@@ -150,20 +146,11 @@ export default defineComponent({
     'cancel',
   ],
   setup(props, { emit }) {
-    // Used to manage Share Types
-    const shareTypeStore = defineShareTypeStore(props.groupStore.instanceStore);
-
-    // Used to create new students
-    const studentStore = defineStudentStore();
-
-    // Used to create new shares on the student
-    const shareStore = defineShareStore(studentStore);
-
     // True when the modal is posting to the API
     const loading = ref(false);
 
     // Pass in the instanceStore so the validator can check for existing students
-    const validateAccount = validateAccountUnique({ instanceStore: props.groupStore.instanceStore });
+    const validateAccount = validateAccountUnique({ instanceStore: props.store.instance });
 
     // An array of new Share Types to create with initial values.
     const shareTemplate = ref<ShareTypeTemplate[]>([]);
@@ -206,11 +193,11 @@ export default defineComponent({
       const newValues: NewStudentRequest = {
         ...filtered,
         password: generatePassword(),
-        groupId: props.groupStore.selected.value?.id ?? -1,
+        groupId: props.store.group.selected.value?.id ?? -1,
       };
 
       try {
-        const student = await studentStore.newStudent(newValues);
+        const student = await props.store.student.newStudent(newValues);
 
         const sharePromises: Promise<Share>[] = [];
         for (let i = 0; i < shareTemplate.value.length; i += 1) {
@@ -218,7 +205,7 @@ export default defineComponent({
           if (tpl === null || tpl.shareType === null) return;
 
           sharePromises.push(
-            shareStore.newShare({
+            props.store.share.newShare({
               shareTypeId: tpl.shareType.id,
               studentId: student.id,
             }),
@@ -240,7 +227,7 @@ export default defineComponent({
 
           const amount = Money.fromNumber(+tpl.initialDeposit);
 
-          transactions.push(shareStore.postTransaction({
+          transactions.push(props.store.share.postTransaction({
             shareId: share.id,
             amount: amount.getAmount(),
             comment: 'Initial Deposit',
@@ -250,7 +237,7 @@ export default defineComponent({
         await Promise.all(transactions);
         emit('ok', student);
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        props.store.error.setCurrentError(e?.message ?? e);
       } finally {
         loading.value = false;
       }
@@ -266,7 +253,7 @@ export default defineComponent({
     watchEffect(() => {
       if (props.show) {
         shareTemplate.value = [];
-        shareTypeStore.fetch();
+        props.store.shareType.fetch();
         resetForm();
       }
     });
@@ -281,7 +268,6 @@ export default defineComponent({
       shareTemplate,
       validateAmount: validateAmountNotNegative,
       loading,
-      shareTypeStore,
     };
   },
 });

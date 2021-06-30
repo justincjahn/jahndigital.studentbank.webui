@@ -1,7 +1,5 @@
 import { InjectionKey } from 'vue';
-import { InstanceStore } from './stores/instance';
-import { ShareTypeStore } from './stores/shareType';
+import { GlobalStore } from './stores/global';
 
-export const INSTANCE_STORE_SYMBOL: InjectionKey<InstanceStore> = Symbol('instance-store');
-
-export const SHARE_TYPE_STORE_SYMBOL: InjectionKey<ShareTypeStore> = Symbol('share-type-store');
+// eslint-disable-next-line import/prefer-default-export
+export const GLOBAL_STORE: InjectionKey<GlobalStore> = Symbol('global-store');

@@ -18,18 +18,16 @@ export function setup() {
     loading: false,
   });
 
-  const selected = computed(() => store.selected);
+  const selected = computed({
+    get: () => store.selected,
+    set: (value: Instance | null) => {
+      store.selected = value;
+    },
+  });
 
   const instances = computed(() => instanceCache.instances);
 
   const loading = computed(() => store.loading);
-
-  /**
-   * Sets the selected instance.
-   *
-   * @param item
-   */
-  function setSelected(item: Instance | null) { store.selected = item; }
 
   /**
    * Fetch instances from the server.
@@ -49,7 +47,7 @@ export function setup() {
       const sid = store.selected?.id ?? -1;
       const hasSelected = instanceCache.instances.findIndex((x) => x.id === sid);
       if (hasSelected <= 0) {
-        setSelected(instanceCache.instances[active > -1 ? active : 0]);
+        selected.value = instanceCache.instances[active > -1 ? active : 0];
       }
     } finally {
       store.loading = false;
@@ -113,7 +111,6 @@ export function setup() {
     selected,
     instances,
     loading,
-    setSelected,
     fetchInstances: fetch,
     newInstance,
     updateInstance,

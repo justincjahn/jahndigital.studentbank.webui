@@ -3,6 +3,7 @@
     <student-selector
       class="student-selector--fixed-width"
       :model-value="selected"
+      :store="globalStore"
       @update:modelValue="handleSelection"
     />
   </suspense>
@@ -72,12 +73,12 @@
   </section>
 
   <div class="student-details">
-    <router-view v-if="studentStore.selected.value !== null" />
+    <router-view v-if="selected !== null" />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, computed, defineAsyncComponent, provide } from 'vue';
+import { defineComponent, onMounted, computed, defineAsyncComponent } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { Field, useForm } from 'vee-validate';
 
@@ -86,17 +87,10 @@ import injectStrict from '@/utils/injectStrict';
 import { validateAccountUnique, validateEmail, validateName } from '@/utils/validators';
 
 // Routes
-// eslint-disable-next-line import/no-cycle
 import StudentRouteNames from '@/modules/admin/students/routeNames';
 
-// Stores
-import errorStore from '@/stores/error';
-import { setup as defineStudentStore } from '../stores/student';
-
 // Symbols
-// eslint-disable-next-line import/order
-import { INSTANCE_STORE_SYMBOL } from '@/modules/admin/symbols';
-import { STUDENT_STORE_SYMBOL } from './symbols';
+import { GLOBAL_STORE } from '../symbols';
 
 /**
  * Handles high-level selection of students and routing to sub-routes.
@@ -109,12 +103,9 @@ export default defineComponent({
   setup() {
     const router = useRouter();
     const route = useRoute();
-    const instanceStore = injectStrict(INSTANCE_STORE_SYMBOL);
+    const globalStore = injectStrict(GLOBAL_STORE);
 
-    const studentStore = defineStudentStore();
-    provide(STUDENT_STORE_SYMBOL, studentStore);
-
-    const validateAccount = validateAccountUnique({ studentStore });
+    const validateAccount = validateAccountUnique({ studentStore: globalStore.student });
 
     const form = useForm({
       validationSchema: {
@@ -129,13 +120,13 @@ export default defineComponent({
      * Fire off an update when the user submits the form.
      */
     const handleSubmit = form.handleSubmit(async (values) => {
-      if (!studentStore.selected.value) return;
-      const merged = { ...studentStore.selected.value, ...values } as Student;
+      if (!globalStore.student.selected.value) return;
+      const merged = { ...globalStore.student.selected.value, ...values } as Student;
 
       try {
-        await studentStore.updateStudent(merged);
+        await globalStore.student.updateStudent(merged);
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        globalStore.error.setCurrentError(e?.message ?? e);
       }
     });
 
@@ -161,8 +152,8 @@ export default defineComponent({
         form.resetForm();
       }
 
-      if (studentStore.selected.value !== student) {
-        studentStore.setSelected(student);
+      if (globalStore.student.selected.value !== student) {
+        globalStore.student.setSelected(student);
       }
     }
 
@@ -193,13 +184,13 @@ export default defineComponent({
         );
 
         if (!Number.isNaN(studentId)) {
-          studentStore
+          globalStore.student
             .getById(studentId)
             .then((student) => {
-              studentStore.setSelected(student);
+              globalStore.student.setSelected(student);
             })
             .catch((error) => {
-              errorStore.setCurrentError(error?.message ?? error);
+              globalStore.error.setCurrentError(error?.message ?? error);
             });
         }
       }
@@ -209,14 +200,14 @@ export default defineComponent({
     const params = computed(() => route.params);
 
     return {
-      selected: studentStore.selected,
+      selected: globalStore.student.selected,
       StudentRouteNames,
-      studentStore,
+      globalStore,
       handleSelection,
       handleClear,
       errors: form.errors,
       handleSubmit,
-      selectedInstance: instanceStore.selected,
+      selectedInstance: globalStore.instance.selected,
       params,
     };
   },

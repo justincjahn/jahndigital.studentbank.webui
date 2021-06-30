@@ -61,8 +61,7 @@ import LoadingLabel from '@/components/LoadingLabel.vue';
 import ShareTypeMultiselect from '@/modules/admin/components/ShareTypeMultiselector.vue';
 
 // Store
-import errorStore from '@/stores/error';
-import { setup as defineShareTypeStore, ShareTypeStore } from '../stores/shareType';
+import { GlobalStore } from '../stores/global';
 
 export default defineComponent({
   components: {
@@ -75,8 +74,8 @@ export default defineComponent({
       type: Boolean,
       required: true,
     },
-    shareTypeStore: {
-      type: Object as PropType<ShareTypeStore>,
+    store: {
+      type: Object as PropType<GlobalStore>,
       required: true,
     },
   },
@@ -85,15 +84,12 @@ export default defineComponent({
     'cancel',
   ],
   setup(props, { emit }) {
-    // Use a bespoke ShareTypeStore for the available share types list so we don't muddle parent state.
-    const shareTypeStore = defineShareTypeStore();
-
     // An array of selected share types
     const linkedSelected = ref<ShareType[]>([]);
 
     // True if the unlink button should be enabled
     const canUnlink = computed(() => {
-      const loading = props.shareTypeStore.loading.value;
+      const loading = props.store.shareType.loading.value;
       if (loading) return false;
 
       if (linkedSelected.value.length === 0) return false;
@@ -104,11 +100,11 @@ export default defineComponent({
     const deletableSelected = ref<ShareType[]>([]);
 
     // Array of share types without any links.
-    const deletableShareTypes = computed(() => shareTypeStore.shareTypes.value.filter((x) => x.shareTypeInstances.length === 0));
+    const deletableShareTypes = computed(() => props.store.shareTypeAvailable.shareTypes.value.filter((x) => x.shareTypeInstances.length === 0));
 
     // True if the unlink button should be enabled
     const canDelete = computed(() => {
-      const loading = shareTypeStore.loading.value;
+      const loading = props.store.shareTypeAvailable.loading.value;
       if (loading) return false;
 
       if (deletableSelected.value.length === 0) return false;
@@ -124,20 +120,20 @@ export default defineComponent({
      * Fetch a list of available share types using our custom store.
      */
     async function fetchAvailableShareTypes() {
-      await shareTypeStore.fetch({ cache: false });
+      await props.store.shareTypeAvailable.fetch({ cache: false });
     }
 
     /**
      * Unlink the currently selected share types.
      */
     async function handleUnlink() {
-      const instanceId = props.shareTypeStore.instanceStore?.selected.value?.id ?? -1;
+      const instanceId = props.store.instance.selected.value?.id ?? -1;
       if (instanceId === -1) return;
 
       const errors = [] as string[];
       await Promise.all(linkedSelected.value.map(async (shareType) => {
         try {
-          await props.shareTypeStore.unlinkShareType({
+          await props.store.shareType.unlinkShareType({
             shareTypeId: shareType.id,
             instanceId,
           });
@@ -149,11 +145,11 @@ export default defineComponent({
       }));
 
       if (errors.length > 0) {
-        errorStore.setCurrentError(errors.join(', '));
+        props.store.error.setCurrentError(errors.join(', '));
       }
 
       // Refetch the share types from the API since we know they've changed on the server
-      await props.shareTypeStore.fetch({ cache: false });
+      await props.store.shareType.fetch({ cache: false });
       await fetchAvailableShareTypes();
     }
 
@@ -164,7 +160,7 @@ export default defineComponent({
       const errors = [] as string[];
       await Promise.all(deletableSelected.value.map(async (shareType) => {
         try {
-          await props.shareTypeStore.deleteShareType(shareType);
+          await props.store.shareType.deleteShareType(shareType);
         } catch (e) {
           errors.push(e?.message ?? e);
         } finally {
@@ -173,29 +169,29 @@ export default defineComponent({
       }));
 
       if (errors.length > 0) {
-        errorStore.setCurrentError(errors.join(', '));
+        props.store.error.setCurrentError(errors.join(', '));
       }
 
       // Refetch the share types from the API since we know they've changed on the server
-      await props.shareTypeStore.fetch({ cache: false });
+      await props.store.shareType.fetch({ cache: false });
       await fetchAvailableShareTypes();
     }
 
     watchEffect(() => {
       if (props.show) {
-        props.shareTypeStore.fetch();
+        props.store.shareType.fetch();
         fetchAvailableShareTypes();
       }
     });
 
     return {
       linkedSelected,
-      linkedShareTypes: props.shareTypeStore.shareTypes,
-      linkedLoading: props.shareTypeStore.loading,
+      linkedShareTypes: props.store.shareType.shareTypes,
+      linkedLoading: props.store.shareType.loading,
       canUnlink,
       deletableSelected,
       deletableShareTypes,
-      deletableLoading: shareTypeStore.loading,
+      deletableLoading: props.store.shareTypeAvailable.loading,
       canDelete,
       handleOk,
       handleUnlink,
