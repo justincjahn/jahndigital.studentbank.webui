@@ -152,7 +152,7 @@ export default defineComponent({
       symbol.value = '';
       amount.value = '0.00';
       amountError.value = '';
-      totalShares.value = '10000';
+      totalShares.value = '10000000';
     }
 
     watchEffect(() => {

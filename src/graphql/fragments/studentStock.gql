@@ -5,6 +5,7 @@ fragment StudentStockParts on StudentStock {
   stockId
   studentId
   sharesOwned
+  netContribution
   dateCreated
   dateLastActive
   stock {

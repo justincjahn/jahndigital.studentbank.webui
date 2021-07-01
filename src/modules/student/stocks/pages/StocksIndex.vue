@@ -24,6 +24,12 @@
         <th class="right">
           Total
         </th>
+        <th class="right">
+          Net Contributions
+        </th>
+        <th class="right">
+          Position
+        </th>
         <th></th>
       </tr>
     </thead>
@@ -61,6 +67,28 @@
                 currency: 'USD',
               }
             ).format(worth(stock))
+          }}
+        </td>
+        <td class="right">
+          {{
+            new Intl.NumberFormat(
+              'en-US',
+              {
+                style: 'currency',
+                currency: 'USD',
+              }
+            ).format(stock.netContribution)
+          }}
+        </td>
+        <td class="right">
+          {{
+            new Intl.NumberFormat(
+              'en-US',
+              {
+                style: 'currency',
+                currency: 'USD',
+              }
+            ).format(position(stock))
           }}
         </td>
         <td>
@@ -181,6 +209,10 @@ export default defineComponent({
       return studentStock.stock.currentValue * studentStock.sharesOwned;
     }
 
+    function position(studentStock: StudentStock) {
+      return worth(studentStock) - studentStock.netContribution;
+    }
+
     // Fetch held stocks when the student's ID changes or they login
     watch(() => userStore.id.value, async (newId, oldId) => {
       if (newId !== -1 && oldId !== newId) {
@@ -206,6 +238,7 @@ export default defineComponent({
       purchaseLoading,
       purchaseSelectedStock,
       worth,
+      position,
       handlePurchaseShow,
       handlePurchaseOk,
       handlePurchaseCancel,

@@ -159,7 +159,7 @@ export default defineComponent({
         return 'Quantity is required and cannot be zero.';
       }
 
-      if (!value.trim().match(/^[0-9]+$/)) {
+      if (!value.trim().match(/^-?[0-9]+$/)) {
         return 'Quantity must be a whole number.';
       }
 

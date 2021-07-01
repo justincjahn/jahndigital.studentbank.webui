@@ -113,6 +113,7 @@ interface StudentStock {
   id: number;
   stockId: number;
   studentId: number;
+  netContribution: number;
   sharesOwned: number;
   dateCreated: string;
   dateLastActive: string;

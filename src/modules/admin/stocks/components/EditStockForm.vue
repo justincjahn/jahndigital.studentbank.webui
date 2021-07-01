@@ -40,7 +40,7 @@
     </div>
 
     <div class="new-stock-modal--fieldset">
-      <label :for="amountId">Initial Value<span class="required">*</span></label>
+      <label :for="amountId">Value<span class="required">*</span></label>
       <base-currency-input
         :id="amountId"
         v-model="amount"
