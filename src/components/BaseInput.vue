@@ -137,11 +137,11 @@ export default defineComponent({
       emit('update:modelValue', value);
     }
 
-    watchEffect(() => {
+    watchEffect(async () => {
       const { modelValue, validator } = props;
       if (!validator) return;
 
-      const error = validator(modelValue.toString());
+      const error = await Promise.resolve(validator(modelValue.toString()));
       emit('update:error', error === true ? '' : error);
     });
 

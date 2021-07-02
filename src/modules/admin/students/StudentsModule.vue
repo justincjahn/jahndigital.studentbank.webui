@@ -1,90 +1,43 @@
 <template>
   <suspense>
-    <student-selector
-      class="student-selector--fixed-width"
-      :model-value="selected"
-      :store="globalStore"
-      @update:modelValue="handleSelection"
-    />
+    <div class="student__selector">
+      <student-selector
+        :model-value="selected"
+        :store="globalStore"
+        @update:modelValue="setSelectedStudent"
+      />
+    </div>
   </suspense>
 
-  <div class="student-info">
-    <form autocomplete="off" @submit.prevent="handleSubmit">
-      <div class="student-info--form-group">
-        <label for="student-info__account-number">Account Number</label>
-        <Field
-          id="student-info__account-number"
-          name="accountNumber"
-          type="text"
-        />
-        <p v-if="errors.accountNumber" class="error">
-          {{ errors.accountNumber }}
-        </p>
-      </div>
-      <div class="student-info--form-group">
-        <label for="student-info__email">Email</label>
-        <Field
-          id="student-info__email"
-          name="email"
-          type="text"
-        />
-        <p v-if="errors.email" class="error">
-          {{ errors.email }}
-        </p>
-      </div>
-      <div class="student-info--form-group">
-        <label for="student-info__first-name">First Name</label>
-        <Field
-          id="student-info__first-name"
-          name="firstName"
-          type="text"
-        />
-        <p v-if="errors.firstName" class="error">
-          {{ errors.firstName }}
-        </p>
-      </div>
-      <div class="student-info--form-group">
-        <label for="student-info__last-name">Last Name</label>
-        <Field
-          id="student-info__last-name"
-          name="lastName"
-          type="text"
-        />
-        <p v-if="errors.lastName" class="error">
-          {{ errors.lastName }}
-        </p>
-      </div>
-      <div class="student-info--submit-group">
-        <input type="submit" class="primary" value="Update" />
-      </div>
-    </form>
-  </div>
+  <div v-if="studentId" class="student__details">
+    <section class="sub-nav sub-nav--padded">
+      <router-link :to="{name: StudentRouteNames.transactions, params}">
+        Transactions
+      </router-link>
+      <router-link :to="{name: StudentRouteNames.stocks, params}">
+        Stocks
+      </router-link>
+      <router-link :to="{name: StudentRouteNames.purchases, params}">
+        Purchases
+      </router-link>
+      <router-link :to="{name: StudentRouteNames.profile, params}">
+        Profile
+      </router-link>
+    </section>
 
-  <section class="sub-nav sub-nav--padded">
-    <router-link :to="{name: StudentRouteNames.transactions, params}">
-      Transactions
-    </router-link>
-    <router-link :to="{name: StudentRouteNames.stocks, params}">
-      Stocks
-    </router-link>
-    <router-link :to="{name: StudentRouteNames.purchases, params}">
-      Purchases
-    </router-link>
-  </section>
-
-  <div class="student-details">
-    <router-view v-if="selected !== null" />
+    <router-view />
   </div>
+  <p v-else class="student__hint help-text">
+    Please use the search box above to find and select a student.
+  </p>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, computed, defineAsyncComponent } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { Field, useForm } from 'vee-validate';
+import { defineComponent, defineAsyncComponent, computed, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 // Utils
 import injectStrict from '@/utils/injectStrict';
-import { validateAccountUnique, validateEmail, validateName } from '@/utils/validators';
 
 // Routes
 import StudentRouteNames from '@/modules/admin/students/routeNames';
@@ -98,115 +51,70 @@ import { GLOBAL_STORE } from '../symbols';
 export default defineComponent({
   components: {
     StudentSelector: defineAsyncComponent(() => import(/* webpackChunkName: "admin-students" */ '@/modules/admin/components/StudentSelector.vue')),
-    Field,
   },
   setup() {
     const router = useRouter();
-    const route = useRoute();
     const globalStore = injectStrict(GLOBAL_STORE);
+    const params = computed(() => router.currentRoute.value.params);
 
-    const validateAccount = validateAccountUnique({ studentStore: globalStore.student });
+    const studentId = computed(() => {
+      if (router.currentRoute.value.params.studentId) {
+        const id = parseInt(
+          Array.isArray(router.currentRoute.value.params.studentId)
+            ? router.currentRoute.value.params.studentId[0]
+            : router.currentRoute.value.params.studentId,
+          10,
+        );
 
-    const form = useForm({
-      validationSchema: {
-        accountNumber: validateAccount,
-        email: validateEmail,
-        firstName: validateName,
-        lastName: validateName,
-      },
-    });
-
-    /**
-     * Fire off an update when the user submits the form.
-     */
-    const handleSubmit = form.handleSubmit(async (values) => {
-      if (!globalStore.student.selected.value) return;
-      const merged = { ...globalStore.student.selected.value, ...values } as Student;
-
-      try {
-        await globalStore.student.updateStudent(merged);
-      } catch (e) {
-        globalStore.error.setCurrentError(e?.message ?? e);
+        if (Number.isNaN(id)) return undefined;
+        return id;
       }
+
+      return undefined;
     });
 
-    /**
-     * Set the selected student, update the route, and update the form.
-     */
     function setSelectedStudent(student: Student|null) {
       if (student !== null) {
         router.replace({
           name: StudentRouteNames.transactions,
           params: {
-            ...route.params,
+            ...params.value,
             studentId: student.id,
           },
         });
-
-        form.setValues(student);
       } else {
         router.replace({
           name: StudentRouteNames.index,
         });
-
-        form.resetForm();
       }
 
       if (globalStore.student.selected.value !== student) {
-        globalStore.student.setSelected(student);
+        globalStore.student.selected.value = student;
       }
     }
 
-    /**
-     * Handle when the user makes a selection in the search widget.
-     */
-    function handleSelection(student: Student) {
-      setSelectedStudent(student);
-    }
+    watch(() => studentId.value, async (newValue, oldValue) => {
+      if (newValue === oldValue) return;
 
-    /**
-     * Handle clearing the student search box.
-     */
-    function handleClear() {
-      setSelectedStudent(null);
-    }
-
-    /**
-     * Rehydrate the selectedStudent or fetch data using the route params.
-     */
-    onMounted(() => {
-      if (route.params.studentId) {
-        const studentId = parseInt(
-          Array.isArray(route.params.studentId)
-            ? route.params.studentId[0]
-            : route.params.studentId,
-          10,
-        );
-
-        if (!Number.isNaN(studentId)) {
-          globalStore.student
-            .getById(studentId)
-            .then((student) => {
-              globalStore.student.setSelected(student);
-            })
-            .catch((error) => {
-              globalStore.error.setCurrentError(error?.message ?? error);
-            });
-        }
+      if (!newValue) {
+        globalStore.student.setSelected(null);
+        return;
       }
-    });
 
-    // Make params reactive so our links work
-    const params = computed(() => route.params);
+      try {
+        const student = await globalStore.student.getById(newValue);
+        globalStore.student.selected.value = student;
+      } catch {
+        globalStore.error.setCurrentError('Unable to fetch student!');
+      }
+    }, { immediate: true });
 
     return {
+      studentId,
       selected: globalStore.student.selected,
       StudentRouteNames,
       globalStore,
-      handleSelection,
-      handleClear,
-      errors: form.errors,
-      handleSubmit,
+      setSelectedStudent,
       selectedInstance: globalStore.instance.selected,
       params,
     };
@@ -215,66 +123,18 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-  .student-info {
-    margin-top: 1.5em;
-    padding: 1em;
-    background-color: colorStep(secondary);
+.student {
+  &__selector {
+    padding: 2em;
+    background-color: colorStep(primary, $step: 2);
 
-    & form {
-      display: flex;
-      flex-direction: column;
-      flex-wrap: wrap;
-      gap: 1.5em;
-    }
-
-    & input {
-      width: 100%;
-    }
-
-    &--submit-group {
-      flex-basis: 100%;
-      text-align: center;
-
-      & input[type=submit].primary {
-        margin: 0;
-      }
-    }
-
-    & p.error {
-      text-align: right;
-      font-size: 0.9em;
-      color: map.get($theme, button-destructive, color);
+    .student-selector {
+      max-width: 30em;
     }
   }
 
-  .student-details {
-    padding: 0 1.5em;
+  &__hint.help-text {
+    margin: 2em;
   }
-
-  div.student-selector--fixed-width {
-    width: clamp(25rem, 35vw, 35rem);
-  }
-
-  @media only screen and (min-width: 760px) {
-    .student-info {
-      & form {
-        flex-direction: row;
-      }
-
-      & label {
-        display: inline-block;
-        width: 150px;
-        text-align: right;
-        padding-right: 0.5em;
-      }
-
-      & input[type=text] {
-        width: clamp(200px, 25vw, 400px);
-      }
-
-      & input[type=submit] {
-        width: inherit;
-      }
-    }
-  }
+}
 </style>

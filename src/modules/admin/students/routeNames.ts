@@ -3,4 +3,5 @@ export default {
   transactions: 'students-transactions',
   stocks: 'students-stocks',
   purchases: 'students-purchases',
+  profile: 'students-profile',
 };

@@ -28,7 +28,12 @@ export function setup(studentStore: StudentStore) {
 
   const totalCount = computed(() => store.totalCount);
 
-  const selected = computed(() => store.selected);
+  const selected = computed({
+    get: () => store.selected,
+    set: (value) => {
+      store.selected = value;
+    },
+  });
 
   const hasNextPage = computed(() => store.pageInfo?.hasNextPage ?? false);
 

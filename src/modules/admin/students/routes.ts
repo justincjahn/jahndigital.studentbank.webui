@@ -12,19 +12,25 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'transactions',
         name: RouteNames.transactions,
-        component: () => import(/* webpackChunkName: "admin-students" */ '@/modules/admin/students/pages/StudentsTransactions.vue'),
+        component: () => import(/* webpackChunkName: "admin-students" */ './pages/StudentsTransactions.vue'),
       },
 
       {
         path: 'stocks',
         name: RouteNames.stocks,
-        component: () => import(/* webpackChunkName: "admin-students" */ '@/modules/admin/students/pages/StudentsStocks.vue'),
+        component: () => import(/* webpackChunkName: "admin-students" */ './pages/StudentsStocks.vue'),
       },
 
       {
         path: 'purchases',
         name: RouteNames.purchases,
-        component: () => import(/* webpackChunkName: "admin-students" */ '@/modules/admin/students/pages/StudentsPurchases.vue'),
+        component: () => import(/* webpackChunkName: "admin-students" */ './pages/StudentsPurchases.vue'),
+      },
+
+      {
+        path: 'profile',
+        name: RouteNames.profile,
+        component: () => import(/* webpackChunkName: "admin-students" */ './pages/StudentsProfile.vue'),
       },
     ],
   },

@@ -1,4 +1,9 @@
 <template>
-  <h1>Settings</h1>
-  <router-view />
+  <h2>Settings Coming Soon...</h2>
 </template>
+
+<style scoped>
+h2 {
+  margin: 2em;
+}
+</style>

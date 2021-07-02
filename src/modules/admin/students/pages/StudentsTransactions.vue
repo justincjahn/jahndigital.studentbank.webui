@@ -2,12 +2,11 @@
   <div class="student-transactions">
     <div class="student-transactions__sidebar">
       <share-selector
-        v-model="selectedShare"
-        :shares="studentShares"
+        v-model="selected"
+        :shares="shares"
       />
 
       <transaction-poster
-        :share="selectedShare"
         :loading="isPosting"
         @submit="postTransaction"
       />
@@ -22,17 +21,14 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue';
 
-// Components
-import ShareSelector from '@/components/ShareSelector.vue';
-import TransactionList from '@/modules/admin/students/components/TransactionList.vue';
-import TransactionPoster from '@/components/TransactionPoster.vue';
-
 // Utils
 import Money from '@/utils/money';
 import injectStrict from '@/utils/injectStrict';
 
-// Stores
-import errorStore from '@/stores/error';
+// Components
+import ShareSelector from '@/components/ShareSelector.vue';
+import TransactionList from '../components/TransactionList.vue';
+import TransactionPoster from '../components/TransactionPoster.vue';
 
 // Symbols
 import { GLOBAL_STORE } from '../../symbols';
@@ -47,23 +43,11 @@ export default defineComponent({
     const globalStore = injectStrict(GLOBAL_STORE);
     const isPosting = ref<boolean>(false);
 
-    const selectedShare = computed<Share|null>({
-      get: () => globalStore.share.selected.value,
-      set: (item) => globalStore.share.setSelected(item),
-    });
-
-    const studentShares = computed(() => {
+    const shares = computed(() => {
       if (!globalStore.student.selected.value) return [] as Share[];
       return globalStore.student.selected.value.shares ?? [] as Share[];
     });
 
-    /**
-     * Attempt to post the transaction from the TransactionPoster component and
-     * update the selected student's data from the GQL server.
-     *
-     * @TODO: Find a way to tell all of the components the share's new balance without
-     * a full query.
-     */
     async function postTransaction(amount: Money, comment?: string) {
       isPosting.value = true;
 
@@ -78,7 +62,7 @@ export default defineComponent({
 
         await globalStore.student.refreshSelected();
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        globalStore.error.setCurrentError(e?.message ?? e);
       } finally {
         isPosting.value = false;
       }
@@ -86,10 +70,10 @@ export default defineComponent({
 
     return {
       globalStore,
-      selectedShare,
-      studentShares,
-      postTransaction,
       isPosting,
+      shares,
+      selected: globalStore.share.selected,
+      postTransaction,
     };
   },
 });
@@ -97,24 +81,29 @@ export default defineComponent({
 
 <style lang="scss">
 .student-transactions {
-  width: 80%;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin: 0px auto;
-
-  &__main, &__sidebar {
-    width: 100%;
-  }
+  gap: 1em;
+  padding: 0 2em;
 
   &__sidebar {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    flex-basis: 30%;
+    gap: 1em;
+  }
+
+  &__main {
+    flex-basis: 70%;
+  }
+
+  .transaction-poster {
+    @include round-border;
+    background-color: colorStep(secondary, $step: 0, $darken: false);
+    padding: 1em;
   }
 
   @media screen and (min-width: 900px) {
-    width: 100%;
     flex-direction: row;
 
     &__sidebar {

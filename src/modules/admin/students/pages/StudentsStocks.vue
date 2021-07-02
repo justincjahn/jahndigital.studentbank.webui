@@ -1,13 +1,9 @@
 <template>
-  Hello, World!
+  <h2>Stock Management Coming Soon...</h2>
 </template>
 
-<script lang="ts">
-export default {
-
-};
-</script>
-
-<style lang="scss">
-
+<style scoped>
+h2 {
+  margin: 2em;
+}
 </style>

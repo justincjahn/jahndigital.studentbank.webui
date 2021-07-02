@@ -30,7 +30,12 @@ export function setup() {
   const students = computed(() => store.students);
 
   // GETs the selected student
-  const selected = computed(() => store.selected);
+  const selected = computed({
+    get: () => store.selected,
+    set: (value) => {
+      store.selected = value;
+    },
+  });
 
   // GETs the current number of items to fetch per operation
   const currentFetchCount = computed(
@@ -242,6 +247,15 @@ export function setup() {
     return data.updateStudent;
   }
 
+  async function updatePassword(id: number, password: string) {
+    const data = await studentService.updateStudent({
+      id,
+      password,
+    });
+
+    return data.updateStudent;
+  }
+
   /**
    * Move the provided students to a new group.
    *
@@ -297,6 +311,7 @@ export function setup() {
     getByEmail,
     getByName,
     updateStudent,
+    updatePassword,
     bulkMove,
     deleteStudent,
   };
