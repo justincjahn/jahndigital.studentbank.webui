@@ -97,7 +97,7 @@ export default defineComponent({
       if (newValue === oldValue) return;
 
       if (!newValue) {
-        globalStore.student.setSelected(null);
+        setSelectedStudent(null);
         return;
       }
 
@@ -108,6 +108,11 @@ export default defineComponent({
         globalStore.error.setCurrentError('Unable to fetch student!');
       }
     }, { immediate: true });
+
+    watch(() => globalStore.instance.selected.value, (newValue, oldValue) => {
+      if (newValue === oldValue) return;
+      setSelectedStudent(null);
+    });
 
     return {
       studentId,
