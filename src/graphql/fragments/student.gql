@@ -1,19 +1,9 @@
-#import "../fragments/group.gql"
+#import "../fragments/studentBase.gql"
 #import "../fragments/share.gql"
 
 fragment StudentParts on Student {
-  id
-  accountNumber
-  firstName
-  lastName
-  groupId
+  ...StudentBaseParts
   shares {
     ...ShareParts
   }
-  group {
-    ...GroupParts
-  }
-  email
-  dateLastLogin
-  dateRegistered
 }

@@ -1,0 +1,15 @@
+#import "./group.gql"
+
+fragment StudentBaseParts on Student {
+  id
+  accountNumber
+  firstName
+  lastName
+  groupId
+  email
+  dateLastLogin
+  dateRegistered
+  group {
+    ...GroupParts
+  }
+}

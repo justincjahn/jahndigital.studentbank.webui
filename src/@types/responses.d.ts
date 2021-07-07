@@ -44,6 +44,10 @@ interface RevokeUserRefreshTokenResponse {
   userRevokeRefreshToken: boolean;
 }
 
+interface UpdateUserResponse {
+  updateUser: UserInfo[];
+}
+
 /*
  * INSTANCES
  */

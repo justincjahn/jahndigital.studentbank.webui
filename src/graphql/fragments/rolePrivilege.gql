@@ -1,0 +1,9 @@
+#import "./privilege.gql"
+
+fragment RolePrivilegeParts on RolePrivilege {
+  privilegeId
+  roleId
+  privilege {
+    ...PrivilegeParts
+  }
+}

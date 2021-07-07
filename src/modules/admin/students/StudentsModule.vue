@@ -82,7 +82,7 @@ export default defineComponent({
             studentId: student.id,
           },
         });
-      } else {
+      } else if (router.currentRoute.value.matched.some((x) => x.name === StudentRouteNames.index)) {
         router.replace({
           name: StudentRouteNames.index,
         });

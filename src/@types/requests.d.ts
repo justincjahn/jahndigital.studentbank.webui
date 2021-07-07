@@ -19,6 +19,14 @@ interface StudentRegistrationRequest {
   password: string;
 }
 
+interface UpdateUserRequest {
+  id: number;
+  email?: string;
+  roleId?: number;
+  password?: string;
+  currentPassword?: string;
+}
+
 /*
  * INSTANCES
  */

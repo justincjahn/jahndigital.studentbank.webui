@@ -193,6 +193,7 @@ interface Role {
 interface UserInfo {
   id: number;
   email: string;
+  roleId: number;
   role: Role;
 }
 

@@ -197,6 +197,10 @@ export default defineComponent({
   width: 30em;
   background-color: colorStep(secondary);
 
+  button {
+    width: 100%;
+  }
+
   h2 {
     margin-bottom: 1em;
   }

@@ -8,6 +8,7 @@ import GroupRoutes from '@/modules/admin/groups/routes';
 import StudentRoutes from '@/modules/admin/students/routes';
 import PurchasesRoutes from '@/modules/admin/purchases/routes';
 import StocksRoutes from '@/modules/admin/stocks/routes';
+import ProfileRoutes from '@/modules/admin/profile/routes';
 import SettingsRoutes from '@/modules/admin/settings/routes';
 import LoginRoutes from '@/modules/admin/login/routes';
 import routerStore from '@/stores/router';
@@ -23,6 +24,7 @@ const routes: Array<RouteRecordRaw> = [
   ...StudentRoutes,
   ...PurchasesRoutes,
   ...StocksRoutes,
+  ...ProfileRoutes,
   ...SettingsRoutes,
   ...LoginRoutes,
 ];

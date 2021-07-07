@@ -32,6 +32,9 @@
       <router-link :to="{name: purchasesIndex }" class="sub-nav--link">
         Purchases
       </router-link>
+      <router-link :to="{name: profileIndex }" class="sub-nav--link">
+        Profile
+      </router-link>
       <router-link :to="{name: settingsIndex }" class="sub-nav--link">
         Settings
       </router-link>
@@ -70,6 +73,7 @@ import GroupRouteNames from '@/modules/admin/groups/routeNames';
 import StudentRouteNames from '@/modules/admin/students/routeNames';
 import PurchasesRouteNames from '@/modules/admin/purchases/routeNames';
 import StocksRouteNames from '@/modules/admin/stocks/routeNames';
+import ProfileRouteNames from '@/modules/admin/profile/routeNames';
 import SettingsRouteNames from '@/modules/admin/settings/routeNames';
 import LoginRouteNames from '@/modules/admin/login/routeNames';
 
@@ -121,6 +125,7 @@ export default defineComponent({
       studentsIndex: StudentRouteNames.index,
       purchasesIndex: PurchasesRouteNames.index,
       stocksIndex: StocksRouteNames.index,
+      profileIndex: ProfileRouteNames.index,
       settingsIndex: SettingsRouteNames.index,
       selectedInstance: globalStore.instance.selected,
       error: globalStore.error.error,
