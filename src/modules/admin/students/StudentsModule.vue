@@ -133,8 +133,10 @@ export default defineComponent({
     padding: 2em;
     background-color: colorStep(primary, $step: 2);
 
-    .student-selector {
-      max-width: 30em;
+    @media screen and (min-width: 750px) {
+      .student-selector {
+        max-width: 30em;
+      }
     }
   }
 

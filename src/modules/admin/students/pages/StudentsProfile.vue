@@ -124,7 +124,12 @@ export default defineComponent({
     const passwordValidator = validatePassword(toRef(data.password, 'repeat'));
 
     const isInfoValid = computed(() => {
-      if (Object.values(data.errors).every((x) => x.length === 0)) return true;
+      const valid = Object.values({
+        ...data.errors,
+        password: '',
+      }).every((x) => x.length === 0);
+
+      if (valid) return true;
       return false;
     });
 
