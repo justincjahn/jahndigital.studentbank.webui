@@ -226,11 +226,15 @@ export default defineComponent({
 
 <style lang="scss">
   .admin-profile {
-    @include round-border;
     margin: 0px auto;
     padding: 2em;
-    width: 30em;
+    width: 100%;
     background-color: colorStep(secondary);
+
+    @media screen and (min-width: 700px) {
+      @include round-border;
+      width: 30em;
+    }
 
     button {
       width: 100%;

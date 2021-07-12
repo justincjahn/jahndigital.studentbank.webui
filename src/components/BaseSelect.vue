@@ -4,7 +4,6 @@
       ref="root"
       class="select__selected"
       :class="{ 'select__selected--open': open }"
-      :style="styles"
       :disabled="disabled"
       @click="toggle"
     >
@@ -16,7 +15,6 @@
       v-if="options.length > 0 || true"
       class="select__items"
       :class="{ 'select__items--hidden': !open }"
-      :style="styles"
     >
       <slot
         name="list"
@@ -42,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onUnmounted, ref, computed, PropType, watchEffect } from 'vue';
+import { defineComponent, onUnmounted, ref, PropType, watchEffect } from 'vue';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Item = Record<string, any>|number|string|null;
@@ -114,9 +112,6 @@ export default defineComponent({
     // Stored reference to the root element
     const root = ref<HTMLButtonElement|null>(null);
 
-    // Used to specify the width of the selection box and drop down.
-    const styles = computed(() => ({ width: props.width }));
-
     // Open and close the select when the user clicks on/off the button.
     function toggle(e?: Event) {
       if (!open.value && props.disabled) return;
@@ -151,7 +146,6 @@ export default defineComponent({
       open,
       toggle,
       select,
-      styles,
       selected,
     };
   },
@@ -172,6 +166,7 @@ export default defineComponent({
 }
 
 .select {
+  $width: 10rem;
   $fontColor: map.get($theme, button-secondary, font-color);
 
   position: static;
@@ -181,6 +176,7 @@ export default defineComponent({
     position: relative;
     margin: 0;
     outline: 0;
+    width: $width;
 
     line-height: 1.25em;
     text-align: left;
@@ -231,6 +227,7 @@ export default defineComponent({
     max-height: clamp(150px, 30vh, 350px);
     overflow-y: auto;
     user-select: none;
+    width: $width;
 
     background-color: map.get($theme, button-secondary, color);
     border: 1px solid colorStep(button-secondary, $step: 2);

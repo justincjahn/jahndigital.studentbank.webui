@@ -267,9 +267,15 @@ export default defineComponent({
 
     &__toolbar {
       position: sticky;
+      display: flex;
+      flex-direction: column;
       top: 0px;
       padding: 1em;
       background-color: colorStep(secondary);
+
+      @media screen and (min-width: 700px) {
+        flex-direction: row;
+      }
     }
 
     &__body {

@@ -13,14 +13,16 @@
     </template>
 
     <div class="sub-menu__bulk-buttons">
-      <button
-        :disabled="!hasSelection"
-        @click.prevent="selection.clear"
-      >
-        Clear Selection
-      </button>
-
       <span class="sub-menu__bulk-buttons__button">
+        <button
+          :disabled="!hasSelection"
+          @click.prevent="selection.clear"
+        >
+          Clear Selection
+        </button>
+      </span>
+
+      <div class="sub-menu__bulk-buttons__button">
         <button
           :disabled="!hasSelection"
           @click.prevent="toggleBulkGroup"
@@ -36,7 +38,7 @@
           @ok="handleBulkGroupModalOk"
           @cancel="toggleBulkGroup"
         />
-      </span>
+      </div>
 
       <span class="sub-menu__bulk-buttons__button">
         <button
@@ -308,29 +310,50 @@ export default {
 
 <style lang="scss">
   .sub-menu {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 1em;
     padding: 1em;
-    background-color: colorStep(secondary);
     margin-bottom: 1em;
+    background-color: colorStep(secondary);
 
-    &__filter {
-      position: relative;
-      flex-basis: clamp(200px, 60vw, 350px);
+    .group-selector {
+      width: 100%;
+      margin-bottom: 1em;
 
-      & input[type=text] {
+      button {
         width: 100%;
       }
 
-      &__reset {
-        @include input-reset;
+      ul {
+        width: calc(100% - 2.15em);
+      }
+
+      @media screen and (min-width: 700px) {
+        width: 12rem;
+
+        button {
+          width: 12rem;
+        }
+
+        ul {
+          width: 12rem;
+        }
       }
     }
 
     &__bulk-buttons {
-      flex-basis: 100%;
+      display: flex;
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+
+      @media screen and (min-width: 700px) {
+        flex-direction: row;
+
+        button {
+          width: inherit;
+        }
+      }
     }
   }
 

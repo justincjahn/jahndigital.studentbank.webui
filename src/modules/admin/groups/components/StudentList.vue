@@ -185,6 +185,8 @@ export default defineComponent({
 
 // Collapse the table into rows instead of columns for small screens
 @media screen and (max-width: 800px) {
+  $size: 7em;
+
   .student-list__list {
     & thead, & tbody, & th, & td, & tr {
       display: block;
@@ -196,13 +198,20 @@ export default defineComponent({
       &:first-child {
         display: block;
         position: relative;
-        padding-left: 95px;
+        padding-left: $size;
+        margin-bottom: 1em;
 
         &::before {
           position: absolute;
-          content: 'Select All';
+          top: 0;
           left: 0.25em;
-          top: 0.2em;
+          width: $size;
+          white-space: nowrap;
+          font-weight: bold;
+          padding-right: 1em;
+          text-align: right;
+          position: absolute;
+          content: 'Select All';
         }
       }
     }
@@ -212,12 +221,11 @@ export default defineComponent({
     }
 
     & tbody tr td {
-      $size: 7em;
-
       position: relative;
       padding-left: $size;
+      text-align: right;
+      padding-right: 1em;
       border: none;
-      text-align: left !important;
       word-break: break-all;
 
       & + td {
@@ -231,11 +239,12 @@ export default defineComponent({
         width: $size;
         white-space: nowrap;
         font-weight: bold;
+        padding-right: 1em;
+        text-align: right;
       }
 
       &:nth-of-type(1):not(.student-list__select-group)::before {
         content: 'Select';
-        margin-left: 2em;
       }
 
       &:nth-of-type(2)::before {

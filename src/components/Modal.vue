@@ -241,6 +241,8 @@ export default defineComponent({
   overflow: hidden;
   background-color: rgba(0,0,0,0.5);
   font-size: 1rem; /* Reset fonts for this modal */
+  display: flex;
+  flex-direction: column;
 
   &.modal--hidden {
     animation: modal-fade-out 0.2s;
@@ -254,14 +256,34 @@ export default defineComponent({
 
   .modal__container {
     background-color: map.get($theme, primary, color);
-    margin: 10% auto;
-    border-radius: 6px;
-    width: 500px;
+
+    // When there's sufficient width, stop stretching the modal 100%
+    @media screen and (min-width: 700px) {
+      margin: 0 auto;
+      width: clamp(450px, 50vw, 600px);
+      border-bottom-left-radius: 0.25rem;
+      border-bottom-right-radius: 0.25rem;
+    }
+
+    // When there's sufficient height, add some margin to the modal
+    @media screen and (min-height: 400px) {
+      margin-top: 30vmin;
+      max-height: calc(100% - 30vmin);
+      overflow-y: auto;
+    }
+
+    // When there's both sufficient width and height, add some rounded corners.
+    @media screen and (min-width: 700px) and (min-height: 400px) {
+      border-radius: 0.25rem;
+    }
 
     &__title {
       background-color: map.get($theme, secondary, color);
-      border-radius: 6px 6px 0 0;
       border-bottom: 1px solid colorStep(secondary, $step: 2);
+
+      @media screen and (min-width: 700px) and (min-height: 400px)  {
+        border-radius: 0.25rem 0.25rem 0 0;
+      }
 
       & h1 { font-size: 1.75rem; }
     }
@@ -277,7 +299,12 @@ export default defineComponent({
 
     &__buttons {
       display: flex;
-      justify-content: flex-end;
+      flex-direction: column;
+
+      @media screen and (min-width: 300px) {
+        flex-direction: row;
+        justify-content: flex-end;
+      }
     }
   }
 
