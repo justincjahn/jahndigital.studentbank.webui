@@ -7,6 +7,12 @@
     {
       "route": "/register/*",
       "rewrite": "register.html"
+    },
+    {
+      "route": "/bulk-import-template.csv",
+      "headers": {
+        "Content-Disposition": "attachment"
+      }
     }
   ],
   "navigationFallback": {

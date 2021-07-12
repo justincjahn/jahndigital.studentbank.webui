@@ -33,7 +33,10 @@
         class="bit__step bit__step--2"
       >
         <h1>Step 2: Import data</h1>
-        <p>Drag and Drop or click the link below to upload your CSV file.</p>
+        <p>
+          Drag and Drop or click the link below to upload your CSV file. Download a copy of the template,
+          <a href="/bulk-import-template.csv" target="_blank">here</a>.
+        </p>
 
         <div
           class="bit__step__file-upload"
