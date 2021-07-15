@@ -80,14 +80,12 @@
     </div>
   </div>
 
-  <suspense>
-    <new-stock-modal
-      :show="showNewStockModal"
-      :loading="newStockPosting"
-      @ok="handleNewStockModalOk"
-      @cancel="toggleNewStockModal"
-    />
-  </suspense>
+  <new-stock-modal
+    :show="showNewStockModal"
+    :loading="newStockPosting"
+    @ok="handleNewStockModalOk"
+    @cancel="toggleNewStockModal"
+  />
 </template>
 
 <script lang="ts">
