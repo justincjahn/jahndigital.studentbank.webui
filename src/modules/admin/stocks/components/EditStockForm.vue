@@ -1,56 +1,38 @@
 <template>
   <form class="edit-stock-form" @submit.prevent="handleSubmit">
-    <div class="new-stock-modal--fieldset">
-      <label :for="nameId">Name<span class="required">*</span></label>
-      <input
-        :id="nameId"
-        v-model="name"
-        type="text"
-        name="name"
-      />
-      <p v-if="selected && nameError" class="error">
-        {{ nameError }}
-      </p>
-    </div>
+    <base-input
+      v-model="name"
+      v-model:error="nameError"
+      label="Name"
+      name="name"
+      required
+      :validator="validateStockName"
+    />
 
-    <div class="new-stock-modal--fieldset">
-      <label :for="symbolId">Symbol<span class="required">*</span></label>
-      <input
-        :id="symbolId"
-        v-model="symbol"
-        type="text"
-        name="symbol"
-      />
-      <p v-if="selected && symbolError" class="error">
-        {{ symbolError }}
-      </p>
-    </div>
+    <base-input
+      v-model="symbol"
+      v-model:error="symbolError"
+      label="Symbol"
+      name="symbol"
+      required
+      :validator="validateStockSymbol"
+    />
 
-    <div class="new-stock-modal--fieldset">
-      <label :for="totalSharesId">Total Shares<span class="required">*</span></label>
-      <input
-        :id="totalSharesId"
-        v-model="totalShares"
-        type="text"
-        name="totalShares"
-      />
-      <p v-if="selected && totalSharesError" class="error">
-        {{ totalSharesError }}
-      </p>
-    </div>
+    <base-input
+      v-model="totalShares"
+      v-model:error="totalSharesError"
+      label="Total Shares"
+      required
+      :validator="validateStockSharesNotNegative"
+    />
 
-    <div class="new-stock-modal--fieldset">
-      <label :for="amountId">Value<span class="required">*</span></label>
-      <base-currency-input
-        :id="amountId"
-        v-model="amount"
-        v-model:error="amountError"
-        :allow-negative="false"
-      />
-      <p v-if="selected && amountError" class="error">
-        {{ amountError }}
-      </p>
-    </div>
+    <currency-input
+      v-model="amount"
+      v-model:error="amountError"
+      label="New Value"
+      required
+      :allow-negative="false"
+    />
 
     <slot
       name="buttons"
@@ -74,18 +56,16 @@ import { defineComponent, PropType, ref, computed, watchEffect } from 'vue';
 
 // Utils
 import { validateStockName, validateStockSymbol, validateStockSharesNotNegative } from '@/utils/validators';
-import uuid4 from '@/utils/uuid4';
 import Money from '@/utils/money';
 
-// Composables
-import useValidation from '@/composables/useValidation';
-
 // Components
-import BaseCurrencyInput from '@/components/BaseCurrencyInput.vue';
+import BaseInput from '@/components/BaseInput.vue';
+import CurrencyInput from '@/components/CurrencyInput.vue';
 
 export default defineComponent({
   components: {
-    BaseCurrencyInput,
+    BaseInput,
+    CurrencyInput,
   },
   props: {
     selected: {
@@ -101,18 +81,12 @@ export default defineComponent({
     'submit',
   ],
   setup(props, { emit }) {
-    const id = uuid4();
-
-    const nameId = `new-stock-modal__name--${id}`;
-    const { value: name, error: nameError } = useValidation(validateStockName);
-
-    const symbolId = `new-stock-modal__symbol--${id}`;
-    const { value: symbol, error: symbolError } = useValidation(validateStockSymbol);
-
-    const totalSharesId = `new-stock-modal__totalShares--${id}`;
-    const { value: totalShares, error: totalSharesError } = useValidation(validateStockSharesNotNegative);
-
-    const amountId = `new-stock-modal__amount--${id}`;
+    const name = ref('');
+    const nameError = ref('');
+    const symbol = ref('');
+    const symbolError = ref('');
+    const totalShares = ref('');
+    const totalSharesError = ref('');
     const amount = ref('');
     const amountError = ref('');
 
@@ -164,16 +138,15 @@ export default defineComponent({
     });
 
     return {
-      nameId,
+      validateStockName,
+      validateStockSymbol,
+      validateStockSharesNotNegative,
       name,
       nameError,
-      symbolId,
       symbol,
       symbolError,
-      totalSharesId,
       totalShares,
       totalSharesError,
-      amountId,
       amount,
       amountError,
       canSubmit,

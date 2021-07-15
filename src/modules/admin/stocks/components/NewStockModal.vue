@@ -16,27 +16,35 @@
       <base-input
         v-model="name"
         v-model:error="nameError"
-        type="text"
+        required
+        label="Name"
         name="name"
+        :validator="validateStockName"
       />
 
       <base-input
         v-model="symbol"
         v-model:error="symbolError"
-        type="text"
+        required
+        label="Symbol"
         name="symbol"
+        :validator="validateStockSymbol"
       />
 
       <base-input
         v-model="totalShares"
         v-model:error="totalSharesError"
-        type="text"
+        required
+        label="Total Shares"
         name="totalShares"
+        :validator="validateStockSharesNotNegative"
       />
 
       <currency-input
         v-model="amount"
         v-model:error="amountError"
+        required
+        label="Initial Value"
         :allow-negative="false"
       />
     </form>
@@ -48,11 +56,7 @@ import { defineComponent, ref, computed, watchEffect } from 'vue';
 
 // Utils
 import { validateStockName, validateStockSymbol, validateStockSharesNotNegative } from '@/utils/validators';
-import uuid4 from '@/utils/uuid4';
 import Money from '@/utils/money';
-
-// Composables
-import useValidation from '@/composables/useValidation';
 
 // Components
 import Modal from '@/components/Modal.vue';
@@ -83,18 +87,12 @@ export default defineComponent({
     'cancel',
   ],
   setup(props, { emit }) {
-    const id = uuid4();
-
-    const nameId = `new-stock-modal__name--${id}`;
-    const { value: name, error: nameError } = useValidation(validateStockName);
-
-    const symbolId = `new-stock-modal__symbol--${id}`;
-    const { value: symbol, error: symbolError } = useValidation(validateStockSymbol);
-
-    const totalSharesId = `new-stock-modal__totalShares--${id}`;
-    const { value: totalShares, error: totalSharesError } = useValidation(validateStockSharesNotNegative);
-
-    const amountId = `new-stock-modal__amount--${id}`;
+    const name = ref('');
+    const nameError = ref('');
+    const symbol = ref('');
+    const symbolError = ref('');
+    const totalShares = ref('');
+    const totalSharesError = ref('');
     const amount = ref('');
     const amountError = ref('');
 
@@ -139,17 +137,15 @@ export default defineComponent({
     });
 
     return {
-      id,
-      amountId,
+      validateStockName,
+      validateStockSymbol,
+      validateStockSharesNotNegative,
       amount,
       amountError,
-      nameId,
       name,
       nameError,
-      symbolId,
       symbol,
       symbolError,
-      totalSharesId,
       totalShares,
       totalSharesError,
       canSubmit,
