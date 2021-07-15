@@ -148,8 +148,10 @@ export default defineComponent({
 
     // When the instance changes, clear the selection
     watchEffect(() => {
-      if (props.store.instance.selected.value !== null) {
-        if (props.store.instance.selected.value.id !== prevInstance.value?.id ?? true) {
+      const instance = props.store.instance.selected.value;
+
+      if (instance) {
+        if (instance.id !== prevInstance.value?.id ?? true) {
           prevInstance.value = props.store.instance.selected.value;
           selection.clear();
         }

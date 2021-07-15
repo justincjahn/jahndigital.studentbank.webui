@@ -94,11 +94,13 @@ export function setup(instanceStore: InstanceStore) {
 
   // Watch for selected instance changes and fetch new groups
   // @NOTE Not using watchEffect here because we don't want to watch store.groups changes.
-  watch(() => instanceStore.selected.value, () => {
-    if (instanceStore.selected.value === null) {
-      store.groups = [];
-    } else {
-      fetchGroups(instanceStore.selected.value.id);
+  watch(() => instanceStore.selected.value, (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      if (newValue === null) {
+        store.groups = [];
+      } else if (typeof newValue !== 'undefined') {
+        fetchGroups(newValue.id);
+      }
     }
 
     if (instanceStore.selected.value?.id !== store.selected?.instanceId ?? false) {
