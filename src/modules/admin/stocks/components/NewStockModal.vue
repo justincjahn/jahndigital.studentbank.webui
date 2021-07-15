@@ -13,57 +13,32 @@
     @cancel="handleCancel"
   >
     <form @submit.prevent>
-      <div class="new-stock-modal--fieldset">
-        <label :for="nameId">Name<span class="required">*</span></label>
-        <input
-          :id="nameId"
-          v-model="name"
-          type="text"
-          name="name"
-        />
-        <p v-if="nameError" class="error">
-          {{ nameError }}
-        </p>
-      </div>
+      <base-input
+        v-model="name"
+        v-model:error="nameError"
+        type="text"
+        name="name"
+      />
 
-      <div class="new-stock-modal--fieldset">
-        <label :for="symbolId">Symbol<span class="required">*</span></label>
-        <input
-          :id="symbolId"
-          v-model="symbol"
-          type="text"
-          name="symbol"
-        />
-        <p v-if="symbolError" class="error">
-          {{ symbolError }}
-        </p>
-      </div>
+      <base-input
+        v-model="symbol"
+        v-model:error="symbolError"
+        type="text"
+        name="symbol"
+      />
 
-      <div class="new-stock-modal--fieldset">
-        <label :for="totalSharesId">Total Shares<span class="required">*</span></label>
-        <input
-          :id="totalSharesId"
-          v-model="totalShares"
-          type="text"
-          name="totalShares"
-        />
-        <p v-if="totalSharesError" class="error">
-          {{ totalSharesError }}
-        </p>
-      </div>
+      <base-input
+        v-model="totalShares"
+        v-model:error="totalSharesError"
+        type="text"
+        name="totalShares"
+      />
 
-      <div class="new-stock-modal--fieldset">
-        <label :for="amountId">Initial Value<span class="required">*</span></label>
-        <base-currency-input
-          :id="amountId"
-          v-model="amount"
-          v-model:error="amountError"
-          :allow-negative="false"
-        />
-        <p v-if="amountError" class="error">
-          {{ amountError }}
-        </p>
-      </div>
+      <currency-input
+        v-model="amount"
+        v-model:error="amountError"
+        :allow-negative="false"
+      />
     </form>
   </modal>
 </template>
@@ -81,7 +56,8 @@ import useValidation from '@/composables/useValidation';
 
 // Components
 import Modal from '@/components/Modal.vue';
-import BaseCurrencyInput from '@/components/BaseCurrencyInput.vue';
+import BaseInput from '@/components/BaseInput.vue';
+import CurrencyInput from '@/components/CurrencyInput.vue';
 
 /**
  * Prompts the user for input and emits an ok event with a valid NewStockRequest object.
@@ -89,7 +65,8 @@ import BaseCurrencyInput from '@/components/BaseCurrencyInput.vue';
 export default defineComponent({
   components: {
     Modal,
-    BaseCurrencyInput,
+    BaseInput,
+    CurrencyInput,
   },
   props: {
     show: {
@@ -182,18 +159,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss">
-  .new-stock-modal--fieldset {
-    display: flex;
-    flex-direction: column;
-
-    & + & {
-      margin-top: 1em;
-    }
-
-    .currency-input input {
-      width: 100%;
-    }
-  }
-</style>
