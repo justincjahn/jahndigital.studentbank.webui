@@ -238,7 +238,9 @@ export default defineComponent({
             cache: false,
             studentId: userStore.id.value,
             where: {
-              stockId: props.stock.id,
+              stockId: {
+                eq: props.stock.id,
+              },
             },
           });
 

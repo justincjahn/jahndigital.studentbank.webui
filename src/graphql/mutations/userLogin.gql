@@ -1,5 +1,11 @@
-mutation userLogin($username: String!, $password: String!) {
-  userLogin(input: {username: $username, password: $password}) {
+mutation userLogin(
+  $username: String!,
+  $password: String!
+) {
+  userLogin(input: {
+    username: $username,
+    password: $password
+  }) {
     jwtToken
   }
 }

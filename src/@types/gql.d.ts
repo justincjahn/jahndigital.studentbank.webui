@@ -5,41 +5,67 @@
  */
 
 type SortOperationKind = 'ASC' | 'DESC';
+type SortBase<TOptions> = OneKey<TOptions, SortOperationKind>;
+
+type FilterOperation = 'eq'
+  | 'neq'
+  | 'contains'
+  | 'ncontains'
+  | 'in'
+  | 'nin'
+  | 'startsWith'
+  | 'nstartsWith'
+  | 'endsWith'
+  | 'nendsWith'
+  | 'gt'
+  | 'ngt'
+  | 'gte'
+  | 'ngte'
+  | 'lt'
+  | 'nlt'
+  | 'lte'
+  | 'nlte';
+
+type FilterInput = OneKey<FilterOperation, string | number | string[] | number[]>;
+interface FilterAndBase<TFilter> { and: TFilter[] }
+interface FilterOrBase<TFilter> { or: TFilter[] }
+type FilterBase<TOptions> = OneKey<TOptions, FilterInput>
+  | FilterOrBase<OneKey<TOptions, FilterInput>>
+  | FilterAndBase<OneKey<TOptions, FilterInput>>;
 
 /**
  * STOCKS
  */
 
 type StockSortOptions = 'name' | 'symbol' | 'rawCurrentValue';
-type StockSort = OneKey<StockSortOptions, SortOperationKind>;
+type StockSort = SortBase<StockSortOptions>;
 
-type StockFilterOptions = 'name_contains'
-  | 'name_not_contains'
-  | 'name_starts_with'
-  | 'name_ends_with'
-  | 'symbol_contains'
-  | 'symbol_not_contains'
-  | 'symbol_starts_with'
-  | 'symbol_ends_with'
-  | 'symbol_in'
-  | 'symbol_not_in';
+type StockFilterOptions = 'name' | 'symbol';
+type StockFilter = FilterBase<StockFilterOptions>;
 
-type StockFilterFilters = OneKey<StockFilterOptions, string>;
-interface StockFilterOr { OR: StockFilterFilters[] }
-interface StockFilterAnd { AND: StockFilterFilters[] }
-type StockFilter = StockFilterFilters | StockFilterOr | StockFilterAnd;
+type StudentStockFilterOptions = 'id' | 'stockId';
+type StudentStockFilter = FilterBase<StudentStockFilterOptions>;
 
-type StudentStockFilterOptions =
-  'id'
-  | 'id_not'
-  | 'id_in'
-  | 'id_not_in'
-  | 'stockId'
-  | 'stockId_not'
-  | 'stockId_in'
-  | 'stockId_not_in';
+/**
+ * STUDENTS
+ */
 
-type StudentStockFilterFilters = OneKey<StudentStockFilterOptions, int | int[]>;
-interface StudentStockFilterOr { OR: StudentStockFilterFilters[] }
-interface StudentStockFilterAnd { AND: StudentStockFilterFilters[] }
-type StudentStockFilter = StudentStockFilterFilters | StudentStockFilterOr | StudentStockFilterAnd;
+type StudentSortOptions = 'id'
+  | 'accountNumber'
+  | 'email'
+  | 'firstName'
+  | 'lastName'
+  | 'dateLastLogin'
+  | 'dateCreated'
+  | 'dateRegistered';
+
+type StudentSort = SortBase<StudentSortOptions>;
+
+type StudentFilterOptions =
+  'accountNumber'
+  | 'email'
+  | 'firstName'
+  | 'lastName'
+  | 'groupId';
+
+type StudentFilter = FilterBase<StudentFilterOptions>;

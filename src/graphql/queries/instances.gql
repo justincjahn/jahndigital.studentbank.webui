@@ -1,7 +1,7 @@
 #import "@/graphql/fragments/instance.gql"
 
 query allInstances {
-  instances(order_by: {description: ASC}) {
+  instances(order: {description: ASC}) {
     nodes {
       ...InstanceParts
     }

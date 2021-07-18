@@ -2,7 +2,9 @@
 
 query studentsById($id: Long!) {
   students(
-    where: { id: $id },
+    where: {
+      id: { eq: $id }
+    },
   ) {
     nodes {
       ...StudentParts

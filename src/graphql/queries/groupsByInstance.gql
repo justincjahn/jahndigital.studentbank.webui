@@ -1,7 +1,12 @@
 #import "@/graphql/fragments/group.gql"
 
 query groupsByInstance($instanceId: Long) {
-  groups(where: { instanceId: $instanceId }, order_by: { name: ASC }) {
+  groups(
+    where: {
+      instanceId: { eq: $instanceId },
+    },
+    order: { name: ASC }
+  ) {
     nodes {
       ...GroupParts
     }

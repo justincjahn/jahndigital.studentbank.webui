@@ -284,7 +284,10 @@ export function setup() {
     // If there are no groups in the DB, there are no students
     if (store.dbGroups.length === 0) return csvStudents;
 
-    const data = await getStudentIdsByGroup(store.dbGroups.map((x) => x.id));
+    const data = await getStudentIdsByGroup(
+      store.dbGroups.map((x) => x.id),
+      { first: 10000 },
+    );
 
     if (data) {
       const dbStudents = data.students.nodes.map((x) => x.accountNumber);

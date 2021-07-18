@@ -3,13 +3,14 @@
 
 query transactions(
   $shareId: Long!,
-  $first: PaginationAmount! = 25,
+  $first: Int = 25,
   $after: String,
+  $order: TransactionSortInput! = { effectiveDate: DESC }
 ) {
   transactions(
     shareId: $shareId,
     first: $first,
-    order_by: { effectiveDate: DESC },
+    order: [$order],
     after: $after
   ) {
     pageInfo {

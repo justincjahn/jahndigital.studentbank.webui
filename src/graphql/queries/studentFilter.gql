@@ -1,5 +1,17 @@
-query students($where: StudentFilter) {
-  students(where: $where) {
+#import "@/graphql/fragments/pageInfo.gql"
+
+query students(
+  $first: Int = 25,
+  $where: StudentFilterInput
+) {
+  students(
+    first: $first,
+    where: $where
+  ) {
+    pageInfo {
+      ...PageInfoParts
+    }
+    totalCount
     nodes {
       accountNumber
     }

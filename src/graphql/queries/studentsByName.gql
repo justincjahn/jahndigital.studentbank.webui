@@ -1,16 +1,24 @@
 #import "@/graphql/fragments/pageInfo.gql"
 #import "@/graphql/fragments/student.gql"
 
-query studentsByName($name: String!) {
+query studentsByName(
+  $first: Int = 25,
+  $order: StudentSortInput! = { accountNumber: ASC },
+  $name: String!
+) {
   students(
+    first: $first,
+    order: [$order],
     where: {
-      OR: [
-        {firstName_starts_with: $name},
-        {lastName_starts_with: $name}
+      or: [
+        {
+          firstName: { starts_with: $name}
+        },
+        {
+          lastName: { starts_with: $name}
+        }
       ]
     },
-    first: 25,
-    order_by: {accountNumber: ASC}
   ) {
     pageInfo {
       ...PageInfoParts

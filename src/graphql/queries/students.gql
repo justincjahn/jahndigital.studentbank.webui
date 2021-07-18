@@ -1,8 +1,20 @@
 #import "@/graphql/fragments/pageInfo.gql"
 #import "@/graphql/fragments/student.gql"
 
-query studentsWithShares($groupId: Long, $first: PaginationAmount, $after: String) {
-  students(where: {groupId: $groupId}, first: $first, after: $after, order_by: {accountNumber: ASC}) {
+query studentsWithShares(
+  $first: Int,
+  $after: String,
+  $order: StudentSortInput! = {accountNumber: ASC},
+  $groupId: Long,
+) {
+  students(
+    first: $first,
+    after: $after,
+    order: [$order]
+    where: {
+      groupId: { eq: $groupId }
+    },
+  ) {
     pageInfo {
       ...PageInfoParts
     }

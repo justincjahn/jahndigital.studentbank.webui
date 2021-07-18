@@ -2,18 +2,18 @@
 #import "../fragments/stock.gql"
 
 query stocks(
-  $instances: [Long!],
-  $first: PaginationAmount! = 25,
+  $first: Int = 25,
   $after: String,
-  $where: StockFilter,
-  $order_by: StockSort! = { name: ASC },
+  $instances: [Long!],
+  $where: StockFilterInput,
+  $order: StockSortInput! = { name: ASC },
 ) {
   stocks(
     instances: $instances,
     first: $first,
     after: $after,
     where: $where,
-    order_by: $order_by
+    order: [$order]
   ) {
     pageInfo {
       ...PageInfoParts

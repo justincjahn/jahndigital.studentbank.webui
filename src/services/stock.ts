@@ -36,7 +36,7 @@ export interface StockListOptions extends FetchOptionsBase {
   where?: StockFilter;
 
   // Sort operation
-  order_by?: StockSort;
+  order?: StockSort;
 }
 
 /**

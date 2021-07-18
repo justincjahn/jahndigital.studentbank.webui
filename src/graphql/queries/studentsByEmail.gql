@@ -1,11 +1,17 @@
 #import "@/graphql/fragments/pageInfo.gql"
 #import "@/graphql/fragments/student.gql"
 
-query studentsByEmail($email: String!) {
+query studentsByEmail(
+  $first: Int = 25,
+  $order: StudentSortInput! = { accountNumber: ASC },
+  $email: String!
+) {
   students(
-    where: { email_contains: $email },
-    first: 25,
-    order_by: {accountNumber: ASC}
+    first: $first,
+    order: [$order],
+    where: {
+      email: { contains: $email }
+    }
   ) {
     pageInfo {
       ...PageInfoParts

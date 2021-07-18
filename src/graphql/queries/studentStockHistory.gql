@@ -3,14 +3,15 @@
 
 query studentStockHistory(
   $studentStockId: Long!,
-  $first: PaginationAmount! = 25,
+  $first: Int = 25,
   $after: String,
+  $order: StudentSortInput! = { datePosted: DESC }
 ) {
   studentStockHistory(
     instances: $instances,
     first: $first,
     after: $after,
-    order_by: { datePosted: DESC }
+    order: [$order]
   ) {
     pageInfo {
       ...PageInfoParts

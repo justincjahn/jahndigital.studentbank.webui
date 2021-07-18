@@ -1,12 +1,16 @@
 #import "../fragments/pageInfo.gql"
 #import "../fragments/share.gql"
 
-query sharesByStudentId($studentId: Long!, $first: PaginationAmount, $after: String) {
+query sharesByStudentId(
+  $studentId: Long!,
+  $first: Int,
+  $after: String
+) {
   shares(
     first: $first,
     after: $after,
     where: {
-      studentId: $studentId,
+      studentId: { eq: $studentId },
     }
   ) {
     pageInfo {

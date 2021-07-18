@@ -3,14 +3,14 @@
 
 query stockHistory(
   $stockId: Long!,
-  $first: PaginationAmount! = 25,
+  $first: Int = 25,
   $after: String,
 ) {
   stockHistory(
     stockId: $stockId,
     first: $first,
     after: $after,
-    order_by: { dateChanged: DESC }
+    order: { dateChanged: DESC }
   ) {
     pageInfo {
       ...PageInfoParts

@@ -18,14 +18,6 @@ interface FetchOptionsBase {
   after?: string;
 }
 
-interface GroupIdFilter {
-  groupId: number;
-}
-
-interface StudentFilter {
-  OR: GroupIdFilter[];
-}
-
 export interface GetByIdOptions extends FetchOptionsBase {
   id: number;
 }
@@ -144,12 +136,17 @@ export async function getStudentsByGroup(options: GetByGroupOptions) {
  * @param groupIds A list of group IDs to return student account numbers for.
  * @returns A list of student account numbers for the specified groups.
  */
-export async function getStudentIdsByGroup(groupIds: number[]) {
+export async function getStudentIdsByGroup(groupIds: number[], options: FetchOptionsBase = {}) {
   const where: StudentFilter = {
-    OR: groupIds.map((x) => ({ groupId: x })),
+    groupId: { in: groupIds.map((x) => x) },
   };
 
-  return query<StudentFilterResponse>(gqlStudentFilter, { where }, 'network-only');
+  const opts = {
+    ...options,
+    where,
+  };
+
+  return query<StudentFilterResponse>(gqlStudentFilter, opts, 'network-only');
 }
 
 /**

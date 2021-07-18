@@ -2,17 +2,18 @@
 #import "../fragments/studentStock.gql"
 
 query studentStocks(
-  $studentId: Long!,
-  $first: PaginationAmount! = 25,
+  $first: Int = 25,
   $after: String,
-  $where: StudentStockFilter
+  $order: StudentStockSortInput! = { sharesOwned: DESC },
+  $where: StudentStockFilterInput,
+  $studentId: Long!
 ) {
   studentStocks(
     studentId: $studentId,
     first: $first,
     after: $after,
     where: $where,
-    order_by: { sharesOwned: DESC }
+    order: [$order]
   ) {
     pageInfo {
       ...PageInfoParts

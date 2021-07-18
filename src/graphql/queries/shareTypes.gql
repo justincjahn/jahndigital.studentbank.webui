@@ -3,14 +3,14 @@
 
 query shareTypes(
   $instances: [Long!],
-  $first: PaginationAmount! = 25,
+  $first: Int = 25,
   $after: String,
 ) {
   shareTypes(
     instances: $instances,
     first: $first,
     after: $after,
-    order_by: { name: ASC }
+    order: { name: ASC }
   ) {
     pageInfo {
       ...PageInfoParts
