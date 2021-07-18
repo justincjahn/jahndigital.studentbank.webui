@@ -81,6 +81,18 @@ export interface BulkImportSample extends StudentInfo {
 type StudentInfoMap = Record<string, StudentInfo>;
 
 /**
+ * Used to track the initial deposits alongside the share request itself.
+ */
+interface NewShareRequestWithDeposit extends NewShareRequest {
+  share?: Share;
+  initialDeposit: number;
+}
+
+interface ShareWithDeposit extends Share {
+  initialDeposit: number;
+}
+
+/**
  * Store that handles the multi-step workflow to post transactions to students' shares.
  */
 export function setup() {
@@ -580,21 +592,29 @@ export function setup() {
 
     // Create share types for each student
     const studentIds = aCreatedStudents.map((student) => student.id);
-    const sharesToCreate: NewShareRequest[] = [];
+    const sharesToCreate: NewShareRequestWithDeposit[] = [];
     studentIds.forEach((studentId) => {
       store.shareTypes.forEach((shareType) => {
+        const initialDeposit = Money.fromStringOrDefault(shareType.initialDeposit);
         if (shareType.shareType === null) throw new Error('Missing Share Type during share creation pass.');
         const shareTypeId = shareType.shareType.id;
-        sharesToCreate.push({ studentId, shareTypeId });
+        sharesToCreate.push({ studentId, shareTypeId, initialDeposit: initialDeposit.getAmount() });
       });
     });
 
-    const createdShares: Share[] = [];
+    const createdShares: ShareWithDeposit[] = [];
     while (sharesToCreate.length) {
       try {
         // eslint-disable-next-line no-await-in-loop
         const res = await Promise.all(
-          sharesToCreate.splice(0, API_MAX_CONCURRENCY).map((newShareRequest) => globalStore.share.newShare(newShareRequest)),
+          sharesToCreate.splice(0, API_MAX_CONCURRENCY).map(async (newShareRequest) => {
+            const r = await globalStore.share.newShare(newShareRequest);
+
+            return {
+              ...r,
+              initialDeposit: newShareRequest.initialDeposit,
+            };
+          }),
         );
 
         res.forEach((share) => {
@@ -612,18 +632,13 @@ export function setup() {
     // Initial transactions
     const transactionsToPost: NewTransactionRequest[] = [];
     const transactions: Transaction[] = [];
-    store.shareTypes.forEach((shareType) => {
-      const initialDeposit = Money.fromStringOrDefault(shareType.initialDeposit).round();
-      const shareTypeId = shareType.shareType?.id ?? -1;
-      if (shareTypeId < 0) throw new Error('Missing Share Type during initial deposit pass.');
 
-      createdShares
-        .filter((share) => share.shareTypeId === shareTypeId)
-        .forEach((share) => transactionsToPost.push({
-          shareId: share.id,
-          amount: initialDeposit,
-          comment: 'Initial Deposit',
-        }));
+    createdShares.forEach((share) => {
+      transactionsToPost.push({
+        shareId: share.id,
+        amount: share.initialDeposit,
+        comment: 'Initial Deposit',
+      });
     });
 
     const bulkTransactionReq: NewBulkTransactionRequest = {
