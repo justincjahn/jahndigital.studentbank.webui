@@ -6,7 +6,7 @@
       </h3>
     </slot>
 
-    <p class="share-info__item">
+    <p class="share-info__item share-info__item--focused">
       <span>Available Balance</span>
 
       {{
@@ -99,14 +99,20 @@ export default defineComponent({
       background-color: colorStep(primary, $step: 2);
     }
 
+    &__item:first-of-type {
+      margin-top: 0.25em;
+    }
+
     &__item {
-      span {
-        font-weight: 100;
-      }
+      margin-left: 0.25em;
 
       span::after {
         content: ':';
         margin-right: 0.25em;
+      }
+
+      &--focused {
+        font-weight: bold;
       }
     }
   }

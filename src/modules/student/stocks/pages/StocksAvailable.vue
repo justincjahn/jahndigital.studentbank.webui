@@ -10,7 +10,7 @@
           Symbol
         </th>
         <th class="center">
-          Name
+          Company
         </th>
         <th class="right">
           Price
@@ -173,5 +173,17 @@ export default defineComponent({
 <style lang="scss">
 .available-stocks-list {
   padding: 0 2em;
+
+  @include mobile-table (
+    $names: [
+      Symbol,
+      Company,
+      Price
+    ]
+  ) {
+    button {
+      margin-left: 0;
+    }
+  }
 }
 </style>

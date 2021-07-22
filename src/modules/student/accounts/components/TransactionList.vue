@@ -99,65 +99,13 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-// Collapse the table into rows instead of columns for small screens
-@media screen and (max-width: 800px) {
-  .transaction-list {
-    // padding: 0 1.5em;
-
-    & thead, & tbody, & th, & td, & tr {
-      display: block;
-    }
-
-    & thead th {
-      display: none;
-    }
-
-    & tr + tr {
-      border-top: 2px solid colorStep(secondary, $step: 4);
-    }
-
-    & tbody tr td {
-      $size: 8em;
-
-      position: relative;
-      padding-left: $size !important;
-      border: none;
-      text-align: left !important;
-      word-break: break-all;
-
-      & + td {
-        border-top: 1px solid colorStep(secondary, $step: 2);
-      }
-
-      &::before {
-        position: absolute;
-        top: 0.5em;
-        left: 0.25em;
-        width: $size;
-        white-space: nowrap;
-        font-weight: bold;
-      }
-
-      &:nth-of-type(1)::before {
-        content: 'Date';
-      }
-
-      &:nth-of-type(2)::before {
-        content: 'Type';
-      }
-
-      &:nth-of-type(3)::before {
-        content: 'Comment';
-      }
-
-      &:nth-of-type(4)::before {
-        content: 'Amount';
-      }
-
-      &:nth-of-type(5)::before {
-        content: 'New Balance';
-      }
-    }
-  }
+.transaction-list {
+  @include mobile-table($names: [
+    Date,
+    Type,
+    Comment,
+    Amount,
+    New Balance
+  ]);
 }
 </style>

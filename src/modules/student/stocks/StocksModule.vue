@@ -1,7 +1,7 @@
 <template>
   <section class="sub-nav sub-nav--padded">
     <router-link :to="{ name: holdingsRoute }">
-      My Holdings
+      My Portfolio
     </router-link>
 
     <router-link :to="{ name: availableRoute }">

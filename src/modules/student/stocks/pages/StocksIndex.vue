@@ -7,13 +7,13 @@
     <thead>
       <tr>
         <th>
-          Name
-        </th>
-        <th>
           Symbol
         </th>
         <th>
-          Last Purchase
+          Company
+        </th>
+        <th>
+          Last Transaction
         </th>
         <th class="center">
           Holdings
@@ -35,8 +35,8 @@
     </thead>
     <tbody>
       <tr v-for="stock in stocks" :key="stock.id">
-        <td>{{ stock.stock.name }}</td>
         <td>{{ stock.stock.symbol }}</td>
+        <td>{{ stock.stock.name }}</td>
         <td>
           {{ new Date(stock.dateLastActive).toLocaleDateString('en-US') }}
           {{ new Date(stock.dateLastActive).toLocaleTimeString('en-US') }}
@@ -250,5 +250,19 @@ export default defineComponent({
 <style lang="scss">
 .held-stocks-list {
   padding: 0 2em;
+
+  @include mobile-table (
+    $size: 9.5em,
+    $names: [
+      Symbol,
+      Company,
+      Last Transaction,
+      Holdings,
+      Share Value,
+      Total,
+      Net Contributions,
+      Position
+    ]
+  );
 }
 </style>

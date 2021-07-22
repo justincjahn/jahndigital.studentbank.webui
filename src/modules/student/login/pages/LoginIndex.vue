@@ -10,7 +10,7 @@
     @ok="login"
   >
     <form class="student-login" @submit.prevent="login">
-      <label for="username">Student ID or Email</label>
+      <label for="username">Student ID Number or Email Address</label>
       <input
         id="username"
         v-model="username"

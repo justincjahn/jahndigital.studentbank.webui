@@ -12,7 +12,7 @@ const routes: RouteRecordRaw[] = [
 
     children: [
       {
-        path: 'holdings',
+        path: 'portfolio',
         name: RouteNames.holdings,
         component: () => import(/* webpackChunkName: "student-stocks" */ './pages/StocksIndex.vue'),
       },

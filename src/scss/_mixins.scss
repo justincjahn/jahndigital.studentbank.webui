@@ -94,3 +94,50 @@
     }
   }
 }
+
+@mixin mobile-table($size: 8em, $width: 800px, $names: []) {
+  @media screen and (max-width: $width) {
+    & thead, & tbody, & th, & td, & tr {
+      display: block;
+    }
+
+    & thead th {
+      display: none;
+    }
+
+    & tr + tr {
+      border-top: 2px solid colorStep(secondary, $step: 4);
+    }
+
+    & tbody tr td {
+      position: relative;
+      padding-left: $size !important;
+      border: none;
+      text-align: left !important;
+      word-break: break-all;
+
+      & + td {
+        border-top: 1px solid colorStep(secondary, $step: 2);
+      }
+
+      &::before {
+        position: absolute;
+        top: 0.5em;
+        left: 0.25em;
+        width: $size;
+        white-space: nowrap;
+        font-weight: bold;
+      }
+
+      @for $i from 1 through length($names) {
+        $x: nth($names, $i);
+
+        &:nth-of-type(#{$i})::before {
+          content: '#{$x}';
+        }
+      }
+
+      @content;
+    }
+  }
+}

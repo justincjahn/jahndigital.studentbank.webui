@@ -230,7 +230,7 @@ export default defineComponent({
 
     // URL to send to students
     const inviteUrl = computed(() => {
-      const baseUrl = `${window.location.protocol}://${window.location.host}/${BASE_URLS.REGISTER}?i=${inviteCode.value}`;
+      const baseUrl = `${window.location.protocol}//${window.location.host}/${BASE_URLS.REGISTER}?i=${inviteCode.value}`;
       return baseUrl;
     });
 

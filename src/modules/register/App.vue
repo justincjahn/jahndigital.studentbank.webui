@@ -20,7 +20,7 @@
         </div>
 
         <div class="fieldset">
-          <label for="registration-card--account-number">Account Number (Student ID)</label>
+          <label for="registration-card--account-number">Account Number (Student ID Number)</label>
 
           <input
             id="registration-card--account-number"
