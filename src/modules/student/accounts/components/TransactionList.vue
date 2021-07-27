@@ -1,6 +1,6 @@
 <template>
   <div class="transaction-list" :class="{ loading }">
-    <table>
+    <table :class="{ loading }">
       <thead>
         <tr>
           <th>
