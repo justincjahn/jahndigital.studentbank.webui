@@ -2,11 +2,13 @@
   <modal
     title="Funds Transfer"
     cancel-label="Cancel"
-    ok-label="Transfer"
     class="transfer-modal large"
+    :ok-label="okLabel"
     :show="show"
-    :can-submit="isValid"
-    :handle-enter="isValid"
+    :can-submit="isValid && !loading"
+    :handle-enter="isValid && !loading"
+    :can-canel="!loading"
+    :handle-escape="!loading"
     @ok="handleOk"
     @cancel="handleCancel"
   >
@@ -93,6 +95,10 @@ export default defineComponent({
       type: Object as PropType<Share[]>,
       default: [] as Share[],
     },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: [
     'ok',
@@ -123,6 +129,11 @@ export default defineComponent({
       if (amountError.value !== '') return false;
       if (commentError.value !== '') return false;
       return true;
+    });
+
+    const okLabel = computed(() => {
+      if (props.loading) return 'Loading...';
+      return 'Transfer';
     });
 
     /**
@@ -183,6 +194,7 @@ export default defineComponent({
       withdrawalLimitError,
       withdrawalLimitFeeError,
       isValid,
+      okLabel,
       amountValid,
       handleOk,
       handleCancel,

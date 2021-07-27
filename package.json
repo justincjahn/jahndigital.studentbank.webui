@@ -1,6 +1,6 @@
 {
   "name": "jahndigital.studentbank.webui",
-  "version": "0.0.5-alpha",
+  "version": "0.0.6-alpha",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",

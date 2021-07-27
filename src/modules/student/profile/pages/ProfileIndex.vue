@@ -23,7 +23,12 @@
           class="primary"
           :disabled="!profileFormValid"
         >
-          Update Profile
+          <template v-if="loading">
+            Loading...
+          </template>
+          <template v-else>
+            Update Profile
+          </template>
         </button>
       </div>
     </form>
@@ -82,7 +87,12 @@
           class="primary"
           :disabled="!passwordChangeFormValid"
         >
-          Update Password
+          <template v-if="loading">
+            Loading...
+          </template>
+          <template v-else>
+            Update Password
+          </template>
         </button>
       </div>
     </form>
@@ -208,6 +218,7 @@ export default defineComponent({
 
     return {
       ...userStore,
+      loading,
       emailAddress,
       emailAddressError,
       validateEmail,

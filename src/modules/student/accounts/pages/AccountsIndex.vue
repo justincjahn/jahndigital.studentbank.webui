@@ -14,6 +14,7 @@
       :show="showTransferModal"
       :source="sourceShare"
       :shares="transferShares"
+      :loading="transferLoading"
       @ok="handleTransfer"
       @cancel="cancelTransfer"
     />
@@ -45,6 +46,7 @@ export default defineComponent({
     const router = useRouter();
     const sourceShare = ref<Share|null>(null);
     const showTransferModal = ref(false);
+    const transferLoading = ref(false);
 
     const orderedShares = computed(() => {
       const shares = [...globalStore.shares.value];
@@ -83,6 +85,7 @@ export default defineComponent({
     async function handleTransfer({ destination, amount, comment }: transferPayload) {
       if (!sourceShare.value) return;
 
+      transferLoading.value = true;
       try {
         await newTransfer({
           sourceShareId: sourceShare.value.id,
@@ -99,6 +102,7 @@ export default defineComponent({
       } catch (e) {
         errorStore.setCurrentError(e?.message ?? e);
       } finally {
+        transferLoading.value = false;
         showTransferModal.value = false;
       }
     }
@@ -132,6 +136,7 @@ export default defineComponent({
       showTransferModal,
       orderedShares,
       transferShares,
+      transferLoading,
       startTransfer,
       cancelTransfer,
       handleTransfer,
