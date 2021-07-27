@@ -1,6 +1,7 @@
 <template>
   <suspense>
     <share-list
+      :selected="selectedShare"
       :shares="orderedShares"
       @start-transfer="startTransfer"
     />
@@ -102,24 +103,31 @@ export default defineComponent({
       }
     }
 
-    // Select the first share if none is selected
     watch(() => router.currentRoute.value, (newRoute) => {
       if (newRoute.name !== AccountsRouteNames.index) return;
-      if (globalStore.shares.value.length === 0) return;
 
-      if (!globalStore.selectedShare.value) {
-        [globalStore.selectedShare.value] = orderedShares.value;
+      let shareIds = newRoute.params?.shareId ?? [];
+      if (!Array.isArray(shareIds)) shareIds = [shareIds];
+
+      const shareId: string|undefined = shareIds[0];
+      if (typeof shareId === 'undefined') {
+        globalStore.selectedShare.value = null;
+        globalStore.clearTransactions();
+        return;
       }
 
-      router.push({
-        name: AccountsRouteNames.transactions,
-        params: {
-          shareId: globalStore.selectedShare.value.id,
-        },
-      });
+      const selected = globalStore.shares.value.find((x) => x.id === +shareId);
+      if (selected) {
+        globalStore.selectedShare.value = selected;
+        globalStore.fetchShareTransactions({
+          shareId: selected.id,
+          first: 10,
+        });
+      }
     }, { immediate: true });
 
     return {
+      selectedShare: globalStore.selectedShare,
       sourceShare,
       showTransferModal,
       orderedShares,
@@ -131,3 +139,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+h2 {
+  margin: 0.75em 0 0.75em 1rem;
+}
+</style>

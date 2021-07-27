@@ -1,34 +1,47 @@
 <template>
   <div class="share-list">
+    <p class="share-list--help help-text">
+      Select an Account from the list below to view transaction history or click Transfer
+      to move funds into another account.
+    </p>
     <div
       v-for="share in shares"
       :key="share.id"
       class="share-list__item"
     >
-      <share-info :share="share">
-        <template #default="{ shareName, share: sh }">
-          <router-link
-            :to="{ name: transactionRoute, params: { shareId: sh.id } }"
-            class="share-list__item--name"
-          >
-            {{ shareName }}
-          </router-link>
-        </template>
-      </share-info>
+      <div class="share-list__item__info">
+        <share-info :share="share">
+          <template #default="{ shareName, share: sh }">
+            <router-link
+              :to="{ name: transactionRoute, params: { shareId: sh.id } }"
+              class="share-list__item__info--name"
+            >
+              {{ shareName }}
+            </router-link>
+          </template>
+        </share-info>
 
-      <button
-        type="button"
-        class="secondary share-list__item--transfer"
-        @click.prevent="startTransfer(share)"
-      >
-        Transfer
-      </button>
+        <button
+          type="button"
+          class="secondary share-list__item__info--transfer"
+          @click.prevent="startTransfer(share)"
+        >
+          Transfer
+        </button>
+      </div>
+
+      <suspense>
+        <transaction-list
+          v-if="share.id == selected?.id ?? -1"
+          class="share-list__item__transactions"
+        />
+      </suspense>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import { defineAsyncComponent, defineComponent, PropType } from 'vue';
 
 // Components
 import ShareInfo from '../../components/ShareInfo.vue';
@@ -39,11 +52,16 @@ import AccountsRouteNames from '../routeNames';
 export default defineComponent({
   components: {
     ShareInfo,
+    TransactionList: defineAsyncComponent(() => import('./TransactionList.vue')),
   },
   props: {
     shares: {
       type: Object as PropType<Share[]>,
       required: true,
+    },
+    selected: {
+      type: Object as PropType<Share|null>,
+      default: null,
     },
   },
   emits: [
@@ -55,7 +73,7 @@ export default defineComponent({
     }
 
     return {
-      transactionRoute: AccountsRouteNames.transactions,
+      transactionRoute: AccountsRouteNames.index,
       startTransfer,
     };
   },
@@ -64,15 +82,17 @@ export default defineComponent({
 
 <style lang="scss">
 .share-list {
-  width: 100%;
-  margin-bottom: 2em;
-  padding: 1em;
   background-color: colorStep(secondary);
 
-  &__item {
+  & &--help { // Specificity
+    padding: 1em;
+  }
+
+  &__item__info {
+    margin: 0 1em;
+    padding-bottom: 1em;
     display: flex;
     flex-direction: column;
-    margin: 0 auto;
 
     @media (min-width: 800px) {
       flex-direction: row;
@@ -80,19 +100,22 @@ export default defineComponent({
       align-items: flex-end;
     }
 
-    & + & {
-      margin-top: 1em;
-      border-top: 1px dotted rgba(0,0,0,0.1);
-    }
-
     &--name {
+      position: relative;
       width: 100%;
       display: block;
-      font-size: 1.15em;
-      font-weight: bold;
-
-      // font-family: 'Consolas', 'Courier New', Courier, monospace;
+      font-size: 1.125em;
+      font-weight: 600;
       text-decoration: none;
+
+      &::after {
+        position: absolute;
+        width: 32px;
+        margin-left: 0.25rem;
+        top: -0.415em;
+        font-size: 2em;
+        content: '\1F892';
+      }
     }
 
     &--transfer {
@@ -102,6 +125,17 @@ export default defineComponent({
         margin: 0;
       }
     }
+  }
+
+  &__item + &__item {
+    padding-top: 0.5em;
+    margin-top: 0.5em;
+    border-top: 1px dotted rgba(0,0,0,0.1);
+  }
+
+  &__item__transactions {
+    padding: 1em;
+    background-color: #FFF;
   }
 }
 </style>

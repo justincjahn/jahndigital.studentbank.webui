@@ -10,15 +10,9 @@ const routes: RouteRecordRaw[] = [
 
     children: [
       {
-        path: '',
+        path: ':shareId?',
         name: RouteNames.index,
         component: () => import(/* webpackChunkName: "student-accounts" */ './pages/AccountsIndex.vue'),
-
-        children: [{
-          path: 'transactions/:shareId',
-          name: RouteNames.transactions,
-          component: () => import(/* webpackChunkName: "student-accounts" */ './pages/AccountsTransactions.vue'),
-        }],
       },
     ],
   },
