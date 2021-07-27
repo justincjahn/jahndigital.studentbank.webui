@@ -96,9 +96,11 @@ export default defineComponent({
 
         await globalStore.fetchShares(sourceShare.value.studentId, false);
 
-        await globalStore.fetchShareTransactions({
-          shareId: currentShareId.value,
-        });
+        if (currentShareId.value > 0) {
+          await globalStore.fetchShareTransactions({
+            shareId: currentShareId.value,
+          });
+        }
       } catch (e) {
         errorStore.setCurrentError(e?.message ?? e);
       } finally {
