@@ -96,7 +96,14 @@
             class="secondary"
             @click="handlePurchaseShow(stock)"
           >
-            Buy/Sell
+            Buy
+          </button>
+
+          <button
+            class="secondary"
+            @click="handlePurchaseShow(stock, true)"
+          >
+            Sell
           </button>
         </td>
       </tr>
@@ -131,6 +138,7 @@
     :loading="purchaseLoading"
     :stock="purchaseSelectedStock"
     :shares="shares"
+    :sell="purchaseModalMode"
     @ok="handlePurchaseOk"
     @cancel="handlePurchaseCancel"
   />
@@ -159,11 +167,14 @@ export default defineComponent({
 
     const showPurchaseModal = ref(false);
 
+    const purchaseModalMode = ref(false);
+
     const purchaseLoading = ref(false);
 
     const purchaseSelectedStock = ref<Stock|null>(null);
 
-    async function handlePurchaseShow(studentStock: StudentStock) {
+    async function handlePurchaseShow(studentStock: StudentStock, sellMode = false) {
+      purchaseModalMode.value = sellMode;
       purchaseSelectedStock.value = studentStock.stock;
       showPurchaseModal.value = true;
 
@@ -235,6 +246,7 @@ export default defineComponent({
       fetchPrevious: globalStore.stocksHeld.fetchPrevious,
 
       showPurchaseModal,
+      purchaseModalMode,
       purchaseLoading,
       purchaseSelectedStock,
       worth,

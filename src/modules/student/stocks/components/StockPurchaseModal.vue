@@ -52,10 +52,11 @@
     <base-input
       v-model="quantity"
       v-model:error="quantityError"
-      label="Quantity to Buy or Sell"
       placeholder="0"
       pattern="^-?[0-9]+$"
+      maxlength="6"
       required
+      :label="`Quantity to ${sell ? 'Sell' : 'Buy'}`"
     />
 
     <ul class="stock-purchase-modal__total">
@@ -122,6 +123,10 @@ export default defineComponent({
       type: Object as PropType<Stock|null>,
       default: null,
     },
+    sell: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: [
     'ok',
@@ -135,17 +140,18 @@ export default defineComponent({
     const studentStock = ref<StudentStock|null>(null);
 
     const title = computed(() => {
-      if (props.stock === null) return 'Purchase Stock';
-      return `Buy/Sell ${props.stock.symbol}`;
+      if (!props.stock) return 'Purchase Stock';
+      if (props.sell) return `Sell ${props.stock.symbol}`;
+      return `Buy ${props.stock.symbol}`;
     });
 
     const sharesOwned = computed(() => {
-      if (studentStock.value === null) return 0;
+      if (!studentStock.value) return 0;
       return studentStock.value.sharesOwned;
     });
 
     const currentValue = computed(() => {
-      if (props.stock === null) return 0.0;
+      if (!props.stock) return 0.0;
       return props.stock.currentValue;
     });
 
@@ -166,6 +172,13 @@ export default defineComponent({
       let shares = +value;
       if (Number.isNaN(shares)) shares = 0;
 
+      if (shares < 0) {
+        return 'Quantity must be greater than zero.';
+      }
+
+      // If we're in 'sell' mode, the quantity should be negative.
+      if (props.sell) shares *= -1;
+
       const shareBalance = selectedShare.value?.balance ?? 0;
       const totalAmount = shares * currentValue.value;
       if (totalAmount > shareBalance) {
@@ -181,6 +194,14 @@ export default defineComponent({
 
     const { value: quantity, error: quantityError } = useValidation(validateQuantity);
 
+    // Depending on if the modal is in buy or sell mode, the quantity should actually be positive or negative.
+    const normQuantity = computed(() => {
+      const isSell = props.sell ? -1 : 1;
+      const qty = +quantity.value;
+      if (Number.isNaN(qty)) return 0.0;
+      return qty * isSell;
+    });
+
     const {
       amount,
       feeAmount,
@@ -188,9 +209,8 @@ export default defineComponent({
     } = useTransactionCalculations(() => selectedShare.value);
 
     const total = computed(() => {
-      const value = +quantity.value.trim() * currentValue.value * -1;
-      if (Number.isNaN(value)) return 0;
-      return value;
+      if (normQuantity.value === 0.0) return 0.0;
+      return normQuantity.value * currentValue.value * -1;
     });
 
     const okLabel = computed(() => {
@@ -209,7 +229,7 @@ export default defineComponent({
 
     function handleOk() {
       emit('ok', {
-        quantity: +quantity.value,
+        quantity: normQuantity.value,
         shareId: selectedShare.value?.id ?? -1,
       });
     }
