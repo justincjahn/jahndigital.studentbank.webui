@@ -27,6 +27,16 @@ header {
 
     h1 {
       font-size: clamp(1.2rem, 3vw, 2rem);
+
+      img {
+        display: block;
+        max-height: clamp(50px, 7vw, 90px);
+        width: auto;
+  
+        @media screen and (min-width: 900px) {
+          display: inline;
+        }
+      }
     }
 
     &__login {

@@ -1,7 +1,17 @@
 <template>
   <header v-if="isAuthenticated">
     <section class="main-nav">
-      <h1>{{ SITE_NAME }}</h1>
+      <h1>
+        <template v-if="SITE_LOGO">
+          <img
+            :src="SITE_LOGO"
+            :alt="SITE_NAME"
+          />
+        </template>
+        <template v-if="!SITE_DISABLE_NAME">
+          {{ SITE_NAME }}
+        </template>
+      </h1>
 
       <div class="main-nav__login">
         <login-widget />
@@ -46,7 +56,7 @@
 </template>
 
 <script type="ts">
-import { SITE_NAME, VERSION } from '@/constants';
+import { SITE_NAME, SITE_DISABLE_NAME, SITE_LOGO, VERSION } from '@/constants';
 import { defineComponent, defineAsyncComponent, provide, watchEffect, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -110,6 +120,8 @@ export default defineComponent({
 
     return {
       SITE_NAME,
+      SITE_DISABLE_NAME,
+      SITE_LOGO,
       VERSION,
       isAuthenticated: userStore.isAuthenticated,
       loading: routerStore.loading,

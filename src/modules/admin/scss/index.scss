@@ -5,7 +5,7 @@
 body {
   margin: 0px auto;
   max-width: 1200px;
-  overflow-y: scroll; /* Show vertical scrollbar to prevent shifting of elements */
+  overflow-y: scroll; // Show vertical scrollbar to prevent shifting of elements
 }
 
 #app {
@@ -21,16 +21,23 @@ header { margin: 0 1.5em; }
 
 .main-nav {
   display: grid;
-  align-items: center;
-  grid-template-rows: repeat(3, 1fr);
+  align-items: flex-start;
   margin-top: 1em;
+  gap: 1rem;
 
   & h1 {
-    font-size: clamp(1.2rem, 3vw, 2rem);
-  }
+    line-height: 1;
+    font-size: clamp(1.2rem, 2.5vw, 2rem);
 
-  &__instances {
-    align-self: center;
+    img {
+      display: block;
+      max-height: clamp(50px, 7vw, 90px);
+      width: auto;
+
+      @media screen and (min-width: 900px) {
+        display: inline;
+      }
+    }
   }
 
   &__login {
@@ -40,7 +47,7 @@ header { margin: 0 1.5em; }
 
   @media screen and (min-width: 750px) {
     display: flex;
-    align-items: baseline;
+    align-items: flex-end;
 
     &__instances {
       margin-left: 1em;

@@ -8,6 +8,12 @@ export const API_MAX_CONCURRENCY: number = process.env.VUE_APP_API_MAX_CONCURREN
 // NOTE: The default for this variable is defined in the vue.config.js file.
 export const SITE_NAME: string = process.env.VUE_APP_SITE_NAME || 'ERROR';
 
+// Hide the site name from the header if true
+export const SITE_DISABLE_NAME: boolean = (process.env?.VUE_APP_SITE_DISABLE_NAME ?? 'false') === 'true';
+
+// The URL of an image to use as the site's header logo.
+export const SITE_LOGO: string | null = process.env.VUE_APP_SITE_LOGO || null;
+
 // The import URL for the theme file containing variables for SCSS
 // NOTE: The default for this variable is defined in the vue.config.js file.
 // NOTE: This is auto-imported by Webpack, so you probably don't need it.

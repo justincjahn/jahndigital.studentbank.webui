@@ -1,7 +1,19 @@
 <template>
   <header v-if="isAuthenticated">
     <section class="main-nav">
-      <h1>{{ SITE_NAME }} Admin</h1>
+      <h1>
+        <template v-if="SITE_LOGO">
+          <img
+            :src="SITE_LOGO"
+            :alt="`${SITE_NAME} Admin`"
+          />
+        </template>
+        <template v-if="!SITE_DISABLE_NAME">
+          {{ SITE_NAME }}
+        </template>
+
+        Admin
+      </h1>
 
       <div class="main-nav__instances">
         <template v-if="isAuthenticated">
@@ -64,7 +76,7 @@
 </template>
 
 <script lang="ts">
-import { BASE_URLS, SITE_NAME, VERSION } from '@/constants';
+import { BASE_URLS, SITE_NAME, SITE_DISABLE_NAME, SITE_LOGO, VERSION } from '@/constants';
 import { defineAsyncComponent, defineComponent, watchEffect, provide, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -119,6 +131,8 @@ export default defineComponent({
 
     return {
       SITE_NAME,
+      SITE_DISABLE_NAME,
+      SITE_LOGO,
       VERSION,
       globalStore,
       groupsIndex: GroupRouteNames.index,

@@ -24,6 +24,8 @@ jobs:
         env:
           VUE_APP_API_URL: "${{ secrets.VUE_APP_API_URL }}"
           VUE_APP_SITE_NAME: "${{ secrets.VUE_APP_SITE_NAME }}"
+          VUE_APP_SITE_DISABLE_NAME: "${{ secrets.VUE_APP_SITE_DISABLE_NAME }}"
+          VUE_APP_SITE_LOGO: "${{ secrets.VUE_APP_SITE_LOGO }}"
           VUE_APP_THEME: "${{ secrets.VUE_APP_THEME }}"
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_NICE_MOSS_0F3FFAB1E }}
