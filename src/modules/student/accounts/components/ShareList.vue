@@ -15,6 +15,7 @@
             <router-link
               :to="{ name: transactionRoute, params: { shareId: sh.id } }"
               class="share-list__item__info--name"
+              @click="handleClick(share)"
             >
               {{ shareName }}
             </router-link>
@@ -41,7 +42,7 @@
 </template>
 
 <script lang="ts">
-import { defineAsyncComponent, defineComponent, PropType } from 'vue';
+import { defineAsyncComponent, defineComponent, PropType, computed } from 'vue';
 
 // Components
 import ShareInfo from '../../components/ShareInfo.vue';
@@ -65,16 +66,25 @@ export default defineComponent({
     },
   },
   emits: [
+    'click',
     'start-transfer',
   ],
   setup(props, { emit }) {
+    const sid = computed(() => props.selected?.id ?? -1);
+
+    function handleClick(share: Share) {
+      emit('click', share);
+    }
+
     function startTransfer(share: Share) {
       emit('start-transfer', share);
     }
 
     return {
       transactionRoute: AccountsRouteNames.index,
+      sid,
       startTransfer,
+      handleClick,
     };
   },
 });
@@ -110,11 +120,30 @@ export default defineComponent({
 
       &::after {
         position: absolute;
-        width: 32px;
-        margin-left: 0.25rem;
-        top: -0.415em;
-        font-size: 2em;
-        content: '\1F892';
+        content: "";
+        top: 0.9rem;
+        width: 0;
+        height: 0;
+        border: 0.4em solid transparent;
+        border-color:
+          rgba(map.get($theme, button-secondary, font-color), 0.6)
+          transparent
+          transparent
+          transparent;
+
+        transform: rotate(-90deg);
+        transform-origin: top;
+        transition: transform 0.1s ease-in-out, top 0.1s ease-in-out;
+      }
+
+      &.router-link-exact-active::after {
+        top: 0.5rem;
+        transform: rotate(0) scale(1.5) translateX(0.3em);
+        border-color:
+          map.get($theme, accent1, color)
+          transparent
+          transparent
+          transparent;
       }
     }
 

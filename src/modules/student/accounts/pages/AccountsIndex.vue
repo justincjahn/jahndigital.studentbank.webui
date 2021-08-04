@@ -4,6 +4,7 @@
       :selected="selectedShare"
       :shares="orderedShares"
       @start-transfer="startTransfer"
+      @click="handleShareClick"
     />
   </suspense>
 
@@ -73,6 +74,17 @@ export default defineComponent({
       showTransferModal.value = false;
     }
 
+    /**
+     * If the share is already selected, unselect it
+     */
+    function handleShareClick(share: Share) {
+      if ((globalStore.selectedShare.value?.id ?? -1) === share.id) {
+        router.push({
+          name: AccountsRouteNames.index,
+        });
+      }
+    }
+
     type transferPayload = {
       destination: Share;
       amount: number;
@@ -129,6 +141,8 @@ export default defineComponent({
           shareId: selected.id,
           first: 10,
         });
+      } else {
+        globalStore.selectedShare.value = null;
       }
     }, { immediate: true });
 
@@ -142,6 +156,7 @@ export default defineComponent({
       startTransfer,
       cancelTransfer,
       handleTransfer,
+      handleShareClick,
     };
   },
 });

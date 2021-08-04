@@ -215,7 +215,7 @@ export default defineComponent({
 
     const okLabel = computed(() => {
       if (props.loading || loading.value) return 'Loading...';
-      if (total.value > 0) return 'Sell';
+      if (props.sell) return 'Sell';
       return 'Buy';
     });
 
