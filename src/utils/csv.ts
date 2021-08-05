@@ -77,7 +77,7 @@ export function parseCSV<THeaders extends any>(
     ...opts,
   };
 
-  const sanitized = file.replace('\r\n', '\n').replace('\n\n', '\n');
+  const sanitized = file.replace(/[\r\n]+/g, '\n');
   const lines = sanitized.split('\n');
 
   for (let i = 0; i < lines.length; i += 1) {
