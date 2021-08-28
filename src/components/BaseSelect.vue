@@ -3,6 +3,7 @@
     <button
       ref="root"
       class="select__selected"
+      type="button"
       :class="{ 'select__selected--open': open }"
       :disabled="disabled"
       @click="toggle"
