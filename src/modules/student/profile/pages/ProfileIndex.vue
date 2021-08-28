@@ -33,77 +33,13 @@
       </div>
     </form>
   </div>
-
-  <div class="student-profile">
-    <h2>Change Password</h2>
-    <form
-      ref="passwordForm"
-      @submit.prevent="submitPasswordChange"
-    >
-      <input
-        type="hidden"
-        name="username"
-        autocomplete="username"
-        aria-label="username"
-        readonly
-        :value="username"
-      />
-
-      <base-input
-        v-model="currentPassword"
-        v-model:error="currentPasswordError"
-        name="current-password"
-        autocomplete="current-password"
-        label="Current Password"
-        type="password"
-        required
-        :validator="currentPasswordValidator"
-      />
-
-      <base-input
-        v-model="password"
-        v-model:error="passwordError"
-        name="new-password"
-        autocomplete="new-password"
-        label="New Password"
-        type="password"
-        required
-        :validator="samePasswordValidator"
-      />
-
-      <base-input
-        v-model="repeatPassword"
-        v-model:error="passwordError"
-        name="repeat-password"
-        autocomplete="repeat-password"
-        label="Repeat Password"
-        type="password"
-        required
-      />
-
-      <div class="buttons">
-        <button
-          type="submit"
-          class="primary"
-          :disabled="!passwordChangeFormValid"
-        >
-          <template v-if="loading">
-            Loading...
-          </template>
-          <template v-else>
-            Update Password
-          </template>
-        </button>
-      </div>
-    </form>
-  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent, ref, computed } from 'vue';
 
 // Utils
-import { validateEmail, validatePassword } from '@/utils/validators';
+import { validateEmail } from '@/utils/validators';
 
 // Services
 import { updateStudent } from '@/services/student';
@@ -121,34 +57,6 @@ export default defineComponent({
     const loading = ref(false);
     const emailAddress = ref(userStore.email.value);
     const emailAddressError = ref('');
-    const passwordForm = ref<HTMLFormElement|null>(null);
-    const currentPassword = ref('');
-    const currentPasswordError = ref('');
-    const repeatPassword = ref('');
-    const password = ref('');
-    const passwordError = ref('');
-    const passwordValidator = validatePassword(repeatPassword);
-
-    // Enrich error messages to tell users that their current and new passwords must differ
-    const samePasswordValidator = (value: string) => {
-      const isValid = passwordValidator(value);
-      if (isValid !== true) return isValid;
-
-      if (value === currentPassword.value) {
-        return 'New password cannot be the same as your old password.';
-      }
-
-      return true;
-    };
-
-    // Ensure that the current password is specified
-    const currentPasswordValidator = (value: string): boolean | string => {
-      if (!value || value.trim().length === 0) {
-        return 'Password is required.';
-      }
-
-      return true;
-    };
 
     // True if the profile form can be submitted
     const profileFormValid = computed(() => {
@@ -160,15 +68,6 @@ export default defineComponent({
       }
 
       return false;
-    });
-
-    // True if the password change form can be submitted
-    const passwordChangeFormValid = computed(() => {
-      if (loading.value) return false;
-      if (currentPassword.value.length <= 0) return false;
-      if (currentPassword.value === password.value) return false;
-      if (passwordError.value.length > 0) return false;
-      return true;
     });
 
     /**
@@ -193,29 +92,6 @@ export default defineComponent({
       }
     }
 
-    /**
-     * Update the student's password.
-     */
-    async function submitPasswordChange() {
-      if (!passwordForm.value) return;
-
-      try {
-        loading.value = true;
-
-        await updateStudent({
-          id: userStore.id.value,
-          currentPassword: currentPassword.value,
-          password: password.value,
-        });
-
-        passwordForm.value.reset();
-      } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
-      } finally {
-        loading.value = false;
-      }
-    }
-
     return {
       ...userStore,
       loading,
@@ -224,16 +100,6 @@ export default defineComponent({
       validateEmail,
       submitProfileUpdate,
       profileFormValid,
-      passwordForm,
-      currentPassword,
-      currentPasswordError,
-      currentPasswordValidator,
-      password,
-      passwordError,
-      repeatPassword,
-      samePasswordValidator,
-      submitPasswordChange,
-      passwordChangeFormValid,
     };
   },
 });
@@ -244,10 +110,9 @@ export default defineComponent({
     padding: 3rem;
 
     @media (min-width: 800px) {
+      @include round-border;
       width: 35rem;
       margin: 2rem auto;
-      border: 2px solid colorStep(secondary, $step: 2);
-      border-radius: 0.5rem;
     }
 
     h2 {

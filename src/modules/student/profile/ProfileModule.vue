@@ -1,4 +1,13 @@
 <template>
+  <section class="sub-nav sub-nav--padded">
+    <router-link :to="{ name: myRoute }">
+      My Profile
+    </router-link>
+
+    <router-link :to="{ name: passwordRoute }">
+      Change Password
+    </router-link>
+  </section>
   <router-view v-if="!loading" />
   <template v-else>
     <loading-label class="page-loading" />
@@ -16,6 +25,9 @@ import LoadingLabel from '@/components/LoadingLabel.vue';
 
 // Stores
 import errorStore from '@/stores/error';
+
+// Routes
+import routeNames from './routeNames';
 
 export default defineComponent({
   components: {
@@ -37,6 +49,8 @@ export default defineComponent({
 
     return {
       loading,
+      myRoute: routeNames.myProfile,
+      passwordRoute: routeNames.changePassword,
     };
   },
 });

@@ -4,7 +4,7 @@
       {{ email }}
     </span>
     <span v-else>
-      {{ username }}
+      {{ username ?? 'Loading...' }}
     </span>
 
     <span class="logout">
