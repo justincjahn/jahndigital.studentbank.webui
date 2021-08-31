@@ -69,7 +69,7 @@ export interface StudentStockHistoryOptions extends FetchOptionsBase {
  * @returns A promise containing a list of stocks.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function getStocks(options?: StockListOptions) {
+export async function getStocks(options?: StockListOptions): Promise<PagedStockResponse> {
   const opts = {
     first: FETCH_OPTIONS.DEFAULT_COUNT,
     cache: true,
@@ -85,7 +85,7 @@ export async function getStocks(options?: StockListOptions) {
  * @param options
  * @returns A promise containing a list of stock history.
  */
-export async function getStockHistory(options: StockHistoryListOptions) {
+export async function getStockHistory(options: StockHistoryListOptions): Promise<PagedStockHistoryResponse> {
   const opts = {
     first: FETCH_OPTIONS.DEFAULT_COUNT,
     cache: true,
@@ -101,7 +101,7 @@ export async function getStockHistory(options: StockHistoryListOptions) {
  * @param options
  * @returns A promise containing a list of stock history.
  */
-export async function getStudentStocks(options: StudentStocksOptions) {
+export async function getStudentStocks(options: StudentStocksOptions): Promise<PagedStudentStockResponse> {
   const opts = {
     first: FETCH_OPTIONS.DEFAULT_COUNT,
     cache: true,
@@ -117,7 +117,9 @@ export async function getStudentStocks(options: StudentStocksOptions) {
  * @param options
  * @returns A promise containing a list of a student's purchase history for the holding provided.
  */
-export async function getStudentStockHistory(options: StudentStockHistoryOptions) {
+export async function getStudentStockHistory(
+  options: StudentStockHistoryOptions,
+): Promise<PagedStudentStockHistoryResponse> {
   const opts = {
     first: FETCH_OPTIONS.DEFAULT_COUNT,
     cache: false,
@@ -134,7 +136,7 @@ export async function getStudentStockHistory(options: StudentStockHistoryOptions
  * @returns A promise containing the new Stock object.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function newStock(input: NewStockRequest) {
+export async function newStock(input: NewStockRequest): Promise<NewStockResponse> {
   return mutate<NewStockResponse>(gqlStockCreate, input);
 }
 
@@ -145,7 +147,7 @@ export async function newStock(input: NewStockRequest) {
  * @returns A promise containing the updated Stock object.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function updateStock(input: UpdateStockRequest) {
+export async function updateStock(input: UpdateStockRequest): Promise<UpdateStockResponse> {
   return mutate<UpdateStockResponse>(gqlStockUpdate, input);
 }
 
@@ -156,7 +158,7 @@ export async function updateStock(input: UpdateStockRequest) {
  * @returns A promise containing the updated Stock object.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function linkStock(input: LinkUnlinkStockRequest) {
+export async function linkStock(input: LinkUnlinkStockRequest): Promise<LinkStockResponse> {
   return mutateCustom<LinkStockResponse>({
     mutation: gqlStockLink,
     variables: input,
@@ -178,7 +180,7 @@ export async function linkStock(input: LinkUnlinkStockRequest) {
  * @returns A promise containing the updated Stock object.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function unlinkStock(input: LinkUnlinkStockRequest) {
+export async function unlinkStock(input: LinkUnlinkStockRequest): Promise<UnlinkStockResponse> {
   return mutateCustom<UnlinkStockResponse>({
     mutation: gqlStockUnlink,
     variables: input,
@@ -200,7 +202,7 @@ export async function unlinkStock(input: LinkUnlinkStockRequest) {
  * @returns True if the object was deleted.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function deleteStock(stock: Stock) {
+export async function deleteStock(stock: Stock): Promise<DeleteStockResponse> {
   return mutateCustom<DeleteStockResponse>({
     mutation: gqlStockDelete,
     variables: { id: stock.id },
@@ -219,6 +221,6 @@ export async function deleteStock(stock: Stock) {
  * @returns A promise containing the updated Stock object.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function restoreStock(input: DeleteRestoreStockRequest) {
+export async function restoreStock(input: DeleteRestoreStockRequest): Promise<RestoreStockResponse> {
   return mutate<RestoreStockResponse>(gqlStockRestore, input);
 }

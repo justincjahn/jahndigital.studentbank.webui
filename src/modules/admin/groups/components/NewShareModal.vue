@@ -13,9 +13,9 @@
     @ok.prevent="handleOk"
   >
     <p>
-      Use the controls below to specify the Shares you'd like to create for each Student currenly selected.  Checking the
-      <em>Allow Duplicate Shares to be Created?</em> box allows the shares you define here to be created even if the Student
-      already has a Share of that type.
+      Use the controls below to specify the Shares you'd like to create for each Student currenly
+      selected.  Checking the <em>Allow Duplicate Shares to be Created?</em> box allows the shares
+      you define here to be created even if the Student already has a Share of that type.
     </p>
 
     <p v-if="students.length">
@@ -60,8 +60,8 @@
   </modal>
 </template>
 <script lang="ts">
-import { API_MAX_CONCURRENCY } from '@/constants';
 import { defineComponent, PropType, ref, computed, watchEffect } from 'vue';
+import { API_MAX_CONCURRENCY } from '@/constants';
 
 // Utils
 import selection from '@/services/StudentSelectionService';
@@ -198,7 +198,8 @@ export default defineComponent({
         try {
           // eslint-disable-next-line no-await-in-loop
           const res = await Promise.all(
-            shareRequests.splice(0, API_MAX_CONCURRENCY).map((newShareRequest) => props.store.share.newShare(newShareRequest)),
+            shareRequests.splice(0, API_MAX_CONCURRENCY)
+              .map((newShareRequest) => props.store.share.newShare(newShareRequest)),
           );
 
           res.forEach((share) => {

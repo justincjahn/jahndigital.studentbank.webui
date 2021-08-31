@@ -34,7 +34,8 @@
 
         <share-type-multiselect
           v-model="deletableSelected"
-          prompt="There are no Share Types that can be deleted.  Share Types must be unlinked from all instances to be deletable."
+          prompt="There are no Share Types that can be deleted.  Share Types must be unlinked
+            from all instances to be deletable."
           :share-types="deletableShareTypes"
           :loading="deletableLoading"
         />
@@ -100,7 +101,10 @@ export default defineComponent({
     const deletableSelected = ref<ShareType[]>([]);
 
     // Array of share types without any links.
-    const deletableShareTypes = computed(() => props.store.shareTypeAvailable.shareTypes.value.filter((x) => x.shareTypeInstances.length === 0));
+    const deletableShareTypes = computed(
+      () => props.store.shareTypeAvailable.shareTypes.value
+        .filter((x) => x.shareTypeInstances.length === 0),
+    );
 
     // True if the unlink button should be enabled
     const canDelete = computed(() => {

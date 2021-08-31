@@ -76,9 +76,9 @@
 </template>
 
 <script lang="ts">
-import { BASE_URLS, SITE_NAME, SITE_DISABLE_NAME, SITE_LOGO, VERSION } from '@/constants';
 import { defineAsyncComponent, defineComponent, watchEffect, provide, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { BASE_URLS, SITE_NAME, SITE_DISABLE_NAME, SITE_LOGO, VERSION } from '@/constants';
 
 // Routes
 import GroupRouteNames from '@/modules/admin/groups/routeNames';

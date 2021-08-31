@@ -17,7 +17,7 @@ import { mutate, query } from './Apollo';
  * @param input
  * @returns
  */
-export async function userLogin(input: LoginRequest) {
+export async function userLogin(input: LoginRequest): Promise<void> {
   userStore.setLoading(true);
 
   try {
@@ -34,7 +34,7 @@ export async function userLogin(input: LoginRequest) {
  * @param input
  * @returns
  */
-export async function studentLogin(input: LoginRequest) {
+export async function studentLogin(input: LoginRequest): Promise<void> {
   userStore.setLoading(true);
 
   try {
@@ -51,7 +51,7 @@ export async function studentLogin(input: LoginRequest) {
  * @param input
  * @returns
  */
-export async function studentPreregistration(input: StudentPreregistrationRequest) {
+export async function studentPreregistration(input: StudentPreregistrationRequest): Promise<void> {
   userStore.setLoading(true);
 
   try {
@@ -65,7 +65,7 @@ export async function studentPreregistration(input: StudentPreregistrationReques
 /**
  * Fetch user or student information from the server.
  */
-export async function info() {
+export async function info(): Promise<void> {
   if (!userStore.isAuthenticated.value) {
     throw new Error(ERROR_CODES.NOT_AUTHENTICATED);
   }
@@ -89,7 +89,7 @@ export async function info() {
 /**
  * Log the user or student out.
  */
-export async function logout() {
+export async function logout(): Promise<void> {
   if (userStore.isStudent.value) {
     const g = await import('@/graphql/mutations/studentRevokeRefreshToken.gql');
 

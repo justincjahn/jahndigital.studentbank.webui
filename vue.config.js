@@ -41,7 +41,7 @@ module.exports = {
   css: {
     loaderOptions: {
       sass: {
-        prependData: `
+        additionalData: `
           @use 'sass:map';
           @use 'sass:math';
           @import "${process.env.VUE_APP_THEME}";

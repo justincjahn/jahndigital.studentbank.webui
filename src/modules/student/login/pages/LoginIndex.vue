@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { ref, computed, watchEffect } from 'vue';
+import { defineComponent, ref, computed, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
 
 // Stores
@@ -48,7 +48,7 @@ import { studentLogin } from '@/services/auth';
 // Components
 import Modal from '@/components/Modal.vue';
 
-export default {
+export default defineComponent({
   components: {
     Modal,
   },
@@ -95,7 +95,7 @@ export default {
       isAuthenticated: userStore.isAuthenticated,
     };
   },
-};
+});
 </script>
 
 <style lang="scss">

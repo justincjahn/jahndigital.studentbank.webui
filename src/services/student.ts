@@ -45,7 +45,7 @@ export interface GetByGroupOptions extends FetchOptionsBase {
  * @returns
  * @throws {Error} If an error occurred during the network call.
  */
-export async function getStudentById(options: GetByIdOptions) {
+export async function getStudentById(options: GetByIdOptions): Promise<StudentResponse> {
   const opts = {
     cache: true,
     ...options,
@@ -61,7 +61,9 @@ export async function getStudentById(options: GetByIdOptions) {
  * @returns
  * @throws {Error} If an error occurred during the network call.
  */
-export async function getStudentsByAccountNumber(options: GetByAccountNumberOptions) {
+export async function getStudentsByAccountNumber(
+  options: GetByAccountNumberOptions,
+): Promise<PagedStudentResponse> {
   const opts = {
     cache: true,
     first: FETCH_OPTIONS.DEFAULT_COUNT,
@@ -86,7 +88,9 @@ export async function getStudentsByAccountNumber(options: GetByAccountNumberOpti
  * @returns
  * @throws {Error} If an error occurred during the network call.
  */
-export async function getStudentsByEmail(options: GetByEmailOptions) {
+export async function getStudentsByEmail(
+  options: GetByEmailOptions,
+): Promise<PagedStudentResponse> {
   const opts = {
     cache: true,
     first: FETCH_OPTIONS.DEFAULT_COUNT,
@@ -103,7 +107,9 @@ export async function getStudentsByEmail(options: GetByEmailOptions) {
  * @returns
  * @throws {Error} If an error occurred during the network call.
  */
-export async function getStudentsByName(options: GetByNameOptions) {
+export async function getStudentsByName(
+  options: GetByNameOptions,
+): Promise<PagedStudentResponse> {
   const opts = {
     cache: true,
     first: FETCH_OPTIONS.DEFAULT_COUNT,
@@ -120,7 +126,9 @@ export async function getStudentsByName(options: GetByNameOptions) {
  * @returns
  * @throws {Error} If an error occurred during the network call.
  */
-export async function getStudentsByGroup(options: GetByGroupOptions) {
+export async function getStudentsByGroup(
+  options: GetByGroupOptions,
+): Promise<PagedStudentResponse> {
   const opts = {
     cache: true,
     first: FETCH_OPTIONS.DEFAULT_COUNT,
@@ -136,7 +144,10 @@ export async function getStudentsByGroup(options: GetByGroupOptions) {
  * @param groupIds A list of group IDs to return student account numbers for.
  * @returns A list of student account numbers for the specified groups.
  */
-export async function getStudentIdsByGroup(groupIds: number[], options: FetchOptionsBase = {}) {
+export async function getStudentIdsByGroup(
+  groupIds: number[],
+  options: FetchOptionsBase = {},
+): Promise<StudentFilterResponse> {
   const where: StudentFilter = {
     groupId: { in: groupIds.map((x) => x) },
   };
@@ -157,7 +168,9 @@ export async function getStudentIdsByGroup(groupIds: number[], options: FetchOpt
  * @returns
  * @throws {Error} If an error occurred during the network call.
  */
-export async function registerStudent(input: StudentRegistrationRequest) {
+export async function registerStudent(
+  input: StudentRegistrationRequest,
+): Promise<StudentRegistrationResponse> {
   return mutate<StudentRegistrationResponse>(gqlRegisterStudent, input);
 }
 
@@ -168,7 +181,7 @@ export async function registerStudent(input: StudentRegistrationRequest) {
  * @returns
  * @throws {Error} If an error occurred during the network call.
  */
-export async function newStudent(input: NewStudentRequest) {
+export async function newStudent(input: NewStudentRequest): Promise<NewStudentResponse> {
   return mutate<NewStudentResponse>(gqlNewStudent, input);
 }
 
@@ -179,7 +192,7 @@ export async function newStudent(input: NewStudentRequest) {
  * @returns
  * @throws {Error} If an error occurred during the network call.
  */
-export async function updateStudent(input: UpdateStudentRequest) {
+export async function updateStudent(input: UpdateStudentRequest): Promise<UpdateStudentResponse> {
   return mutate<UpdateStudentResponse>(gqlUpdateStudent, input);
 }
 
@@ -191,7 +204,10 @@ export async function updateStudent(input: UpdateStudentRequest) {
  * @returns
  * @throws {Error} If an error occurred during the network call.
  */
-export async function bulkMoveStudents(targetGroup: Group, students: Student[]) {
+export async function bulkMoveStudents(
+  targetGroup: Group,
+  students: Student[],
+): Promise<UpdateBulkStudentResponse> {
   return mutateCustom<UpdateBulkStudentResponse>({
     mutation: gqlBulkGroup,
     variables: {
@@ -215,7 +231,7 @@ export async function bulkMoveStudents(targetGroup: Group, students: Student[]) 
  * @returns
  * @throws {Error} If an error occurred during the network call.
  */
-export async function deleteStudent(student: Student) {
+export async function deleteStudent(student: Student): Promise<DeleteStudentResponse> {
   return mutateCustom<DeleteStudentResponse>({
     mutation: gqlDeleteStudent,
     variables: { id: student.id },

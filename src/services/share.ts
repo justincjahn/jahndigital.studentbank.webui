@@ -20,7 +20,7 @@ export interface FetchOptionsByStudentId extends FetchOptions {
  * @returns
  * @throws {Error} If an error occurred during the network call.
  */
-export function getSharesByStudentId(options: FetchOptionsByStudentId) {
+export function getSharesByStudentId(options: FetchOptionsByStudentId): Promise<PagedShareResponse> {
   const opts = {
     cache: true,
     ...options,
@@ -36,7 +36,7 @@ export function getSharesByStudentId(options: FetchOptionsByStudentId) {
  * @returns A promise containing the newly created Share.
  * @throws {Error} If an error occurred during the network call.
  */
-export function newShare(input: NewShareRequest) {
+export function newShare(input: NewShareRequest): Promise<NewShareResponse> {
   return mutate<NewShareResponse>(gqlNewShare, input);
 }
 
@@ -46,6 +46,6 @@ export function newShare(input: NewShareRequest) {
  * @param input
  * @returns Response object that's true if the Share is deleted sucessfully.
  */
-export function deleteShare(input: DeleteRestoreShareRequest) {
+export function deleteShare(input: DeleteRestoreShareRequest): Promise<DeleteShareResponse> {
   return mutate<DeleteShareResponse>(gqlDeleteShare, input);
 }

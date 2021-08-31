@@ -1,4 +1,4 @@
-import { reactive, computed, isReactive } from 'vue';
+import { reactive, computed, isReactive, ComputedRef } from 'vue';
 
 // Utils
 import Rate from '@/utils/rate';
@@ -19,6 +19,13 @@ export interface ShareTypeErrorsDTO {
   dividendRate: string;
   withdrawalLimitCount: string;
   withdrawalLimitFee: string;
+}
+
+export interface UseShareTypeForm {
+  data: ShareTypeDTO;
+  errors: ShareTypeErrorsDTO;
+  isValid: ComputedRef<boolean>;
+  reset: (shareType?: ShareType) => void;
 }
 
 export function buildFormData(): ShareTypeDTO {
@@ -42,7 +49,7 @@ export function buildErrorData(): ShareTypeErrorsDTO {
   });
 }
 
-export default function useShareTypeForm(d?: ShareTypeDTO, e?: ShareTypeErrorsDTO) {
+export default function useShareTypeForm(d?: ShareTypeDTO, e?: ShareTypeErrorsDTO): UseShareTypeForm {
   if (d && !isReactive(d)) {
     throw new Error('[useShareTypeForm] Data must be reactive.');
   }

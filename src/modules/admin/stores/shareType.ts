@@ -13,6 +13,7 @@ import * as shareTypeService from '@/services/shareType';
  * @param instanceStore The {InstanceStore} to watch, if desired.
  * @param immediate If the store should immediately try to fetch share types instead of waiting for change.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup(instanceStore?: InstanceStore) {
   const store = reactive({
     loading: false,

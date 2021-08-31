@@ -25,7 +25,8 @@
     />
 
     <p v-if="selected && selected.dividendRate <= 0" class="error">
-      ERROR: The selected Share Type does not have a dividend rate.  Please select a different one or edit the Share Type.
+      ERROR: The selected Share Type does not have a dividend rate.  Please select a different one
+      or edit the Share Type.
     </p>
 
     <p v-if="selected && selected.dividendRate > 0">

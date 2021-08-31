@@ -84,13 +84,6 @@ import Money from '@/utils/money';
 // Store
 import { GlobalStore } from '../../stores/global';
 
-interface NewStudentForm {
-  accountNumber: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-}
-
 export default defineComponent({
   components: {
     BaseInput,

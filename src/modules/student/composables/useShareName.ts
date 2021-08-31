@@ -1,7 +1,7 @@
-import { computed } from 'vue';
+import { computed, ComputedRef } from 'vue';
 import userStore from '@/stores/user';
 
-export default function useShareName(share: () => Share|null) {
+export default function useShareName(share: () => Share|null): { name: ComputedRef<string> } {
   const name = computed(() => {
     const sh = share();
     const accountNumber = (userStore.username.value ?? '').toString().padStart(10, '0');

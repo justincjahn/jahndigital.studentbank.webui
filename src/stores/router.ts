@@ -1,5 +1,6 @@
 import { reactive, computed } from 'vue';
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup() {
   const store = reactive({
     loading: true,

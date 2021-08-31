@@ -4,7 +4,7 @@
  * @param {number} len Length of the password to generate.
  * @returns {string} A randomly generated password of len.
  */
-export default function generatePassword(len = 32) {
+export default function generatePassword(len = 32): string {
   const getBytes = () => {
     const result = new Uint8Array(1);
     window.crypto.getRandomValues(result);

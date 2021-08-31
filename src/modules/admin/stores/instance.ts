@@ -12,6 +12,7 @@ const instanceCache = reactive({
  * with their own groups, students, stocks, share types, etc.  They are most often used to create
  * new environments for new terms/groups of students/people.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup() {
   const store = reactive({
     selected: null as Instance|null,

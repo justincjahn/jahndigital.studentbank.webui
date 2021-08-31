@@ -29,6 +29,7 @@ export enum PostingPolicy {
 /**
  * Store that handles the multi-step workflow to post transactions to students' shares.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup() {
   /**
    * Step 1: Select Share Type

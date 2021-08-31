@@ -370,6 +370,7 @@ export default defineComponent({
 
     return {
       Money,
+      BulkImportStep,
       handleOk,
       handleCancel,
       globalStore,
@@ -383,7 +384,6 @@ export default defineComponent({
       fileUploader,
       shareTemplate,
       canContinue,
-      BulkImportStep,
       ...bulkImportStore,
       isPosting,
     };

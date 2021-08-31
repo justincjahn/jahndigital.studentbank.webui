@@ -9,6 +9,7 @@ import parseJwt from '@/utils/parseJwt';
  * push new JWT tokens to this store periodically as they expire, or as users login
  * and logoff.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup() {
   const store = reactive({
     loading: false,

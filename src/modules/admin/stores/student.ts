@@ -1,10 +1,11 @@
-import { FETCH_OPTIONS } from '@/constants';
 import { computed, reactive } from 'vue';
+import { FETCH_OPTIONS } from '@/constants';
 import * as studentService from '@/services/student';
 
 /**
  * Stores information about students and the currently selected student.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup() {
   const store = reactive({
     loading: false,

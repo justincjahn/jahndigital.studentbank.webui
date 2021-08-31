@@ -114,7 +114,7 @@ export default class Money {
    *
    * @returns String in the format $1.00.
    */
-  toString() {
+  toString(): string {
     return new Intl.NumberFormat(
       'en-US',
       {

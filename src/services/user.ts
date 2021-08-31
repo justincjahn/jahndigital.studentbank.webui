@@ -9,6 +9,6 @@ import gqlUpdateUser from '../graphql/mutations/userUpdate.gql';
  * @returns
  * @throws {Error} If an error occurred during the network call.
  */
-export async function updateUser(input: UpdateUserRequest) {
+export async function updateUser(input: UpdateUserRequest): Promise<UpdateUserResponse> {
   return mutate<UpdateUserResponse>(gqlUpdateUser, input);
 }

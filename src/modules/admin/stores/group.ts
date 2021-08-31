@@ -1,6 +1,6 @@
+import { computed, reactive, watch } from 'vue';
 import * as groupService from '@/services/group';
 import { InstanceStore } from '@/modules/admin/stores/instance';
-import { computed, reactive, watch } from 'vue';
 
 /**
  * Stores information regarding the groups of the currently selected Instance and
@@ -8,6 +8,7 @@ import { computed, reactive, watch } from 'vue';
  *
  * @param {InstanceStore} instanceStore Watches the selected instance and fetches groups for it automatically.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup(instanceStore: InstanceStore) {
   const store = reactive({
     selected: null as Group|null,

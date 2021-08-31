@@ -27,7 +27,7 @@ export interface TransactionFetchOptions {
  * @returns A promise containing a list of transactions.
  * @throws {Error} If an error occurred during the network call.
  */
-export function getTransactions(options: TransactionFetchOptions) {
+export function getTransactions(options: TransactionFetchOptions): Promise<PagedTransactionResponse> {
   const opts = {
     first: FETCH_OPTIONS.DEFAULT_COUNT,
     cache: true,
@@ -44,7 +44,7 @@ export function getTransactions(options: TransactionFetchOptions) {
  * @returns A promise containing the posted transactions.
  * @throws {Error} If an error occurred during the network call.
  */
-export function newTransaction(input: NewTransactionRequest) {
+export function newTransaction(input: NewTransactionRequest): Promise<NewTransactionResponse> {
   return mutate<NewTransactionResponse>(gqlNewTransaction, input);
 }
 
@@ -55,7 +55,7 @@ export function newTransaction(input: NewTransactionRequest) {
  * @returns A promise containing the list of transactions that were posted.
  * @throws {Error} If an error occurred during the network call.
  */
-export function newBulkTransaction(input: NewBulkTransactionRequest) {
+export function newBulkTransaction(input: NewBulkTransactionRequest): Promise<NewBulkTransactionResponse> {
   return mutate<NewBulkTransactionResponse>(gqlNewBulkTransaction, input);
 }
 
@@ -66,7 +66,7 @@ export function newBulkTransaction(input: NewBulkTransactionRequest) {
  * @returns A promise containing the two posted transactions.
  * @throws {Error} If an error occurred during the network call.
  */
-export function newTransfer(input: NewTransferRequest) {
+export function newTransfer(input: NewTransferRequest): Promise<NewTransferResponse> {
   return mutate<NewTransferResponse>(gqlTransactionTransfer, input);
 }
 
@@ -77,6 +77,6 @@ export function newTransfer(input: NewTransferRequest) {
  * @returns A promise containing the new StudentStock object.
  * @throws {Error} If an error occurred during the network call.
  */
-export function newStockPurchase(input: NewStockPurchaseRequest) {
+export function newStockPurchase(input: NewStockPurchaseRequest): Promise<NewStockPurchaseResponse> {
   return mutate<NewStockPurchaseResponse>(gqlNewStockPurchase, input);
 }

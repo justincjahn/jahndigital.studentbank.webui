@@ -1,5 +1,3 @@
-import { API_ENDPOINT } from '@/constants';
-
 import {
   ApolloLink,
   Observable,
@@ -8,6 +6,7 @@ import {
   FetchResult,
 } from '@apollo/client/core';
 
+import { API_ENDPOINT } from '@/constants';
 import userStore from '../stores/user';
 
 interface Subscriber {

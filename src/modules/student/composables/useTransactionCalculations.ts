@@ -1,14 +1,23 @@
-import { ref, computed } from 'vue';
+import { ref, computed, Ref, ComputedRef } from 'vue';
 import Money from '@/utils/money';
 
 export interface UseTransactionCalculationsOptions {
   initialBalance: string;
 }
 
+export interface UseTransactionCalculations {
+  amount: Ref<string>;
+  amountMoney: ComputedRef<Money>;
+  withdrawalLimitError: ComputedRef<boolean>;
+  withdrawalLimitFeeError: ComputedRef<boolean>;
+  feeAmount: ComputedRef<Money>;
+  remainingBalance: ComputedRef<Money>;
+}
+
 export default function useTransactionCalculations(
   share: () => Share | null,
   options?: UseTransactionCalculationsOptions,
-) {
+): UseTransactionCalculations {
   const opts = {
     initialBalance: '0.00',
     ...options,

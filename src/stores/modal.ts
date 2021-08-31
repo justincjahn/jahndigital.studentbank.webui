@@ -3,6 +3,7 @@ import { computed, reactive } from 'vue';
 /**
  * Stores information about modal windows and their order.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup() {
   const store = reactive({
     open: [] as HTMLElement[],

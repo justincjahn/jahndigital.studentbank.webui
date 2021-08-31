@@ -1,6 +1,6 @@
 import { inject, InjectionKey } from 'vue';
 
-export default function injectStrict<T>(key: InjectionKey<T>, fallback?: T) {
+export default function injectStrict<T>(key: InjectionKey<T>, fallback?: T): T {
   const resolved = inject(key, fallback);
 
   if (!resolved) {

@@ -109,7 +109,7 @@
 </template>
 
 <script lang="ts">
-import { ref, computed, defineAsyncComponent } from 'vue';
+import { ref, computed, defineAsyncComponent, defineComponent } from 'vue';
 
 // Services
 import selection from '@/services/StudentSelectionService';
@@ -149,7 +149,7 @@ const StudentList = defineAsyncComponent(
   () => import(/* webpackChunkName: "admin-groups" */ '../components/StudentList.vue'),
 );
 
-export default {
+export default defineComponent({
   components: {
     StudentList,
     GroupSelector,
@@ -305,7 +305,7 @@ export default {
       selectedStudentsResolving,
     };
   },
-};
+});
 </script>
 
 <style lang="scss">

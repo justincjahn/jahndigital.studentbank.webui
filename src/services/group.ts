@@ -16,7 +16,7 @@ export interface FetchOptions {
  * @returns
  * @throws {Error} If an error occurred during the network call.
  */
-export async function getGroups(options: FetchOptions) {
+export async function getGroups(options: FetchOptions): Promise<GroupResponse> {
   const opts = {
     cache: true,
     ...options,
@@ -32,7 +32,7 @@ export async function getGroups(options: FetchOptions) {
  * @returns
  * @throws {Error} If an error occurred during the network call.
  */
-export async function newGroup(input: NewGroupRequest) {
+export async function newGroup(input: NewGroupRequest): Promise<NewGroupResponse> {
   return mutateCustom<NewGroupResponse>({
     mutation: gqlNewGroup,
     variables: input,
@@ -52,7 +52,7 @@ export async function newGroup(input: NewGroupRequest) {
  * @returns
  * @throws {Error} If an error occurred during the network call.
  */
-export async function updateGroup(input: UpdateGroupRequest) {
+export async function updateGroup(input: UpdateGroupRequest): Promise<UpdateGroupResponse> {
   return mutateCustom<UpdateGroupResponse>({
     mutation: gqlUpdateGroup,
     variables: input,
@@ -72,7 +72,7 @@ export async function updateGroup(input: UpdateGroupRequest) {
  * @returns
  * @throws {Error} If an error occurred during the network call.
  */
-export async function deleteGroup(group: Group) {
+export async function deleteGroup(group: Group): Promise<DeleteGroupResponse> {
   return mutateCustom<DeleteGroupResponse>({
     mutation: gqlDeleteGroup,
     variables: { id: group.id },

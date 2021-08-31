@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable max-len -->
   <svg
     xmlns="http://www.w3.org/2000/svg"
     class="dollar-icon"
@@ -23,7 +24,10 @@
 
 <style lang="scss">
 @function spring-wobbly($t) {
-  $result: -0.5 * math.pow(2.71818, (-6 * $t)) * (-2 * math.pow(2.71828, (6 * $t)) + math.sin(12 * $t) + 2 * math.cos(12 * $t));
+  $result:
+    -0.5 * math.pow(2.71818, (-6 * $t))
+    * (-2 * math.pow(2.71828, (6 * $t))
+    + math.sin(12 * $t) + 2 * math.cos(12 * $t));
   @return $result;
 }
 

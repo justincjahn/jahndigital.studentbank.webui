@@ -11,6 +11,7 @@ import { subscribe } from '@/services/eventBus';
 /**
  * Stores information about the history of a stock in the system and enables pagination.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup() {
   const store = reactive({
     loading: false,

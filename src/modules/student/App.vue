@@ -56,9 +56,9 @@
 </template>
 
 <script type="ts">
-import { SITE_NAME, SITE_DISABLE_NAME, SITE_LOGO, VERSION } from '@/constants';
 import { defineComponent, defineAsyncComponent, provide, watchEffect, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { SITE_NAME, SITE_DISABLE_NAME, SITE_LOGO, VERSION } from '@/constants';
 
 // Components
 import LoadingLabel from '@/components/LoadingLabel.vue';

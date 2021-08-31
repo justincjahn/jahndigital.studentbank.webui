@@ -1,5 +1,5 @@
-import { FETCH_OPTIONS } from '@/constants';
 import { computed, reactive, watch } from 'vue';
+import { FETCH_OPTIONS } from '@/constants';
 
 // Store
 import { StudentStore } from '@/modules/admin/stores/student';
@@ -13,6 +13,7 @@ import * as transactionService from '@/services/transaction';
  * transaction histories and a balance.  The Student object receives Share data from the
  * GraphQL api, so we tie the functionality of this store to the studentStore passed in.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup(studentStore: StudentStore) {
   const store = reactive({
     loading: false,

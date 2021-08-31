@@ -17,6 +17,7 @@ import { setup as defineStockHistoryStore } from '@/stores/stockHistory';
 /**
  * Global store with modules that serves as the overall application state.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup() {
   const stocksAvailable = defineStockStore();
   const stocksHeld = defineStudentStockStore();

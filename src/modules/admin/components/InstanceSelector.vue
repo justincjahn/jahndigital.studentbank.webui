@@ -16,9 +16,9 @@
         {{ option?.description ?? prompt }}
       </template>
     </template>
-    <template #list="{ options, className, select, selected }">
+    <template #list="{ options: tplOptions, className, select, selected }">
       <li
-        v-for="option in options"
+        v-for="option in tplOptions"
         :key="option.id"
         :class="[className, selected(option)]"
         @click="select(option)"
@@ -159,8 +159,8 @@
 </template>
 
 <script lang="ts">
-import { BASE_URLS } from '@/constants';
 import { computed, defineAsyncComponent, defineComponent, PropType, ref } from 'vue';
+import { BASE_URLS } from '@/constants';
 
 // Components
 import BaseSelect, { Search } from '@/components/BaseSelect.vue';
@@ -172,7 +172,7 @@ import uuid4 from '@/utils/uuid4';
 // Stores
 import { GlobalStore } from '../stores/global';
 
-export enum ModalState {
+enum ModalState {
   ADD,
   EDIT,
   DELETE,

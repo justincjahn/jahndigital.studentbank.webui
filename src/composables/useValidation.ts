@@ -1,4 +1,4 @@
-import { ref, computed, Ref, isRef } from 'vue';
+import { ref, computed, Ref, ComputedRef, isRef } from 'vue';
 
 type validationFunc = (value: string) => string | boolean;
 type decoratorFunc = (value: string) => string;
@@ -13,7 +13,13 @@ export interface UseValidationOptions {
  *
  * @param {(string) => string|boolean}validator Function that checks the value.
  */
-export default function useValidation(validator: validationFunc | Ref<validationFunc>, options?: UseValidationOptions) {
+export default function useValidation(
+  validator: validationFunc | Ref<validationFunc>,
+  options?: UseValidationOptions,
+): {
+  value: Ref<string>,
+  error: ComputedRef<string>
+} {
   const opts = options || {};
   const value = opts?.value ?? ref('');
 

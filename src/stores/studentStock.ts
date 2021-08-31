@@ -7,6 +7,7 @@ import { StudentStocksOptions, getStudentStocks } from '@/services/stock';
 /**
  * Stores information about a student's purchased stocks.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup() {
   const store = reactive({
     loading: false,

@@ -19,6 +19,7 @@ import { stockCreate, stockUpdate, stockDelete } from '@/events';
 /**
  * Stores information about stocks in the system and enables pagination.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup() {
   const store = reactive({
     loading: false,

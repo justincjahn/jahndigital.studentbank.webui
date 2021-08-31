@@ -32,7 +32,7 @@ export interface FetchOptions {
  * @returns A promise containing a list of Share Type objects.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function getShareTypes(options?: FetchOptions) {
+export async function getShareTypes(options?: FetchOptions): Promise<PagedShareTypeResponse> {
   const opts = {
     first: FETCH_OPTIONS.DEFAULT_COUNT,
     cache: true,
@@ -49,7 +49,7 @@ export async function getShareTypes(options?: FetchOptions) {
  * @returns A promise containing the newly created Share Type.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function newShareType(input: NewShareTypeRequest) {
+export async function newShareType(input: NewShareTypeRequest): Promise<NewShareTypeResponse> {
   return mutate<NewShareTypeResponse>(gqlNewShareType, input);
 }
 
@@ -60,7 +60,7 @@ export async function newShareType(input: NewShareTypeRequest) {
  * @returns A promise containing the updated Share Type.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function updateShareType(input: UpdateShareTypeRequest) {
+export async function updateShareType(input: UpdateShareTypeRequest): Promise<UpdateShareTypeResponse> {
   return mutate<UpdateShareTypeResponse>(gqlUpdateShareType, input);
 }
 
@@ -71,7 +71,7 @@ export async function updateShareType(input: UpdateShareTypeRequest) {
  * @returns A promise containing the updated Share Type.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function linkShareType(input: LinkUnlinkShareTypeRequest) {
+export async function linkShareType(input: LinkUnlinkShareTypeRequest): Promise<LinkShareTypeResponse> {
   return mutateCustom<LinkShareTypeResponse>({
     mutation: gqlLinkShareType,
     variables: input,
@@ -93,7 +93,7 @@ export async function linkShareType(input: LinkUnlinkShareTypeRequest) {
  * @returns A promise containing a Share Type.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function unlinkShareType(input: LinkUnlinkShareTypeRequest) {
+export async function unlinkShareType(input: LinkUnlinkShareTypeRequest): Promise<UnlinkShareTypeResponse> {
   return mutateCustom<UnlinkShareTypeResponse>({
     mutation: gqlUnlinkShareType,
     variables: input,
@@ -114,7 +114,7 @@ export async function unlinkShareType(input: LinkUnlinkShareTypeRequest) {
  * @param input
  * @returns True if the Share Type was deleted.
  */
-export async function deleteShareType(shareType: ShareType) {
+export async function deleteShareType(shareType: ShareType): Promise<DeleteShareTypeResponse> {
   return mutateCustom<DeleteShareTypeResponse>({
     mutation: gqlDeleteShareType,
     variables: { id: shareType.id },
@@ -130,8 +130,8 @@ export async function deleteShareType(shareType: ShareType) {
  * Post dividends for the provided Share Type ID
  *
  * @param input
- * @returns True if dividends were posted succesfully.
+ * @returns True if dividends were posted successfully.
  */
-export async function postDividends(input: DividendPostingRequest) {
+export async function postDividends(input: DividendPostingRequest): Promise<DividendPostingResponse> {
   return mutate<DividendPostingResponse>(gqlDividendPosting, input);
 }

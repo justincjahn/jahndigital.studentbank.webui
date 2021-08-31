@@ -3,6 +3,7 @@ import { computed, reactive } from 'vue';
 /**
  * Stores information about errors encountered in the system.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup() {
   const store = reactive({
     error: null as string|null,

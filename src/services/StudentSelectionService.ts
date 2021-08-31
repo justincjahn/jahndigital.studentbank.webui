@@ -1,5 +1,5 @@
-import Apollo from '@/services/Apollo';
 import { reactive } from 'vue';
+import Apollo from '@/services/Apollo';
 import gqlStudentsWithShares from '@/graphql/queries/students.gql';
 
 /**
@@ -27,7 +27,7 @@ export class StudentSelection extends Array<IStudentSelection> {
   /**
    * Clear the selection completely
    */
-  clear() {
+  clear(): void {
     this.splice(0, this.length);
   }
 
@@ -141,7 +141,7 @@ export class StudentSelection extends Array<IStudentSelection> {
    *
    * @param student The student object to add.
    */
-  pushStudent(student: Student) {
+  pushStudent(student: Student): void {
     if (this.hasStudent(student)) { return; }
 
     this.push({
@@ -156,7 +156,7 @@ export class StudentSelection extends Array<IStudentSelection> {
    *
    * @param group The group object to add.
    */
-  pushGroup(group: Group) {
+  pushGroup(group: Group): void {
     if (this.hasGroup(group.id)) { return; }
 
     const students = this.getStudents(group);
@@ -174,7 +174,7 @@ export class StudentSelection extends Array<IStudentSelection> {
    *
    * @param student The student object to remove.
    */
-  popStudent(student: Student) {
+  popStudent(student: Student): void {
     const implicit = this.hasGroup(student.groupId);
 
     // The student is part of a selected group
@@ -221,7 +221,7 @@ export class StudentSelection extends Array<IStudentSelection> {
    *
    * @param group The group object to remove.
    */
-  popGroup(group: Group) {
+  popGroup(group: Group): void {
     const oldIndex: number = this.findIndex(
       (item) => item.type === StudentSelectionType.GROUP
         && item.object.id === group.id,
@@ -244,7 +244,7 @@ export class StudentSelection extends Array<IStudentSelection> {
    *
    * @param student The student to select/deselect.
    */
-  toggleStudent(student: Student|null) {
+  toggleStudent(student: Student|null): void {
     if (student == null) return;
 
     const excluded: IStudentSelection|undefined = this.find(
@@ -265,7 +265,7 @@ export class StudentSelection extends Array<IStudentSelection> {
    *
    * @param group The group to select/deselect.
    */
-  toggleGroup(group: Group|null) {
+  toggleGroup(group: Group|null): void {
     if (group == null) return;
 
     if (this.hasGroup(group)) {
@@ -294,12 +294,12 @@ export class StudentSelection extends Array<IStudentSelection> {
           });
 
           students = [...students, ...studentList.data.students.nodes];
-        } catch (error) {
-          throw error?.message ?? error;
+        } catch (e) {
+          throw e?.message ?? e;
         }
       }));
-    } catch (error) {
-      throw error?.message ?? error;
+    } catch (e) {
+      throw e?.message ?? e;
     }
 
     // Resolve students not excluded

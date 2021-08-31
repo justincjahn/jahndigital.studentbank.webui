@@ -98,7 +98,7 @@ export default class Rate {
    * @param value
    * @returns Integer representing the number of decimal places in the number.
    */
-  static numberOfDecimals(value: number) {
+  static numberOfDecimals(value: number): number {
     if (Math.floor(value) === value) return 0;
     return value.toString().split('.')[1].length || 0;
   }

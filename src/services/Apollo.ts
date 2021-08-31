@@ -1,5 +1,3 @@
-import { ERROR_CODES, API_ENDPOINT } from '@/constants';
-
 import {
   ApolloClient,
   ApolloLink,
@@ -13,6 +11,7 @@ import {
 
 import { onError } from '@apollo/client/link/error';
 import { setContext } from '@apollo/client/link/context';
+import { ERROR_CODES, API_ENDPOINT } from '@/constants';
 
 // Stores
 import userStore from '../stores/user';
@@ -95,7 +94,7 @@ const defaultClient = new ApolloClient({
 });
 
 /**
- * Convienience method to call Apollo queries or reject if no data was returned.
+ * Convenience method to call Apollo queries or reject if no data was returned.
  *
  * @param qry The GraphQL DocumentNode to send to the server.
  * @param variables The variables, if any, to send to the server for the provided query.
@@ -105,28 +104,28 @@ export async function query<TReturn, TOptions = OperationVariables>(
   qry: DocumentNode,
   variables?: TOptions,
   fetchPolicy?: FetchPolicy,
-) {
+): Promise<TReturn> {
   const res = await defaultClient.query<TReturn>({ query: qry, variables, fetchPolicy });
   if (res.data) return Promise.resolve(res.data);
   return Promise.reject(new Error('An unknown error has occurred.'));
 }
 
 /**
- * Convienience method to call Apollo queries or reject if no data was returned.
+ * Convenience method to call Apollo queries or reject if no data was returned.
  *
  * @param options
  * @returns The server result, or a rejected promise.
  */
 export async function mutateCustom<TReturn, TVariables = OperationVariables>(
   options: MutationOptions<TReturn, TVariables>,
-) {
+): Promise<TReturn> {
   const res = await defaultClient.mutate<TReturn, TVariables>(options);
   if (res.data) return Promise.resolve(res.data);
   return Promise.reject(new Error('An unknown error has occurred.'));
 }
 
 /**
- * Convienience method to call Apollo mutations or reject if no data was returned.
+ * Convenience method to call Apollo mutations or reject if no data was returned.
  *
  * @param mutation The GraphQL DocumentNode to send to the server.
  * @param variables The variables, if any, to send to the server.
@@ -135,7 +134,7 @@ export async function mutateCustom<TReturn, TVariables = OperationVariables>(
 export async function mutate<TReturn, TOptions = OperationVariables>(
   mutation: DocumentNode,
   variables?: TOptions,
-) {
+): Promise<TReturn> {
   return mutateCustom<TReturn, TOptions>({ mutation, variables });
 }
 

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-types */
+
 import uuid4 from '@/utils/uuid4';
 
 /**
@@ -37,10 +39,12 @@ const subscriptions: EventSubscriptions = {};
  * @param name The name of the event.
  * @returns
  */
-export function create<TPayload extends object|undefined = undefined>(name: string) {
+export function create<TPayload extends object|undefined = undefined>(
+  name: string,
+): EventInfo<TPayload> {
   return {
     name,
-    payload: Object as TPayload,
+    payload: {} as TPayload,
   } as EventInfo<TPayload>;
 }
 
@@ -51,7 +55,10 @@ export function create<TPayload extends object|undefined = undefined>(name: stri
  * @param visitor The function to call when the event is triggered.
  * @returns A function that, when called, will unsubscribe from the event.
  */
-export function subscribe<TEvent extends EventInfo>(event: TEvent, visitor: Action<TEvent['payload']>) {
+export function subscribe<TEvent extends EventInfo>(
+  event: TEvent,
+  visitor: Action<TEvent['payload']>,
+): () => void {
   const uuid = uuid4();
 
   if (!Object.keys(subscriptions).includes(event.name)) {
@@ -71,7 +78,10 @@ export function subscribe<TEvent extends EventInfo>(event: TEvent, visitor: Acti
  * @param event The event to fire.
  * @param payload The payload to provide to subscribers.
  */
-export function publish<TEvent extends EventInfo>(event: TEvent, payload: TEvent['payload']) {
+export function publish<TEvent extends EventInfo>(
+  event: TEvent,
+  payload: TEvent['payload'],
+): void {
   if (!subscriptions[event.name]) return;
   Object.values(subscriptions[event.name]).forEach((visitor) => visitor(payload));
 }

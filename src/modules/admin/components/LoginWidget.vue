@@ -11,6 +11,8 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
+
 // Routes
 import LoginRouteNames from '@/modules/admin/login/routeNames';
 
@@ -20,7 +22,7 @@ import userStore from '@/stores/user';
 // Services
 import { logout as userLogout } from '@/services/auth';
 
-export default {
+export default defineComponent({
   setup() {
     const logout = () => userLogout();
 
@@ -30,5 +32,5 @@ export default {
       logout,
     };
   },
-};
+});
 </script>

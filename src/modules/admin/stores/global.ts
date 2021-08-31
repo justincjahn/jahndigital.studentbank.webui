@@ -11,6 +11,7 @@ import { setup as defineShareStore } from './share';
 /**
  * Global store with modules that serves as the overall application state.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup() {
   const instance = defineInstanceStore();
   const group = defineGroupStore(instance);

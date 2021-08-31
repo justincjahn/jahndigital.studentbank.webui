@@ -11,7 +11,7 @@ import { query, mutateCustom } from './Apollo';
  * @returns A promise containing a list of instances.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function getInstances(cache = true) {
+export async function getInstances(cache = true): Promise<InstanceResponse> {
   return query<InstanceResponse>(gqlInstances, undefined, cache ? 'cache-first' : 'network-only');
 }
 
@@ -22,7 +22,7 @@ export async function getInstances(cache = true) {
  * @returns A promise containing the newly created instance.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function newInstance(input: NewInstanceRequest) {
+export async function newInstance(input: NewInstanceRequest): Promise<NewInstanceResponse> {
   return mutateCustom<NewInstanceResponse>({
     mutation: gqlNewInstance,
     variables: input,
@@ -39,7 +39,7 @@ export async function newInstance(input: NewInstanceRequest) {
  * @returns A promise containing the updated instance.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function updateInstance(input: UpdateInstanceRequest) {
+export async function updateInstance(input: UpdateInstanceRequest): Promise<UpdateInstanceResponse> {
   return mutateCustom<UpdateInstanceResponse>({
     mutation: gqlUpdateInstance,
     variables: input,
@@ -56,7 +56,7 @@ export async function updateInstance(input: UpdateInstanceRequest) {
  * @returns True if the object was deleted.
  * @throws {Error} If an error occurred during the network call.
  */
-export async function deleteInstance(input: DeleteRestoreInstanceRequest) {
+export async function deleteInstance(input: DeleteRestoreInstanceRequest): Promise<DeleteInstanceResponse> {
   return mutateCustom<DeleteInstanceResponse>({
     mutation: gqlDeleteInstance,
     variables: input,

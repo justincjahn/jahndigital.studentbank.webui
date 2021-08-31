@@ -117,8 +117,8 @@
 </template>
 
 <script lang="ts">
-import { BASE_URLS } from '@/constants';
 import { defineAsyncComponent, defineComponent, ref, onMounted, computed } from 'vue';
+import { BASE_URLS } from '@/constants';
 
 // Utils
 import { validateAccount, validateInviteCode, validateEmail, validatePassword } from '@/utils/validators';

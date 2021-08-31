@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/camelcase */
+/* eslint-disable camelcase */
 
-import { API_MAX_CONCURRENCY } from '@/constants';
 import { computed, reactive } from 'vue';
+import { API_MAX_CONCURRENCY } from '@/constants';
 
 // Utils
 import { parseCSV } from '@/utils/csv';
@@ -33,6 +33,7 @@ export enum BulkImportStep {
 /**
  * The columns expected in the CSV file.
  */
+// eslint-disable-next-line no-use-before-define
 export const StudentImportColumns: StudentImportKeys = {
   account_number: true,
   email: true,
@@ -95,6 +96,7 @@ interface ShareWithDeposit extends Share {
 /**
  * Store that handles the multi-step workflow to post transactions to students' shares.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup() {
   const stepCount = Object.keys(BulkImportStep).length / 2;
   const globalStore = defineGlobalStore();
