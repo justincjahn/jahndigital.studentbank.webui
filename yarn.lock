@@ -9040,11 +9040,6 @@ vary@~1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
 
-vee-validate@^4.1.0:
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-4.1.2.tgz#f7c522824775c96c4f6591034df2f8d020cbdffc"
-  integrity sha512-GKCqYxg/WqrC7NibYNgFIz50Hnw4ma9F7eA8lbi7yYdzqaHIafob7546bMuosd0yV3YnXj6gc+A2UpV1Sw3jvQ==
-
 vendors@^1.0.0:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/vendors/-/vendors-1.0.4.tgz#e2b800a53e7a29b93506c3cf41100d16c4c4ad8e"
