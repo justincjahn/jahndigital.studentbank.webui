@@ -20,3 +20,7 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Self-signed certificates for HTTPS development
+localhost.crt
+localhost.key

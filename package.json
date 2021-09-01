@@ -1,6 +1,6 @@
 {
   "name": "jahndigital.studentbank.webui",
-  "version": "0.0.13-alpha.202108311207",
+  "version": "0.0.14-alpha.202109010115",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -9,10 +9,15 @@
   },
   "dependencies": {
     "@apollo/client": "^3.3.14",
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/vue-fontawesome": "^3.0.0-4",
+    "apexcharts": "^3.28.1",
     "core-js": "^3.8.3",
     "graphql": "^15.4.0",
     "vue": "^3.0.4",
-    "vue-router": "^4.0.3"
+    "vue-router": "^4.0.3",
+    "vue3-apexcharts": "^1.4.1"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.15.1",

@@ -1,4 +1,8 @@
 <template>
+  <p class="stock-hint help-text">
+    Tip: Click on the stock symbol to view detailed pricing history.
+  </p>
+
   <table
     v-if="stocks.length > 0 || loading"
     class="available-stocks-list"
@@ -21,7 +25,11 @@
     <tbody>
       <tr v-for="stock in stocks" :key="stock.id">
         <td>
-          {{ stock.symbol }}
+          <router-link
+            :to="{ name: stockDetailRoute, params: { id: stock.id }}"
+          >
+            {{ stock.symbol }}
+          </router-link>
         </td>
         <td class="center">
           {{ stock.name }}
@@ -96,6 +104,9 @@ import errorStore from '@/stores/error';
 import userStore from '@/stores/user';
 import { GLOBAL_STORE } from '../../symbols';
 
+// Routes
+import StocksRouteNames from '../routeNames';
+
 export default defineComponent({
   components: {
     StockPurchaseModal: defineAsyncComponent(() => import('../components/StockPurchaseModal.vue')),
@@ -150,6 +161,8 @@ export default defineComponent({
     });
 
     return {
+      stockDetailRoute: StocksRouteNames.detail,
+
       shares: globalStore.shares,
       loading: globalStore.stocksAvailable.loading,
       stocks: globalStore.stocksAvailable.items,
@@ -171,6 +184,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+.stock-hint.help-text {
+  margin: 0 1em 1.5em 1em;
+}
+
 .available-stocks-list {
   padding: 0 2em;
 

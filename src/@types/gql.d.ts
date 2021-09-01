@@ -40,7 +40,7 @@ type FilterBase<TOptions> = OneKey<TOptions, FilterInput>
 type StockSortOptions = 'name' | 'symbol' | 'rawCurrentValue';
 type StockSort = SortBase<StockSortOptions>;
 
-type StockFilterOptions = 'name' | 'symbol';
+type StockFilterOptions = 'id' | 'name' | 'symbol';
 type StockFilter = FilterBase<StockFilterOptions>;
 
 type StudentStockFilterOptions = 'id' | 'stockId';

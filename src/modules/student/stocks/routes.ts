@@ -22,6 +22,12 @@ const routes: RouteRecordRaw[] = [
         name: RouteNames.available,
         component: () => import(/* webpackChunkName: "student-stocks" */ './pages/StocksAvailable.vue'),
       },
+
+      {
+        path: 'detail/:id',
+        name: RouteNames.detail,
+        component: () => import(/* webpackChunkName: "student-stocks" */ './pages/StocksDetail.vue'),
+      },
     ],
   },
 ];

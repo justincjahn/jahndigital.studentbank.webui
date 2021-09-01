@@ -1,4 +1,8 @@
 <template>
+  <p class="stock-hint help-text">
+    Tip: Click on the stock symbol to view detailed pricing history.
+  </p>
+
   <table
     v-if="stocks.length > 0 || loading"
     class="held-stocks-list"
@@ -35,7 +39,13 @@
     </thead>
     <tbody>
       <tr v-for="stock in stocks" :key="stock.id">
-        <td>{{ stock.stock.symbol }}</td>
+        <td>
+          <router-link
+            :to="{ name: stockDetailRoute, params: { id: stock.stockId }}"
+          >
+            {{ stock.stock.symbol }}
+          </router-link>
+        </td>
         <td>{{ stock.stock.name }}</td>
         <td>
           {{ new Date(stock.dateLastActive).toLocaleDateString('en-US') }}
@@ -158,6 +168,9 @@ import userStore from '@/stores/user';
 import errorStore from '@/stores/error';
 import { GLOBAL_STORE } from '../../symbols';
 
+// Routes
+import StocksRouteNames from '../routeNames';
+
 export default defineComponent({
   components: {
     StockPurchaseModal: defineAsyncComponent(() => import('../components/StockPurchaseModal.vue')),
@@ -236,6 +249,7 @@ export default defineComponent({
     }, { immediate: true });
 
     return {
+      stockDetailRoute: StocksRouteNames.detail,
       loading: globalStore.stocksHeld.loading,
       shares: globalStore.shares,
       stocks: globalStore.stocksHeld.items,
@@ -260,6 +274,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+.stock-hint.help-text {
+  margin: 0 1em 1.5em 1em;
+}
+
 .held-stocks-list {
   padding: 0 2em;
 

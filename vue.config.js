@@ -1,9 +1,20 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const fs = require('fs');
+
 process.env.VUE_APP_THEME = process.env.VUE_APP_THEME || '@/scss/_theme.scss';
 process.env.VUE_APP_SITE_NAME = process.env.VUE_APP_SITE_NAME || 'Student Bank';
 
 // eslint-disable-next-line import/newline-after-import, @typescript-eslint/no-var-requires
 const { version } = require('./package.json');
 process.env.VUE_APP_VERSION = version || 'unknown';
+
+let https = true;
+if (fs.existsSync('./localhost.key') && fs.existsSync('./localhost.crt')) {
+  https = {
+    key: fs.readFileSync('./localhost.key'),
+    cert: fs.readFileSync('./localhost.crt'),
+  };
+}
 
 module.exports = {
   productionSourceMap: false,
@@ -66,8 +77,10 @@ module.exports = {
   },
 
   devServer: {
-    https: true,
+    https,
+    host: 'localhost',
     port: 8443,
+    hotOnly: false,
     proxy: {
       '/graphql': {
         target: 'https://localhost:5001',
