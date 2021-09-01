@@ -9,7 +9,7 @@
     <table
       v-if="stockHistory.length > 0 || historyLoading"
       class="stock-details__history-list"
-      :class="{ loading }"
+      :class="{ loading: historyLoading }"
     >
       <thead>
         <tr>
