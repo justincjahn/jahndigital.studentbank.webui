@@ -113,11 +113,6 @@ export default defineComponent({
       emit('update:error', newError);
     });
 
-    // If the props updates, syncronize with our local value
-    watch(() => props.modelValue, (newValue) => {
-      if (amount.value !== newValue) amount.value = newValue;
-    });
-
     // When the parent's v-model changes, update the input value
     watch(() => props.modelValue, (newValue) => {
       if (amount.value !== newValue) amount.value = newValue;

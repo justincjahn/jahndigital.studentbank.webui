@@ -1,4 +1,4 @@
-// Global typings for common objects throughout the application.
+/* eslint-disable no-use-before-define, camelcase */
 
 /**
  * GLOBAL OBJECTS
@@ -182,7 +182,7 @@ interface Privilege {
 }
 
 interface Role {
-  description: name;
+  description: string;
   rolePrivileges: Privilege[];
 }
 
