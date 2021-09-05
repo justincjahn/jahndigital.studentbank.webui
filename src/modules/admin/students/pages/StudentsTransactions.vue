@@ -84,7 +84,6 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: 1em;
-  padding: 0 2em;
 
   &__sidebar {
     display: flex;

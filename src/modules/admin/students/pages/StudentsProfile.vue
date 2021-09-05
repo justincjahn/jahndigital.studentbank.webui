@@ -7,20 +7,15 @@
         v-model="data.student.accountNumber"
         v-model:error="data.errors.accountNumber"
         label="Account Number"
+        required
         :validator="validateAccount"
-      />
-
-      <base-input
-        v-model="data.student.email"
-        v-model:error="data.errors.email"
-        label="Email"
-        :validator="validateEmail"
       />
 
       <base-input
         v-model="data.student.firstName"
         v-model:error="data.errors.firstName"
         label="First Name"
+        required
         :validator="validateName"
       />
 
@@ -28,7 +23,15 @@
         v-model="data.student.lastName"
         v-model:error="data.errors.lastName"
         label="Last Name"
+        required
         :validator="validateName"
+      />
+
+      <base-input
+        v-model="data.student.email"
+        v-model:error="data.errors.email"
+        label="Email"
+        :validator="validateEmail"
       />
 
       <div class="fieldset">

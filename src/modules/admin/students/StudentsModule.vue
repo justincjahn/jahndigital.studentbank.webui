@@ -25,7 +25,11 @@
       </router-link>
     </section>
 
-    <router-view />
+    <div class="student__details__main">
+      <h2>{{selected?.lastName}}, {{selected?.firstName}}</h2>
+
+      <router-view />
+    </div>
   </div>
   <p v-else class="student__hint help-text">
     Please use the search box above to find and select a student.
@@ -137,6 +141,14 @@ export default defineComponent({
       .student-selector {
         max-width: 30em;
       }
+    }
+  }
+
+  &__details__main {
+    padding: 0 1.5em;
+
+    & > h2 {
+      margin-bottom: 0.5em;
     }
   }
 
