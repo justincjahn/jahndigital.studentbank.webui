@@ -6,6 +6,23 @@
       {{ stock?.name }} Detail
     </h2>
 
+    <suspense>
+      <template #default>
+        <apexchart
+          :options="chartOptions"
+          :series="chartSeries"
+          type="line"
+          width="100%"
+          height="250rem"
+        />
+      </template>
+      <template #fallback>
+        <loading-label>
+          Chart loading...
+        </loading-label>
+      </template>
+    </suspense>
+
     <table
       v-if="stockHistory.length > 0 || historyLoading"
       class="stock-details__history-list"
@@ -85,7 +102,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, defineAsyncComponent, onMounted, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 
 // Icons
@@ -96,6 +113,8 @@ import LoadingLabel from '@/components/LoadingLabel.vue';
 
 // Utils
 import injectStrict from '@/utils/injectStrict';
+import median from '@/utils/median';
+import Money from '@/utils/money';
 
 // Services
 import { getStocks } from '@/services/stock';
@@ -110,6 +129,7 @@ import StocksRouteNames from '../routeNames';
 export default defineComponent({
   components: {
     LoadingLabel,
+    apexchart: defineAsyncComponent(() => import(/* webpackChunkName: "apexchart" */ 'vue3-apexcharts')),
   },
   setup() {
     const globalStore = injectStrict(GLOBAL_STORE);
@@ -117,6 +137,61 @@ export default defineComponent({
     const loading = ref(true);
     const historyLoading = ref(true);
     const stock = ref<Stock|null>(null);
+
+    const chartOptions = computed(() => {
+      const values = globalStore.stockHistory.items.value;
+      const length = values.length > 0 ? values.length - 1 : 0;
+
+      // Get the value of the oldest history item
+      const firstItem = globalStore.stockHistory.items.value[length]?.value ?? -1;
+
+      // Get the median value of them all
+      const medianValue = median(values.map((history) => history.value));
+
+      // Calculate up or down
+      const color = medianValue >= firstItem ? '#198754' : '#DC3848';
+
+      return {
+        colors: [color],
+        xaxis: {
+          type: 'datetime',
+        },
+        yaxis: {
+          labels: {
+            formatter(val: number) {
+              return Money.fromNumber(val).toString();
+            },
+          },
+        },
+        tooltip: {
+          y: {
+            formatter(val: number) {
+              return Money.fromNumber(val).toString();
+            },
+          },
+          x: {
+            format: 'dd MMM yyyy',
+          },
+        },
+        chart: {
+          zoom: {
+            autoScaleYaxis: true,
+          },
+        },
+      };
+    });
+
+    const chartSeries = computed(() => {
+      const data = globalStore.stockHistory.items.value.map((history) => ({
+        x: new Date(history.dateChanged).getTime(),
+        y: history.value,
+      }));
+
+      return [{
+        name: 'Value',
+        data,
+      }];
+    });
 
     /**
      * Calculates the percent increase between the current value and the previous.
@@ -188,6 +263,8 @@ export default defineComponent({
       loading,
       historyLoading,
       stock,
+      chartOptions,
+      chartSeries,
       stockHistory: globalStore.stockHistory.items,
       next: globalStore.stockHistory.fetchNext,
       previous: globalStore.stockHistory.fetchPrevious,
