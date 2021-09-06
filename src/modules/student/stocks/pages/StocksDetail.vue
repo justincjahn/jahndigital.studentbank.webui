@@ -113,7 +113,6 @@ import LoadingLabel from '@/components/LoadingLabel.vue';
 
 // Utils
 import injectStrict from '@/utils/injectStrict';
-import median from '@/utils/median';
 import Money from '@/utils/money';
 
 // Services
@@ -140,16 +139,9 @@ export default defineComponent({
 
     const chartOptions = computed(() => {
       const values = globalStore.stockHistory.items.value;
-      const length = values.length > 0 ? values.length - 1 : 0;
-
-      // Get the value of the oldest history item
-      const firstItem = globalStore.stockHistory.items.value[length]?.value ?? -1;
-
-      // Get the median value of them all
-      const medianValue = median(values.map((history) => history.value));
-
-      // Calculate up or down
-      const color = medianValue >= firstItem ? '#198754' : '#DC3848';
+      const latest = values[0]?.value ?? -1;
+      const previous = values[1]?.value ?? -1;
+      const color = latest >= previous ? '#198754' : '#DC3848';
 
       return {
         colors: [color],
