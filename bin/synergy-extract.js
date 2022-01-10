@@ -79,7 +79,7 @@ function parseCSV(
     // Skip empty lines
     if (lines[i].trim().length === 0) continue;
 
-    const values = parseCSVLine(lines[i], options.delimiter, options.qualifier);
+    const values = parseCSVLine(lines[i].trim(), options.delimiter, options.qualifier);
 
     // Set string headings or generate numeric headings
     if (options.header && i === 0) {
@@ -154,11 +154,18 @@ try {
 
 const sourceData = parseCSV(sourceDataRaw);
 let output = 'group,account_number,first_name,last_name,email\n';
+
+// sourceData.forEach((row) => {
+//   const period = row.Period;
+//   const accountNumber = row['Perm ID'];
+//   const [lastName, firstName] = parseName(row['Student Name']);
+//   output += `"Period ${period}","${accountNumber}","${firstName}","${lastName}",\n`;
+// });
+
 sourceData.forEach((row) => {
-  const period = row.Period;
-  const accountNumber = row['Perm ID'];
-  const [lastName, firstName] = parseName(row['Student Name']);
-  output += `"Period ${period}","${accountNumber}","${firstName}","${lastName}",\n`;
+  const { period, email, account_number } = row;
+  const [lastName, firstName] = parseName(row.student_name);
+  output += `"${period}","${account_number}","${firstName}","${lastName}","${email}"\n`;
 });
 
 console.log(output);
