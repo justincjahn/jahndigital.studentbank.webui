@@ -29,6 +29,10 @@ module.exports = {
     // Allow the name given to the default export to be the same as the file's name
     'import/no-named-as-default-member': 'off',
 
+    // Allow cleaner TS defineProps and defineEmits definitions
+    'no-spaced-func': 'off',
+    'func-call-spacing': 'off',
+
     // Not really a line length stickler- sometimes it's necessary, but keep it _somewhat_ manageable
     'max-len': ['error', {
       code: 120,

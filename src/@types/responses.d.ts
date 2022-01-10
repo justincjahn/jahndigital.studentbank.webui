@@ -327,3 +327,7 @@ interface DeleteStockResponse {
 interface RestoreStockResponse {
   restoreStock: Stock[];
 }
+
+interface PurgeStockHistoryResponse {
+  purgeStockHistory: StockHistory[];
+}

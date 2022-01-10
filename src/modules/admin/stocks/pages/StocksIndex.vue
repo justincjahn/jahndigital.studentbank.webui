@@ -28,6 +28,13 @@
       >
         Delete Selected
       </button>
+      <button
+        type="button"
+        :disabled="!selected"
+        @click="togglePurgeStockModal"
+      >
+        Purge History
+      </button>
     </nav>
     <div class="stocks-index__body">
       <div class="stocks-index__body__main-panel">
@@ -86,6 +93,13 @@
     @ok="handleNewStockModalOk"
     @cancel="toggleNewStockModal"
   />
+
+  <purge-stock-history-modal
+    :show="showPurgeModal"
+    :loading="purgeModalLoading"
+    @ok="handlePurgeStockModalOk"
+    @cancel="togglePurgeStockModal"
+  />
 </template>
 
 <script lang="ts">
@@ -100,6 +114,7 @@ import { GLOBAL_STORE } from '../../symbols';
 import StockList from '../components/StockList.vue';
 import StockHistoryList from '../components/StockHistoryList.vue';
 import EditStockForm from '../components/EditStockForm.vue';
+import PurgeStockHistoryModal from '../components/PurgeStockHistoryModal.vue';
 
 // Routes
 import RouteNames from '../routeNames';
@@ -110,11 +125,14 @@ export default defineComponent({
     StockHistoryList,
     NewStockModal: defineAsyncComponent(() => import('../components/NewStockModal.vue')),
     EditStockForm,
+    PurgeStockHistoryModal,
   },
   setup() {
     const router = useRouter();
     const globalStore = injectStrict(GLOBAL_STORE);
     const showNewStockModal = ref(false);
+    const showPurgeModal = ref(false);
+    const purgeModalLoading = ref(false);
     const newStockPosting = ref(false);
     const updateStockPosting = ref(false);
 
@@ -236,8 +254,36 @@ export default defineComponent({
       }
     }
 
+    /**
+     * Open or close the Purge modal.
+     */
+    function togglePurgeStockModal() {
+      showPurgeModal.value = !showPurgeModal.value;
+    }
+
+    /**
+     * Handle the stock history purge.
+     *
+     * @param date The date to purge to.
+     */
+    async function handlePurgeStockModalOk(date: string) {
+      if (!globalStore.stock.selected.value) return;
+
+      purgeModalLoading.value = true;
+      try {
+        await globalStore.stock.purgeHistory(globalStore.stock.selected.value, date);
+      } catch (e) {
+        globalStore.error.setCurrentError(e?.message ?? e);
+      } finally {
+        purgeModalLoading.value = false;
+        togglePurgeStockModal();
+      }
+    }
+
     return {
       showNewStockModal,
+      showPurgeModal,
+      purgeModalLoading,
       newStockPosting,
       updateStockPosting,
       globalStore,
@@ -245,6 +291,8 @@ export default defineComponent({
       isLinked,
       toggleNewStockModal,
       handleNewStockModalOk,
+      togglePurgeStockModal,
+      handlePurgeStockModalOk,
       handleUpdateStock,
       handleStockClick,
       handleStockDoubleClick,

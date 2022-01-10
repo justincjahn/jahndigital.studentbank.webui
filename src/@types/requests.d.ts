@@ -209,3 +209,8 @@ interface NewStockPurchaseRequest {
   stockId: number;
   quantity: number;
 }
+
+interface PurgeStockHistoryRequest {
+  stockId: number;
+  date: string;
+}

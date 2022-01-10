@@ -10,6 +10,7 @@ import {
   unlinkStock,
   deleteStock,
   newStock,
+  purgeStockHistory,
 } from '@/services/stock';
 
 // Events
@@ -224,6 +225,27 @@ export function setup() {
     throw new Error('[Remove Stock]: Stock was not deleted from the server!');
   }
 
+  /**
+   * Purges history of a stock to a given point.
+   *
+   * @param stock The stock whose history to purge.
+   * @param date A date in yyyy-mm-dd format.
+   * @returns A list of {@link StockHistory} objects that were purged.
+   */
+  async function purgeHistory(stock: Stock, date: string) {
+    const res = await purgeStockHistory({
+      stockId: stock.id,
+      date,
+    });
+
+    if (res.purgeStockHistory) {
+      publish(stockUpdate, stock);
+      return res.purgeStockHistory;
+    }
+
+    throw new Error('[Purge Stock History]: Stock History was not deleted from the server!');
+  }
+
   // If a stock object was created elsewhere, push it in
   const unsubCreate = subscribe(stockCreate, (stock) => {
     if (store.instances.length === 0) {
@@ -296,6 +318,7 @@ export function setup() {
     link,
     unlink,
     remove,
+    purgeHistory,
     dispose,
   };
 }

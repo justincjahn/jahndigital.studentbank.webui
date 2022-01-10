@@ -381,3 +381,9 @@ export function validateStockSharesNotNegative(value: string): string | boolean 
 
   return true;
 }
+
+export function validateDate(value: string): string | boolean {
+  if (!value || value.trim().length === 0) return 'Date cannot be empty.';
+  if (!value.match(/\d{4}-\d{2}-\d{2}/)) return 'Date must be in the format yyyy-mm-dd.';
+  return true;
+}

@@ -9,6 +9,7 @@ import gqlStockDelete from '@/graphql/mutations/stockDelete.gql';
 import gqlStockRestore from '@/graphql/mutations/stockRestore.gql';
 import gqlStudentStocks from '@/graphql/queries/studentStocks.gql';
 import gqlStudentStockHistory from '@/graphql/queries/studentStockHistory.gql';
+import gqlStockHistoryPurge from '@/graphql/mutations/stockHistoryPurge.gql';
 import { query, mutate, mutateCustom } from './Apollo';
 
 /**
@@ -211,6 +212,20 @@ export async function deleteStock(stock: Stock): Promise<DeleteStockResponse> {
         id: cache.identify({ ...stock }),
       });
     },
+  });
+}
+
+/**
+ * Purge a stock's history up to the provided date.
+ *
+ * @param input
+ * @returns A promise containing an array of StockHistory objects that were purged.
+ * @throws {Error} If an error occurred during the network call.
+ */
+export async function purgeStockHistory(input: PurgeStockHistoryRequest): Promise<PurgeStockHistoryResponse> {
+  return mutateCustom<PurgeStockHistoryResponse>({
+    mutation: gqlStockHistoryPurge,
+    variables: input,
   });
 }
 
