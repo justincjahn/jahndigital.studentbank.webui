@@ -119,8 +119,8 @@ import Money from '@/utils/money';
 import { getStocks } from '@/services/stock';
 
 // Stores
-import { GLOBAL_STORE } from '../../symbols';
 import errorStore from '@/stores/error';
+import { GLOBAL_STORE } from '../../symbols';
 
 // Routes
 import StocksRouteNames from '../routeNames';
