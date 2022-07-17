@@ -12,10 +12,10 @@ query studentsByName(
     where: {
       or: [
         {
-          firstName: { startsWith: $name}
+          firstName: { startsWithInvariant: $name}
         },
         {
-          lastName: { startsWith: $name}
+          lastName: { startsWithInvariant: $name}
         }
       ]
     },
