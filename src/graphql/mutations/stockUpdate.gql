@@ -4,14 +4,14 @@ mutation updateStock(
   $id: Long!,
   $name: String,
   $symbol: String,
-  $totalShares: Long,
+  $rawDescription: String,
   $currentValue: Money,
 ) {
   updateStock(input: {
     id: $id,
     name: $name,
     symbol: $symbol,
-    totalShares: $totalShares,
+    rawDescription: $rawDescription,
     currentValue: $currentValue
   }) {
     ...StockParts

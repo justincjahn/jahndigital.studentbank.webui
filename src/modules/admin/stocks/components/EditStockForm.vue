@@ -19,11 +19,9 @@
     />
 
     <base-input
-      v-model="totalShares"
-      v-model:error="totalSharesError"
-      label="Total Shares"
-      required
-      :validator="validateStockSharesNotNegative"
+      v-model="rawDescription"
+      label="Description"
+      name="description"
     />
 
     <currency-input
@@ -85,8 +83,7 @@ export default defineComponent({
     const nameError = ref('');
     const symbol = ref('');
     const symbolError = ref('');
-    const totalShares = ref('');
-    const totalSharesError = ref('');
+    const rawDescription = ref('');
     const amount = ref('');
     const amountError = ref('');
 
@@ -95,7 +92,6 @@ export default defineComponent({
       if (!props.selected) return false;
       if (nameError.value.length > 0) return false;
       if (symbolError.value.length > 0) return false;
-      if (totalSharesError.value.length > 0) return false;
       if (amountError.value.length > 0) return false;
       return true;
     });
@@ -103,15 +99,14 @@ export default defineComponent({
     function reset() {
       name.value = '';
       symbol.value = '';
-      totalShares.value = '10000';
       amount.value = '0.00';
     }
 
     function sync(stock: Stock) {
       name.value = stock.name;
       symbol.value = stock.symbol;
-      totalShares.value = stock.totalShares.toString();
       amount.value = Money.fromNumber(stock.currentValue).toString().replace('$', '');
+      rawDescription.value = stock.rawDescription;
     }
 
     function handleSubmit() {
@@ -122,8 +117,8 @@ export default defineComponent({
         id: props.selected.id,
         name: name.value,
         symbol: symbol.value,
-        totalShares: Number.parseInt(totalShares.value, 10),
         currentValue: Money.fromStringOrDefault(amount.value).getAmount(),
+        rawDescription: rawDescription.value,
       };
 
       emit('submit', res);
@@ -145,8 +140,7 @@ export default defineComponent({
       nameError,
       symbol,
       symbolError,
-      totalShares,
-      totalSharesError,
+      rawDescription,
       amount,
       amountError,
       canSubmit,

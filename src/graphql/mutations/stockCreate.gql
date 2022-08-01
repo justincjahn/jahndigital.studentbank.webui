@@ -3,13 +3,13 @@
 mutation newStock(
   $name: String!,
   $symbol: String!,
-  $totalShares: Long!,
+  $rawDescription: String,
   $currentValue: Money!,
 ) {
   newStock(input: {
     name: $name,
     symbol: $symbol,
-    totalShares: $totalShares,
+    rawDescription: $rawDescription,
     currentValue: $currentValue
   }) {
     ...StockParts

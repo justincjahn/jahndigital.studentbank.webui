@@ -2,7 +2,7 @@ fragment StockBaseParts on Stock {
   id
   name
   symbol
-  availableShares
-  totalShares
   currentValue
+  rawDescription
+  formattedDescription
 }

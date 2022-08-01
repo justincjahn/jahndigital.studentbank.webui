@@ -183,7 +183,7 @@ interface DividendPostingRequest {
 interface NewStockRequest {
   name: string;
   symbol: string;
-  totalShares: number;
+  rawDescription: string;
   currentValue: number;
 }
 
@@ -191,7 +191,7 @@ interface UpdateStockRequest {
   id: number;
   name?: string;
   symbol?: string;
-  totalShares?: number;
+  rawDescription: string;
   currentValue?: number;
 }
 

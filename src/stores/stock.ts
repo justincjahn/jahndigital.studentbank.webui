@@ -292,6 +292,26 @@ export function setup() {
   });
 
   /**
+   * Fetch a specific stock by ID and return it.
+   *
+   * @param id The ID number of the student.
+   * @returns {Stock|null} A Stock object, or null if no student was found.
+   * @throws {Error} If an error ocurred during the fetch operation.
+   */
+  async function getById(id: number): Promise<Stock | null> {
+    const data = await getStocks({
+      where: { id: { eq: id } },
+      first: 1,
+    });
+
+    if (data.stocks.nodes.length > 0) {
+      return data.stocks.nodes[0];
+    }
+
+    return null;
+  }
+
+  /**
    * Unsubscribe from global events in preparation for the store unmounting
    */
   function dispose() {
@@ -312,6 +332,7 @@ export function setup() {
     fetch,
     fetchNext,
     fetchPrevious,
+    getById,
     clear,
     create,
     update,

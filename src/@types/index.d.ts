@@ -96,9 +96,9 @@ interface Stock {
   id: number;
   name: string;
   symbol: string;
-  availableShares: number;
-  totalShares: number;
   currentValue: number;
+  rawDescription: string;
+  formattedDescription: string;
   stockInstances?: StockInstance[];
 }
 

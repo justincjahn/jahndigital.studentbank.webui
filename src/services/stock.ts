@@ -27,6 +27,13 @@ interface FetchOptionsBase {
 }
 
 /**
+ * Options used to query for a single stock record.
+ */
+export interface GetByIdOptions extends FetchOptionsBase {
+  id: number;
+}
+
+/**
  * Options used to query for a list of stocks.
  */
 export interface StockListOptions extends FetchOptionsBase {

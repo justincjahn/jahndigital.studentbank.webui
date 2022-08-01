@@ -32,12 +32,9 @@
       />
 
       <base-input
-        v-model="totalShares"
-        v-model:error="totalSharesError"
-        required
-        label="Total Shares"
-        name="totalShares"
-        :validator="validateStockSharesNotNegative"
+        v-model="rawDescription"
+        label="Description"
+        name="description"
       />
 
       <currency-input
@@ -91,8 +88,7 @@ export default defineComponent({
     const nameError = ref('');
     const symbol = ref('');
     const symbolError = ref('');
-    const totalShares = ref('');
-    const totalSharesError = ref('');
+    const rawDescription = ref('');
     const amount = ref('');
     const amountError = ref('');
 
@@ -100,7 +96,6 @@ export default defineComponent({
       if (props.loading) return false;
       if (nameError.value.length > 0) return false;
       if (symbolError.value.length > 0) return false;
-      if (totalSharesError.value.length > 0) return false;
       if (amountError.value.length > 0) return false;
       return true;
     });
@@ -111,7 +106,7 @@ export default defineComponent({
       const req: NewStockRequest = {
         name: name.value,
         symbol: symbol.value,
-        totalShares: Number.parseInt(totalShares.value, 10),
+        rawDescription: rawDescription.value,
         currentValue: Money.fromStringOrDefault(amount.value).getAmount(),
       };
 
@@ -127,7 +122,6 @@ export default defineComponent({
       symbol.value = '';
       amount.value = '0.00';
       amountError.value = '';
-      totalShares.value = '10000000';
     }
 
     watchEffect(() => {
@@ -146,8 +140,7 @@ export default defineComponent({
       nameError,
       symbol,
       symbolError,
-      totalShares,
-      totalSharesError,
+      rawDescription,
       canSubmit,
       handleOk,
       handleCancel,
