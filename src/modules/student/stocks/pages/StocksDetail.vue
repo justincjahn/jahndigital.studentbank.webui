@@ -6,6 +6,10 @@
       {{ stock?.name }} Detail
     </h2>
 
+    <template v-if="stock?.formattedDescription">
+      <div class="stock-details__description" v-html="stock?.formattedDescription" />
+    </template>
+
     <suspense>
       <template #default>
         <apexchart
@@ -274,6 +278,10 @@ export default defineComponent({
 
   h2 {
     margin-bottom: 1em;
+  }
+
+  &__description {
+    margin-bottom: 2em;
   }
 
   &__history-list {
