@@ -16,22 +16,13 @@
   </template>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-
+<script setup lang="ts">
 import DollarIcon from './DollarIcon.vue';
 
-export default defineComponent({
-  components: {
-    DollarIcon,
-  },
-  props: {
-    show: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
-  },
+withDefaults(defineProps<{
+  show?: boolean
+}>(), {
+  show: false,
 });
 </script>
 

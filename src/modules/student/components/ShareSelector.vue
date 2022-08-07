@@ -10,10 +10,11 @@
 </template>
 
 <script lang="ts">
+import { Search } from '@/types';
 import { defineComponent, PropType, computed } from 'vue';
 
 // Components
-import BaseSelect, { Search } from '@/components/BaseSelect.vue';
+import BaseSelect from '@/components/BaseSelect.vue';
 
 // Stores
 import userStore from '@/stores/user';

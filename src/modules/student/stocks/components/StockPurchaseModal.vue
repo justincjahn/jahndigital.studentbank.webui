@@ -85,7 +85,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, defineAsyncComponent, PropType, ref, computed, watch } from 'vue';
+import { validationFunc } from '@/types';
+import { defineComponent, defineAsyncComponent, PropType, ref, computed, watch, watchEffect } from 'vue';
 
 // Composables
 import useValidation from '@/composables/useValidation';
@@ -154,13 +155,12 @@ export default defineComponent({
       if (!props.stock) return 0.0;
       return props.stock.currentValue;
     });
-
     /**
      * Ensures that the quantity field contains a valid number, the
      * student has enough funds in the selected account, or the
      * student has enough shares to sell.
      */
-    function validateQuantity(value: string): string | boolean {
+    const generateValidator = (share: Share|null): validationFunc => (value: string) => {
       if (!value || value.trim().length === 0 || value === '0') {
         return 'Quantity is required and cannot be zero.';
       }
@@ -179,7 +179,7 @@ export default defineComponent({
       // If we're in 'sell' mode, the quantity should be negative.
       if (props.sell) shares *= -1;
 
-      const shareBalance = selectedShare.value?.balance ?? 0;
+      const shareBalance = share?.balance ?? 0;
       const totalAmount = shares * currentValue.value;
       if (totalAmount > shareBalance) {
         return 'The selected account does not have the funds to purchase this quantity.';
@@ -190,9 +190,10 @@ export default defineComponent({
       }
 
       return true;
-    }
+    };
 
-    const { value: quantity, error: quantityError } = useValidation(validateQuantity);
+    const validator = ref(generateValidator(selectedShare.value));
+    const { value: quantity, error: quantityError } = useValidation(validator);
 
     // Depending on if the modal is in buy or sell mode, the quantity should actually be positive or negative.
     const normQuantity = computed(() => {
@@ -275,6 +276,10 @@ export default defineComponent({
           loading.value = false;
         }
       }
+    });
+
+    watchEffect(() => {
+      validator.value = generateValidator(selectedShare.value);
     });
 
     return {

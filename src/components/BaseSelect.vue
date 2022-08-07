@@ -1,3 +1,99 @@
+<script setup lang="ts">
+import { Item, Search } from '@/types';
+import { onUnmounted, ref, watchEffect } from 'vue';
+
+/**
+ * A custom drop-down component with some customizability and animations.  When an item
+ * is selected, the v-model is updated via an update:modelValue event.  Anonymous functions
+ * may be passed in that output the name of each item.  When no item is selected, a custom
+ * prompt message may be passed in as a param.
+ *
+ * Slots:
+ *   + selected: The contents of the button containing the selected item.
+ *     - option: The object/number/string currently selected.
+ *     - prompt: The promp to use when there is nothing selected.
+ *   + list: Create custom list elements for each item.
+ *     - options: The list of items to render.
+ *     - className: The class that should be applied to each list item.
+ *     - select: The function to call when an item is selected.  Add it to each list items @click event.
+ *     - selected: Should be called in the class prop for each option.  Outputs the className for the currently selected option.
+ *   + option: The contents of each list item.  Can be used to customize the display of each list item.
+ *     - option: The object/number/string being rendered.
+ */
+
+const props = withDefaults(defineProps<{
+  modelValue?: Item
+  options: Readonly<Array<Item>>
+  value?: Search
+  key?: Search
+  prompt?: string
+  width?: string
+  disabled?: boolean
+  shouldToggle?: boolean
+}>(), {
+  modelValue: null,
+  value: (x: Readonly<Item>) => x?.toString() ?? 'UNKNOWN',
+  key: (x: Readonly<Item>) => {
+    if (typeof x === 'object') return x?.id ?? x;
+    return x;
+  },
+  prompt: 'Choose an item...',
+  width: '10rem',
+  disabled: false,
+  shouldToggle: false,
+});
+
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: Item): void
+  (event: 'update:shouldToggle', value: boolean): void
+}>();
+
+// True if the select box is open
+const open = ref(false);
+
+// Stored reference to the root element
+const root = ref<HTMLButtonElement|null>(null);
+
+// Open and close the select when the user clicks on/off the button.
+function toggle(e?: Event) {
+  if (!open.value && props.disabled) return;
+
+  if (!e) {
+    open.value = !open.value;
+  } else {
+    open.value = !(e?.target !== root.value);
+  }
+}
+
+// Update the v-model when a new item is selected
+function select(item: Item) { emit('update:modelValue', item); }
+
+// Determines if the provided item is currently selected
+function selected(item: Item) {
+  if (typeof props.key !== 'function') return '';
+  return props.key(props.modelValue) === props.key(item) ? 'selected' : '';
+}
+
+// Register global click event when the box is opened and unregister when it closes
+watchEffect(() => {
+  if (open.value === true) {
+    document.addEventListener('click', toggle);
+  } else {
+    document.removeEventListener('click', toggle);
+  }
+});
+
+watchEffect(() => {
+  if (props.shouldToggle === true) {
+    toggle();
+    emit('update:shouldToggle', false);
+  }
+});
+
+// Unregister a global click event that toggles the selector
+onUnmounted(() => { document.removeEventListener('click', toggle); });
+</script>
+
 <template>
   <div class="select" :class="{ 'select--open': open }">
     <button
@@ -26,7 +122,7 @@
       >
         <li
           v-for="option in options"
-          :key="key(option)"
+          :key="(typeof key === 'function') ? key(option) : ''"
           class="select__items__item"
           :class="selected(option)"
           @click="select(option)"
@@ -39,119 +135,6 @@
     </ul>
   </div>
 </template>
-
-<script lang="ts">
-import { defineComponent, onUnmounted, ref, PropType, watchEffect } from 'vue';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Item = Record<string, any>|number|string|null;
-export type Search = <T extends Item>(obj: T) => string;
-
-/**
- * A custom drop-down component with some customizability and animations.  When an item
- * is selected, the v-model is updated via an update:modelValue event.  Anonymous functions
- * may be passed in that output the name of each item.  When no item is selected, a custom
- * prompt message may be passed in as a param.
- *
- * Slots:
- *   + selected: The contents of the button containing the selected item.
- *     - option: The object/number/string currently selected.
- *     - prompt: The promp to use when there is nothing selected.
- *   + list: Create custom list elements for each item.
- *     - options: The list of items to render.
- *     - className: The class that should be applied to each list item.
- *     - select: The function to call when an item is selected.  Add it to each list items @click event.
- *     - selected: Should be called in the class prop for each option.  Outputs the className for the currently selected option.
- *   + option: The contents of each list item.  Can be used to customize the display of each list item.
- *     - option: The object/number/string being rendered.
- */
-export default defineComponent({
-  props: {
-    modelValue: {
-      type: [Object, Number, String] as PropType<Item>,
-      default: null,
-    },
-    options: {
-      type: Array as PropType<Readonly<Item[]>>,
-      required: true,
-    },
-    value: {
-      type: Function as PropType<Search>,
-      required: false,
-      default: (x: Readonly<Item>) => x,
-    },
-    key: {
-      type: Function as PropType<Search>,
-      required: false,
-      default: (x: Readonly<Item>) => {
-        if (typeof x === 'object') return x?.id ?? x;
-        return x;
-      },
-    },
-    prompt: {
-      type: String,
-      required: false,
-      default: 'Choose an item...',
-    },
-    width: {
-      type: String,
-      required: false,
-      default: '10rem',
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: [
-    'update:modelValue',
-  ],
-  setup(props, { emit }) {
-    // True if the select box is open
-    const open = ref(false);
-
-    // Stored reference to the root element
-    const root = ref<HTMLButtonElement|null>(null);
-
-    // Open and close the select when the user clicks on/off the button.
-    function toggle(e?: Event) {
-      if (!open.value && props.disabled) return;
-
-      if (!e) {
-        open.value = !open.value;
-      } else {
-        open.value = !(e?.target !== root.value);
-      }
-    }
-
-    // Update the v-model when a new item is selected
-    function select(item: Item) { emit('update:modelValue', item); }
-
-    // Determines if the provided item is currently selected
-    function selected(item: Item) { return props.key(props.modelValue) === props.key(item) ? 'selected' : ''; }
-
-    // Register global click event when the box is opened and unregister when it closes
-    watchEffect(() => {
-      if (open.value === true) {
-        document.addEventListener('click', toggle);
-      } else {
-        document.removeEventListener('click', toggle);
-      }
-    });
-
-    // Unregister a global click event that toggles the selector
-    onUnmounted(() => { document.removeEventListener('click', toggle); });
-
-    return {
-      root,
-      open,
-      toggle,
-      select,
-      selected,
-    };
-  },
-});
-</script>
 
 <style lang="scss">
 @keyframes menuOpen {

@@ -1,3 +1,51 @@
+<script lang="ts">
+import { validationFunc, Item, Search } from '@/types';
+import { ref } from 'vue';
+import Period from '@/enums/Period';
+import BaseInput from './BaseInput.vue';
+import BaseSelect from './BaseSelect.vue';
+
+export default {
+  inheritAttrs: false,
+};
+</script>
+
+<script setup lang="ts">
+const options = Object.keys(Period);
+const value: Search = (obj: Item) => Period[obj as PeriodStrings] ?? 'UNKNOWN';
+
+withDefaults(defineProps<{
+  id?: string
+  name?: string
+  modelValue?: string|boolean
+  helpText?: string
+  error?: string
+  label?: string
+  required?: boolean
+  validator?: validationFunc
+}>(), {
+  modelValue: '',
+  helpText: '',
+  error: '',
+  label: '',
+  required: false,
+  validator: (): boolean => false,
+});
+
+defineEmits<{
+  (event: 'update:modelValue', value: string|boolean): void
+  (event: 'update:error', error: string|false): void
+}>();
+
+const shouldToggle = ref(false);
+
+function openInput() {
+  setTimeout(() => {
+    shouldToggle.value = true;
+  }, 10);
+}
+</script>
+
 <template>
   <base-input
     v-bind="$props"
@@ -20,83 +68,14 @@
     <template #default="{ modelValue: val, update, inputName }">
       <base-select
         :id="id"
-        ref="input"
         :name="inputName"
-        :model-value="val"
+        :model-value="val.toString()"
+        v-model:shouldToggle="shouldToggle"
         :options="options"
         :value="value"
         v-bind="$attrs"
-        @update:modelValue="x => update(x)"
+        @update:modelValue="x => update(x?.toString() ?? '')"
       />
     </template>
   </base-input>
 </template>
-
-<script lang="ts">
-import { defineComponent, PropType, ref } from 'vue';
-import Period from '@/enums/Period';
-import BaseInput, { validationFunc } from './BaseInput.vue';
-import BaseSelect from './BaseSelect.vue';
-
-const options = Object.keys(Period);
-const value = (option: PeriodStrings) => Period[option] ?? 'UNKNOWN';
-
-export default defineComponent({
-  components: {
-    BaseInput,
-    BaseSelect,
-  },
-  inheritAttrs: false,
-  props: {
-    id: {
-      type: String,
-      default: undefined,
-    },
-    name: {
-      type: String,
-      default: undefined,
-    },
-    modelValue: {
-      type: String,
-      default: '',
-    },
-    helpText: {
-      type: String,
-      default: '',
-    },
-    error: {
-      type: String,
-      default: '',
-    },
-    label: {
-      type: String,
-      default: '',
-    },
-    validator: {
-      type: Function as PropType<validationFunc>,
-      default: undefined,
-    },
-  },
-  emits: [
-    'update:modelValue',
-    'update:error',
-  ],
-  setup() {
-    const input = ref<typeof BaseSelect|null>(null);
-
-    function openInput() {
-      setTimeout(() => {
-        if (!input.value) return;
-        input.value.toggle();
-      }, 10);
-    }
-
-    return {
-      options,
-      value,
-      input,
-      openInput,
-    };
-  },
-});
-</script>

@@ -159,11 +159,12 @@
 </template>
 
 <script lang="ts">
+import { Search } from '@/types';
 import { computed, defineAsyncComponent, defineComponent, PropType, ref } from 'vue';
 import { BASE_URLS } from '@/constants';
 
 // Components
-import BaseSelect, { Search } from '@/components/BaseSelect.vue';
+import BaseSelect from '@/components/BaseSelect.vue';
 import Modal from '@/components/Modal.vue';
 
 // Utils

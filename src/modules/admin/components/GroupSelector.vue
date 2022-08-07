@@ -58,10 +58,11 @@
 </template>
 
 <script lang="ts">
+import { Search } from '@/types';
 import { defineComponent, ref, computed, PropType } from 'vue';
 
 // Components
-import BaseSelect, { Search } from '@/components/BaseSelect.vue';
+import BaseSelect from '@/components/BaseSelect.vue';
 import Modal from '@/components/Modal.vue';
 
 // Utils

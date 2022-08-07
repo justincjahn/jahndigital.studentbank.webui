@@ -1,6 +1,6 @@
-import { ref, computed, Ref, ComputedRef, isRef } from 'vue';
+import { validationFunc } from '@/types';
+import { ref, Ref, ComputedRef, isRef, watch } from 'vue';
 
-type validationFunc = (value: string) => string | boolean;
 type decoratorFunc = (value: string) => string;
 
 export interface UseValidationOptions {
@@ -11,38 +11,59 @@ export interface UseValidationOptions {
 /**
  * Provides a mechanism to validate a string value when it changes.
  *
- * @param {(string) => string|boolean}validator Function that checks the value.
+ * @param {(string) => string|boolean|Promise<string|boolean>} validator Function that checks the value.
+ * @param {UseValidationOptions} options
  */
 export default function useValidation(
-  validator: validationFunc | Ref<validationFunc>,
+  validator: validationFunc | Ref<validationFunc> | ComputedRef<validationFunc>,
   options?: UseValidationOptions,
 ): {
   value: Ref<string>,
-  error: ComputedRef<string>
+  error: Ref<string>,
+  loading: Ref<boolean>,
 } {
   const opts = options || {};
   const value = opts?.value ?? ref('');
+  const error = ref<string>('');
+  const loading = ref(false);
 
-  // Compute error every time the value (or validator) changes
-  const error = computed(() => {
+  async function runValidation(newValue: string) {
     // Run the value through a decorator if provided
-    let val = value.value;
+    let val = newValue;
     if (opts.decorator) {
       val = isRef(opts.decorator) ? opts.decorator.value(val) : opts.decorator(val);
     }
 
-    // Run the value through the validation function
     const func = isRef(validator) ? validator.value : validator;
-    const isValid = func(val);
+    loading.value = true;
+    const isValid = await Promise.resolve(func(val));
+    loading.value = false;
 
-    // Normalize the error into a string and return
-    if (isValid === true) return '';
-    if (isValid === false) return 'An unknown error occurred.';
-    return isValid;
+    if (isValid === true) {
+      error.value = '';
+      return;
+    }
+
+    if (isValid === false) {
+      error.value = 'An unknown error occurred.';
+      return;
+    }
+
+    error.value = isValid;
+  }
+
+  watch(validator, () => {
+    runValidation(value.value);
   });
+
+  watch(value, async (newValue, oldValue) => {
+    if (newValue === oldValue) return;
+    await runValidation(newValue);
+  }, { immediate: true });
 
   return {
     value,
     error,
+    loading,
   };
 }

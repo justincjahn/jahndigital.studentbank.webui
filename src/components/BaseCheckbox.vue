@@ -1,3 +1,37 @@
+<script setup lang="ts">
+import { validationFunc } from '@/types';
+import BaseInput from './BaseInput.vue';
+
+withDefaults(defineProps<{
+  id?: string
+  name?: string
+  modelValue?: string|boolean
+  helpText?: string
+  error?: string
+  label?: string
+  required?: boolean
+  validator?: validationFunc
+}>(), {
+  modelValue: '',
+  helpText: '',
+  error: '',
+  label: '',
+  required: false,
+  validator: (): boolean => false,
+});
+
+defineEmits<{
+  (event: 'update:modelValue', value: string|boolean): void
+  (event: 'update:error', error: string|false): void
+}>();
+</script>
+
+<script lang="ts">
+export default {
+  inheritAttrs: false,
+};
+</script>
+
 <template>
   <base-input
     v-bind="$props"
@@ -9,58 +43,12 @@
       <input
         :id="inputId"
         :name="inputName"
-        :checked="val"
+        :checked="(val as boolean)"
         :required="isReq"
         type="checkbox"
         v-bind="$attrs"
-        @input="update($event.target.checked)"
+        @input="update(($event?.target as HTMLInputElement)?.checked)"
       />
     </template>
   </base-input>
 </template>
-
-<script lang="ts">
-import { defineComponent, PropType } from 'vue';
-import BaseInput, { validationFunc } from './BaseInput.vue';
-
-export default defineComponent({
-  components: {
-    BaseInput,
-  },
-  inheritAttrs: false,
-  props: {
-    id: {
-      type: String,
-      default: undefined,
-    },
-    name: {
-      type: String,
-      default: undefined,
-    },
-    modelValue: {
-      type: [String, Boolean],
-      default: '',
-    },
-    helpText: {
-      type: String,
-      default: '',
-    },
-    error: {
-      type: String,
-      default: '',
-    },
-    label: {
-      type: String,
-      default: '',
-    },
-    validator: {
-      type: Function as PropType<validationFunc>,
-      default: () => true,
-    },
-  },
-  emits: [
-    'update:modelValue',
-    'update:error',
-  ],
-});
-</script>

@@ -11,7 +11,7 @@
       <base-rate-input
         :id="inputId"
         :name="inputName"
-        :model-value="val"
+        :model-value="val?.toString() ?? ''"
         :error="err"
         :validator="validator"
         :allow-negative="allowNegative"
@@ -25,57 +25,35 @@
   </base-input>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from 'vue';
-import BaseInput, { validationFunc } from './BaseInput.vue';
+<script setup lang="ts">
+import { validationFunc } from '@/types';
+import BaseInput from './BaseInput.vue';
 import BaseRateInput from './BaseRateInput.vue';
 
-export default defineComponent({
-  components: {
-    BaseInput,
-    BaseRateInput,
-  },
-  props: {
-    id: {
-      type: String,
-      default: undefined,
-    },
-    modelValue: {
-      type: String,
-      default: undefined,
-    },
-    helpText: {
-      type: String,
-      default: undefined,
-    },
-    error: {
-      type: String,
-      default: undefined,
-    },
-    label: {
-      type: String,
-      default: undefined,
-    },
-    required: {
-      type: Boolean,
-      default: false,
-    },
-    validator: {
-      type: Function as PropType<validationFunc>,
-      default: undefined,
-    },
-    allowNegative: {
-      type: Boolean,
-      default: true,
-    },
-    allowZero: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  emits: [
-    'update:modelValue',
-    'update:error',
-  ],
+withDefaults(defineProps<{
+  id?: string
+  name?: string
+  modelValue?: string
+  helpText?: string
+  error?: string
+  label?: string
+  required?: boolean
+  validator?: validationFunc
+  allowNegative?: boolean
+  allowZero?: boolean
+}>(), {
+  modelValue: '',
+  helpText: '',
+  error: '',
+  label: '',
+  required: false,
+  allowNegative: true,
+  allowZero: true,
+  validator: (): boolean => false,
 });
+
+defineEmits<{
+  (event: 'update:modelValue', value: string|boolean): void
+  (event: 'update:error', error: string|false): void
+}>();
 </script>

@@ -1,3 +1,54 @@
+<script lang="ts">
+import { validationFunc } from '@/types';
+import { computed, watchEffect } from 'vue';
+import uuid4 from '@/utils/uuid4';
+
+export default {
+  inheritAttrs: false,
+};
+</script>
+
+<script setup lang="ts">
+const props = withDefaults(defineProps<{
+  id?: string
+  name?: string
+  modelValue?: string|boolean
+  helpText?: string
+  error?: string
+  label?: string
+  required?: boolean
+  validator?: validationFunc
+}>(), {
+  modelValue: '',
+  helpText: '',
+  error: '',
+  label: '',
+  required: false,
+  validator: (): boolean => false,
+});
+
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: string|boolean): void
+  (event: 'update:error', error: string|false): void
+}>();
+
+const inputId = computed(() => {
+  if (props.id) return props.id;
+  return uuid4();
+});
+
+function handleUpdate(value: string|boolean) {
+  emit('update:modelValue', value);
+}
+
+watchEffect(async () => {
+  const { modelValue, validator } = props;
+  if (!validator) return;
+  const error = await Promise.resolve(validator(modelValue.toString()));
+  emit('update:error', error === true ? '' : error);
+});
+</script>
+
 <template>
   <div class="fieldset" :class="[$attrs.class ?? '', required ? 'required' : '']">
     <slot
@@ -9,7 +60,7 @@
       :error="error"
       :label="label"
       :help-text="helpText"
-      :update="updateModelValue"
+      :update="handleUpdate"
       :attrs="$attrs"
     >
       <label v-if="label" :for="inputId">
@@ -31,7 +82,7 @@
       :label="label"
       :required="required"
       :help-text="helpText"
-      :update="updateModelValue"
+      :update="handleUpdate"
       :attrs="$attrs"
     >
       <p v-if="helpText" class="help-text">
@@ -47,7 +98,7 @@
       :label="label"
       :required="required"
       :helpText="helpText"
-      :update="updateModelValue"
+      :update="handleUpdate"
       :attrs="$attrs"
     >
       <input
@@ -58,8 +109,8 @@
         :class="{ error, required }"
         :required="required"
         v-bind="$attrs"
-        @input="updateModelValue($event.target.value)"
-        @focus="$event.target.select()"
+        @input="handleUpdate(($event?.target as HTMLInputElement)?.value)"
+        @focus="($event?.target as HTMLInputElement)?.select()"
       />
     </slot>
 
@@ -72,7 +123,7 @@
         :error="error"
         :label="label"
         :help-text="helpText"
-        :update="updateModelValue"
+        :update="handleUpdate"
         :attrs="$attrs"
       >
         {{ error }}
@@ -80,75 +131,3 @@
     </p>
   </div>
 </template>
-
-<script lang="ts">
-import { defineComponent, PropType, computed, watchEffect } from 'vue';
-import uuid4 from '@/utils/uuid4';
-
-export type validationFunc = (value: string) => string | boolean;
-
-export default defineComponent({
-  inheritAttrs: false,
-  props: {
-    id: {
-      type: String,
-      default: undefined,
-    },
-    name: {
-      type: String,
-      default: undefined,
-    },
-    modelValue: {
-      type: [String, Boolean],
-      default: '',
-    },
-    helpText: {
-      type: String,
-      default: '',
-    },
-    error: {
-      type: String,
-      default: '',
-    },
-    label: {
-      type: String,
-      default: '',
-    },
-    required: {
-      type: Boolean,
-      default: false,
-    },
-    validator: {
-      type: Function as PropType<validationFunc>,
-      default: undefined,
-    },
-  },
-  emits: [
-    'update:modelValue',
-    'update:error',
-  ],
-  setup(props, { emit }) {
-    const inputId = computed(() => {
-      if (props.id) return props.id;
-      return uuid4();
-    });
-
-    function updateModelValue(value: string) {
-      emit('update:modelValue', value);
-    }
-
-    watchEffect(async () => {
-      const { modelValue, validator } = props;
-      if (!validator) return;
-
-      const error = await Promise.resolve(validator(modelValue.toString()));
-      emit('update:error', error === true ? '' : error);
-    });
-
-    return {
-      inputId,
-      updateModelValue,
-    };
-  },
-});
-</script>

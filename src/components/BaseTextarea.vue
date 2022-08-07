@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { validationFunc } from '@/types';
 import { PropType, ref } from 'vue';
-import BaseInput, { validationFunc } from './BaseInput.vue';
+import BaseInput from './BaseInput.vue';
 
 defineProps({
   id: {
@@ -69,7 +70,7 @@ function handleInput(value: string, callback: (value: string) => void) {
         ref="textarea"
         :id="inputId"
         :name="inputName"
-        :value="val"
+        :value="val?.toString() ?? ''"
         :class="{ err, isReq }"
         :required="isReq"
         v-bind="$attrs"

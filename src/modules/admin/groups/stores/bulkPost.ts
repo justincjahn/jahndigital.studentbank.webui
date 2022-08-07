@@ -233,7 +233,7 @@ export function setup() {
       return;
     }
 
-    // Loop throuch each selected student and pull out those with at least one of the given share type
+    // Loop through each selected student and pull out those with at least one of the given share type
     const studentsWithShares = store.selectedStudents.filter(
       (student) => (student.shares?.findIndex((share) => share.shareTypeId === shareType.id) ?? -1) >= 0,
     );
