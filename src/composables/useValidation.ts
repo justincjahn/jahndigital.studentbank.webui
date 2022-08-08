@@ -1,7 +1,8 @@
 import { validationFunc } from '@/types';
-import { ref, Ref, ComputedRef, isRef, watch } from 'vue';
+import { ref, Ref, unref, watchEffect } from 'vue';
 
 type decoratorFunc = (value: string) => string;
+export type ReactiveFunction<TParam> = () => TParam
 
 export interface UseValidationOptions {
   decorator?: decoratorFunc | Ref<decoratorFunc>;
@@ -15,7 +16,7 @@ export interface UseValidationOptions {
  * @param {UseValidationOptions} options
  */
 export default function useValidation(
-  validator: validationFunc | Ref<validationFunc> | ComputedRef<validationFunc>,
+  validator: validationFunc | Ref<validationFunc>,
   options?: UseValidationOptions,
 ): {
   value: Ref<string>,
@@ -31,12 +32,11 @@ export default function useValidation(
     // Run the value through a decorator if provided
     let val = newValue;
     if (opts.decorator) {
-      val = isRef(opts.decorator) ? opts.decorator.value(val) : opts.decorator(val);
+      val = unref(opts.decorator)(val);
     }
 
-    const func = isRef(validator) ? validator.value : validator;
     loading.value = true;
-    const isValid = await Promise.resolve(func(val));
+    const isValid = await Promise.resolve(unref(validator)(val));
     loading.value = false;
 
     if (isValid === true) {
@@ -52,14 +52,11 @@ export default function useValidation(
     error.value = isValid;
   }
 
-  watch(validator, () => {
-    runValidation(value.value);
+  watchEffect(() => {
+    if (unref(validator)) {
+      runValidation(value.value);
+    }
   });
-
-  watch(value, async (newValue, oldValue) => {
-    if (newValue === oldValue) return;
-    await runValidation(newValue);
-  }, { immediate: true });
 
   return {
     value,
