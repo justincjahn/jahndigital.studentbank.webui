@@ -201,7 +201,10 @@ export function setup() {
     try {
       store.selectedStudents = await studentSelection.resolve();
     } catch (e) {
-      setError(1, `Unable to fetch selected students: ${e?.message ?? e}`);
+      if (e instanceof Error) {
+        setError(1, `Unable to fetch selected students: ${e?.message ?? e}`);
+      }
+
       throw e;
     } finally {
       store.loading = false;

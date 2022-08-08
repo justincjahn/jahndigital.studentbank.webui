@@ -173,7 +173,9 @@ export default defineComponent({
 
         emailAddress.value = globalStore.user.email.value;
       } catch (e) {
-        globalStore.error.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          globalStore.error.setCurrentError(e?.message ?? e);
+        }
       } finally {
         loading.value = false;
       }
@@ -196,7 +198,9 @@ export default defineComponent({
 
         passwordForm.value.reset();
       } catch (e) {
-        globalStore.error.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          globalStore.error.setCurrentError(e?.message ?? e);
+        }
       } finally {
         loading.value = false;
       }

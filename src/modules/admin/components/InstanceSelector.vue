@@ -344,7 +344,9 @@ export default defineComponent({
           update(instance);
           toggle();
         } catch (e) {
-          errorStore.value.setCurrentError(e?.message ?? e);
+          if (e instanceof Error) {
+            errorStore.value.setCurrentError(e?.message ?? e);
+          }
         }
       }
 
@@ -365,7 +367,9 @@ export default defineComponent({
           update(instance);
           toggle();
         } catch (e) {
-          errorStore.value.setCurrentError(e?.message ?? e);
+          if (e instanceof Error) {
+            errorStore.value.setCurrentError(e?.message ?? e);
+          }
         }
       }
 
@@ -381,7 +385,9 @@ export default defineComponent({
           update(instance);
           toggle();
         } catch (e) {
-          errorStore.value.setCurrentError(e?.message ?? e);
+          if (e instanceof Error) {
+            errorStore.value.setCurrentError(e?.message ?? e);
+          }
         }
       }
 
@@ -393,7 +399,9 @@ export default defineComponent({
           await instanceStore.value.deleteInstance(props.modelValue!);
           update(null);
         } catch (e) {
-          errorStore.value.setCurrentError(e.message ?? e);
+          if (e instanceof Error) {
+            errorStore.value.setCurrentError(e.message ?? e);
+          }
         } finally {
           toggle();
         }

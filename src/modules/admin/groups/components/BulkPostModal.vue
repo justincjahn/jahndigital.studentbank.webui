@@ -281,7 +281,11 @@ export default defineComponent({
       try {
         bulkPostStore.setAmount(value);
       } catch (e) {
-        return (e?.message ?? e) as string;
+        if (e instanceof Error) {
+          return (e?.message ?? e) as string;
+        }
+
+        return e as string;
       }
 
       return true;
@@ -297,7 +301,11 @@ export default defineComponent({
         bulkPostStore.setComment(value);
         commentError.value = '';
       } catch (e) {
-        commentError.value = e?.message ?? e;
+        if (e instanceof Error) {
+          commentError.value = e?.message ?? e;
+        }
+
+        commentError.value = e as string;
       }
     }
 
@@ -359,7 +367,11 @@ export default defineComponent({
         const data = await bulkPostStore.post();
         emit('ok', data);
       } catch (e) {
-        props.store.error.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          props.store.error.setCurrentError(e?.message ?? e);
+        }
+
+        props.store.error.setCurrentError(e as string);
       }
     }
 

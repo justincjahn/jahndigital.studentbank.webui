@@ -299,7 +299,9 @@ export default defineComponent({
         await bulkImportStore.post();
         emit('ok', bulkImportStore);
       } catch (e) {
-        setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          setCurrentError(e?.message ?? e);
+        }
       } finally {
         isPosting.value = false;
       }
@@ -327,7 +329,9 @@ export default defineComponent({
       try {
         bulkImportStore.processFile(fileInfo);
       } catch (e) {
-        setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          setCurrentError(e?.message ?? e);
+        }
       }
     }
 

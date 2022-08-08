@@ -227,7 +227,9 @@ export default defineComponent({
           showBulkGroupModal.value = true;
           selectedStudents.value = await selection.resolve();
         } catch (e) {
-          errorStore.setCurrentError(e?.message ?? e);
+          if (e instanceof Error) {
+            errorStore.setCurrentError(e?.message ?? e);
+          }
         } finally {
           selectedStudentsResolving.value = false;
         }
@@ -248,7 +250,9 @@ export default defineComponent({
         handleGroupSelection(movedGroup);
         selection.clear();
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          errorStore.setCurrentError(e?.message ?? e);
+        }
       } finally {
         selectedStudentsResolving.value = false;
       }

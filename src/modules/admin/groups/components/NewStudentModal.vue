@@ -205,7 +205,9 @@ export default defineComponent({
         await Promise.all(transactions);
         emit('ok', student);
       } catch (e) {
-        props.store.error.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          props.store.error.setCurrentError(e?.message ?? e);
+        }
       } finally {
         loading.value = false;
       }

@@ -33,7 +33,9 @@ export default defineComponent({
         loading.value = true;
         await info();
       } catch (e) {
-        globalStore.error.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          globalStore.error.setCurrentError(e?.message ?? e);
+        }
       } finally {
         loading.value = false;
       }

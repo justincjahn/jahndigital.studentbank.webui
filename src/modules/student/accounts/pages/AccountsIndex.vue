@@ -114,7 +114,9 @@ export default defineComponent({
           });
         }
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          errorStore.setCurrentError(e?.message ?? e);
+        }
       } finally {
         transferLoading.value = false;
         showTransferModal.value = false;

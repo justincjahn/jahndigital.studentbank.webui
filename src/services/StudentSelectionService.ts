@@ -295,11 +295,15 @@ export class StudentSelection extends Array<IStudentSelection> {
 
           students = [...students, ...studentList.data.students.nodes];
         } catch (e) {
-          throw e?.message ?? e;
+          if (e instanceof Error) {
+            throw e?.message ?? e;
+          }
         }
       }));
     } catch (e) {
-      throw e?.message ?? e;
+      if (e instanceof Error) {
+        throw e?.message ?? e;
+      }
     }
 
     // Resolve students not excluded

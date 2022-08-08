@@ -247,7 +247,9 @@ export default defineComponent({
           stockId: stock.value.id ?? -1,
         });
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          errorStore.setCurrentError(e?.message ?? e);
+        }
       } finally {
         historyLoading.value = false;
       }

@@ -146,7 +146,9 @@ export default defineComponent({
 
         showPurchaseModal.value = false;
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          errorStore.setCurrentError(e?.message ?? e);
+        }
       } finally {
         purchaseLoading.value = false;
       }

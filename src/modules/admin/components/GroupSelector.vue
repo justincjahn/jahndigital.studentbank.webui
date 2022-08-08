@@ -176,7 +176,9 @@ export default defineComponent({
           update(group);
           toggle();
         } catch (e) {
-          props.store.error.setCurrentError(e?.message ?? e);
+          if (e instanceof Error) {
+            props.store.error.setCurrentError(e?.message ?? e);
+          }
         }
       }
 
@@ -192,7 +194,9 @@ export default defineComponent({
           update(group);
           toggle();
         } catch (e) {
-          props.store.error.setCurrentError(e?.message ?? e);
+          if (e instanceof Error) {
+            props.store.error.setCurrentError(e?.message ?? e);
+          }
         }
       }
 
@@ -203,7 +207,9 @@ export default defineComponent({
           await props.store.group.deleteGroup(props.modelValue);
           update(null);
         } catch (e) {
-          props.store.error.setCurrentError(e?.message ?? e);
+          if (e instanceof Error) {
+            props.store.error.setCurrentError(e?.message ?? e);
+          }
         } finally {
           toggle();
         }

@@ -260,7 +260,11 @@ export function setup() {
       await globalStore.group.fetchGroups(store.instance.id, false);
       store.dbGroups = [...globalStore.group.groups.value];
     } catch (e) {
-      throw new Error(`Error fetching groups: '${e?.message ?? e}'.`);
+      if (e instanceof Error) {
+        throw new Error(`Error fetching groups: '${e?.message ?? e}'.`);
+      }
+
+      throw e;
     }
   }
 
@@ -414,7 +418,11 @@ export function setup() {
     try {
       store.studentsToCreate = await filterStudents(tmpStudents);
     } catch (e) {
-      throw new Error(`Unable to fetch student data from the server: ${e?.message ?? e}.`);
+      if (e instanceof Error) {
+        throw new Error(`Unable to fetch student data from the server: ${e?.message ?? e}.`);
+      }
+
+      throw e;
     }
 
     // Validate that we didn't have any students already in the database.
@@ -455,7 +463,11 @@ export function setup() {
     try {
       await importCSV(contents);
     } catch (e) {
-      throw e?.message ?? e;
+      if (e instanceof Error) {
+        throw e?.message ?? e;
+      }
+
+      throw e;
     } finally {
       store.loading = false;
     }
@@ -551,7 +563,11 @@ export function setup() {
         });
       } catch (e) {
         store.loading = false;
-        throw new Error(e?.message ?? e);
+        if (e instanceof Error) {
+          throw new Error(e?.message ?? e);
+        }
+
+        throw e;
       }
     }
 
@@ -586,7 +602,12 @@ export function setup() {
         });
       } catch (e) {
         store.loading = false;
-        throw new Error(`Unable to create one or more students: ${e?.message ?? e}.`);
+
+        if (e instanceof Error) {
+          throw new Error(`Unable to create one or more students: ${e?.message ?? e}.`);
+        }
+
+        throw e;
       }
     }
 
@@ -625,7 +646,12 @@ export function setup() {
         });
       } catch (e) {
         store.loading = false;
-        throw new Error(`Unable to create one or more shares on students: ${e?.message ?? e}.`);
+
+        if (e instanceof Error) {
+          throw new Error(`Unable to create one or more shares on students: ${e?.message ?? e}.`);
+        }
+
+        throw e;
       }
     }
 
@@ -653,7 +679,12 @@ export function setup() {
       transactions.push(...res);
     } catch (e) {
       store.loading = false;
-      throw new Error(`Unable to perform transaction bulk post: ${e?.message ?? e}.`);
+
+      if (e instanceof Error) {
+        throw new Error(`Unable to perform transaction bulk post: ${e?.message ?? e}.`);
+      }
+
+      throw e;
     }
 
     console.debug('[Bulk Import]: Bulk transactions complete.', transactions);

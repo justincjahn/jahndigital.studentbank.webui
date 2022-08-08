@@ -182,7 +182,9 @@ export default defineComponent({
         await globalStore.stock.create(req);
         toggleNewStockModal();
       } catch (e) {
-        globalStore.error.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          globalStore.error.setCurrentError(e?.message ?? e);
+        }
       } finally {
         newStockPosting.value = false;
       }
@@ -196,7 +198,9 @@ export default defineComponent({
       try {
         await globalStore.stock.update(req);
       } catch (e) {
-        globalStore.error.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          globalStore.error.setCurrentError(e?.message ?? e);
+        }
       } finally {
         updateStockPosting.value = false;
       }
@@ -217,7 +221,9 @@ export default defineComponent({
 
         globalStore.stock.selected.value = null;
       } catch (e) {
-        globalStore.error.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          globalStore.error.setCurrentError(e?.message ?? e);
+        }
       }
     }
 
@@ -236,7 +242,9 @@ export default defineComponent({
 
         globalStore.stock.selected.value = null;
       } catch (e) {
-        globalStore.error.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          globalStore.error.setCurrentError(e?.message ?? e);
+        }
       }
     }
 
@@ -250,7 +258,9 @@ export default defineComponent({
         await globalStore.stock.remove(globalStore.stock.selected.value);
         globalStore.stock.selected.value = null;
       } catch (e) {
-        globalStore.error.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          globalStore.error.setCurrentError(e?.message ?? e);
+        }
       }
     }
 
@@ -273,7 +283,9 @@ export default defineComponent({
       try {
         await globalStore.stock.purgeHistory(globalStore.stock.selected.value, date);
       } catch (e) {
-        globalStore.error.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          globalStore.error.setCurrentError(e?.message ?? e);
+        }
       } finally {
         purgeModalLoading.value = false;
         togglePurgeStockModal();

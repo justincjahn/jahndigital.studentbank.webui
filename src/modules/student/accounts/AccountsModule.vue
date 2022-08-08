@@ -37,7 +37,9 @@ export default defineComponent({
         try {
           await globalStore.fetchShares(newId);
         } catch (e) {
-          errorStore.setCurrentError(e?.message ?? e);
+          if (e instanceof Error) {
+            errorStore.setCurrentError(e?.message ?? e);
+          }
         } finally {
           loading.value = false;
         }

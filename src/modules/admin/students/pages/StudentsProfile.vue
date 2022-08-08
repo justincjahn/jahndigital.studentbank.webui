@@ -152,7 +152,9 @@ export default defineComponent({
           [globalStore.student.selected.value] = res;
         }
       } catch (e) {
-        globalStore.error.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          globalStore.error.setCurrentError(e?.message ?? e);
+        }
       } finally {
         loading.value = false;
       }
@@ -165,7 +167,9 @@ export default defineComponent({
         data.password.new = '';
         data.password.repeat = '';
       } catch (e) {
-        globalStore.error.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          globalStore.error.setCurrentError(e?.message ?? e);
+        }
       } finally {
         loading.value = false;
       }

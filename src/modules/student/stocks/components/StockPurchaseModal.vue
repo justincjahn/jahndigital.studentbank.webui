@@ -271,7 +271,9 @@ export default defineComponent({
             studentStock.value = null;
           }
         } catch (e) {
-          errorStore.setCurrentError(e?.message ?? e);
+          if (e instanceof Error) {
+            errorStore.setCurrentError(e?.message ?? e);
+          }
         } finally {
           loading.value = false;
         }

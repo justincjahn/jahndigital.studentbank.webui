@@ -90,7 +90,9 @@ export default defineComponent({
           withdrawalLimitFee: Money.fromStringOrDefault(formData.withdrawalLimitFee).getAmount(),
         });
       } catch (e) {
-        props.store.error.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          props.store.error.setCurrentError(e?.message ?? e);
+        }
       } finally {
         loading.value = false;
       }

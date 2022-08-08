@@ -86,7 +86,9 @@ export default defineComponent({
 
         emailAddress.value = userStore.email.value;
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          errorStore.setCurrentError(e?.message ?? e);
+        }
       } finally {
         loading.value = false;
       }

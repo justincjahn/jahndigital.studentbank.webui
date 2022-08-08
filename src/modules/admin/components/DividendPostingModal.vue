@@ -108,7 +108,9 @@ export default defineComponent({
 
         emit('ok');
       } catch (e) {
-        setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          setCurrentError(e?.message ?? e);
+        }
       } finally {
         loading.value = false;
       }

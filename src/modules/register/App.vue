@@ -215,7 +215,9 @@ export default defineComponent({
         window.location.href = `/${BASE_URLS.STUDENT}`;
       } catch (e) {
         console.error('[Registration Error]', e);
-        errorStore.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          errorStore.setCurrentError(e?.message ?? e);
+        }
       } finally {
         loading.value = false;
       }

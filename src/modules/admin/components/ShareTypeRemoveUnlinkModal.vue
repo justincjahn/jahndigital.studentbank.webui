@@ -142,7 +142,9 @@ export default defineComponent({
             instanceId,
           });
         } catch (e) {
-          errors.push(e?.message ?? e);
+          if (e instanceof Error) {
+            errors.push(e?.message ?? e);
+          }
         } finally {
           linkedSelected.value = [];
         }
@@ -166,7 +168,9 @@ export default defineComponent({
         try {
           await props.store.shareType.deleteShareType(shareType);
         } catch (e) {
-          errors.push(e?.message ?? e);
+          if (e instanceof Error) {
+            errors.push(e?.message ?? e);
+          }
         } finally {
           deletableSelected.value = [];
         }

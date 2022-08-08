@@ -36,7 +36,7 @@ const router = createRouter({
 
 // If the route is a function, then tell the store we need to load
 router.beforeEach((to, _, next) => {
-  if (typeof to.matched[0]?.components.default === 'function') {
+  if (typeof to.matched[0]?.components?.default === 'function') {
     routerStore.setLoading(true);
   }
 

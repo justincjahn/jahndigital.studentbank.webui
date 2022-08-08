@@ -41,7 +41,9 @@ export default defineComponent({
         loading.value = true;
         await info();
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          errorStore.setCurrentError(e?.message ?? e);
+        }
       } finally {
         loading.value = false;
       }

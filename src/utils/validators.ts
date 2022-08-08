@@ -271,7 +271,9 @@ export function validateRate(value: string): string|boolean {
   try {
     Rate.fromString(value);
   } catch (e) {
-    return e.message;
+    if (e instanceof Error) {
+      return e.message;
+    }
   }
 
   return true;
@@ -290,7 +292,9 @@ export function validateRateNonzero(value: string): string | boolean {
     const rate = Rate.fromString(value);
     if (rate.getRate() === 0) return 'Rate cannot be zero.';
   } catch (e) {
-    return e.message;
+    if (e instanceof Error) {
+      return e.message;
+    }
   }
 
   return true;
@@ -309,7 +313,9 @@ export function validateRateNotNegative(value: string): string | boolean {
     const rate = Rate.fromString(value);
     if (rate.getRate() < 0.0) return 'Rate cannot be negative.';
   } catch (e) {
-    return e.message;
+    if (e instanceof Error) {
+      return e.message;
+    }
   }
 
   return true;

@@ -150,7 +150,9 @@ export default defineComponent({
         reset();
         await fetchAvailableShareTypes();
       } catch (e) {
-        props.store.error.setCurrentError('Unable to add the Share Type.  Does it already exist?');
+        if (e instanceof Error) {
+          props.store.error.setCurrentError('Unable to add the Share Type.  Does it already exist?');
+        }
       } finally {
         addLoading.value = false;
       }
@@ -172,7 +174,9 @@ export default defineComponent({
             instanceId,
           });
         } catch (e) {
-          errors.push(e?.message ?? e);
+          if (e instanceof Error) {
+            errors.push(e?.message ?? e);
+          }
         }
       }));
 

@@ -213,7 +213,9 @@ export default defineComponent({
 
         showPurchaseModal.value = false;
       } catch (e) {
-        errorStore.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          errorStore.setCurrentError(e?.message ?? e);
+        }
       } finally {
         purchaseLoading.value = false;
       }
@@ -243,7 +245,9 @@ export default defineComponent({
         try {
           await globalStore.stocksHeld.fetch({ cache: false, studentId: newId });
         } catch (e) {
-          errorStore.setCurrentError(e?.message ?? e);
+          if (e instanceof Error) {
+            errorStore.setCurrentError(e?.message ?? e);
+          }
         }
       }
     }, { immediate: true });

@@ -62,7 +62,9 @@ export default defineComponent({
 
         await globalStore.student.refreshSelected();
       } catch (e) {
-        globalStore.error.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          globalStore.error.setCurrentError(e?.message ?? e);
+        }
       } finally {
         isPosting.value = false;
       }

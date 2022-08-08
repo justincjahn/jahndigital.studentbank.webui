@@ -148,7 +148,9 @@ export default defineComponent({
       try {
         students.value = await selection.resolve();
       } catch (e) {
-        props.store.error.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          props.store.error.setCurrentError(e?.message ?? e);
+        }
       } finally {
         loading.value = false;
       }
@@ -208,7 +210,12 @@ export default defineComponent({
           });
         } catch (e) {
           loading.value = false;
-          throw new Error(`Unable to create one or more shares on students: ${e?.message ?? e}.`);
+
+          if (e instanceof Error) {
+            throw new Error(`Unable to create one or more shares on students: ${e?.message ?? e}.`);
+          }
+
+          throw e;
         }
       }
 
@@ -241,7 +248,9 @@ export default defineComponent({
         const transactions = await props.store.share.postBulkTransaction(bulkTransactionReq);
         console.debug('[New Share]: Share transactions posted.', transactions);
       } catch (e) {
-        props.store.error.setCurrentError(e?.message ?? e);
+        if (e instanceof Error) {
+          props.store.error.setCurrentError(e?.message ?? e);
+        }
       } finally {
         loading.value = false;
       }
