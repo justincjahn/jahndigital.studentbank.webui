@@ -11,7 +11,7 @@ export default class Money {
    * @param amount
    */
   static fromDatabase(amount: number): Money {
-    return new Money(amount / (10 ** Money.precision));
+    return new Money(amount / 10 ** Money.precision);
   }
 
   /**
@@ -74,7 +74,7 @@ export default class Money {
    * Converts the Money object into a whole number suitable for database storage
    */
   getDatabaseAmount(): number {
-    return Math.floor(this.round() * (10 ** Money.precision));
+    return Math.floor(this.round() * 10 ** Money.precision);
   }
 
   /**
@@ -115,13 +115,10 @@ export default class Money {
    * @returns String in the format $1.00.
    */
   toString(): string {
-    return new Intl.NumberFormat(
-      'en-US',
-      {
-        style: 'currency',
-        currency: 'USD',
-      },
-    ).format(this.round());
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(this.round());
   }
 
   /**
@@ -131,10 +128,10 @@ export default class Money {
    * @param precision
    */
   static round(num: number, precision = 2): number {
-    const power = num * (10 ** precision);
+    const power = num * 10 ** precision;
     let rounded = Math.round(power);
     // eslint-disable-next-line no-nested-ternary
     rounded = Math.abs(power) % 1 === 0.5 ? (rounded % 2 === 0 ? rounded : rounded - 1) : rounded;
-    return rounded / (10 ** precision);
+    return rounded / 10 ** precision;
   }
 }

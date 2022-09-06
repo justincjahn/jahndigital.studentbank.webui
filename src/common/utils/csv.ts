@@ -1,7 +1,7 @@
 /* eslint-disable no-continue */
 
 // Represents an individual line of a CSV
-export type CSVItem<T> = { [index in keyof T]: string }
+export type CSVItem<T> = { [index in keyof T]: string };
 
 // CSV Options
 export interface CSVOpts {
@@ -18,11 +18,7 @@ export interface CSVOpts {
  * @param qualifier For values containing the delimiter, it can be encapsulated in this.  Usually a double-quote.
  * @returns An array of strings.
  */
-export function parseCSVLine(
-  line: string,
-  delimiter = ',',
-  qualifier = '"',
-): string[] {
+export function parseCSVLine(line: string, delimiter = ',', qualifier = '"'): string[] {
   const parsed = new Array<string>();
   const chars = line.split('');
 
@@ -37,9 +33,9 @@ export function parseCSVLine(
       continue;
     }
 
-    if ((current === delimiter && !encapsulated) || line.length === (i + 1)) {
+    if ((current === delimiter && !encapsulated) || line.length === i + 1) {
       // Last character in the line, but the encapsulation was never closed
-      if (line.length === (i + 1) && current !== delimiter) {
+      if (line.length === i + 1 && current !== delimiter) {
         buffer += current;
       }
 
@@ -58,14 +54,14 @@ export function parseCSVLine(
  * Parse a CSV into an array of objects.
  *
  * @param file The string to parse.
- * @param header If there is a header in the provided string, or if numeric indicies should be used.
+ * @param header If there is a header in the provided string, or if numeric indices should be used.
  * @param delimiter Column delimiter, usually a comma.
  * @param qualifier For values containing the delimiter, it can be encapsulated in this.  Usually a double-quote.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseCSV<THeaders extends any>(
   file: string,
-  opts: CSVOpts = {},
+  opts: CSVOpts = {}
 ): Array<CSVItem<THeaders>> {
   let headers = new Array<string>();
   const parsed = new Array<CSVItem<THeaders>>();

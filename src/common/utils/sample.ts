@@ -44,9 +44,10 @@ export default function sample<T>(population: Array<T>, k: number): Array<T> {
   if (n <= setsize) {
     // An n-length list is smaller than a k-length set
     const pool = population.slice();
-    for (let i = 0; i < k; i += 1) { // invariant:  non-selected at [0,n-i)
+    for (let i = 0; i < k; i += 1) {
+      // invariant:  non-selected at [0,n-i)
       // eslint-disable-next-line no-bitwise
-      const j = Math.random() * (n - i) | 0;
+      const j = (Math.random() * (n - i)) | 0;
       result[i] = pool[j];
       pool[j] = pool[n - i - 1]; // move non-selected item into vacancy
     }
@@ -54,10 +55,10 @@ export default function sample<T>(population: Array<T>, k: number): Array<T> {
     const selected = new Set();
     for (let i = 0; i < k; i += 1) {
       // eslint-disable-next-line no-bitwise
-      let j = Math.random() * n | 0;
+      let j = (Math.random() * n) | 0;
       while (selected.has(j)) {
         // eslint-disable-next-line no-bitwise
-        j = Math.random() * n | 0;
+        j = (Math.random() * n) | 0;
       }
 
       selected.add(j);

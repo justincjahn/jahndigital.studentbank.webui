@@ -11,7 +11,7 @@ export default class Rate {
    * @param rate
    */
   static fromDatabase(rate: number): Rate {
-    return new Rate(rate / (10 ** Rate.precision));
+    return new Rate(rate / 10 ** Rate.precision);
   }
 
   /**
@@ -38,15 +38,13 @@ export default class Rate {
 
     // Make sure the rate has zero or one decimal points
     if ((s.match(/\./g) || []).length > 1) {
-      throw new Error(
-        'Rates may only contain one decimal point.',
-      );
+      throw new Error('Rates may only contain one decimal point.');
     }
 
     // Make sure the string contains valid characters
     if (!/^-?[0-9]+(\.?[0-9]+)?[%]?$/.test(s)) {
       throw new Error(
-        'Rates cannot contain alpha characters or special characters other than period and percent.',
+        'Rates cannot contain alpha characters or special characters other than period and percent.'
       );
     }
 
@@ -54,11 +52,11 @@ export default class Rate {
     if (s.endsWith('%')) {
       if (s.length === 1) {
         throw new Error(
-          'Rate percentages must contain a numeric value and only a percent was provided.',
+          'Rate percentages must contain a numeric value and only a percent was provided.'
         );
       }
 
-      const r = (Number.parseFloat(s.substring(0, s.length - 1)) / 100);
+      const r = Number.parseFloat(s.substring(0, s.length - 1)) / 100;
       return new Rate(r);
     }
 
@@ -118,7 +116,7 @@ export default class Rate {
    * Converts the Rate object into a whole number suitable for database storage
    */
   getDatabaseRate(): number {
-    return Math.floor(this.round() * (10 ** Rate.precision));
+    return Math.floor(this.round() * 10 ** Rate.precision);
   }
 
   /**

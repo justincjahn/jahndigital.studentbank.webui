@@ -11,12 +11,14 @@ export default function generatePassword(len = 32): string {
     return result[0];
   };
 
-  return Array.from({ length: len }).map(() => {
-    let result = '';
-    do {
-      result = String.fromCharCode(getBytes());
-    } while (/[a-zA-Z0-9_\-+.$#%&^*()!~`]/.test(result) === false);
+  return Array.from({ length: len })
+    .map(() => {
+      let result = '';
+      do {
+        result = String.fromCharCode(getBytes());
+      } while (/[a-zA-Z0-9_\-+.$#%&^*()!~`]/.test(result) === false);
 
-    return result;
-  }).join('');
+      return result;
+    })
+    .join('');
 }
