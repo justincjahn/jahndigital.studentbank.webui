@@ -1,0 +1,23 @@
+#import "@/graphql/fragments/shareType.gql"
+
+mutation updateShareType(
+  $id: Long!,
+  $name: String,
+  $dividendRate: Rate,
+  $withdrawalLimitCount: Int,
+  $withdrawalLimitPeriod: Period,
+  $withdrawalLimitShouldFee: Boolean,
+  $withdrawalLimitFee: Money
+) {
+  updateShareType(input: {
+    id: $id,
+    name: $name,
+    dividendRate: $dividendRate,
+    withdrawalLimitCount: $withdrawalLimitCount,
+    withdrawalLimitPeriod: $withdrawalLimitPeriod,
+    withdrawalLimitShouldFee: $withdrawalLimitShouldFee,
+    withdrawalLimitFee: $withdrawalLimitFee
+  }) {
+    ...ShareTypeParts
+  }
+}

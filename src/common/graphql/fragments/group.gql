@@ -1,0 +1,9 @@
+fragment GroupParts on Group{
+  id
+  instanceId
+  name
+  instance {
+    id
+    description
+  }
+}

@@ -1,0 +1,11 @@
+#import "./transaction.gql"
+
+fragment StudentStockHistoryParts on StudentStockHistory {
+  id
+  count
+  amount
+  datePosted
+  transaction {
+    ...TransactionParts
+  }
+}

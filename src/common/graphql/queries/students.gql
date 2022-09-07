@@ -1,0 +1,26 @@
+#import "@/graphql/fragments/pageInfo.gql"
+#import "@/graphql/fragments/student.gql"
+
+query studentsWithShares(
+  $first: Int,
+  $after: String,
+  $order: StudentSortInput! = {accountNumber: ASC},
+  $groupId: Long,
+) {
+  students(
+    first: $first,
+    after: $after,
+    order: [$order]
+    where: {
+      groupId: { eq: $groupId }
+    },
+  ) {
+    pageInfo {
+      ...PageInfoParts
+    }
+    totalCount
+    nodes {
+      ...StudentParts
+    }
+  }
+}

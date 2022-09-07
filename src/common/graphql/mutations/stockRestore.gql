@@ -1,0 +1,7 @@
+#import "@/graphql/fragments/stock.gql"
+
+mutation restoreStock($id: Long!) {
+  restoreStock(id: $id) {
+    ...StockParts
+  }
+}

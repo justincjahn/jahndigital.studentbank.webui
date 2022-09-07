@@ -1,0 +1,24 @@
+#import "@/graphql/fragments/pageInfo.gql"
+#import "@/graphql/fragments/student.gql"
+
+query studentsByEmail(
+  $first: Int = 25,
+  $order: StudentSortInput! = { accountNumber: ASC },
+  $email: String!
+) {
+  students(
+    first: $first,
+    order: [$order],
+    where: {
+      email: { contains: $email }
+    }
+  ) {
+    pageInfo {
+      ...PageInfoParts
+    }
+    totalCount
+    nodes {
+      ...StudentParts
+    }
+  }
+}

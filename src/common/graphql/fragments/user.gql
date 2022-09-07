@@ -1,0 +1,13 @@
+#import "./role.gql"
+
+fragment UserParts on User {
+  id
+  email
+  roleId
+  dateCreated
+  dateRegistered
+  dateLastLogin
+  role {
+    ...RoleParts
+  }
+}

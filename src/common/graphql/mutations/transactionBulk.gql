@@ -1,0 +1,13 @@
+#import "@/graphql/fragments/transaction.gql"
+
+mutation newBulkTransaction(
+  $shares: [NewTransactionRequestInput!]!,
+  $skipNegative: Boolean!
+) {
+  newBulkTransaction(
+    input: $shares,
+    skipBelowNegative: $skipNegative
+  ) {
+    ...TransactionParts
+  }
+}

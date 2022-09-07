@@ -1,0 +1,19 @@
+#import "@/graphql/fragments/user.gql"
+
+mutation updateUser (
+  $id: Long!,
+  $email: String,
+  $currentPassword: String,
+  $password: String,
+  $roleId: Long,
+) {
+  updateUser(input: {
+    id: $id,
+    email: $email,
+    roleId: $roleId,
+    currentPassword: $currentPassword,
+    password: $password
+  }) {
+    ...UserParts
+  }
+}

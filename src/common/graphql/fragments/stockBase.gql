@@ -1,0 +1,8 @@
+fragment StockBaseParts on Stock {
+  id
+  name
+  symbol
+  currentValue
+  rawDescription
+  formattedDescription
+}

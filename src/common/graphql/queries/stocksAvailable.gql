@@ -1,0 +1,26 @@
+#import "../fragments/pageInfo.gql"
+#import "../fragments/stock.gql"
+
+query stocks(
+  $first: Int = 25,
+  $after: String,
+  $instances: [Long!],
+  $where: StockFilterInput,
+  $order: StockSortInput! = { name: ASC },
+) {
+  stocks(
+    instances: $instances,
+    first: $first,
+    after: $after,
+    where: $where,
+    order: [$order]
+  ) {
+    pageInfo {
+      ...PageInfoParts
+    }
+    totalCount
+    nodes {
+      ...StockParts
+    }
+  }
+}

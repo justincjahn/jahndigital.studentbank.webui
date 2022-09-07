@@ -1,0 +1,3 @@
+mutation deleteInstance($id: Long!) {
+  deleteInstance(id: $id)
+}

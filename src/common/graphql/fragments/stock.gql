@@ -1,0 +1,13 @@
+#import "./stockBase.gql"
+#import "./instance.gql"
+
+fragment StockParts on Stock {
+  ...StockBaseParts
+
+  stockInstances {
+    instanceId
+    instance {
+      ...InstanceParts
+    }
+  }
+}

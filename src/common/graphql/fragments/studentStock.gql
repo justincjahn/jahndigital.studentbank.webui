@@ -1,0 +1,14 @@
+#import "./stockBase.gql"
+
+fragment StudentStockParts on StudentStock {
+  id
+  stockId
+  studentId
+  sharesOwned
+  netContribution
+  dateCreated
+  dateLastActive
+  stock {
+    ...StockBaseParts
+  }
+}

@@ -1,0 +1,13 @@
+#import "@/graphql/fragments/stockHistory.gql"
+
+mutation purgeStockHistory(
+  $stockId: Long!,
+  $date: DateTime!,
+) {
+  purgeStockHistory(input: {
+    stockId: $stockId,
+    date: $date
+  }) {
+    ...StockHistoryParts
+  }
+}

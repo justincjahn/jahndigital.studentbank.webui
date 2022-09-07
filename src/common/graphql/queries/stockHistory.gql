@@ -1,0 +1,23 @@
+#import "../fragments/pageInfo.gql"
+#import "../fragments/stockHistory.gql"
+
+query stockHistory(
+  $stockId: Long!,
+  $first: Int = 25,
+  $after: String,
+) {
+  stockHistory(
+    stockId: $stockId,
+    first: $first,
+    after: $after,
+    order: { dateChanged: DESC }
+  ) {
+    pageInfo {
+      ...PageInfoParts
+    }
+    totalCount
+    nodes {
+      ...StockHistoryParts
+    }
+  }
+}

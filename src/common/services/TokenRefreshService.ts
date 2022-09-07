@@ -1,20 +1,20 @@
-import {
-  ApolloLink,
-  Observable,
-  Operation,
-  NextLink,
-  FetchResult,
-} from '@apollo/client/core';
+import { ApolloLink, Observable, Operation, NextLink, FetchResult } from '@apollo/client/core';
 
-import { API_ENDPOINT } from '@/constants';
-import userStore from '../stores/user';
+import { API_ENDPOINT } from '@/common/constants';
+import userStore from '@/common/stores/user';
 
+/**
+ * Subscriber of Apollo
+ */
 interface Subscriber {
   next?: (result: FetchResult) => void;
   error?: (error: Error) => void;
   complete?: () => void;
 }
 
+/**
+ * An Apollo request that's been queued.
+ */
 interface QueuedRequest extends Subscriber {
   operation: Operation;
   forward?: NextLink;
@@ -28,10 +28,10 @@ interface QueuedRequest extends Subscriber {
  */
 export default class TokenRefreshService extends ApolloLink {
   // List of queued requests that need to be run after the token is fetched
-  private _queue: QueuedRequest[] = [];
+  private queue: QueuedRequest[] = [];
 
   // True if the service is currently trying to fetch a refresh token
-  private _fetching = false;
+  private fetching = false;
 
   /**
    * Determine if the current state is valid for fetching data.
@@ -111,24 +111,28 @@ export default class TokenRefreshService extends ApolloLink {
    * @returns
    */
   public request(operation: Operation, forward: NextLink): Observable<FetchResult> | null {
-    if (typeof forward !== 'function') throw new Error('Token Refresh Service is terminating link.');
+    if (typeof forward !== 'function')
+      throw new Error('Token Refresh Service is terminating link.');
     if (TokenRefreshService.isValid()) return forward(operation);
 
-    const res = this._enqueue({ operation, forward });
+    const res = this.enqueue({ operation, forward });
 
-    if (!this._fetching) {
-      this._fetching = true;
+    if (!this.fetching) {
+      this.fetching = true;
 
-      TokenRefreshService.fetchRefreshToken().then((token) => {
-        userStore.setToken(token);
-      }).catch((e) => {
-        console.warn('Your refresh token is invalid.  Please login again.');
-        console.error(e);
-        userStore.setToken(null);
-      }).finally(() => {
-        this._fetching = false;
-        this._run();
-      });
+      TokenRefreshService.fetchRefreshToken()
+        .then((token) => {
+          userStore.setToken(token);
+        })
+        .catch((e) => {
+          console.warn('Your refresh token is invalid.  Please login again.');
+          console.error(e);
+          userStore.setToken(null);
+        })
+        .finally(() => {
+          this.fetching = false;
+          this.run();
+        });
     }
 
     return res;
@@ -140,12 +144,12 @@ export default class TokenRefreshService extends ApolloLink {
    * @param request
    * @returns
    */
-  private _enqueue(request: QueuedRequest): Observable<FetchResult> {
+  private enqueue(request: QueuedRequest): Observable<FetchResult> {
     const req = { ...request };
 
     if (!req.observable) {
       req.observable = new Observable<FetchResult>((observer) => {
-        this._queue.push(req);
+        this.queue.push(req);
         req.subscriber = req.subscriber || {};
         req.subscriber.next = req.next || observer.next.bind(observer);
         req.subscriber.error = req.error || observer.error.bind(observer);
@@ -159,14 +163,14 @@ export default class TokenRefreshService extends ApolloLink {
   /**
    * Execute all of the pending requests and clear the queue.
    */
-  private _run() {
-    this._queue.forEach((queuedRequest) => {
+  private run() {
+    this.queue.forEach((queuedRequest) => {
       if (!queuedRequest.forward) return;
       const req = queuedRequest.forward(queuedRequest.operation);
       if (!queuedRequest.subscriber) return;
       req.subscribe(queuedRequest.subscriber);
     });
 
-    this._queue = [];
+    this.queue = [];
   }
 }

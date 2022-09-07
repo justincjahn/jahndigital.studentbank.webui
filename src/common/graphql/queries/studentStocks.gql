@@ -1,0 +1,26 @@
+#import "../fragments/pageInfo.gql"
+#import "../fragments/studentStock.gql"
+
+query studentStocks(
+  $first: Int = 25,
+  $after: String,
+  $order: StudentStockSortInput! = { sharesOwned: DESC },
+  $where: StudentStockFilterInput,
+  $studentId: Long!
+) {
+  studentStocks(
+    studentId: $studentId,
+    first: $first,
+    after: $after,
+    where: $where,
+    order: [$order]
+  ) {
+    pageInfo {
+      ...PageInfoParts
+    }
+    totalCount
+    nodes {
+      ...StudentStockParts
+    }
+  }
+}

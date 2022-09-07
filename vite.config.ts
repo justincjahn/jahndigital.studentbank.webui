@@ -2,17 +2,19 @@ import { resolve } from 'path';
 import { defineConfig, loadEnv, UserConfig } from 'vite';
 
 // Plugins
+import graphql from '@rollup/plugin-graphql';
 import handlebars from 'vite-plugin-handlebars';
 import vue from '@vitejs/plugin-vue';
 
 export default defineConfig(({ mode }): UserConfig => {
-  var env = loadEnv(mode, __dirname);
+  const env = loadEnv(mode, __dirname, 'VITE_');
 
   return {
-    root:'src',
+    root: 'src',
+    envDir: __dirname,
     resolve: {
       alias: {
-        '@': resolve(__dirname, 'src'),
+        '@/': `${resolve(__dirname, 'src')}/`,
       },
     },
     build: {
@@ -25,13 +27,18 @@ export default defineConfig(({ mode }): UserConfig => {
         },
       },
     },
+    optimizeDeps: {
+      include: ['@apollo/client/core'],
+      exclude: ['@apollo/client'],
+    },
     plugins: [
       vue(),
+      graphql(),
       handlebars({
         context: {
           ...env,
         },
       }) as Plugin,
-    ]
+    ],
   };
 });

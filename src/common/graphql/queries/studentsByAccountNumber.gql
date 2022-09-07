@@ -1,0 +1,24 @@
+#import "@/graphql/fragments/pageInfo.gql"
+#import "@/graphql/fragments/student.gql"
+
+query studentsByAcccountNumber(
+  $first: Int = 25,
+  $order: StudentSortInput! = { accountNumber: ASC },
+  $accountNumber: String!
+) {
+  students(
+    first: $first,
+    order: [$order],
+    where: {
+      accountNumber: { contains: $accountNumber }
+    }
+  ) {
+    pageInfo {
+      ...PageInfoParts
+    }
+    totalCount
+    nodes {
+      ...StudentParts
+    }
+  }
+}

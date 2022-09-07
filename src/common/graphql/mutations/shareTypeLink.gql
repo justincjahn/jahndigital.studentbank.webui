@@ -1,0 +1,13 @@
+#import "@/graphql/fragments/shareType.gql"
+
+mutation linkShareType(
+  $shareTypeId: Long!,
+  $instanceId: Long!
+) {
+  linkShareType(input: {
+    shareTypeId: $shareTypeId,
+    instanceId: $instanceId
+  }) {
+    ...ShareTypeParts
+  }
+}

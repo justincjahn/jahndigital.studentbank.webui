@@ -1,8 +1,22 @@
+import type { UserInfo } from '@/common/types/UserInfo';
+import type { StudentInfo } from '@/common/types/StudentInfo';
+
 import { reactive, computed } from 'vue';
-import { PERSIST_TOKEN } from '@/constants';
+import { PERSIST_TOKEN } from '@/common/constants';
 
 // Utils
-import parseJwt from '@/utils/parseJwt';
+import parseJwt from '@/common/utils/parseJwt';
+
+/**
+ * Data stored in localstorage.
+ */
+export interface PersistedData {
+  // Is student?
+  iss: boolean;
+
+  // Is preauthenticated?
+  pre: boolean;
+}
 
 /**
  * Stores information about users in the system.  The auth service and Apollo will
@@ -110,7 +124,9 @@ export function setup() {
    *
    * @param s
    */
-  function setLoading(s = false) { store.loading = s; }
+  function setLoading(s = false) {
+    store.loading = s;
+  }
 
   /**
    * Set the JWT token.

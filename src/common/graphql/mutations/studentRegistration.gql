@@ -1,0 +1,9 @@
+mutation studentRegistration(
+  $email: String!,
+  $password: String!
+) {
+  studentRegistration(input: {
+    email: $email,
+    password: $password
+  })
+}

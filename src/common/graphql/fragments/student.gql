@@ -1,0 +1,9 @@
+#import "../fragments/studentBase.gql"
+#import "../fragments/share.gql"
+
+fragment StudentParts on Student {
+  ...StudentBaseParts
+  shares {
+    ...ShareParts
+  }
+}

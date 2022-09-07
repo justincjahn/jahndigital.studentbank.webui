@@ -1,0 +1,23 @@
+#import "@/graphql/fragments/pageInfo.gql"
+#import "@/graphql/fragments/shareType.gql"
+
+query shareTypes(
+  $instances: [Long!],
+  $first: Int = 25,
+  $after: String,
+) {
+  shareTypes(
+    instances: $instances,
+    first: $first,
+    after: $after,
+    order: { name: ASC }
+  ) {
+    pageInfo {
+      ...PageInfoParts
+    }
+    totalCount
+    nodes {
+      ...ShareTypeParts
+    }
+  }
+}

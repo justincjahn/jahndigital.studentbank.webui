@@ -11,9 +11,13 @@
     "format": "prettier .  --write"
   },
   "dependencies": {
+    "@apollo/client": "^3.6.9",
+    "graphql": "^16.6.0",
+    "graphql-tag": "^2.12.6",
     "vue": "^3.2.37"
   },
   "devDependencies": {
+    "@rollup/plugin-graphql": "^1.1.0",
     "@rushstack/eslint-patch": "^1.1.4",
     "@types/node": "^18.7.15",
     "@vitejs/plugin-vue": "^3.1.0",

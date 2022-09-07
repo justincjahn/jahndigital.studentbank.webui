@@ -1,0 +1,7 @@
+#import "@/graphql/fragments/instance.gql"
+
+mutation newInstance($description: String!) {
+  newInstance(input: { description: $description }) {
+    ...InstanceParts
+  }
+}

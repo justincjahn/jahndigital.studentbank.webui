@@ -1,0 +1,11 @@
+#import "./rolePrivilege.gql"
+
+fragment RoleParts on Role {
+  id
+  name
+  description
+  isBuiltIn
+  rolePrivileges {
+    ...RolePrivilegeParts
+  }
+}

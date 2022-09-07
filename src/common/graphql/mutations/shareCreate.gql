@@ -1,0 +1,13 @@
+#import "@/graphql/fragments/share.gql"
+
+mutation newShare(
+  $shareTypeId: Long!,
+  $studentId: Long!,
+) {
+  newShare(input: {
+    shareTypeId: $shareTypeId,
+    studentId: $studentId
+  }) {
+    ...ShareParts
+  }
+}
