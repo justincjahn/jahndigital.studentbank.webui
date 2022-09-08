@@ -11,6 +11,7 @@
     "composables",
     "Denormalize",
     "localstorage",
+    "Preauthorized",
     "VITE"
   ],
   "typescript.tsdk": "node_modules/typescript/lib"

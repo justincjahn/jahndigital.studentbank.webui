@@ -1,9 +1,28 @@
-import { ERROR_CODES } from '@/constants';
+import { ERROR_CODES } from '@/common/constants';
+
+import type {
+  UserLoginMutation,
+  UserLoginMutationVariables,
+  StudentLoginMutation,
+  StudentLoginMutationVariables,
+  StudentPreregistrationMutation,
+  StudentPreregistrationMutationVariables,
+  CurrentStudentQuery,
+  CurrentUserQuery,
+  UserRevokeRefreshTokenMutation,
+  StudentRevokeRefreshTokenMutation,
+} from '@/generated/graphql';
+
+// GQL
 import gqlUserLogin from '@/graphql/mutations/userLogin.gql';
 import gqlStudentPreregistration from '@/graphql/mutations/studentPreregistration.gql';
 import gqlStudentLogin from '@/graphql/mutations/studentLogin.gql';
+
+// Stores
 import userStore from '../stores/user';
-import { mutate, query } from './Apollo';
+
+// Services
+import { mutate, query } from './apollo';
 
 /**
  * Instead of stores calling service functions, this service stores data within a store.
@@ -17,11 +36,13 @@ import { mutate, query } from './Apollo';
  * @param input
  * @returns
  */
-export async function userLogin(input: LoginRequest): Promise<void> {
+export async function userLogin(
+  input: UserLoginMutationVariables
+): Promise<void> {
   userStore.setLoading(true);
 
   try {
-    const res = await mutate<UserLoginResponse>(gqlUserLogin, input);
+    const res = await mutate<UserLoginMutation>(gqlUserLogin, input);
     userStore.setToken(res.userLogin.jwtToken);
   } finally {
     userStore.setLoading(false);
@@ -34,11 +55,13 @@ export async function userLogin(input: LoginRequest): Promise<void> {
  * @param input
  * @returns
  */
-export async function studentLogin(input: LoginRequest): Promise<void> {
+export async function studentLogin(
+  input: StudentLoginMutationVariables
+): Promise<void> {
   userStore.setLoading(true);
 
   try {
-    const res = await mutate<StudentLoginResponse>(gqlStudentLogin, input);
+    const res = await mutate<StudentLoginMutation>(gqlStudentLogin, input);
     userStore.setToken(res.studentLogin.jwtToken);
   } finally {
     userStore.setLoading(false);
@@ -51,11 +74,17 @@ export async function studentLogin(input: LoginRequest): Promise<void> {
  * @param input
  * @returns
  */
-export async function studentPreregistration(input: StudentPreregistrationRequest): Promise<void> {
+export async function studentPreregistration(
+  input: StudentPreregistrationMutationVariables
+): Promise<void> {
   userStore.setLoading(true);
 
   try {
-    const res = await mutate<StudentPreregistrationResponse>(gqlStudentPreregistration, input);
+    const res = await mutate<StudentPreregistrationMutation>(
+      gqlStudentPreregistration,
+      input
+    );
+
     userStore.setToken(res.studentPreregistration);
   } finally {
     userStore.setLoading(false);
@@ -74,11 +103,11 @@ export async function info(): Promise<void> {
   try {
     if (userStore.isStudent.value) {
       const g = await import('@/graphql/queries/currentStudent.gql');
-      const res = await query<CurrentStudentResponse>(g, undefined, 'no-cache');
+      const res = await query<CurrentStudentQuery>(g, undefined, 'no-cache');
       userStore.setInfo(res.currentStudent[0]);
     } else {
       const g = await import('@/graphql/queries/currentUser.gql');
-      const res = await query<CurrentUserResponse>(g, undefined, 'no-cache');
+      const res = await query<CurrentUserQuery>(g, undefined, 'no-cache');
       userStore.setInfo(res.currentUser[0]);
     }
   } finally {
@@ -94,7 +123,7 @@ export async function logout(): Promise<void> {
     const g = await import('@/graphql/mutations/studentRevokeRefreshToken.gql');
 
     try {
-      await mutate<RevokeStudentRefreshTokenResponse>(g);
+      await mutate<StudentRevokeRefreshTokenMutation>(g);
     } finally {
       userStore.setToken(null);
     }
@@ -102,7 +131,7 @@ export async function logout(): Promise<void> {
     const g = await import('@/graphql/mutations/userRevokeRefreshToken.gql');
 
     try {
-      await mutate<RevokeUserRefreshTokenResponse>(g);
+      await mutate<UserRevokeRefreshTokenMutation>(g);
     } finally {
       userStore.setToken(null);
     }

@@ -7,6 +7,7 @@ import {
   FetchPolicy,
   MutationOptions,
   OperationVariables,
+  QueryOptions,
 } from '@apollo/client/core';
 
 import { onError } from '@apollo/client/link/error';
@@ -44,9 +45,9 @@ const errorLink = onError(({ networkError, graphQLErrors }: any) => {
       }
 
       return console.error(
-        `[GraphQL error]: Message: ${message ?? 'unknown error'}, Path: ${path ?? 'N/A'}, Code: ${
-          extensions?.code ?? 'N/A'
-        }`,
+        `[GraphQL error]: Message: ${message ?? 'unknown error'}, Path: ${
+          path ?? 'N/A'
+        }, Code: ${extensions?.code ?? 'N/A'}`,
         locations
       );
     });
@@ -67,7 +68,9 @@ const errorLink = onError(({ networkError, graphQLErrors }: any) => {
 const authLink = setContext((_, { headers }) => ({
   headers: {
     ...headers,
-    Authorization: userStore.jwtToken.value ? `Bearer ${userStore.jwtToken.value}` : '',
+    Authorization: userStore.jwtToken.value
+      ? `Bearer ${userStore.jwtToken.value}`
+      : '',
   },
 }));
 
@@ -86,7 +89,12 @@ const httpLink = createHttpLink({
  */
 const defaultClient = new ApolloClient({
   // @note Ordering is important here
-  link: ApolloLink.from([errorLink, new TokenRefreshService(), authLink, httpLink]),
+  link: ApolloLink.from([
+    errorLink,
+    new TokenRefreshService(),
+    authLink,
+    httpLink,
+  ]),
   cache: new InMemoryCache(),
 });
 
@@ -97,12 +105,16 @@ const defaultClient = new ApolloClient({
  * @param variables The variables, if any, to send to the server for the provided query.
  * @returns The server result, or a rejected promise.
  */
-export async function query<TReturn, TOptions extends OperationVariables>(
+export async function query<TReturn, TOptions = OperationVariables>(
   qry: DocumentNode,
-  variables?: TOptions,
+  variables?: QueryOptions<TOptions, TReturn>,
   fetchPolicy?: FetchPolicy
 ): Promise<TReturn> {
-  const res = await defaultClient.query<TReturn>({ query: qry, variables, fetchPolicy });
+  const res = await defaultClient.query<TReturn>({
+    query: qry,
+    variables,
+    fetchPolicy,
+  });
   if (res.data) return Promise.resolve(res.data);
   return Promise.reject(new Error('An unknown error has occurred.'));
 }
@@ -113,7 +125,7 @@ export async function query<TReturn, TOptions extends OperationVariables>(
  * @param options
  * @returns The server result, or a rejected promise.
  */
-export async function mutateCustom<TReturn, TVariables extends OperationVariables>(
+export async function mutateCustom<TReturn, TVariables = OperationVariables>(
   options: MutationOptions<TReturn, TVariables>
 ): Promise<TReturn> {
   const res = await defaultClient.mutate<TReturn, TVariables>(options);
@@ -128,7 +140,7 @@ export async function mutateCustom<TReturn, TVariables extends OperationVariable
  * @param variables The variables, if any, to send to the server.
  * @returns An Apollo result object of the TReturn type.
  */
-export async function mutate<TReturn, TOptions extends OperationVariables>(
+export async function mutate<TReturn, TOptions = OperationVariables>(
   mutation: DocumentNode,
   variables?: TOptions
 ): Promise<TReturn> {

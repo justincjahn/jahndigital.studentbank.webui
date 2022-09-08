@@ -10,7 +10,7 @@ import parseJwt from '@/common/utils/parseJwt';
 /**
  * Data stored in localstorage.
  */
-export interface PersistedData {
+interface PersistedData {
   // Is student?
   iss: boolean;
 
@@ -34,7 +34,7 @@ export function setup() {
     expiration: null as number | null,
     hydrated: false,
     isStudent: false,
-    isPreauth: false,
+    isPreauthorized: false,
     info: null as UserInfo | StudentInfo | null,
   });
 
@@ -69,13 +69,17 @@ export function setup() {
   const isStudent = computed(() => store.isStudent);
 
   // True if the token is for preauthentication
-  const isPreauth = computed(() => store.isPreauth);
+  const isPreauthorized = computed(() => store.isPreauthorized);
 
   // True if the current user is anonymous and hasn't logged in before
-  const isAnonymous = computed(() => store.id === -1 && store.hydrated === false);
+  const isAnonymous = computed(
+    () => store.id === -1 && store.hydrated === false
+  );
 
   // True if the user is authenticated
-  const isAuthenticated = computed(() => store.token !== null || store.hydrated);
+  const isAuthenticated = computed(
+    () => store.token !== null || store.hydrated
+  );
 
   // True if the user info has been provided by the auth service
   const hasInfo = computed(() => store.info !== null);
@@ -93,7 +97,7 @@ export function setup() {
   function persist() {
     const data: PersistedData = {
       iss: store.isStudent,
-      pre: store.isPreauth,
+      pre: store.isPreauthorized,
     };
 
     localStorage.setItem(PERSIST_TOKEN, JSON.stringify(data));
@@ -106,7 +110,7 @@ export function setup() {
     const data = localStorage.getItem(PERSIST_TOKEN);
     if (!data) return;
 
-    const userInfo: PersistedData|undefined = JSON.parse(data);
+    const userInfo: PersistedData | undefined = JSON.parse(data);
     if (!userInfo) return;
 
     store.hydrated = true;
@@ -115,7 +119,7 @@ export function setup() {
     }
 
     if (userInfo.pre) {
-      store.isPreauth = true;
+      store.isPreauthorized = true;
     }
   }
 
@@ -141,7 +145,7 @@ export function setup() {
       store.username = '';
       store.email = '';
       store.isStudent = false;
-      store.isPreauth = false;
+      store.isPreauthorized = false;
       store.expiration = null;
       store.hydrated = false;
       store.info = null;
@@ -154,7 +158,7 @@ export function setup() {
     store.username = data.unique_name;
     store.email = data.email;
     store.isStudent = data.utyp === 'student';
-    store.isPreauth = (data?.pre ?? 'N') !== 'N';
+    store.isPreauthorized = (data?.pre ?? 'N') !== 'N';
     store.expiration = data.exp;
     store.info = null;
     persist();
@@ -182,7 +186,7 @@ export function setup() {
     jwtToken,
     tokenExpiration,
     isStudent,
-    isPreauth,
+    isPreauthorized,
     isAnonymous,
     isAuthenticated,
     hasInfo,

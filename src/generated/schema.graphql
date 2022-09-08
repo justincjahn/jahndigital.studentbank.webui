@@ -1,0 +1,1833 @@
+﻿schema {
+  query: Query
+  mutation: Mutation
+}
+
+type AuthenticateResponse {
+  id: Long!
+  username: String!
+  jwtToken: String!
+}
+
+"A connection to a list of items."
+type DeletedGroupsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [DeletedGroupsEdge!]
+  "A flattened list of the nodes."
+  nodes: [Group!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type DeletedGroupsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Group!
+}
+
+"A connection to a list of items."
+type DeletedInstancesConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [DeletedInstancesEdge!]
+  "A flattened list of the nodes."
+  nodes: [Instance!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type DeletedInstancesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Instance!
+}
+
+"A connection to a list of items."
+type DeletedProductsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [DeletedProductsEdge!]
+  "A flattened list of the nodes."
+  nodes: [Product!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type DeletedProductsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Product!
+}
+
+"A connection to a list of items."
+type DeletedShareTypesConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [DeletedShareTypesEdge!]
+  "A flattened list of the nodes."
+  nodes: [ShareType!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type DeletedShareTypesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: ShareType!
+}
+
+"A connection to a list of items."
+type DeletedSharesConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [DeletedSharesEdge!]
+  "A flattened list of the nodes."
+  nodes: [Share!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type DeletedSharesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Share!
+}
+
+"A connection to a list of items."
+type DeletedStocksConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [DeletedStocksEdge!]
+  "A flattened list of the nodes."
+  nodes: [Stock!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type DeletedStocksEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Stock!
+}
+
+"A connection to a list of items."
+type DeletedStudentsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [DeletedStudentsEdge!]
+  "A flattened list of the nodes."
+  nodes: [Student!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type DeletedStudentsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Student!
+}
+
+type Group @authorize(policy: "DataOwner<P_MANAGE_GROUPS>", apply: BEFORE_RESOLVER) {
+  students: [Student!]! @authorize(policy: "P_MANAGE_GROUPS", apply: BEFORE_RESOLVER)
+  id: Long!
+  instanceId: Long!
+  name: String!
+  instance: Instance!
+  dateDeleted: DateTime
+  dateCreated: DateTime!
+}
+
+"A connection to a list of items."
+type GroupsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [GroupsEdge!]
+  "A flattened list of the nodes."
+  nodes: [Group!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type GroupsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Group!
+}
+
+type Instance @authorize(policy: "DataOwner<P_MANAGE_INSTANCES>", apply: BEFORE_RESOLVER) {
+  groups: [Group!]! @authorize(policy: "P_MANAGE_GROUPS", apply: BEFORE_RESOLVER)
+  description: String!
+  id: Long!
+  isActive: Boolean!
+  inviteCode: String!
+  stockInstances: [StockInstance!]!
+  shareTypeInstances: [ShareTypeInstance!]!
+  productInstances: [ProductInstance!]!
+  dateDeleted: DateTime
+  dateCreated: DateTime!
+}
+
+"A connection to a list of items."
+type InstancesConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [InstancesEdge!]
+  "A flattened list of the nodes."
+  nodes: [Instance!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type InstancesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Instance!
+}
+
+"CRUD operations for User entities."
+type Mutation {
+  "Update a Group."
+  updateGroup(input: UpdateGroupRequestInput!): [Group!]! @authorize(policy: "P_MANAGE_GROUPS", apply: BEFORE_RESOLVER)
+  "Create a new Group."
+  newGroup(input: NewGroupRequestInput!): [Group!]! @authorize(policy: "P_MANAGE_GROUPS", apply: BEFORE_RESOLVER)
+  "Delete a Group."
+  deleteGroup(id: Long!): Boolean! @authorize(policy: "P_MANAGE_GROUPS", apply: BEFORE_RESOLVER)
+  "Restore a soft-deleted Group."
+  restoreGroup(id: Long!): [Group!]! @authorize(policy: "P_MANAGE_GROUPS", apply: BEFORE_RESOLVER)
+  "Update an Instance."
+  updateInstance(input: UpdateInstanceRequestInput!): [Instance!]! @authorize(policy: "P_MANAGE_INSTANCES", apply: BEFORE_RESOLVER)
+  "Create an Instance."
+  newInstance(input: NewInstanceRequestInput!): Instance! @authorize(policy: "P_MANAGE_INSTANCES", apply: BEFORE_RESOLVER)
+  "Soft-delete an Instance."
+  deleteInstance(id: Long!): Boolean! @authorize(policy: "P_MANAGE_INSTANCES", apply: BEFORE_RESOLVER)
+  "Restore a soft-deleted Instance."
+  restoreInstance(id: Long!): [Instance!]! @authorize(policy: "P_MANAGE_INSTANCES", apply: BEFORE_RESOLVER)
+  "Create a new Product."
+  newProduct(input: NewProductRequestInput!): [Product!]! @authorize(policy: "P_MANAGE_PURCHASES", apply: BEFORE_RESOLVER)
+  "Update a Product."
+  updateProduct(input: UpdateProductRequestInput!): [Product!]! @authorize(policy: "P_MANAGE_PRODUCTS", apply: BEFORE_RESOLVER)
+  "Link a Product with the provided Group."
+  linkProduct(input: LinkProductRequestInput!): [Product!]! @authorize(policy: "P_MANAGE_PRODUCTS", apply: BEFORE_RESOLVER)
+  "Unlink a Product from the provided Group."
+  unlinkProduct(input: LinkProductRequestInput!): [Product!]! @authorize(policy: "P_MANAGE_PRODUCTS", apply: BEFORE_RESOLVER)
+  "Soft-delete a Product."
+  deleteProduct(id: Long!): Boolean! @authorize(policy: "P_MANAGE_PRODUCTS", apply: BEFORE_RESOLVER)
+  "Restore a soft-deleted Product."
+  restoreProduct(id: Long!): [Product!]! @authorize(policy: "P_MANAGE_PRODUCTS", apply: BEFORE_RESOLVER)
+  "Make a new purchase, if authorized."
+  newPurchase(input: PurchaseRequestInput!): [StudentPurchase!]! @authorize(apply: BEFORE_RESOLVER)
+  "Create a new Share ."
+  newShare(input: NewShareRequestInput!): [Share!]! @authorize(policy: "P_MANAGE_SHARES", apply: BEFORE_RESOLVER)
+  "Update a Share ."
+  updateShare(input: UpdateShareRequestInput!): [Share!]! @authorize(policy: "P_MANAGE_SHARES", apply: BEFORE_RESOLVER)
+  "Soft-delete a Share ."
+  deleteShare(id: Long!): Boolean! @authorize(policy: "P_MANAGE_SHARES", apply: BEFORE_RESOLVER)
+  "Restore a soft-deleted Share."
+  restoreShare(id: Long!): [Share!]! @authorize(policy: "P_MANAGE_SHARES", apply: BEFORE_RESOLVER)
+  "Create a new ShareType."
+  newShareType(input: NewShareTypeRequestInput!): [ShareType!]! @authorize(policy: "P_MANAGE_SHARE_TYPES", apply: BEFORE_RESOLVER)
+  "Update a ShareType."
+  updateShareType(input: UpdateShareTypeRequestInput!): [ShareType!]! @authorize(policy: "P_MANAGE_SHARE_TYPES", apply: BEFORE_RESOLVER)
+  "Link a ShareType to an Instance.abstract"
+  linkShareType(input: LinkShareTypeRequestInput!): [ShareType!]! @authorize(policy: "P_MANAGE_SHARE_TYPES", apply: BEFORE_RESOLVER)
+  "Unlink a ShareType from an Instance."
+  unlinkShareType(input: LinkShareTypeRequestInput!): [ShareType!]! @authorize(policy: "P_MANAGE_SHARE_TYPES", apply: BEFORE_RESOLVER)
+  "Soft-delete a ShareType."
+  deleteShareType(id: Long!): Boolean! @authorize(policy: "P_MANAGE_SHARE_TYPES", apply: BEFORE_RESOLVER)
+  "Restore a soft-deleted ShareType."
+  restoreShareType(id: Long!): [ShareType!]! @authorize(policy: "P_MANAGE_SHARE_TYPES", apply: BEFORE_RESOLVER)
+  "Create a new stock."
+  newStock(input: NewStockRequestInput!): [Stock!]! @authorize(policy: "P_MANAGE_STOCKS", apply: BEFORE_RESOLVER)
+  "Update a Stock."
+  updateStock(input: UpdateStockRequestInput!): [Stock!]! @authorize(policy: "P_MANAGE_STOCKS", apply: BEFORE_RESOLVER)
+  "Purge stock history for a given stock to a given date."
+  purgeStockHistory(input: PurgeStockRequestInput!): [StockHistory!]! @authorize(policy: "P_MANAGE_STOCKS", apply: BEFORE_RESOLVER)
+  "Link a Stock to an Instance."
+  linkStock(input: LinkStockRequestInput!): [Stock!]! @authorize(policy: "P_MANAGE_STOCKS", apply: BEFORE_RESOLVER)
+  "Unlink a Stock from an Instance."
+  unlinkStock(input: LinkStockRequestInput!): [Stock!]! @authorize(policy: "P_MANAGE_STOCKS", apply: BEFORE_RESOLVER)
+  "Soft-delete a stock."
+  deleteStock(id: Long!): Boolean! @authorize(policy: "P_MANAGE_STOCKS", apply: BEFORE_RESOLVER)
+  "Restore a deleted stock."
+  restoreStock(id: Long!): [Stock!]! @authorize(policy: "P_MANAGE_STOCKS", apply: BEFORE_RESOLVER)
+  "Log the student in using a username and password and return JWT tokens."
+  studentLogin(input: AuthenticateRequestInput!): AuthenticateResponse!
+  "Obtain a new JWT token using a refresh token."
+  studentRefreshToken("The refresh token to use when obtaining a new JWT token. Must be valid and not expired." token: String): AuthenticateResponse!
+  "Revoke a refresh token."
+  studentRevokeRefreshToken("The refresh token to revoke." token: String): Boolean! @authorize(apply: BEFORE_RESOLVER)
+  "Attempt to generate a preauthorization token from the provided input.\n            \n\n**Returns:**\nA temporary JWT token if preauthorization is successful."
+  studentPreregistration(input: StudentPreauthenticationRequestInput!): String!
+  "Register a student using the preauthorization token and provided input.\n            \n\n**Returns:**\nTrue if registration is successful, otherwise an error message."
+  studentRegistration(input: StudentRegisterRequestInput!): Boolean! @authorize(policy: "Preauthorization", apply: BEFORE_RESOLVER)
+  "Update an existing student."
+  updateStudent(input: UpdateStudentRequestInput!): [Student!]! @authorize(apply: BEFORE_RESOLVER)
+  "Update a group of students at once."
+  updateBulkStudent(input: [UpdateStudentRequestInput!]!): [Student!]! @authorize(policy: "P_MANAGE_STUDENTS", apply: BEFORE_RESOLVER)
+  "Create a new student."
+  newStudent(input: NewStudentRequestInput!): [Student!]! @authorize(policy: "P_MANAGE_STUDENTS", apply: BEFORE_RESOLVER)
+  "Delete a student."
+  deleteStudent(id: Long!): Boolean! @authorize(policy: "P_MANAGE_STUDENTS", apply: BEFORE_RESOLVER)
+  "Restore a deleted student."
+  restoreStudent(id: Long!): [Student!]! @authorize(policy: "P_MANAGE_STUDENTS", apply: BEFORE_RESOLVER)
+  "Attempt to buy or sell the provided stock."
+  newStockPurchase(input: PurchaseStockRequestInput!): [StudentStock!]!
+  "Post a Transaction to the provided share, if authorized."
+  newTransaction(input: TransactionRequestInput!): Transaction! @authorize(policy: "P_MANAGE_TRANSACTIONS", apply: BEFORE_RESOLVER)
+  "Perform a bulk transaction and return transaction information."
+  newBulkTransaction(input: [NewTransactionRequestInput!]! "Continue posting other transactions if a withdrawal cannot be completed due to nonsufficient funds\nwhile the takeNegative flag is set to false." skipBelowNegative: Boolean! = false): [Transaction!]! @authorize(policy: "P_MANAGE_TRANSACTIONS", apply: BEFORE_RESOLVER)
+  "Transfer funds from one share to another, if authorized."
+  newTransfer(input: NewTransferRequestInput!): TupleOfTransactionAndTransaction! @authorize(apply: BEFORE_RESOLVER)
+  "Post dividends for a specific ShareType and a group of Instance."
+  postDividends(input: PostDividendsRequestInput!): Boolean! @authorize(policy: "P_MANAGE_TRANSACTIONS", apply: BEFORE_RESOLVER)
+  "Log the user in using a username and password and return JWT tokens."
+  userLogin(input: AuthenticateRequestInput!): AuthenticateResponse!
+  "Obtain a new JWT token using a refresh token."
+  userRefreshToken("The refresh token to use when obtaining a new JWT token. Must be valid and not expired." token: String): AuthenticateResponse!
+  "Revoke a refresh token."
+  userRevokeRefreshToken("The refresh token to revoke." token: String): Boolean! @authorize(apply: BEFORE_RESOLVER)
+  "Update a user."
+  updateUser(input: UpdateUserRequestInput!): [User!]! @authorize(apply: BEFORE_RESOLVER)
+  "Create a new user."
+  newUser(input: NewUserRequestInput!): [User!]! @authorize(policy: "P_MANAGE_USERS", apply: BEFORE_RESOLVER)
+  "Delete a user."
+  deleteUser(id: Long!): Boolean! @authorize(policy: "P_MANAGE_USERS", apply: BEFORE_RESOLVER)
+}
+
+"Information about pagination in a connection."
+type PageInfo {
+  "Indicates whether more edges exist following the set defined by the clients arguments."
+  hasNextPage: Boolean!
+  "Indicates whether more edges exist prior the set defined by the clients arguments."
+  hasPreviousPage: Boolean!
+  "When paginating backwards, the cursor to continue."
+  startCursor: String
+  "When paginating forwards, the cursor to continue."
+  endCursor: String
+}
+
+type Privilege {
+  id: Long!
+  name: String!
+  description: String!
+  rolePrivileges: [RolePrivilege!]!
+  dateCreated: DateTime!
+}
+
+type Product {
+  productInstances: [ProductInstance!]! @authorize(policy: "P_MANAGE_PRODUCTS", apply: BEFORE_RESOLVER)
+  id: Long!
+  images: [ProductImage!]!
+  rawCost: Long!
+  cost: Money!
+  isLimitedQuantity: Boolean!
+  quantity: Int!
+  name: String!
+  description: String!
+  dateDeleted: DateTime
+  dateCreated: DateTime!
+}
+
+type ProductImage {
+  id: Long!
+  url: String!
+}
+
+type ProductInstance {
+  instanceId: Long!
+  productId: Long!
+  instance: Instance!
+  product: Product!
+}
+
+"A connection to a list of items."
+type ProductsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [ProductsEdge!]
+  "A flattened list of the nodes."
+  nodes: [Product!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type ProductsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Product!
+}
+
+"A connection to a list of items."
+type PurchasesConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [PurchasesEdge!]
+  "A flattened list of the nodes."
+  nodes: [StudentPurchase!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type PurchasesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: StudentPurchase!
+}
+
+"Allows students to list their purchases and admins to list all purchases."
+type Query {
+  "Get a list of stocks available to the user."
+  stocks("One or more instances to use when filtering." instances: [Long!] "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: StockFilterInput order: [StockSortInput!]): StocksConnection @authorize(apply: BEFORE_RESOLVER)
+  "Get a list of history for a given stock."
+  stockHistory(stockId: Long! "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: StockHistoryFilterInput order: [StockHistorySortInput!]): StockHistoryConnection @authorize(apply: BEFORE_RESOLVER)
+  "Get all deleted stocks."
+  deletedStocks("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: StockFilterInput order: [StockSortInput!]): DeletedStocksConnection @authorize(policy: "P_MANAGE_STOCKS", apply: BEFORE_RESOLVER)
+  "Get groups if authorized (Manage Groups)."
+  groups("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: GroupFilterInput order: [GroupSortInput!]): GroupsConnection @authorize(policy: "P_MANAGE_GROUPS", apply: BEFORE_RESOLVER)
+  "Get deleted groups if authorized (Manage Groups)."
+  deletedGroups("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: GroupFilterInput order: [GroupSortInput!]): DeletedGroupsConnection @authorize(policy: "P_MANAGE_GROUPS", apply: BEFORE_RESOLVER)
+  "Get instances if authorized (Manage Instances)"
+  instances("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: InstanceFilterInput order: [InstanceSortInput!]): InstancesConnection @authorize(policy: "P_MANAGE_INSTANCES", apply: BEFORE_RESOLVER)
+  "Get instances if authorized (Manage Instances)"
+  deletedInstances("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: InstanceFilterInput order: [InstanceSortInput!]): DeletedInstancesConnection @authorize(policy: "P_MANAGE_INSTANCES", apply: BEFORE_RESOLVER)
+  "Lists all products available to a given student."
+  products("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ProductFilterInput order: [ProductSortInput!]): ProductsConnection @authorize(apply: BEFORE_RESOLVER)
+  "Get a list of deleted products if authorized (Manage Products)."
+  deletedProducts("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ProductFilterInput order: [ProductSortInput!]): DeletedProductsConnection @authorize(policy: "P_MANAGE_PRODUCTS", apply: BEFORE_RESOLVER)
+  "Get the purchases the user has available to them."
+  purchases("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: StudentPurchaseFilterInput order: [StudentPurchaseSortInput!]): PurchasesConnection @authorize(apply: BEFORE_RESOLVER)
+  "Get shares for the currently active user."
+  shares("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ShareFilterInput order: [ShareSortInput!]): SharesConnection
+  "Get deleted shares (if authorized)."
+  deletedShares("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ShareFilterInput order: [ShareSortInput!]): DeletedSharesConnection
+  "Get share type information available to the student or user."
+  shareTypes("A list of instances to filter the list of share types to." instances: [Long!] "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ShareTypeFilterInput order: [ShareTypeSortInput!]): ShareTypesConnection
+  "Get share type information."
+  deletedShareTypes("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: ShareTypeFilterInput order: [ShareTypeSortInput!]): DeletedShareTypesConnection
+  "Get the currently logged in student's information (if the user is a student)."
+  currentStudent: [Student!]! @authorize(apply: BEFORE_RESOLVER)
+  "Fetch information about a specific student."
+  student("The ID number of the student to fetch." studentId: Long!): [Student!]! @authorize(policy: "DataOwner<P_MANAGE_STUDENTS>", apply: BEFORE_RESOLVER)
+  "Get all students matching the criteria."
+  students("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: StudentFilterInput order: [StudentSortInput!]): StudentsConnection @authorize(policy: "P_MANAGE_STUDENTS", apply: BEFORE_RESOLVER)
+  "Get all deleted students matching criteria."
+  deletedStudents("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: StudentFilterInput order: [StudentSortInput!]): DeletedStudentsConnection @authorize(policy: "P_MANAGE_STUDENTS", apply: BEFORE_RESOLVER)
+  "Get the currently logged in user information (if the user is a user)."
+  currentUser: [User!]! @authorize(apply: BEFORE_RESOLVER)
+  "Gets a list of users in the system."
+  users("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: UserFilterInput order: [UserSortInput!]): UsersConnection @authorize(policy: "P_MANAGE_USERS", apply: BEFORE_RESOLVER)
+  "Returns true if the user is authenticated."
+  isAuthenticated: Boolean!
+  "Get the stocks purchased by the student specified."
+  studentStocks(studentId: Long! "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: StudentStockFilterInput order: [StudentStockSortInput!]): StudentStocksConnection
+  "Get the purchase history for a student's stock."
+  studentStockHistory(studentStockId: Long! "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: StudentStockHistoryFilterInput order: [StudentStockHistorySortInput!]): StudentStockHistoryConnection
+  "Get transactions by Student ID and Share ID"
+  transactions(shareId: Long! "Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: TransactionFilterInput order: [TransactionSortInput!]): TransactionsConnection
+}
+
+type Role {
+  id: Long!
+  name: String!
+  description: String
+  isBuiltIn: Boolean!
+  rolePrivileges: [RolePrivilege!]!
+  dateCreated: DateTime!
+}
+
+type RolePrivilege {
+  roleId: Long!
+  privilegeId: Long!
+  role: Role!
+  privilege: Privilege!
+}
+
+type Share @authorize(policy: "DataOwner<P_MANAGE_SHARES>", apply: BEFORE_RESOLVER) {
+  id: Long!
+  shareTypeId: Long!
+  studentId: Long!
+  shareType: ShareType!
+  student: Student!
+  rawBalance: Long!
+  balance: Money!
+  rawDividendLastAmount: Long!
+  dividendLastAmount: Money!
+  rawTotalDividends: Long!
+  totalDividends: Money!
+  limitedWithdrawalCount: Int!
+  dateLastActive: DateTime!
+  dateDeleted: DateTime
+  dateCreated: DateTime!
+}
+
+type ShareType @authorize(apply: BEFORE_RESOLVER) {
+  shares: [Share!]! @authorize(policy: "P_MANAGE_SHARES", apply: BEFORE_RESOLVER)
+  id: Long!
+  name: String!
+  rawDividendRate: Long!
+  dividendRate: Rate!
+  withdrawalLimitCount: Int!
+  withdrawalLimitPeriod: Period!
+  withdrawalLimitShouldFee: Boolean!
+  rawWithdrawalLimitFee: Long!
+  withdrawalLimitFee: Money!
+  shareTypeInstances: [ShareTypeInstance!]!
+  withdrawalLimitLastReset: DateTime!
+  dateDeleted: DateTime
+  dateCreated: DateTime!
+}
+
+type ShareTypeInstance {
+  shareTypeId: Long!
+  instanceId: Long!
+  shareType: ShareType!
+  instance: Instance!
+}
+
+"A connection to a list of items."
+type ShareTypesConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [ShareTypesEdge!]
+  "A flattened list of the nodes."
+  nodes: [ShareType!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type ShareTypesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: ShareType!
+}
+
+"A connection to a list of items."
+type SharesConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [SharesEdge!]
+  "A flattened list of the nodes."
+  nodes: [Share!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type SharesEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Share!
+}
+
+type Stock @authorize(policy: "DataOwner<P_MANAGE_STOCKS>", apply: BEFORE_RESOLVER) {
+  id: Long!
+  symbol: String!
+  name: String!
+  rawDescription: String!
+  formattedDescription: String!
+  rawCurrentValue: Long!
+  currentValue: Money!
+  studentStock: [StudentStock!]!
+  history: [StockHistory!]!
+  stockInstances: [StockInstance!]!
+  dateDeleted: DateTime
+  dateCreated: DateTime!
+}
+
+type StockHistory {
+  id: Long!
+  stockId: Long!
+  stock: Stock!
+  rawValue: Long!
+  value: Money!
+  dateChanged: DateTime!
+}
+
+"A connection to a list of items."
+type StockHistoryConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [StockHistoryEdge!]
+  "A flattened list of the nodes."
+  nodes: [StockHistory!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type StockHistoryEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: StockHistory!
+}
+
+type StockInstance {
+  instanceId: Long!
+  stockId: Long!
+  instance: Instance!
+  stock: Stock!
+}
+
+"A connection to a list of items."
+type StocksConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [StocksEdge!]
+  "A flattened list of the nodes."
+  nodes: [Stock!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type StocksEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Stock!
+}
+
+type Student @authorize(policy: "DataOwner<P_MANAGE_STUDENTS>", apply: BEFORE_RESOLVER) {
+  group: Group! @authorize(policy: "DataOwner<P_MANAGE_GROUPS>", apply: BEFORE_RESOLVER)
+  id: Long!
+  accountNumber: String!
+  email: String
+  firstName: String!
+  lastName: String!
+  groupId: Long!
+  shares: [Share!]!
+  purchases: [StudentPurchase!]!
+  dateLastLogin: DateTime
+  dateRegistered: DateTime
+  dateDeleted: DateTime
+  dateCreated: DateTime!
+}
+
+type StudentPurchase @authorize(policy: "DataOwner<P_MANAGE_PURCHASES>", apply: BEFORE_RESOLVER) {
+  id: Long!
+  studentId: Long!
+  student: Student!
+  rawTotalCost: Long!
+  totalCost: Money!
+  status: PurchaseStatus!
+  items: [StudentPurchaseItem!]!
+  dateCreated: DateTime!
+}
+
+type StudentPurchaseItem {
+  id: Long!
+  studentPurchaseId: Long!
+  productId: Long!
+  studentPurchase: StudentPurchase!
+  product: Product!
+  quantity: Int!
+  rawPurchasePrice: Long!
+  purchasePrice: Money!
+}
+
+type StudentStock @authorize(policy: "DataOwner<P_MANAGE_STOCKS>", apply: BEFORE_RESOLVER) {
+  calculatePurchaseAmount(quantity: Int!): Money!
+  id: Long!
+  studentId: Long!
+  stockId: Long!
+  student: Student!
+  stock: Stock!
+  sharesOwned: Long!
+  rawNetContribution: Long!
+  netContribution: Money!
+  history: [StudentStockHistory!]!
+  dateLastActive: DateTime!
+  dateCreated: DateTime!
+}
+
+type StudentStockHistory {
+  id: Long!
+  studentStockId: Long!
+  transactionId: Long!
+  studentStock: StudentStock!
+  transaction: Transaction!
+  count: Int!
+  rawAmount: Long!
+  amount: Money!
+  datePosted: DateTime!
+}
+
+"A connection to a list of items."
+type StudentStockHistoryConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [StudentStockHistoryEdge!]
+  "A flattened list of the nodes."
+  nodes: [StudentStockHistory!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type StudentStockHistoryEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: StudentStockHistory!
+}
+
+"A connection to a list of items."
+type StudentStocksConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [StudentStocksEdge!]
+  "A flattened list of the nodes."
+  nodes: [StudentStock!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type StudentStocksEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: StudentStock!
+}
+
+"A connection to a list of items."
+type StudentsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [StudentsEdge!]
+  "A flattened list of the nodes."
+  nodes: [Student!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type StudentsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Student!
+}
+
+type Transaction @authorize(policy: "DataOwner<P_MANAGE_TRANSACTIONS>", apply: BEFORE_RESOLVER) {
+  id: Long!
+  targetShareId: Long!
+  transactionType: String!
+  targetShare: Share!
+  comment: String
+  rawAmount: Long!
+  amount: Money!
+  rawNewBalance: Long!
+  newBalance: Money!
+  effectiveDate: DateTime!
+}
+
+"A connection to a list of items."
+type TransactionsConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [TransactionsEdge!]
+  "A flattened list of the nodes."
+  nodes: [Transaction!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type TransactionsEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Transaction!
+}
+
+type TupleOfTransactionAndTransaction {
+  item1: Transaction!
+  item2: Transaction!
+}
+
+type User @authorize(policy: "DataOwner<P_MANAGE_USERS>", apply: BEFORE_RESOLVER) {
+  id: Long!
+  roleId: Long!
+  email: String!
+  role: Role!
+  dateLastLogin: DateTime
+  dateRegistered: DateTime
+  dateDeleted: DateTime
+  dateCreated: DateTime!
+}
+
+"A connection to a list of items."
+type UsersConnection {
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+  "A list of edges."
+  edges: [UsersEdge!]
+  "A flattened list of the nodes."
+  nodes: [User!]
+  totalCount: Int!
+}
+
+"An edge in a connection."
+type UsersEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: User!
+}
+
+input AuthenticateRequestInput {
+  username: String!
+  password: String!
+}
+
+input BooleanOperationFilterInput {
+  eq: Boolean
+  neq: Boolean
+}
+
+input ComparableDateTimeOperationFilterInput {
+  eq: DateTime
+  neq: DateTime
+  in: [DateTime!]
+  nin: [DateTime!]
+  gt: DateTime
+  ngt: DateTime
+  gte: DateTime
+  ngte: DateTime
+  lt: DateTime
+  nlt: DateTime
+  lte: DateTime
+  nlte: DateTime
+}
+
+input ComparableDecimalOperationFilterInput {
+  eq: Decimal
+  neq: Decimal
+  in: [Decimal!]
+  nin: [Decimal!]
+  gt: Decimal
+  ngt: Decimal
+  gte: Decimal
+  ngte: Decimal
+  lt: Decimal
+  nlt: Decimal
+  lte: Decimal
+  nlte: Decimal
+}
+
+input ComparableInt32OperationFilterInput {
+  eq: Int
+  neq: Int
+  in: [Int!]
+  nin: [Int!]
+  gt: Int
+  ngt: Int
+  gte: Int
+  ngte: Int
+  lt: Int
+  nlt: Int
+  lte: Int
+  nlte: Int
+}
+
+input ComparableInt64OperationFilterInput {
+  eq: Long
+  neq: Long
+  in: [Long!]
+  nin: [Long!]
+  gt: Long
+  ngt: Long
+  gte: Long
+  ngte: Long
+  lt: Long
+  nlt: Long
+  lte: Long
+  nlte: Long
+}
+
+input ComparableNullableOfDateTimeOperationFilterInput {
+  eq: DateTime
+  neq: DateTime
+  in: [DateTime]
+  nin: [DateTime]
+  gt: DateTime
+  ngt: DateTime
+  gte: DateTime
+  ngte: DateTime
+  lt: DateTime
+  nlt: DateTime
+  lte: DateTime
+  nlte: DateTime
+}
+
+input GroupFilterInput {
+  and: [GroupFilterInput!]
+  or: [GroupFilterInput!]
+  id: ComparableInt64OperationFilterInput
+  instanceId: ComparableInt64OperationFilterInput
+  name: StringOperationFilterInput
+  instance: InstanceFilterInput
+  students: ListFilterInputTypeOfStudentFilterInput
+  dateDeleted: ComparableNullableOfDateTimeOperationFilterInput
+  dateCreated: ComparableDateTimeOperationFilterInput
+}
+
+input GroupSortInput {
+  id: SortEnumType
+  instanceId: SortEnumType
+  name: SortEnumType
+  instance: InstanceSortInput
+  dateDeleted: SortEnumType
+  dateCreated: SortEnumType
+}
+
+input InstanceFilterInput {
+  and: [InstanceFilterInput!]
+  or: [InstanceFilterInput!]
+  id: ComparableInt64OperationFilterInput
+  description: StringOperationFilterInput
+  isActive: BooleanOperationFilterInput
+  inviteCode: StringOperationFilterInput
+  groups: ListFilterInputTypeOfGroupFilterInput
+  stockInstances: ListFilterInputTypeOfStockInstanceFilterInput
+  shareTypeInstances: ListFilterInputTypeOfShareTypeInstanceFilterInput
+  productInstances: ListFilterInputTypeOfProductInstanceFilterInput
+  dateDeleted: ComparableNullableOfDateTimeOperationFilterInput
+  dateCreated: ComparableDateTimeOperationFilterInput
+}
+
+input InstanceSortInput {
+  id: SortEnumType
+  description: SortEnumType
+  isActive: SortEnumType
+  inviteCode: SortEnumType
+  dateDeleted: SortEnumType
+  dateCreated: SortEnumType
+}
+
+input LinkProductRequestInput {
+  productId: Long!
+  instanceId: Long!
+}
+
+"Request to link or unlink a share type to an Instance."
+input LinkShareTypeRequestInput {
+  "The share type to link."
+  shareTypeId: Long!
+  "The instance to link to."
+  instanceId: Long!
+}
+
+"Request to link or unlink a stock to an Instance."
+input LinkStockRequestInput {
+  "The stock to link."
+  stockId: Long!
+  "The instance to link to."
+  instanceId: Long!
+}
+
+input ListFilterInputTypeOfGroupFilterInput {
+  all: GroupFilterInput
+  none: GroupFilterInput
+  some: GroupFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfProductImageFilterInput {
+  all: ProductImageFilterInput
+  none: ProductImageFilterInput
+  some: ProductImageFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfProductInstanceFilterInput {
+  all: ProductInstanceFilterInput
+  none: ProductInstanceFilterInput
+  some: ProductInstanceFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfRefreshTokenFilterInput {
+  all: RefreshTokenFilterInput
+  none: RefreshTokenFilterInput
+  some: RefreshTokenFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfRolePrivilegeFilterInput {
+  all: RolePrivilegeFilterInput
+  none: RolePrivilegeFilterInput
+  some: RolePrivilegeFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfShareFilterInput {
+  all: ShareFilterInput
+  none: ShareFilterInput
+  some: ShareFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfShareTypeInstanceFilterInput {
+  all: ShareTypeInstanceFilterInput
+  none: ShareTypeInstanceFilterInput
+  some: ShareTypeInstanceFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfStockHistoryFilterInput {
+  all: StockHistoryFilterInput
+  none: StockHistoryFilterInput
+  some: StockHistoryFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfStockInstanceFilterInput {
+  all: StockInstanceFilterInput
+  none: StockInstanceFilterInput
+  some: StockInstanceFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfStudentFilterInput {
+  all: StudentFilterInput
+  none: StudentFilterInput
+  some: StudentFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfStudentPurchaseFilterInput {
+  all: StudentPurchaseFilterInput
+  none: StudentPurchaseFilterInput
+  some: StudentPurchaseFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfStudentPurchaseItemFilterInput {
+  all: StudentPurchaseItemFilterInput
+  none: StudentPurchaseItemFilterInput
+  some: StudentPurchaseItemFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfStudentStockFilterInput {
+  all: StudentStockFilterInput
+  none: StudentStockFilterInput
+  some: StudentStockFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfStudentStockHistoryFilterInput {
+  all: StudentStockHistoryFilterInput
+  none: StudentStockHistoryFilterInput
+  some: StudentStockHistoryFilterInput
+  any: Boolean
+}
+
+input ListFilterInputTypeOfTransactionFilterInput {
+  all: TransactionFilterInput
+  none: TransactionFilterInput
+  some: TransactionFilterInput
+  any: Boolean
+}
+
+input MoneyFilterInput {
+  and: [MoneyFilterInput!]
+  or: [MoneyFilterInput!]
+  amount: ComparableDecimalOperationFilterInput
+  databaseAmount: ComparableInt64OperationFilterInput
+}
+
+input MoneySortInput {
+  amount: SortEnumType
+  databaseAmount: SortEnumType
+}
+
+"Request data to create a group."
+input NewGroupRequestInput {
+  "Get or set the name of the group."
+  name: String
+  "Get or set the Instance ID of the group."
+  instanceId: Long!
+}
+
+input NewInstanceRequestInput {
+  "Get or set the description of the instance."
+  description: String
+}
+
+input NewProductRequestInput {
+  name: String
+  description: String
+  cost: Money
+  isLimitedQuantity: Boolean!
+  quantity: Int!
+}
+
+input NewShareRequestInput {
+  studentId: Long!
+  shareTypeId: Long!
+}
+
+"Request data to create a Share Type."
+input NewShareTypeRequestInput {
+  "Get or set the name of the share type."
+  name: String!
+  "Get or set the dividend rate."
+  dividendRate: Rate!
+  "Get or set the number of withdrawals allowed per period.  Use zero to disable."
+  withdrawalLimitCount: Int
+  "Get or set the withdrawal limit period to use when resetting the withdrawal limit counters."
+  withdrawalLimitPeriod: Period
+  "Get or set if withdrawals over the WithdrawalLimitCount should fee instead of being declined."
+  withdrawalLimitShouldFee: Boolean
+  "Get or set the amount to fee if WithdrawalLimitShouldFee is true."
+  withdrawalLimitFee: Money
+}
+
+input NewStockRequestInput {
+  "Unique symbol of the stock."
+  symbol: String!
+  "Name of the company"
+  name: String!
+  "The description of the stock."
+  rawDescription: String
+  "The current value of the stock."
+  currentValue: Money!
+}
+
+"Data fields for a new student."
+input NewStudentRequestInput {
+  "Get or set the student's account number."
+  accountNumber: String
+  "Get or set the student's first name."
+  firstName: String
+  "Get or set the student's last name."
+  lastName: String
+  "Get or set the student's password."
+  password: String
+  "Get or set the student's group ID."
+  groupId: Long!
+  "Get or set the student's email address."
+  email: String
+}
+
+"Represents a request to post a monetary transaction."
+input NewTransactionRequestInput {
+  "Get or set the Share ID to post to."
+  shareId: Long!
+  "Get or set the amount to post."
+  amount: Money!
+  "Get or set an optional comment for the transaction."
+  comment: String
+  "Allow the transaction to take the account negative."
+  takeNegative: Boolean
+}
+
+"Request to transfer funds from one share to another."
+input NewTransferRequestInput {
+  "The source Share ID."
+  sourceShareId: Long!
+  "The destination Share ID."
+  destinationShareId: Long!
+  "The amount to transfer."
+  amount: Money!
+  "Get or set an optional comment."
+  comment: String
+}
+
+"Data fields to create a user."
+input NewUserRequestInput {
+  "Get or set the user's email address."
+  email: String
+  "Get or set the user's password."
+  password: String
+  "Get or set the user's role."
+  roleId: Long!
+}
+
+input PeriodOperationFilterInput {
+  eq: Period
+  neq: Period
+  in: [Period!]
+  nin: [Period!]
+}
+
+input PostDividendsRequestInput {
+  shareTypeId: Long!
+  instances: [Long!]!
+}
+
+input PrivilegeFilterInput {
+  and: [PrivilegeFilterInput!]
+  or: [PrivilegeFilterInput!]
+  id: ComparableInt64OperationFilterInput
+  name: StringOperationFilterInput
+  description: StringOperationFilterInput
+  rolePrivileges: ListFilterInputTypeOfRolePrivilegeFilterInput
+  dateCreated: ComparableDateTimeOperationFilterInput
+}
+
+input ProductFilterInput {
+  and: [ProductFilterInput!]
+  or: [ProductFilterInput!]
+  id: ComparableInt64OperationFilterInput
+  images: ListFilterInputTypeOfProductImageFilterInput
+  rawCost: ComparableInt64OperationFilterInput
+  cost: MoneyFilterInput
+  isLimitedQuantity: BooleanOperationFilterInput
+  quantity: ComparableInt32OperationFilterInput
+  productInstances: ListFilterInputTypeOfProductInstanceFilterInput
+  name: StringOperationFilterInput
+  description: StringOperationFilterInput
+  dateDeleted: ComparableNullableOfDateTimeOperationFilterInput
+  dateCreated: ComparableDateTimeOperationFilterInput
+}
+
+input ProductImageFilterInput {
+  and: [ProductImageFilterInput!]
+  or: [ProductImageFilterInput!]
+  id: ComparableInt64OperationFilterInput
+  url: StringOperationFilterInput
+}
+
+input ProductInstanceFilterInput {
+  and: [ProductInstanceFilterInput!]
+  or: [ProductInstanceFilterInput!]
+  instanceId: ComparableInt64OperationFilterInput
+  productId: ComparableInt64OperationFilterInput
+  instance: InstanceFilterInput
+  product: ProductFilterInput
+}
+
+input ProductSortInput {
+  id: SortEnumType
+  rawCost: SortEnumType
+  cost: MoneySortInput
+  isLimitedQuantity: SortEnumType
+  quantity: SortEnumType
+  name: SortEnumType
+  description: SortEnumType
+  dateDeleted: SortEnumType
+  dateCreated: SortEnumType
+}
+
+input PurchaseRequestInput {
+  shareId: Long!
+  items: [PurchaseRequestItemInput!]!
+}
+
+input PurchaseRequestItemInput {
+  productId: Long!
+  count: Int!
+}
+
+input PurchaseStatusOperationFilterInput {
+  eq: PurchaseStatus
+  neq: PurchaseStatus
+  in: [PurchaseStatus!]
+  nin: [PurchaseStatus!]
+}
+
+input PurchaseStockRequestInput {
+  shareId: Long!
+  stockId: Long!
+  quantity: Int!
+}
+
+"A request to purge the history of a given stock."
+input PurgeStockRequestInput {
+  "The stock for which to purge history."
+  stockId: Long!
+  "A cutoff date.  Stock history entries older than this date will be purged."
+  date: DateTime!
+}
+
+input RateFilterInput {
+  and: [RateFilterInput!]
+  or: [RateFilterInput!]
+  value: ComparableDecimalOperationFilterInput
+  databaseValue: ComparableInt64OperationFilterInput
+}
+
+input RateSortInput {
+  value: SortEnumType
+  databaseValue: SortEnumType
+}
+
+input RefreshTokenFilterInput {
+  and: [RefreshTokenFilterInput!]
+  or: [RefreshTokenFilterInput!]
+  id: ComparableInt64OperationFilterInput
+  token: StringOperationFilterInput
+  created: ComparableDateTimeOperationFilterInput
+  expires: ComparableDateTimeOperationFilterInput
+  revoked: ComparableNullableOfDateTimeOperationFilterInput
+  isExpired: BooleanOperationFilterInput
+  createdByIpAddress: StringOperationFilterInput
+  revokedByIpAddress: StringOperationFilterInput
+  replacedByToken: StringOperationFilterInput
+  isActive: BooleanOperationFilterInput
+}
+
+input RoleFilterInput {
+  and: [RoleFilterInput!]
+  or: [RoleFilterInput!]
+  id: ComparableInt64OperationFilterInput
+  name: StringOperationFilterInput
+  description: StringOperationFilterInput
+  isBuiltIn: BooleanOperationFilterInput
+  rolePrivileges: ListFilterInputTypeOfRolePrivilegeFilterInput
+  dateCreated: ComparableDateTimeOperationFilterInput
+}
+
+input RolePrivilegeFilterInput {
+  and: [RolePrivilegeFilterInput!]
+  or: [RolePrivilegeFilterInput!]
+  roleId: ComparableInt64OperationFilterInput
+  privilegeId: ComparableInt64OperationFilterInput
+  role: RoleFilterInput
+  privilege: PrivilegeFilterInput
+}
+
+input RoleSortInput {
+  id: SortEnumType
+  name: SortEnumType
+  description: SortEnumType
+  isBuiltIn: SortEnumType
+  dateCreated: SortEnumType
+}
+
+input ShareFilterInput {
+  and: [ShareFilterInput!]
+  or: [ShareFilterInput!]
+  id: ComparableInt64OperationFilterInput
+  shareTypeId: ComparableInt64OperationFilterInput
+  studentId: ComparableInt64OperationFilterInput
+  shareType: ShareTypeFilterInput
+  student: StudentFilterInput
+  rawBalance: ComparableInt64OperationFilterInput
+  balance: MoneyFilterInput
+  rawDividendLastAmount: ComparableInt64OperationFilterInput
+  dividendLastAmount: MoneyFilterInput
+  rawTotalDividends: ComparableInt64OperationFilterInput
+  totalDividends: MoneyFilterInput
+  transactions: ListFilterInputTypeOfTransactionFilterInput
+  limitedWithdrawalCount: ComparableInt32OperationFilterInput
+  dateLastActive: ComparableDateTimeOperationFilterInput
+  dateDeleted: ComparableNullableOfDateTimeOperationFilterInput
+  dateCreated: ComparableDateTimeOperationFilterInput
+}
+
+input ShareSortInput {
+  id: SortEnumType
+  shareTypeId: SortEnumType
+  studentId: SortEnumType
+  shareType: ShareTypeSortInput
+  student: StudentSortInput
+  rawBalance: SortEnumType
+  balance: MoneySortInput
+  rawDividendLastAmount: SortEnumType
+  dividendLastAmount: MoneySortInput
+  rawTotalDividends: SortEnumType
+  totalDividends: MoneySortInput
+  limitedWithdrawalCount: SortEnumType
+  dateLastActive: SortEnumType
+  dateDeleted: SortEnumType
+  dateCreated: SortEnumType
+}
+
+input ShareTypeFilterInput {
+  and: [ShareTypeFilterInput!]
+  or: [ShareTypeFilterInput!]
+  id: ComparableInt64OperationFilterInput
+  name: StringOperationFilterInput
+  rawDividendRate: ComparableInt64OperationFilterInput
+  dividendRate: RateFilterInput
+  withdrawalLimitCount: ComparableInt32OperationFilterInput
+  withdrawalLimitPeriod: PeriodOperationFilterInput
+  withdrawalLimitShouldFee: BooleanOperationFilterInput
+  rawWithdrawalLimitFee: ComparableInt64OperationFilterInput
+  withdrawalLimitFee: MoneyFilterInput
+  shareTypeInstances: ListFilterInputTypeOfShareTypeInstanceFilterInput
+  shares: ListFilterInputTypeOfShareFilterInput
+  withdrawalLimitLastReset: ComparableDateTimeOperationFilterInput
+  dateDeleted: ComparableNullableOfDateTimeOperationFilterInput
+  dateCreated: ComparableDateTimeOperationFilterInput
+}
+
+input ShareTypeInstanceFilterInput {
+  and: [ShareTypeInstanceFilterInput!]
+  or: [ShareTypeInstanceFilterInput!]
+  shareTypeId: ComparableInt64OperationFilterInput
+  instanceId: ComparableInt64OperationFilterInput
+  shareType: ShareTypeFilterInput
+  instance: InstanceFilterInput
+}
+
+input ShareTypeSortInput {
+  id: SortEnumType
+  name: SortEnumType
+  rawDividendRate: SortEnumType
+  dividendRate: RateSortInput
+  withdrawalLimitCount: SortEnumType
+  withdrawalLimitPeriod: SortEnumType
+  withdrawalLimitShouldFee: SortEnumType
+  rawWithdrawalLimitFee: SortEnumType
+  withdrawalLimitFee: MoneySortInput
+  withdrawalLimitLastReset: SortEnumType
+  dateDeleted: SortEnumType
+  dateCreated: SortEnumType
+}
+
+input StockFilterInput {
+  and: [StockFilterInput!]
+  or: [StockFilterInput!]
+  id: ComparableInt64OperationFilterInput
+  symbol: StringOperationFilterInput
+  name: StringOperationFilterInput
+  rawDescription: StringOperationFilterInput
+  formattedDescription: StringOperationFilterInput
+  rawCurrentValue: ComparableInt64OperationFilterInput
+  currentValue: MoneyFilterInput
+  studentStock: ListFilterInputTypeOfStudentStockFilterInput
+  history: ListFilterInputTypeOfStockHistoryFilterInput
+  stockInstances: ListFilterInputTypeOfStockInstanceFilterInput
+  dateDeleted: ComparableNullableOfDateTimeOperationFilterInput
+  dateCreated: ComparableDateTimeOperationFilterInput
+}
+
+input StockHistoryFilterInput {
+  and: [StockHistoryFilterInput!]
+  or: [StockHistoryFilterInput!]
+  id: ComparableInt64OperationFilterInput
+  stockId: ComparableInt64OperationFilterInput
+  stock: StockFilterInput
+  rawValue: ComparableInt64OperationFilterInput
+  value: MoneyFilterInput
+  dateChanged: ComparableDateTimeOperationFilterInput
+}
+
+input StockHistorySortInput {
+  id: SortEnumType
+  stockId: SortEnumType
+  stock: StockSortInput
+  rawValue: SortEnumType
+  value: MoneySortInput
+  dateChanged: SortEnumType
+}
+
+input StockInstanceFilterInput {
+  and: [StockInstanceFilterInput!]
+  or: [StockInstanceFilterInput!]
+  instanceId: ComparableInt64OperationFilterInput
+  stockId: ComparableInt64OperationFilterInput
+  instance: InstanceFilterInput
+  stock: StockFilterInput
+}
+
+input StockSortInput {
+  id: SortEnumType
+  symbol: SortEnumType
+  name: SortEnumType
+  rawDescription: SortEnumType
+  formattedDescription: SortEnumType
+  rawCurrentValue: SortEnumType
+  currentValue: MoneySortInput
+  dateDeleted: SortEnumType
+  dateCreated: SortEnumType
+}
+
+input StringOperationFilterInput {
+  and: [StringOperationFilterInput!]
+  or: [StringOperationFilterInput!]
+  eq: String
+  neq: String
+  contains: String
+  ncontains: String
+  in: [String]
+  nin: [String]
+  startsWith: String
+  nstartsWith: String
+  endsWith: String
+  nendsWith: String
+  startsWithInvariant: String
+}
+
+input StudentFilterInput {
+  and: [StudentFilterInput!]
+  or: [StudentFilterInput!]
+  id: ComparableInt64OperationFilterInput
+  accountNumber: StringOperationFilterInput
+  email: StringOperationFilterInput
+  firstName: StringOperationFilterInput
+  lastName: StringOperationFilterInput
+  password: StringOperationFilterInput
+  groupId: ComparableInt64OperationFilterInput
+  group: GroupFilterInput
+  shares: ListFilterInputTypeOfShareFilterInput
+  refreshTokens: ListFilterInputTypeOfRefreshTokenFilterInput
+  purchases: ListFilterInputTypeOfStudentPurchaseFilterInput
+  dateLastLogin: ComparableNullableOfDateTimeOperationFilterInput
+  dateRegistered: ComparableNullableOfDateTimeOperationFilterInput
+  dateDeleted: ComparableNullableOfDateTimeOperationFilterInput
+  dateCreated: ComparableDateTimeOperationFilterInput
+}
+
+input StudentPreauthenticationRequestInput {
+  accountNumber: String!
+  inviteCode: String!
+}
+
+input StudentPurchaseFilterInput {
+  and: [StudentPurchaseFilterInput!]
+  or: [StudentPurchaseFilterInput!]
+  id: ComparableInt64OperationFilterInput
+  studentId: ComparableInt64OperationFilterInput
+  student: StudentFilterInput
+  rawTotalCost: ComparableInt64OperationFilterInput
+  totalCost: MoneyFilterInput
+  status: PurchaseStatusOperationFilterInput
+  items: ListFilterInputTypeOfStudentPurchaseItemFilterInput
+  dateCreated: ComparableDateTimeOperationFilterInput
+}
+
+input StudentPurchaseItemFilterInput {
+  and: [StudentPurchaseItemFilterInput!]
+  or: [StudentPurchaseItemFilterInput!]
+  id: ComparableInt64OperationFilterInput
+  studentPurchaseId: ComparableInt64OperationFilterInput
+  productId: ComparableInt64OperationFilterInput
+  studentPurchase: StudentPurchaseFilterInput
+  product: ProductFilterInput
+  quantity: ComparableInt32OperationFilterInput
+  rawPurchasePrice: ComparableInt64OperationFilterInput
+  purchasePrice: MoneyFilterInput
+}
+
+input StudentPurchaseSortInput {
+  id: SortEnumType
+  studentId: SortEnumType
+  student: StudentSortInput
+  rawTotalCost: SortEnumType
+  totalCost: MoneySortInput
+  status: SortEnumType
+  dateCreated: SortEnumType
+}
+
+input StudentRegisterRequestInput {
+  email: String!
+  password: String!
+}
+
+input StudentSortInput {
+  id: SortEnumType
+  accountNumber: SortEnumType
+  email: SortEnumType
+  firstName: SortEnumType
+  lastName: SortEnumType
+  password: SortEnumType
+  groupId: SortEnumType
+  group: GroupSortInput
+  dateLastLogin: SortEnumType
+  dateRegistered: SortEnumType
+  dateDeleted: SortEnumType
+  dateCreated: SortEnumType
+}
+
+input StudentStockFilterInput {
+  and: [StudentStockFilterInput!]
+  or: [StudentStockFilterInput!]
+  id: ComparableInt64OperationFilterInput
+  studentId: ComparableInt64OperationFilterInput
+  stockId: ComparableInt64OperationFilterInput
+  student: StudentFilterInput
+  stock: StockFilterInput
+  sharesOwned: ComparableInt64OperationFilterInput
+  rawNetContribution: ComparableInt64OperationFilterInput
+  netContribution: MoneyFilterInput
+  history: ListFilterInputTypeOfStudentStockHistoryFilterInput
+  dateLastActive: ComparableDateTimeOperationFilterInput
+  dateCreated: ComparableDateTimeOperationFilterInput
+}
+
+input StudentStockHistoryFilterInput {
+  and: [StudentStockHistoryFilterInput!]
+  or: [StudentStockHistoryFilterInput!]
+  id: ComparableInt64OperationFilterInput
+  studentStockId: ComparableInt64OperationFilterInput
+  transactionId: ComparableInt64OperationFilterInput
+  studentStock: StudentStockFilterInput
+  transaction: TransactionFilterInput
+  count: ComparableInt32OperationFilterInput
+  rawAmount: ComparableInt64OperationFilterInput
+  amount: MoneyFilterInput
+  datePosted: ComparableDateTimeOperationFilterInput
+}
+
+input StudentStockHistorySortInput {
+  id: SortEnumType
+  studentStockId: SortEnumType
+  transactionId: SortEnumType
+  studentStock: StudentStockSortInput
+  transaction: TransactionSortInput
+  count: SortEnumType
+  rawAmount: SortEnumType
+  amount: MoneySortInput
+  datePosted: SortEnumType
+}
+
+input StudentStockSortInput {
+  id: SortEnumType
+  studentId: SortEnumType
+  stockId: SortEnumType
+  student: StudentSortInput
+  stock: StockSortInput
+  sharesOwned: SortEnumType
+  rawNetContribution: SortEnumType
+  netContribution: MoneySortInput
+  dateLastActive: SortEnumType
+  dateCreated: SortEnumType
+}
+
+input TransactionFilterInput {
+  and: [TransactionFilterInput!]
+  or: [TransactionFilterInput!]
+  id: ComparableInt64OperationFilterInput
+  targetShareId: ComparableInt64OperationFilterInput
+  transactionType: StringOperationFilterInput
+  targetShare: ShareFilterInput
+  comment: StringOperationFilterInput
+  rawAmount: ComparableInt64OperationFilterInput
+  amount: MoneyFilterInput
+  rawNewBalance: ComparableInt64OperationFilterInput
+  newBalance: MoneyFilterInput
+  effectiveDate: ComparableDateTimeOperationFilterInput
+}
+
+input TransactionRequestInput {
+  shareId: Long!
+  amount: Money!
+  comment: String
+  type: String
+  effectiveDate: DateTime
+  takeNegative: Boolean
+  withdrawalLimit: Boolean
+}
+
+input TransactionSortInput {
+  id: SortEnumType
+  targetShareId: SortEnumType
+  transactionType: SortEnumType
+  targetShare: ShareSortInput
+  comment: SortEnumType
+  rawAmount: SortEnumType
+  amount: MoneySortInput
+  rawNewBalance: SortEnumType
+  newBalance: MoneySortInput
+  effectiveDate: SortEnumType
+}
+
+"Request data to update a group."
+input UpdateGroupRequestInput {
+  "Get or set the ID number of the group."
+  id: Long!
+  "Get or set the name of the group."
+  name: String
+  "Get or set the Instance ID of the group."
+  instanceId: Long
+}
+
+input UpdateInstanceRequestInput {
+  "Get or set the ID number of the instance."
+  id: Long!
+  "Get or set the description of the instance."
+  description: String
+  "Get or set if the instance is active."
+  isActive: Boolean
+}
+
+input UpdateProductRequestInput {
+  id: Long!
+  name: String
+  description: String
+  cost: Money
+  isLimitedQuantity: Boolean
+  quantity: Int
+}
+
+input UpdateShareRequestInput {
+  id: Long!
+  shareTypeId: Long!
+}
+
+"Request data to update a Share Type."
+input UpdateShareTypeRequestInput {
+  "Get or set the ID number of the share type."
+  id: Long!
+  "Get or set the name of the share type."
+  name: String
+  "Get or set the dividend rate."
+  dividendRate: Rate
+  "Get or set the number of withdrawals allowed per period.  Use zero to disable."
+  withdrawalLimitCount: Int
+  "Get or set the withdrawal limit period to use when resetting the withdrawal limit counters."
+  withdrawalLimitPeriod: Period
+  "Get or set if withdrawals over the WithdrawalLimitCount should fee instead of being declined."
+  withdrawalLimitShouldFee: Boolean
+  "Get or set the amount to fee if WithdrawalLimitShouldFee is true."
+  withdrawalLimitFee: Money
+}
+
+input UpdateStockRequestInput {
+  "The ID number of the stock"
+  id: Long!
+  "Unique symbol of the stock."
+  symbol: String
+  "Name of the company"
+  name: String
+  "Description of the stock."
+  rawDescription: String
+  "The current value of the stock."
+  currentValue: Money
+}
+
+"Data fields to update a student."
+input UpdateStudentRequestInput {
+  "Get or set the student ID. Required when updating students."
+  id: Long!
+  "Get or set the student's first name."
+  firstName: String
+  "Get or set the student's last name."
+  lastName: String
+  "Get or set the student's account number."
+  accountNumber: String
+  "Get or set the student's email address."
+  email: String
+  "Get or set the student's password."
+  password: String
+  "Get or set the student's current password."
+  currentPassword: String
+  "Get or set the student's group ID."
+  groupId: Long
+}
+
+"Data fields to update a user."
+input UpdateUserRequestInput {
+  "Get or set the user's ID."
+  id: Long!
+  "Get or set the user's email address."
+  email: String
+  "Get or set the user's password."
+  password: String
+  "If a password change is requested, then this field must be set to the user's current password."
+  currentPassword: String
+  "Get or set the user's role."
+  roleId: Long
+}
+
+input UserFilterInput {
+  and: [UserFilterInput!]
+  or: [UserFilterInput!]
+  id: ComparableInt64OperationFilterInput
+  roleId: ComparableInt64OperationFilterInput
+  email: StringOperationFilterInput
+  role: RoleFilterInput
+  password: StringOperationFilterInput
+  refreshTokens: ListFilterInputTypeOfRefreshTokenFilterInput
+  dateLastLogin: ComparableNullableOfDateTimeOperationFilterInput
+  dateRegistered: ComparableNullableOfDateTimeOperationFilterInput
+  dateDeleted: ComparableNullableOfDateTimeOperationFilterInput
+  dateCreated: ComparableDateTimeOperationFilterInput
+}
+
+input UserSortInput {
+  id: SortEnumType
+  roleId: SortEnumType
+  email: SortEnumType
+  role: RoleSortInput
+  password: SortEnumType
+  dateLastLogin: SortEnumType
+  dateRegistered: SortEnumType
+  dateDeleted: SortEnumType
+  dateCreated: SortEnumType
+}
+
+enum ApplyPolicy {
+  BEFORE_RESOLVER
+  AFTER_RESOLVER
+}
+
+enum Period {
+  DAILY
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  ANNUALLY
+}
+
+enum PurchaseStatus {
+  PLACED
+  IN_PROGRESS
+  COMPLETE
+  CANCELLED
+}
+
+enum SortEnumType {
+  ASC
+  DESC
+}
+
+directive @authorize("The name of the authorization policy that determines access to the annotated resource." policy: String "Roles that are allowed to access the annotated resource." roles: [String!] "Defines when when the resolver shall be executed.By default the resolver is executed after the policy has determined that the current user is allowed to access the field." apply: ApplyPolicy! = BEFORE_RESOLVER) repeatable on SCHEMA | OBJECT | FIELD_DEFINITION
+
+"The `@defer` directive may be provided for fragment spreads and inline fragments to inform the executor to delay the execution of the current fragment to indicate deprioritization of the current fragment. A query with `@defer` directive will cause the request to potentially return multiple responses, where non-deferred data is delivered in the initial response and data deferred is delivered in a subsequent response. `@include` and `@skip` take precedence over `@defer`."
+directive @defer("If this argument label has a value other than null, it will be passed on to the result of this defer directive. This label is intended to give client applications a way to identify to which fragment a deferred result belongs to." label: String "Deferred when true." if: Boolean) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"The `@specifiedBy` directive is used within the type system definition language to provide a URL for specifying the behavior of custom scalar definitions."
+directive @specifiedBy("The specifiedBy URL points to a human-readable specification. This field will only read a result for scalar types." url: String!) on SCALAR
+
+"The `@stream` directive may be provided for a field of `List` type so that the backend can leverage technology such as asynchronous iterators to provide a partial list in the initial response, and additional list items in subsequent responses. `@include` and `@skip` take precedence over `@stream`."
+directive @stream("If this argument label has a value other than null, it will be passed on to the result of this stream directive. This label is intended to give client applications a way to identify to which fragment a streamed result belongs to." label: String "The initial elements that shall be send down to the consumer." initialCount: Int! = 0 "Streamed when true." if: Boolean) on FIELD
+
+"The `DateTime` scalar represents an ISO-8601 compliant date time type."
+scalar DateTime @specifiedBy(url: "https:\/\/www.graphql-scalars.com\/date-time")
+
+"The built-in `Decimal` scalar type."
+scalar Decimal
+
+"The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
+scalar Long
+
+"US Currency as a float (preferred) or string without the dollar symbol. E.g 10.33 is $10.33."
+scalar Money
+
+"API\/Interest Rate represented as a float.  E.g. 0.02 is 0.02%"
+scalar Rate

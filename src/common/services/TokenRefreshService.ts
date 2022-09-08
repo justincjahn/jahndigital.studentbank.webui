@@ -1,4 +1,10 @@
-import { ApolloLink, Observable, Operation, NextLink, FetchResult } from '@apollo/client/core';
+import {
+  ApolloLink,
+  Observable,
+  Operation,
+  NextLink,
+  FetchResult,
+} from '@apollo/client/core';
 
 import { API_ENDPOINT } from '@/common/constants';
 import userStore from '@/common/stores/user';
@@ -23,8 +29,8 @@ interface QueuedRequest extends Subscriber {
 }
 
 /**
- * Prior to sending a request to the GraphQL server, this link will determine if the user's JWT token
- * needs to be refreshed, and does so.
+ * Prior to sending a request to the GraphQL server, this link will determine
+ * if the user's JWT token needs to be refreshed, and does so.
  */
 export default class TokenRefreshService extends ApolloLink {
   // List of queued requests that need to be run after the token is fetched
@@ -61,7 +67,6 @@ export default class TokenRefreshService extends ApolloLink {
     `;
 
     let operation = 'userRefreshToken';
-
     if (userStore.isStudent.value) {
       body = `
         mutation studentRefreshToken {
@@ -76,17 +81,12 @@ export default class TokenRefreshService extends ApolloLink {
 
     const res = await fetch(API_ENDPOINT, {
       method: 'POST',
-
       credentials: 'include',
-
       cache: 'no-cache',
-
       mode: 'cors',
-
       headers: {
         'Content-Type': 'application/json',
       },
-
       body: JSON.stringify({
         operationName: operation,
         query: body,
@@ -97,7 +97,8 @@ export default class TokenRefreshService extends ApolloLink {
     const resJson = await res.json();
     if (!resJson.data) throw new Error('No data returned by server.');
 
-    const data = resJson.data.userRefreshToken || resJson.data.studentRefreshToken || null;
+    const data =
+      resJson.data.userRefreshToken || resJson.data.studentRefreshToken || null;
     if (!data || !data.jwtToken) throw new Error('No token found in response.');
 
     return data.jwtToken;
@@ -110,7 +111,10 @@ export default class TokenRefreshService extends ApolloLink {
    * @param forward
    * @returns
    */
-  public request(operation: Operation, forward: NextLink): Observable<FetchResult> | null {
+  public request(
+    operation: Operation,
+    forward: NextLink
+  ): Observable<FetchResult> | null {
     if (typeof forward !== 'function')
       throw new Error('Token Refresh Service is terminating link.');
     if (TokenRefreshService.isValid()) return forward(operation);
@@ -153,7 +157,8 @@ export default class TokenRefreshService extends ApolloLink {
         req.subscriber = req.subscriber || {};
         req.subscriber.next = req.next || observer.next.bind(observer);
         req.subscriber.error = req.error || observer.error.bind(observer);
-        req.subscriber.complete = req.complete || observer.complete.bind(observer);
+        req.subscriber.complete =
+          req.complete || observer.complete.bind(observer);
       });
     }
 

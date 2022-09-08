@@ -5,10 +5,10 @@ query studentStockHistory(
   $studentStockId: Long!,
   $first: Int = 25,
   $after: String,
-  $order: StudentSortInput! = { datePosted: DESC }
+  $order: StudentStockHistorySortInput! = { datePosted: DESC }
 ) {
   studentStockHistory(
-    instances: $instances,
+    studentStockId: $studentStockId,
     first: $first,
     after: $after,
     order: [$order]
