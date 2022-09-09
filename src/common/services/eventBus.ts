@@ -78,7 +78,7 @@ export function subscribe<TEvent extends EventInfo>(
  */
 export function publish<TEvent extends EventInfo>(
   event: TEvent,
-  payload: TEvent['payload']
+  payload: TEvent['payload'] = undefined
 ): void {
   if (!subscriptions[event.name]) return;
   Object.values(subscriptions[event.name]).forEach((visitor) =>

@@ -1,40 +1,57 @@
-import type { UserInfo } from '@/common/types/UserInfo';
-import type { StudentInfo } from '@/common/types/StudentInfo';
+import type {
+  CurrentUserQuery,
+  CurrentStudentQuery,
+} from '@/generated/graphql';
 
-import { reactive, computed } from 'vue';
-import { PERSIST_TOKEN } from '@/common/constants';
+import { reactive, computed, watch } from 'vue';
+
+// Stores
+import tokenStore from '@/common/stores/token';
+
+// Services
+import {
+  userInfo,
+  studentInfo,
+  userLogin,
+  studentLogin,
+  userLogout,
+  studentLogout,
+} from '@/common/services/auth';
 
 // Utils
 import parseJwt from '@/common/utils/parseJwt';
 
-/**
- * Data stored in localstorage.
- */
-interface PersistedData {
-  // Is student?
-  iss: boolean;
+import { publish } from '@/common/services/eventBus';
 
-  // Is preauthenticated?
-  pre: boolean;
-}
+import {
+  userLogin as evtLogin,
+  userLogout as evtLogout,
+} from '@/common/events';
+
+import { ERROR_CODES } from '../constants';
+
+/**
+ * Information obtained from the GQL endpoint pertaining to the current student.
+ */
+export type StudentInfo = CurrentStudentQuery['currentStudent'][0];
+
+/**
+ * Information obtained from the GQL endpoint pertaining to the current user.
+ */
+export type UserInfo = CurrentUserQuery['currentUser'][0];
 
 /**
  * Stores information about users in the system.  The auth service and Apollo will
  * push new JWT tokens to this store periodically as they expire, or as users login
  * and logoff.
  */
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup() {
   const store = reactive({
     loading: false,
     id: -1,
     username: '',
     email: '',
-    token: null as string | null,
     expiration: null as number | null,
-    hydrated: false,
-    isStudent: false,
-    isPreauthorized: false,
     info: null as UserInfo | StudentInfo | null,
   });
 
@@ -49,7 +66,7 @@ export function setup() {
     if (store.username.length > 0) return store.username;
     if (store.info === null) return '';
 
-    if (store.isStudent) {
+    if (tokenStore.isStudent) {
       return (store.info as StudentInfo).accountNumber;
     }
 
@@ -59,140 +76,145 @@ export function setup() {
   // GETs the email of the user or student
   const email = computed(() => store.email || (store.info?.email ?? ''));
 
-  // GETs the JWT token of the session
-  const jwtToken = computed(() => store.token);
-
   // GETs the expiration timestamp of the token
   const tokenExpiration = computed(() => (store.expiration ?? 0) * 1000);
-
-  // True if the user is a student
-  const isStudent = computed(() => store.isStudent);
-
-  // True if the token is for preauthentication
-  const isPreauthorized = computed(() => store.isPreauthorized);
-
-  // True if the current user is anonymous and hasn't logged in before
-  const isAnonymous = computed(
-    () => store.id === -1 && store.hydrated === false
-  );
-
-  // True if the user is authenticated
-  const isAuthenticated = computed(
-    () => store.token !== null || store.hydrated
-  );
 
   // True if the user info has been provided by the auth service
   const hasInfo = computed(() => store.info !== null);
 
-  /**
-   * Clear data from local storage to fully log users out.
-   */
-  function clear() {
-    localStorage.removeItem(PERSIST_TOKEN);
-  }
+  // True if the use has not logged in before
+  const isAnonymous = computed(() => tokenStore.isAnonymous.value);
+
+  // True if the user is authenticated or has logged in before and may have a valid refresh token
+  const isAuthenticated = computed(() => tokenStore.isAuthenticated.value);
+
+  // True if the user is preauthorized for registration
+  const isPreauthorized = computed(() => tokenStore.isPreauthorized.value);
+
+  // True if the user is a student
+  const isStudent = computed(() => tokenStore.isStudent.value);
 
   /**
-   * Persist data to local storage for subsequent page reloads.
+   * Get user information from the API.
    */
-  function persist() {
-    const data: PersistedData = {
-      iss: store.isStudent,
-      pre: store.isPreauthorized,
-    };
+  async function getInfo() {
+    if (tokenStore.state.value === null) return;
+    if (tokenStore.isPreauthorized.value) return;
 
-    localStorage.setItem(PERSIST_TOKEN, JSON.stringify(data));
-  }
+    store.loading = true;
 
-  /**
-   * Attempt to hydrate stored data from local storage.
-   */
-  function hydrate() {
-    const data = localStorage.getItem(PERSIST_TOKEN);
-    if (!data) return;
+    try {
+      const info = tokenStore.isStudent.value
+        ? await studentInfo()
+        : await userInfo();
 
-    const userInfo: PersistedData | undefined = JSON.parse(data);
-    if (!userInfo) return;
+      store.info = info;
+      store.email = info?.email ?? '';
+      store.id = info.id;
+      store.username = (info as StudentInfo)?.accountNumber ?? info.id;
 
-    store.hydrated = true;
-    if (userInfo.iss) {
-      store.isStudent = true;
+      publish(evtLogin, info);
+    } catch (e: unknown) {
+      if (!(e instanceof Error)) return;
+      if (e.message === ERROR_CODES.NOT_AUTHORIZED) return;
+      throw e;
+    } finally {
+      store.loading = false;
     }
+  }
 
-    if (userInfo.pre) {
-      store.isPreauthorized = true;
+  /**
+   * Log a user or student in.
+   *
+   * @param username
+   * @param password
+   * @param student True if the user is attempting to login as a student.
+   */
+  async function login(user: string, password: string, student = false) {
+    store.loading = true;
+
+    try {
+      const data = student
+        ? await studentLogin({ username: user, password })
+        : await userLogin({ username: user, password });
+
+      if (data === null) {
+        throw new Error(ERROR_CODES.NOT_AUTHORIZED);
+      }
+
+      tokenStore.token.value = data;
+    } finally {
+      store.loading = false;
     }
   }
 
   /**
-   * Set the loading state of the store.
-   *
-   * @param s
+   * Log a user or student out.
    */
-  function setLoading(s = false) {
-    store.loading = s;
+  async function logout() {
+    store.loading = true;
+
+    try {
+      if (tokenStore.isStudent.value) {
+        await studentLogout();
+      } else {
+        await userLogout();
+      }
+    } finally {
+      store.loading = false;
+      tokenStore.token.value = null;
+      publish(evtLogout);
+    }
   }
 
-  /**
-   * Set the JWT token.
-   *
-   * @param token
-   */
-  function setToken(token: string | null) {
-    store.token = token;
+  // Update the data in the store when the JWT token changes
+  watch(tokenStore.token, (newValue, oldValue) => {
+    if (newValue === oldValue) return;
 
-    if (token === null) {
+    if (newValue === null) {
       store.id = -1;
       store.username = '';
       store.email = '';
-      store.isStudent = false;
-      store.isPreauthorized = false;
       store.expiration = null;
-      store.hydrated = false;
       store.info = null;
-      clear();
       return;
     }
 
-    const data = parseJwt(token);
+    const data = parseJwt(newValue);
     store.id = +data.nameid;
     store.username = data.unique_name;
     store.email = data.email;
-    store.isStudent = data.utyp === 'student';
-    store.isPreauthorized = (data?.pre ?? 'N') !== 'N';
     store.expiration = data.exp;
     store.info = null;
-    persist();
-  }
+  });
 
-  /**
-   * Set user information from a {UserInfo} or {StudentInfo} object.
-   *
-   * @param info
-   */
-  function setInfo(info: UserInfo | StudentInfo) {
-    store.info = info;
-    store.email = info.email;
-    store.id = info.id;
-    store.username = (info as StudentInfo)?.accountNumber ?? info.id;
-  }
+  // Get info from the API when the token is hydrated
+  watch(
+    tokenStore.state,
 
-  hydrate();
+    (newValue, oldValue) => {
+      if (newValue === oldValue) return;
+      getInfo();
+    },
+
+    {
+      immediate: true,
+    }
+  );
 
   return {
     loading,
     id,
     username,
     email,
-    jwtToken,
     tokenExpiration,
-    isStudent,
-    isPreauthorized,
+    hasInfo,
     isAnonymous,
     isAuthenticated,
-    hasInfo,
-    setLoading,
-    setToken,
-    setInfo,
+    isPreauthorized,
+    isStudent,
+    login,
+    logout,
   };
 }
 

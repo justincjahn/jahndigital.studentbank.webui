@@ -10,57 +10,14 @@ import {
   QueryOptions,
 } from '@apollo/client/core';
 
-import { onError } from '@apollo/client/link/error';
 import { setContext } from '@apollo/client/link/context';
 import { ERROR_CODES, API_ENDPOINT } from '@/common/constants';
 
-// Stores
-import userStore from '@/common/stores/user';
+// Composables
+import tokenStore from '@/common/stores/token';
 
 // Services
 import TokenRefreshService from './TokenRefreshService';
-
-/**
- * Extra logging for failed requests.
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const errorLink = onError(({ networkError, graphQLErrors }: any) => {
-  if (networkError) {
-    console.error(`[Network error]: ${networkError}`);
-
-    if (networkError.statusCode === 500) {
-      console.error('Internal Server Error');
-    }
-  }
-
-  if (graphQLErrors) {
-    let code = '';
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    graphQLErrors.map((request: any): void => {
-      const { message, locations, path, extensions } = request;
-
-      if (extensions && typeof extensions.code !== 'undefined') {
-        code = extensions.code;
-      }
-
-      return console.error(
-        `[GraphQL error]: Message: ${message ?? 'unknown error'}, Path: ${
-          path ?? 'N/A'
-        }, Code: ${extensions?.code ?? 'N/A'}`,
-        locations
-      );
-    });
-
-    if (code === ERROR_CODES.NOT_AUTHORIZED) {
-      console.log('Unauthorized');
-    }
-
-    if (code === ERROR_CODES.NOT_AUTHENTICATED) {
-      console.log('Not logged in.');
-    }
-  }
-});
 
 /**
  * Inject authentication headers into every query sent to the server.
@@ -68,8 +25,8 @@ const errorLink = onError(({ networkError, graphQLErrors }: any) => {
 const authLink = setContext((_, { headers }) => ({
   headers: {
     ...headers,
-    Authorization: userStore.jwtToken.value
-      ? `Bearer ${userStore.jwtToken.value}`
+    Authorization: tokenStore.token.value
+      ? `Bearer ${tokenStore.token.value}`
       : '',
   },
 }));
@@ -89,12 +46,7 @@ const httpLink = createHttpLink({
  */
 const defaultClient = new ApolloClient({
   // @note Ordering is important here
-  link: ApolloLink.from([
-    errorLink,
-    new TokenRefreshService(),
-    authLink,
-    httpLink,
-  ]),
+  link: ApolloLink.from([new TokenRefreshService(), authLink, httpLink]),
   cache: new InMemoryCache(),
 });
 
@@ -115,8 +67,9 @@ export async function query<TReturn, TOptions = OperationVariables>(
     variables,
     fetchPolicy,
   });
-  if (res.data) return Promise.resolve(res.data);
-  return Promise.reject(new Error('An unknown error has occurred.'));
+
+  if (res.data) return res.data;
+  throw new Error(ERROR_CODES.UNKNOWN_ERROR);
 }
 
 /**
@@ -129,8 +82,8 @@ export async function mutateCustom<TReturn, TVariables = OperationVariables>(
   options: MutationOptions<TReturn, TVariables>
 ): Promise<TReturn> {
   const res = await defaultClient.mutate<TReturn, TVariables>(options);
-  if (res.data) return Promise.resolve(res.data);
-  return Promise.reject(new Error('An unknown error has occurred.'));
+  if (res.data) return res.data;
+  throw new Error(ERROR_CODES.UNKNOWN_ERROR);
 }
 
 /**

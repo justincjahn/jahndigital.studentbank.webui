@@ -1,7 +1,8 @@
+import type { UserInfo, StudentInfo } from '@/common/stores/user';
 import { create } from '@/common/services/eventBus';
-import { UserInfo } from '@/common/types/UserInfo';
-import { StudentInfo } from '@/common/types/StudentInfo';
 
+// Fired when a user logs in to the application successfully
 export const userLogin = create<UserInfo | StudentInfo>('user-login');
 
+// Fired when a user logs out of the application
 export const userLogout = create('user-logout');

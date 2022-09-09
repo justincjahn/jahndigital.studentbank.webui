@@ -6,8 +6,8 @@ import {
   FetchResult,
 } from '@apollo/client/core';
 
-import { API_ENDPOINT } from '@/common/constants';
-import userStore from '@/common/stores/user';
+import { API_ENDPOINT, ERROR_CODES } from '@/common/constants';
+import tokenStore from '@/common/stores/token';
 
 /**
  * Subscriber of Apollo
@@ -28,6 +28,19 @@ interface QueuedRequest extends Subscriber {
   observable?: Observable<FetchResult>;
 }
 
+interface GraphQLErrorExtension {
+  code: string;
+}
+
+interface GraphQLError {
+  extensions?: GraphQLErrorExtension;
+  message: string;
+}
+
+interface GraphQLErrors {
+  errors: GraphQLError[];
+}
+
 /**
  * Prior to sending a request to the GraphQL server, this link will determine
  * if the user's JWT token needs to be refreshed, and does so.
@@ -45,10 +58,17 @@ export default class TokenRefreshService extends ApolloLink {
    * @returns True if the token is valid for fetching data from the server.
    */
   static isValid(): boolean {
-    if (userStore.isAnonymous.value) return true;
-    if (!userStore.isAuthenticated.value) return false;
-    if (userStore.tokenExpiration.value < Date.now()) return false;
+    if (tokenStore.isAnonymous.value) return true;
+    if (!tokenStore.isAuthenticated.value) return false;
+    if (tokenStore.expiration.value < Date.now()) return false;
     return true;
+  }
+
+  static getErrorCodes(res: GraphQLErrors): string[] {
+    if (!res.errors) return [];
+    return res.errors.map(
+      (x) => x?.extensions?.code ?? ERROR_CODES.UNKNOWN_ERROR
+    );
   }
 
   /**
@@ -67,7 +87,7 @@ export default class TokenRefreshService extends ApolloLink {
     `;
 
     let operation = 'userRefreshToken';
-    if (userStore.isStudent.value) {
+    if (tokenStore.isStudent.value) {
       body = `
         mutation studentRefreshToken {
           studentRefreshToken {
@@ -95,11 +115,20 @@ export default class TokenRefreshService extends ApolloLink {
     });
 
     const resJson = await res.json();
-    if (!resJson.data) throw new Error('No data returned by server.');
+    const errors = this.getErrorCodes(resJson);
+
+    if (errors.includes(ERROR_CODES.INVALID_REFRESH_TOKEN)) {
+      throw new Error(ERROR_CODES.INVALID_REFRESH_TOKEN);
+    } else if (errors.length > 0 || !resJson.data) {
+      throw new Error(errors[0]);
+    }
 
     const data =
       resJson.data.userRefreshToken || resJson.data.studentRefreshToken || null;
-    if (!data || !data.jwtToken) throw new Error('No token found in response.');
+
+    if (!data || !data.jwtToken) {
+      throw new Error(ERROR_CODES.INVALID_REFRESH_TOKEN);
+    }
 
     return data.jwtToken;
   }
@@ -126,12 +155,18 @@ export default class TokenRefreshService extends ApolloLink {
 
       TokenRefreshService.fetchRefreshToken()
         .then((token) => {
-          userStore.setToken(token);
+          tokenStore.token.value = token;
         })
-        .catch((e) => {
-          console.warn('Your refresh token is invalid.  Please login again.');
-          console.error(e);
-          userStore.setToken(null);
+        .catch((e: unknown) => {
+          tokenStore.token.value = null;
+
+          if (!(e instanceof Error)) return;
+          if (e.message !== ERROR_CODES.INVALID_REFRESH_TOKEN) {
+            console.error(
+              'An unknown error occurred during token refresh.',
+              e.message
+            );
+          }
         })
         .finally(() => {
           this.fetching = false;

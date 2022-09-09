@@ -1,20 +1,22 @@
 // The endpoint URL for the API
-export const API_ENDPOINT: string = import.meta.env.VITE_APP_API_URL || '/graphql';
-
-console.warn(import.meta.env.VITE_APP_API_URL);
+export const API_ENDPOINT: string =
+  import.meta.env.VITE_APP_API_URL || '/graphql';
 
 // Maximum number of mutations to run at once
-export const API_MAX_CONCURRENCY: number = import.meta.env.VITE_APP_API_MAX_CONCURRENCY || 5;
+export const API_MAX_CONCURRENCY: number =
+  import.meta.env.VITE_APP_API_MAX_CONCURRENCY || 5;
 
 // The name of the site.
 // NOTE: The default for this variable is defined in the vue.config.js file.
 export const SITE_NAME: string = import.meta.env.VITE_APP_SITE_NAME || 'ERROR';
 
 // Hide the site name from the header if true
-export const SITE_DISABLE_NAME: boolean = (import.meta.env?.VITE_APP_SITE_DISABLE_NAME ?? 'false') === 'true';
+export const SITE_DISABLE_NAME: boolean =
+  (import.meta.env?.VITE_APP_SITE_DISABLE_NAME ?? 'false') === 'true';
 
 // The URL of an image to use as the site's header logo.
-export const SITE_LOGO: string | null = import.meta.env.VITE_APP_SITE_LOGO || null;
+export const SITE_LOGO: string | null =
+  import.meta.env.VITE_APP_SITE_LOGO || null;
 
 // The import URL for the theme file containing variables for SCSS
 // NOTE: The default for this variable is defined in the vue.config.js file.
@@ -47,6 +49,8 @@ export const ERROR_CODES = {
   NOT_AUTHORIZED: 'AUTH_NOT_AUTHORIZED',
   NOT_FOUND: 'ERROR_NOT_FOUND',
   QUERY_FAILED: 'ERROR_QUERY_FAILED',
+  INVALID_REFRESH_TOKEN: 'INVALID_REFRESH_TOKEN',
+  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
 };
 
 export const FETCH_OPTIONS = {

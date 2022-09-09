@@ -8,10 +8,13 @@
     "vue"
   ],
   "cSpell.words": [
+    "certgen",
     "composables",
     "Denormalize",
     "localstorage",
+    "nameid",
     "Preauthorized",
+    "utyp",
     "VITE"
   ],
   "typescript.tsdk": "node_modules/typescript/lib"

@@ -1,10 +1,12 @@
 <script lang="ts" setup>
-import { query } from '@/common/services/apollo.ts';
-import test from '@/common/graphql/queries/currentUser.gql';
+import userStore from '@/common/stores/user';
 
-query(test);
+// setTimeout(() => userStore.login('admin@domain.tld', 'admin'), 3000);
+// userStore.logout();
 </script>
 
 <template>
   <h1>Vue App!</h1>
+  <p v-if="userStore.tokenStore.isAnonymous.value">Not Logged In</p>
+  <p v-else>{{ userStore.email.value }}</p>
 </template>
