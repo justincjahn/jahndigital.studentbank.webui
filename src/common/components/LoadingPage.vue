@@ -1,0 +1,56 @@
+<script lang="ts" setup>
+import DollarIcon from '@/common/components/DollarIcon.vue';
+
+withDefaults(
+  defineProps<{
+    overlay?: boolean;
+  }>(),
+  {
+    overlay: false,
+  }
+);
+</script>
+
+<template>
+  <teleport to="#modal">
+    <div :class="{ 'loading-overlay': overlay, 'loading-inline': !overlay }">
+      <div class="loading-overlay__container">
+        <dollar-icon class="loading-overlay__container__icon" />
+        <p>Loading...</p>
+      </div>
+    </div>
+  </teleport>
+</template>
+
+<style>
+.loading-overlay,
+.loading-inline {
+  overflow: hidden;
+  text-align: center;
+  user-select: none;
+  font-size: 4rem;
+}
+
+.loading-overlay {
+  position: fixed;
+  z-index: 800; /* Important: don't set larger than the lowest modal at 900. */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--primary-bg-color);
+}
+
+.loading-overlay .loading-overlay__container {
+  margin: auto;
+  text-align: center;
+}
+
+.loading-overlay .loading-overlay__container__icon {
+  font-size: 3em;
+}
+
+.loading-inline .loading-overlay__container__icon {
+  font-size: 2em;
+}
+</style>

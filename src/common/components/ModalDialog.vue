@@ -1,5 +1,5 @@
 <template>
-  <Teleport to="#modal">
+  <teleport to="#modal">
     <div
       ref="root"
       class="modal"
@@ -58,7 +58,7 @@
         </div>
       </div>
     </div>
-  </Teleport>
+  </teleport>
 </template>
 
 <script lang="ts">
@@ -145,7 +145,7 @@ export default defineComponent({
       100
     );
 
-    // Watch for Escape and Enter keypresses and call the appropriate handler.
+    // Watch for Escape and Enter key-presses and call the appropriate handler.
     function handleKeyPress(e: KeyboardEvent) {
       // Ignore keypress if we're not the top modal
       if (root.value === null || modalStore.topmost.value !== root.value) {
@@ -211,8 +211,8 @@ export default defineComponent({
     const modalStyle = computed(() => ({
       zIndex:
         root.value !== null && modalStore.topmost.value === root.value
-          ? 100
-          : 50,
+          ? 1000
+          : 900,
     }));
 
     return {
@@ -230,7 +230,6 @@ export default defineComponent({
 <style>
 .modal {
   position: fixed;
-  z-index: 500;
   left: 0;
   top: 0;
   width: 100%;
@@ -254,7 +253,7 @@ export default defineComponent({
 }
 
 .modal .modal__container {
-  background-color: var(--main-bg-color);
+  background-color: hsl(var(--primary-bg-color));
 }
 
 @media screen and (min-width: 700px) {
@@ -281,8 +280,8 @@ export default defineComponent({
 }
 
 .modal .modal__container__title {
-  background-color: var(--main-bg-color);
-  border-bottom: 1px solid var(--main-bg-color-dark2);
+  background-color: hsl(var(--primary-bg-color));
+  border-bottom: 1px solid hsl(var(--primary-bg-color-dark2));
 
   @media screen and (min-width: 700px) and (min-height: 400px) {
     border-radius: 0.25rem 0.25rem 0 0;

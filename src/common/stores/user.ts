@@ -9,26 +9,18 @@ import { reactive, computed, watch } from 'vue';
 import tokenStore from '@/common/stores/token';
 
 // Services
-import {
-  userInfo,
-  studentInfo,
-  userLogin,
-  studentLogin,
-  userLogout,
-  studentLogout,
-} from '@/common/services/auth';
+import { publish } from '@/common/services/eventBus';
 
 // Utils
 import parseJwt from '@/common/utils/parseJwt';
 
-import { publish } from '@/common/services/eventBus';
-
+// Common
 import {
   userLogin as evtLogin,
   userLogout as evtLogout,
 } from '@/common/events';
 
-import { ERROR_CODES } from '../constants';
+import { ERROR_CODES } from '@/common/constants';
 
 /**
  * Information obtained from the GQL endpoint pertaining to the current student.
@@ -41,9 +33,8 @@ export type StudentInfo = CurrentStudentQuery['currentStudent'][0];
 export type UserInfo = CurrentUserQuery['currentUser'][0];
 
 /**
- * Stores information about users in the system.  The auth service and Apollo will
- * push new JWT tokens to this store periodically as they expire, or as users login
- * and logoff.
+ * Stores information about the currently logged in user. Relies on the token service to know
+ * the user's login state.
  */
 export function setup() {
   const store = reactive({
@@ -51,17 +42,16 @@ export function setup() {
     id: -1,
     username: '',
     email: '',
-    expiration: null as number | null,
     info: null as UserInfo | StudentInfo | null,
   });
 
-  // GETs the loading state of the fetch
+  // Gets the loading state of the fetch
   const loading = computed(() => store.loading);
 
-  // GETs the ID number of the user
+  // Gets the ID number of the user
   const id = computed(() => store.id);
 
-  // GETs the username of the user
+  // Gets the username of the user
   const username = computed(() => {
     if (store.username.length > 0) return store.username;
     if (store.info === null) return '';
@@ -73,11 +63,8 @@ export function setup() {
     return (store.info as UserInfo).email;
   });
 
-  // GETs the email of the user or student
+  // Gets the email of the user or student
   const email = computed(() => store.email || (store.info?.email ?? ''));
-
-  // GETs the expiration timestamp of the token
-  const tokenExpiration = computed(() => (store.expiration ?? 0) * 1000);
 
   // True if the user info has been provided by the auth service
   const hasInfo = computed(() => store.info !== null);
@@ -94,8 +81,11 @@ export function setup() {
   // True if the user is a student
   const isStudent = computed(() => tokenStore.isStudent.value);
 
+  // Gets the expiration timestamp of the token
+  const expiration = computed(() => tokenStore.expiration.value);
+
   /**
-   * Get user information from the API.
+   * Get user information from the API and publish a login event.
    */
   async function getInfo() {
     if (tokenStore.state.value === null) return;
@@ -104,9 +94,14 @@ export function setup() {
     store.loading = true;
 
     try {
-      const info = tokenStore.isStudent.value
-        ? await studentInfo()
-        : await userInfo();
+      let info: StudentInfo | UserInfo | undefined;
+      if (tokenStore.isStudent.value) {
+        const { studentInfo } = await import('@/common/services/auth');
+        info = await studentInfo();
+      } else {
+        const { userInfo } = await import('@/common/services/auth');
+        info = await userInfo();
+      }
 
       store.info = info;
       store.email = info?.email ?? '';
@@ -124,7 +119,7 @@ export function setup() {
   }
 
   /**
-   * Log a user or student in.
+   * Log a user or student in or throw an error if the login failed.
    *
    * @param username
    * @param password
@@ -134,14 +129,20 @@ export function setup() {
     store.loading = true;
 
     try {
-      const data = student
-        ? await studentLogin({ username: user, password })
-        : await userLogin({ username: user, password });
+      let data: string | null = null;
+      if (student) {
+        const { studentLogin } = await import('@/common/services/auth');
+        data = await studentLogin({ username: user, password });
+      } else {
+        const { userLogin } = await import('@/common/services/auth');
+        data = await userLogin({ username: user, password });
+      }
 
       if (data === null) {
         throw new Error(ERROR_CODES.NOT_AUTHORIZED);
       }
 
+      // @note triggers a watch defined below.
       tokenStore.token.value = data;
     } finally {
       store.loading = false;
@@ -156,8 +157,10 @@ export function setup() {
 
     try {
       if (tokenStore.isStudent.value) {
+        const { studentLogout } = await import('@/common/services/auth');
         await studentLogout();
       } else {
+        const { userLogout } = await import('@/common/services/auth');
         await userLogout();
       }
     } finally {
@@ -175,7 +178,6 @@ export function setup() {
       store.id = -1;
       store.username = '';
       store.email = '';
-      store.expiration = null;
       store.info = null;
       return;
     }
@@ -184,7 +186,6 @@ export function setup() {
     store.id = +data.nameid;
     store.username = data.unique_name;
     store.email = data.email;
-    store.expiration = data.exp;
     store.info = null;
   });
 
@@ -207,12 +208,12 @@ export function setup() {
     id,
     username,
     email,
-    tokenExpiration,
     hasInfo,
     isAnonymous,
     isAuthenticated,
     isPreauthorized,
     isStudent,
+    expiration,
     login,
     logout,
   };

@@ -10,7 +10,7 @@ import { API_ENDPOINT, ERROR_CODES } from '@/common/constants';
 import tokenStore from '@/common/stores/token';
 
 /**
- * Subscriber of Apollo
+ * Data required to process and progress the request to the next in the chain.
  */
 interface Subscriber {
   next?: (result: FetchResult) => void;
@@ -28,15 +28,24 @@ interface QueuedRequest extends Subscriber {
   observable?: Observable<FetchResult>;
 }
 
+/**
+ * An an extension of the GraphQL errors object that includes an error code.
+ */
 interface GraphQLErrorExtension {
   code: string;
 }
 
+/**
+ * A GraphQL error object.
+ */
 interface GraphQLError {
   extensions?: GraphQLErrorExtension;
   message: string;
 }
 
+/**
+ * A collection of GraphQL error objects.
+ */
 interface GraphQLErrors {
   errors: GraphQLError[];
 }
@@ -162,10 +171,7 @@ export default class TokenRefreshService extends ApolloLink {
 
           if (!(e instanceof Error)) return;
           if (e.message !== ERROR_CODES.INVALID_REFRESH_TOKEN) {
-            console.error(
-              'An unknown error occurred during token refresh.',
-              e.message
-            );
+            throw e;
           }
         })
         .finally(() => {

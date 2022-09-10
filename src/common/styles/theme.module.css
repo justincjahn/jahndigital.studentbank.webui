@@ -1,0 +1,41 @@
+:root {
+  --primary-bg-base: 0 0%;
+  --primary-bg-color: var(--primary-bg-base) 96%;
+  --primary-bg-color-dark1: var(--primary-bg-base) 92%;
+  --primary-bg-color-dark2: var(--primary-bg-base) 88%;
+  --primary-font-color: 210, 29%, 24%;
+  --primary-font-color-alt: 210, 29%, 24%;
+
+  --secondary-bg-base: 0 0%;
+  --secondary-bg-color: var(--secondary-bg-base) 96%;
+  --secondary-bg-color-dark1: var(--secondary-bg-base) 92%;
+  --secondary-bg-color-dark2: var(--secondary-bg-base) 88%;
+  --secondary-font-color: 210, 29%, 24%;
+  --secondary-font-color-alt: 210, 29%, 24%;
+
+  --accent1-bg-base: 211, 100%;
+  --accent1-bg-color-light2: var(--accent1-bg-base) 56%;
+  --accent1-bg-color-light1: var(--accent1-bg-base) 51%;
+  --accent1-bg-color: var(--accent1-bg-base) 46%;
+  --accent1-bg-color-dark1: var(--accent1-bg-base) 41%;
+  --accent1-bg-color-dark2: var(--accent1-bg-base) 35%
+  --accent1-font-color: 0 0% 100%;
+  --accent1-font-color-alt: 0 0% 0%;
+
+  --destructive-bg-base: 354 70%;
+  --destructive-bg-color-light2: var(--destructive-bg-base) 74%;
+  --destructive-bg-color-light1: var(--destructive-bg-base) 64%;
+  --destructive-bg-color: var(--destructive-bg-base) 54%;
+  --destructive-bg-color-dark1: var(--destructive-bg-base) 44%;
+  --destructive-bg-color-dark2: var(--destructive-bg-base) 34%;
+  --destructive-font-color: 0 0% 100%;
+}
+
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --primary-bg-color: var(--primary-bg-base) 23%;
+    --primary-bg-color-dark1: var(--primary-bg-base) 18%;
+    --primary-bg-color-dark2: var(--primary-bg-base) 12%;
+    --primary-font-color: 210, 29%, 100%;
+  }
+} */

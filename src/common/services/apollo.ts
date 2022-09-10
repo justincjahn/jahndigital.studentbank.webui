@@ -12,16 +12,10 @@ import {
 
 import { setContext } from '@apollo/client/link/context';
 import { ERROR_CODES, API_ENDPOINT } from '@/common/constants';
-
-// Composables
 import tokenStore from '@/common/stores/token';
-
-// Services
 import TokenRefreshService from './TokenRefreshService';
 
-/**
- * Inject authentication headers into every query sent to the server.
- */
+// Inject authentication headers into every query sent to the server.
 const authLink = setContext((_, { headers }) => ({
   headers: {
     ...headers,
@@ -31,9 +25,7 @@ const authLink = setContext((_, { headers }) => ({
   },
 }));
 
-/**
- * The Apollo HTTP Link to use when querying the server.
- */
+// The Apollo HTTP Link to use when querying the server.
 const httpLink = createHttpLink({
   uri: API_ENDPOINT,
 
@@ -41,9 +33,7 @@ const httpLink = createHttpLink({
   credentials: 'include',
 });
 
-/**
- * The default Apollo client used by services.
- */
+// The default Apollo client used by services.
 const defaultClient = new ApolloClient({
   // @note Ordering is important here
   link: ApolloLink.from([new TokenRefreshService(), authLink, httpLink]),

@@ -13,7 +13,6 @@ import type {
 
 import type { UserInfo, StudentInfo } from '@/common/stores/user';
 
-// Services
 import { mutate, query } from './apollo';
 
 /**

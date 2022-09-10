@@ -1,5 +1,8 @@
 import { toRef, reactive } from 'vue';
 
+/**
+ * Stores information about the state of the router.
+ */
 export function setup() {
   const store = reactive({
     loading: true,

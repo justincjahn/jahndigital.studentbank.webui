@@ -8,17 +8,20 @@ export function setup() {
     error: null as string | null,
   });
 
-  // GETs the current error
-  const error = computed(() => store.error);
+  // Get or set the current error
+  const error = computed({
+    get() {
+      return store.error;
+    },
 
-  // SETs the current error
-  function setCurrentError(e: string | null) {
-    store.error = e;
-  }
+    set(value) {
+      store.error = value;
+      console.error('Caught error: %s', value);
+    },
+  });
 
   return {
     error,
-    setCurrentError,
   };
 }
 

@@ -12,6 +12,11 @@ export enum UserState {
   STUDENT_PREREGISTRATION = 4,
 }
 
+/**
+ * Stores critical information about a user's JWT token.  Hydrates the last login status
+ * from localStorage to help indicate if the user may have a valid refresh token stored
+ * in an HTTP only cookie.
+ */
 function setup() {
   const store = reactive({
     token: null as string | null,
@@ -19,7 +24,8 @@ function setup() {
     expiration: null as number | null,
   });
 
-  // Get the UserState of the user. If it's null, then it hasn't been hydrated.
+  // Get the UserState of the user. If it's null, then it hasn't been hydrated or the user
+  /// has never logged in before.
   const state = computed(() => store.state);
 
   // Get the unix timestamp representing the expiration time of the token
@@ -47,7 +53,7 @@ function setup() {
     }
   }
 
-  // Get or set the JWT token of the user.  If it's null, then the user is considered logged out
+  // Get or set the JWT token of the user.  If it's null, then the user is considered logged out.
   const token = computed({
     get() {
       return store.token;

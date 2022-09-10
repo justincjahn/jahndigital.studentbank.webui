@@ -1,6 +1,13 @@
 import uuid4 from '@/common/utils/uuid4';
 
 /**
+ * Simple implementation of a type-safe event system that enables the creation of a shared
+ * EventInfo object that can be subscribed to.  Subscribers can subsequently remove their
+ * subscriptions by calling the function returned by the subscribe method.  Publishers can
+ * call the publish function by passing in the EventInfo object and the payload, if required.
+ */
+
+/**
  * Denotes a function signature that accepts a payload and returns nothing.
  */
 export type Action<TPayload = undefined> = (payload: TPayload) => void;
@@ -32,10 +39,10 @@ interface EventSubscriptions {
 const subscriptions: EventSubscriptions = {};
 
 /**
- * Create a new event
+ * Create a new event.
  *
  * @param name The name of the event.
- * @returns
+ * @returns An EventInfo object that is used to publish and subscribe to events.
  */
 export function create<TPayload extends object | undefined = undefined>(
   name: string
@@ -71,10 +78,10 @@ export function subscribe<TEvent extends EventInfo>(
 }
 
 /**
- * Publish a payload (fire) a given event.
+ * Publish (fire) a given event with an optional payload object.
  *
  * @param event The event to fire.
- * @param payload The payload to provide to subscribers.
+ * @param payload The payload to provide to subscribers, if required.
  */
 export function publish<TEvent extends EventInfo>(
   event: TEvent,

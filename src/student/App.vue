@@ -7,6 +7,6 @@ import userStore from '@/common/stores/user';
 
 <template>
   <h1>Vue App!</h1>
-  <p v-if="userStore.tokenStore.isAnonymous.value">Not Logged In</p>
+  <p v-if="userStore.isAnonymous.value">Not Logged In</p>
   <p v-else>{{ userStore.email.value }}</p>
 </template>
