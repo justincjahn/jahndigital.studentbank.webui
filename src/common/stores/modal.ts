@@ -3,16 +3,15 @@ import { computed, reactive } from 'vue';
 /**
  * Stores information about modal windows and their order.
  */
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup() {
   const store = reactive({
     open: [] as HTMLElement[],
   });
 
-  // GETs the list of opened modals
+  // Gets the list of opened modals
   const opened = computed(() => store.open);
 
-  // GETs the topmost modal
+  // Gets the topmost modal
   const topmost = computed(() => {
     if (store.open.length === 0) return null;
     return store.open[store.open.length - 1];
