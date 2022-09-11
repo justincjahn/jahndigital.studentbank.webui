@@ -32,7 +32,7 @@ export default defineConfig(({ mode }): UserConfig => {
       rollupOptions: {
         input: {
           index: resolve(__dirname, 'src/index.html'),
-          registration: resolve(__dirname, 'src/registration/index.html'),
+          register: resolve(__dirname, 'src/register/index.html'),
           admin: resolve(__dirname, 'src/admin/index.html'),
         },
       },

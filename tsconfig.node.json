@@ -8,6 +8,8 @@
   },
   "include": [
     "vite.config.ts",
-    ".eslintrc.cjs"
+    ".eslintrc.cjs",
+    "apollo.config.cjs",
+    "package.json"
   ]
 }
