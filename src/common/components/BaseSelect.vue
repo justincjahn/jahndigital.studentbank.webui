@@ -14,8 +14,10 @@ import { onUnmounted, ref, watchEffect } from 'vue';
  *   + list: Create custom list elements for each item.
  *     - options: The list of items to render.
  *     - className: The class that should be applied to each list item.
- *     - select: The function to call when an item is selected.  Add it to each list items @click event.
- *     - selected: Should be called in the class prop for each option.  Outputs the className for the currently selected option.
+ *     - select(Item): The function to call when an item is selected.
+ *     - selected(Item): Should be called in the class prop for each option.  Returns a boolean.
+ *     - highlighted(Item): Should should be called to determine if the item is highlighted.  Returns a boolean.
+ *     - enter(Item): Should be called when the user's mouse hovers over the item.
  *   + option: The contents of each list item.  Can be used to customize the display of each list item.
  *     - option: The object/number/string being rendered.
  */
