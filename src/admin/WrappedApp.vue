@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { defineAsyncComponent, provide, onUnmounted, computed } from 'vue';
+import { defineAsyncComponent, provide, onUnmounted, computed, ref } from 'vue';
 import { GLOBAL_STORE } from '@/admin/symbols';
 import { setup as defineGlobalStore } from '@/admin/common/stores/global';
 
@@ -11,10 +11,20 @@ import {
 } from '@/common/constants';
 
 import LoadingPage from '@/common/components/LoadingPage.vue';
+import BaseSelect from '@/common/components/BaseSelect.vue';
 
 const ModalDialog = defineAsyncComponent(
   () => import('@/common/components/ModalDialog.vue')
 );
+
+const selectedItem = ref<string | undefined>();
+const testItems = [
+  'This',
+  'Is',
+  'A',
+  'Test',
+  'Really long item that should truncate',
+];
 
 const globalStore = defineGlobalStore();
 provide(GLOBAL_STORE, globalStore);
@@ -49,7 +59,10 @@ const error = computed({
   </header>
 
   <main v-if="isLoading"><loading-page /></main>
-  <main v-else><router-view /></main>
+  <main v-else>
+    <base-select v-model="selectedItem" :options="testItems" />
+    <router-view />
+  </main>
 
   <footer>&copy; 2022 Jahn Digital v{{ VERSION }}</footer>
 
