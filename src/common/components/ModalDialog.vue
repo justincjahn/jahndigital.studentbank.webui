@@ -64,7 +64,7 @@
 <script lang="ts">
 import { computed, defineComponent, onUnmounted, ref, watchEffect } from 'vue';
 import modalStore from '@/common/stores/modal';
-import debounce from '@/common/utils/debounce';
+import useDebounce from '@/common/composables/useDebounce';
 
 /**
  * Describes the possible event types that might be provided to the callback functions.
@@ -139,8 +139,8 @@ export default defineComponent({
     }
 
     // If the OK/Cancel button is focused and the enter key is pressed, prevent sending the event twice.
-    const handleOk = debounce(ok, 100);
-    const handleCancel = debounce(
+    const handleOk = useDebounce(ok, 100);
+    const handleCancel = useDebounce(
       props.cancelLabel ? cancel : () => undefined,
       100
     );

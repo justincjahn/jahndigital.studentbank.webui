@@ -1,3 +1,5 @@
+/// <reference types="vitest" />
+
 import { resolve } from 'path';
 import { existsSync, readFileSync } from 'fs';
 import { defineConfig, loadEnv, UserConfig } from 'vite';
@@ -37,6 +39,7 @@ export default defineConfig(({ mode }): UserConfig => {
         },
       },
     },
+    test: {},
     optimizeDeps: {
       include: ['@apollo/client/core'],
       exclude: ['@apollo/client'],

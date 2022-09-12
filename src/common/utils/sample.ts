@@ -29,19 +29,24 @@
  * @param k The number of values to select.
  */
 export default function sample<T>(population: Array<T>, k: number): Array<T> {
-  if (!Array.isArray(population)) throw new TypeError('Population must be an array.');
-
-  const n = population.length;
-  if (k < 0 || k > n) throw new RangeError('Sample larger than population or is negative');
-
-  const result = new Array(k);
-  let setsize = 21; // size of a small set minus size of an empty list
-
-  if (k > 5) {
-    setsize += 4 ** Math.ceil(Math.log(k * 3) / Math.log(4));
+  if (!Array.isArray(population)) {
+    throw new TypeError('Population must be an array.');
   }
 
-  if (n <= setsize) {
+  const n = population.length;
+
+  if (k < 0 || k > n) {
+    throw new RangeError('Sample larger than population or is negative');
+  }
+
+  const result = new Array(k);
+  let setSize = 21; // size of a small set minus size of an empty list
+
+  if (k > 5) {
+    setSize += 4 ** Math.ceil(Math.log(k * 3) / Math.log(4));
+  }
+
+  if (n <= setSize) {
     // An n-length list is smaller than a k-length set
     const pool = population.slice();
     for (let i = 0; i < k; i += 1) {

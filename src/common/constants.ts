@@ -18,11 +18,6 @@ export const SITE_DISABLE_NAME: boolean =
 export const SITE_LOGO: string | null =
   import.meta.env.VITE_APP_SITE_LOGO || null;
 
-// The import URL for the theme file containing variables for SCSS
-// NOTE: The default for this variable is defined in the vue.config.js file.
-// NOTE: This is auto-imported by Webpack, so you probably don't need it.
-export const THEME: string = import.meta.env.VITE_APP_THEME || 'ERROR';
-
 // The version number of this build
 // NOTE: The default for this variable is defined in the vue.config.js file.
 export const VERSION: string = import.meta.env.VITE_APP_VERSION || 'ERROR';

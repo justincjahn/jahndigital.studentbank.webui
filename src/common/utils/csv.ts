@@ -1,9 +1,13 @@
 /* eslint-disable no-continue */
 
-// Represents an individual line of a CSV
+/**
+ * Represents an individual line of a CSV
+ */
 export type CSVItem<T> = { [index in keyof T]: string };
 
-// CSV Options
+/**
+ * Options object passed to the parseCSV function.
+ */
 export interface CSVOpts {
   header?: boolean;
   delimiter?: string;
@@ -18,7 +22,11 @@ export interface CSVOpts {
  * @param qualifier For values containing the delimiter, it can be encapsulated in this.  Usually a double-quote.
  * @returns An array of strings.
  */
-export function parseCSVLine(line: string, delimiter = ',', qualifier = '"'): string[] {
+export function parseCSVLine(
+  line: string,
+  delimiter = ',',
+  qualifier = '"'
+): string[] {
   const parsed = new Array<string>();
   const chars = line.split('');
 
@@ -54,9 +62,9 @@ export function parseCSVLine(line: string, delimiter = ',', qualifier = '"'): st
  * Parse a CSV into an array of objects.
  *
  * @param file The string to parse.
- * @param header If there is a header in the provided string, or if numeric indices should be used.
- * @param delimiter Column delimiter, usually a comma.
- * @param qualifier For values containing the delimiter, it can be encapsulated in this.  Usually a double-quote.
+ * @param opts.header If there is a header in the provided string, or if numeric indices should be used.
+ * @param opts.delimiter Column delimiter, usually a comma.
+ * @param opts.qualifier For values containing the delimiter, it can be encapsulated in this.  Usually a double-quote.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parseCSV<THeaders extends any>(
@@ -78,7 +86,9 @@ export function parseCSV<THeaders extends any>(
 
   for (let i = 0; i < lines.length; i += 1) {
     // Skip empty lines
-    if (lines[i].trim().length === 0) continue;
+    if (lines[i].trim().length === 0) {
+      continue;
+    }
 
     const values = parseCSVLine(lines[i], options.delimiter, options.qualifier);
 

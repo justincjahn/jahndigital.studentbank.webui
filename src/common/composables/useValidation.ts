@@ -1,34 +1,55 @@
-import { validationFunc } from '@/types';
 import { ref, Ref, unref, watchEffect } from 'vue';
 
-type decoratorFunc = (value: string) => string;
-export type ReactiveFunction<TParam> = () => TParam
+/**
+ * Callback function passed to validator utilities to check input values.
+ */
+export type ValidationFunc = (
+  value: string
+) => string | boolean | Promise<string | boolean>;
 
+/**
+ * Function called to format a value before it's validated.
+ */
+export type DecoratorFunc = (value: string) => string;
+
+/**
+ * Options object passed to the useValidation function.
+ */
 export interface UseValidationOptions {
-  decorator?: decoratorFunc | Ref<decoratorFunc>;
+  decorator?: DecoratorFunc | Ref<DecoratorFunc>;
   value?: Ref<string>;
+  immediate?: boolean;
 }
 
 /**
  * Provides a mechanism to validate a string value when it changes.
  *
- * @param {(string) => string|boolean|Promise<string|boolean>} validator Function that checks the value.
- * @param {UseValidationOptions} options
+ * @param validator
+ * @param options
  */
 export default function useValidation(
-  validator: validationFunc | Ref<validationFunc>,
-  options?: UseValidationOptions,
+  validator: ValidationFunc | Ref<ValidationFunc>,
+  options?: UseValidationOptions
 ): {
-  value: Ref<string>,
-  error: Ref<string>,
-  loading: Ref<boolean>,
+  value: Ref<string>;
+  error: Ref<string>;
+  loading: Ref<boolean>;
 } {
   const opts = options || {};
   const value = opts?.value ?? ref('');
   const error = ref<string>('');
   const loading = ref(false);
+  let initialValidation = true;
 
   async function runValidation(newValue: string) {
+    if (initialValidation) {
+      initialValidation = false;
+
+      if (!(options?.immediate ?? false)) {
+        return;
+      }
+    }
+
     // Run the value through a decorator if provided
     let val = newValue;
     if (opts.decorator) {
