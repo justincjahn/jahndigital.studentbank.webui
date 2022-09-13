@@ -106,7 +106,8 @@ export function setup() {
       store.info = info;
       store.email = info?.email ?? '';
       store.id = info.id;
-      store.username = (info as StudentInfo)?.accountNumber ?? info.id;
+      store.username =
+        (info as StudentInfo).accountNumber ?? (info as UserInfo).email;
 
       publish(evtLogin, info);
     } catch (e: unknown) {
@@ -186,7 +187,6 @@ export function setup() {
     store.id = +data.nameid;
     store.username = data.unique_name;
     store.email = data.email;
-    store.info = null;
   });
 
   // Get info from the API when the token is hydrated

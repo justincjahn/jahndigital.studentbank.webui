@@ -280,7 +280,7 @@ export default defineComponent({
 }
 
 .modal .modal__container__title {
-  background-color: hsl(var(--primary-bg-color));
+  background-color: hsl(var(--secondary-bg-color));
   border-bottom: 1px solid hsl(var(--primary-bg-color-dark2));
 
   @media screen and (min-width: 700px) and (min-height: 400px) {

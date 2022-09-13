@@ -1,0 +1,125 @@
+label {
+  font-weight: bold;
+}
+
+label span.required {
+  font-size: 0.7em;
+  color: hsl(var(--destructive-bg-color));
+  vertical-align: super;
+}
+
+input[type=text],
+input[type=password]
+{
+  padding: 0.5em 2em 0.5em 0.5em;
+  outline-color: hsl(var(--accent1-bg-color-light1));
+  border: 1px solid hsl(var(--secondary-bg-color-dark1));
+  border-radius: var(--border-radius);
+}
+
+input[type=text]:invalid,
+input[type=password]:invalid,
+input[type=text].error,
+input[type=password].error
+{
+  outline-color: hsl(var(--destructive-bg-color-light1));
+  border: 1px solid hsl(var(--destructive-bg-color-light1));
+}
+
+button,
+input[type=submit]
+{
+  outline: 0;
+  padding: 0.5em;
+  margin: 0.25em;
+  min-width: 100px;
+  cursor: pointer;
+
+  color: hsl(var(--secondary-font-color));
+  background-color: hsl(var(--secondary-bg-color));
+  border: 1px solid hsl(var(--secondary-bg-color-dark1));
+  border-radius: var(--border-radius);
+
+  transition-property: filter, background-color;
+  transition-duration: 0.15s;
+  transition-delay: 0;
+}
+
+button:hover:enabled,
+input[type=submit]:hover:enabled,
+button:focus:enabled,
+input[type=submit]:focus:enabled
+{
+  filter: brightness(0.95);
+}
+
+button:focus:enabled,
+input[type=submit]:focus:enabled
+{
+  border-color: hsl(var(--accent1-bg-color-light2));
+  filter: brightness(1.2);
+}
+
+button:active:enabled,
+input[type=submit]:active:enabled
+{
+  filter: brightness(0.9);
+}
+
+button:disabled,
+input[type=submit]:disabled
+{
+  cursor: inherit;
+  color: hsla(var(--primary-font-color) / 0.5);
+}
+
+button.destructive,
+input[type=submit].destructive
+{
+  color: hsl(var(--destructive-font-color));
+  background-color: hsl(var(--destructive-bg-color));
+  border: 1px solid hsl(var(--destructive-bg-color-dark1));
+}
+
+button.destructive:disabled,
+input[type=submit].destructive:disabled
+{
+  color: hsla(var(--destructive-font-color) / 0.5);
+}
+
+button.primary,
+input[type=submit].primary
+{
+  color: hsl(var(--accent1-font-color));
+  background-color: hsl(var(--accent1-bg-color));
+  border: 1px solid hsl(var(--accent1-bg-color-dark1));
+}
+
+button.primary:disabled,
+input[type=submit].primary:disabled
+{
+  color: hsla(var(--accent1-font-color) / 0.5);
+}
+
+div.fieldset {
+  display: flex;
+  flex-direction: column;
+}
+
+div.fieldset input {
+  width: 100%;
+}
+
+div.fieldset.inline {
+  flex-direction: row;
+  align-items: center;
+}
+
+div.fieldset.inline input {
+  width: auto;
+  margin-left: 1em;
+}
+
+div.fieldset + div.fieldset {
+  margin-top: 1em;
+}

@@ -16,7 +16,6 @@ export function setup() {
 
     set(value) {
       store.error = value;
-      console.error('Caught error: %s', value);
     },
   });
 

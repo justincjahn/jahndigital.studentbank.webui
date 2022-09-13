@@ -1,5 +1,6 @@
 @import url('./reset.module.css');
 @import url('./theme.module.css');
+@import url('./forms.module.css');
 
 body {
   font-size:               12pt;
