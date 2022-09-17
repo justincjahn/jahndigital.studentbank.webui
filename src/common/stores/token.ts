@@ -1,16 +1,7 @@
 import { reactive, computed } from 'vue';
+import UserState from '@/common/enums/UserState';
 import { PERSIST_TOKEN } from '@/common/constants';
 import parseJwt, { JwtData } from '@/common/utils/parseJwt';
-
-/**
- * The value persisted in localStorage to determine if the user has previously logged in.
- */
-export enum UserState {
-  USER = 1,
-  USER_PREREGISTRATION = 2,
-  STUDENT = 3,
-  STUDENT_PREREGISTRATION = 4,
-}
 
 /**
  * Stores critical information about a user's JWT token.  Hydrates the last login status
