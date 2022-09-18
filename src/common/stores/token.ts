@@ -51,9 +51,12 @@ function setup() {
     },
 
     set(value) {
+      if (value === store.token) return;
+
       store.token = value;
 
       if (value === null) {
+        store.expiration = null;
         computeState(null);
       } else {
         const data = parseJwt(value);
@@ -87,14 +90,25 @@ function setup() {
   );
 
   // True if the user is a student
-  const isStudent = computed(() => store.state === UserState.STUDENT);
+  const isStudent = computed(
+    () =>
+      store.state === UserState.STUDENT ||
+      store.state === UserState.STUDENT_PREREGISTRATION
+  );
 
-  // Hydrate the state from local storage
-  const data = localStorage.getItem(PERSIST_TOKEN);
+  /**
+   * Hydrate the user's state from local storage.
+   */
+  function hydrate() {
+    // Hydrate the state from local storage
+    const data = localStorage.getItem(PERSIST_TOKEN);
 
-  if (data) {
-    store.state = +data;
+    if (data) {
+      store.state = +data;
+    }
   }
+
+  hydrate();
 
   return {
     token,
@@ -104,6 +118,7 @@ function setup() {
     isPreauthorized,
     isAuthenticated,
     isStudent,
+    hydrate,
   };
 }
 

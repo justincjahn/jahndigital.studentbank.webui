@@ -68,7 +68,7 @@ export default class TokenRefreshService extends ApolloLink {
    */
   static isValid(): boolean {
     if (tokenStore.isAnonymous.value) return true;
-    if (!tokenStore.isAuthenticated.value) return false;
+    if (tokenStore.isAuthenticated.value === false) return false;
     if (tokenStore.expiration.value < Date.now()) return false;
     return true;
   }
