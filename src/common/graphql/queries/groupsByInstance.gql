@@ -1,4 +1,4 @@
-#import "@/graphql/fragments/group.gql"
+#import "../fragments/group.gql"
 
 query groupsByInstance($instanceId: Long) {
   groups(

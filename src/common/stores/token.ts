@@ -51,8 +51,6 @@ function setup() {
     },
 
     set(value) {
-      if (value === store.token) return;
-
       store.token = value;
 
       if (value === null) {

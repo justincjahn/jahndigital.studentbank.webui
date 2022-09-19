@@ -39,7 +39,11 @@ export default defineConfig(({ mode }): UserConfig => {
         },
       },
     },
-    test: {},
+    test: {
+      cache: {
+        dir: `${resolve(__dirname, 'node_modules', '.vitest')}`,
+      },
+    },
     optimizeDeps: {
       include: ['@apollo/client/core'],
       exclude: ['@apollo/client'],
@@ -47,6 +51,10 @@ export default defineConfig(({ mode }): UserConfig => {
     server: {
       https,
       port: 8443,
+    },
+    preview: {
+      https,
+      port: 9443,
     },
     plugins: [
       vue(),

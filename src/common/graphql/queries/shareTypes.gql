@@ -1,5 +1,5 @@
-#import "@/graphql/fragments/pageInfo.gql"
-#import "@/graphql/fragments/shareType.gql"
+#import "../fragments/pageInfo.gql"
+#import "../fragments/shareType.gql"
 
 query shareTypes(
   $instances: [Long!],

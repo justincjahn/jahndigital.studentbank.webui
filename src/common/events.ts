@@ -6,3 +6,6 @@ export const userLogin = create<UserInfo | StudentInfo>('user-login');
 
 // Fired when a user logs out of the application
 export const userLogout = create('user-logout');
+
+// Fired when a new error is logged in the errorStore
+export const newError = create<string | null>('error-new');

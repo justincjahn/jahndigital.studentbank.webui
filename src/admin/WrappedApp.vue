@@ -1,5 +1,11 @@
 <script lang="ts" setup>
-import { defineAsyncComponent, provide, onUnmounted, computed } from 'vue';
+import {
+  defineAsyncComponent,
+  provide,
+  onUnmounted,
+  computed,
+  watchEffect,
+} from 'vue';
 
 // Stores
 import { setup as defineGlobalStore } from '@/admin/common/stores/global';
@@ -23,11 +29,17 @@ const LoginWidget = defineAsyncComponent(
   () => import('@/admin/common/components/LoginWidget.vue')
 );
 
+const InstanceSelector = defineAsyncComponent(
+  () => import('@/admin/common/components/InstanceSelector.vue')
+);
+
 const globalStore = defineGlobalStore();
 provide(GLOBAL_STORE, globalStore);
 onUnmounted(() => globalStore.dispose());
 
 const isLoading = computed(() => globalStore.router.loading.value);
+
+const isAuthenticated = computed(() => globalStore.user.isAuthenticated.value);
 
 const isAnonymous = computed(() => globalStore.user.isAnonymous.value);
 
@@ -36,8 +48,24 @@ const error = computed({
     return globalStore.error.error.value;
   },
   set(value) {
-    globalStore.error.error.value = value;
+    globalStore.error.setCurrentError(value);
   },
+});
+
+const currentInstance = computed({
+  get() {
+    return globalStore.instance.selected.value;
+  },
+
+  set(val) {
+    globalStore.instance.selected.value = val;
+  },
+});
+
+watchEffect(() => {
+  if (isAuthenticated.value && !currentInstance.value) {
+    globalStore.instance.fetchInstances();
+  }
 });
 </script>
 
@@ -53,7 +81,11 @@ const error = computed({
         </template>
       </h1>
 
-      <div class="main-nav__instances">Instances...</div>
+      <div class="main-nav__instances">
+        <suspense>
+          <instance-selector v-model="currentInstance" :store="globalStore" />
+        </suspense>
+      </div>
 
       <div class="main-nav__login"><login-widget /></div>
     </header>

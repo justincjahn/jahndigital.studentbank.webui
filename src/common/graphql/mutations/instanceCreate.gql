@@ -1,4 +1,4 @@
-#import "@/graphql/fragments/instance.gql"
+#import "../fragments/instance.gql"
 
 mutation newInstance($description: String!) {
   newInstance(input: { description: $description }) {

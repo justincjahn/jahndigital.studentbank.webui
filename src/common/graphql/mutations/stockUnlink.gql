@@ -1,4 +1,4 @@
-#import "@/graphql/fragments/stock.gql"
+#import "../fragments/stock.gql"
 
 mutation unlinkStock(
   $stockId: Long!,

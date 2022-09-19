@@ -1,5 +1,5 @@
-#import "@/graphql/fragments/pageInfo.gql"
-#import "@/graphql/fragments/student.gql"
+#import "../fragments/pageInfo.gql"
+#import "../fragments/student.gql"
 
 query studentsByAcccountNumber(
   $first: Int = 25,

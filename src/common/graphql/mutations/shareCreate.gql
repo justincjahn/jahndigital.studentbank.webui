@@ -1,4 +1,4 @@
-#import "@/graphql/fragments/share.gql"
+#import "../fragments/share.gql"
 
 mutation newShare(
   $shareTypeId: Long!,

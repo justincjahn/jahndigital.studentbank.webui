@@ -1,4 +1,4 @@
-#import "@/graphql/fragments/pageInfo.gql"
+#import "../fragments/pageInfo.gql"
 
 query students(
   $first: Int = 25,

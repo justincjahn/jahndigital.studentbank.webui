@@ -23,22 +23,17 @@ import { onUnmounted, ref, watchEffect } from 'vue';
  */
 
 /**
- * Represents an item in a dropdown menu.
- */
-export type Item = Record<string, any> | number | string | null;
-
-/**
  * Function definition that returns a string representation of an item.
  */
-export type Search = (obj: Item) => string;
+export type Search = (obj: unknown) => string;
 
 const props = withDefaults(
   defineProps<{
     // The currently selected item
-    modelValue?: Item;
+    modelValue: unknown;
 
     // The available options
-    options: Readonly<Array<Item>>;
+    options: Readonly<Array<unknown>>;
 
     // A function that returns a string representing the displayed value of the item
     valueFunc?: Search;
@@ -59,10 +54,9 @@ const props = withDefaults(
     shouldToggle?: boolean;
   }>(),
   {
-    modelValue: null,
-    valueFunc: (x: Readonly<Item>) => x?.toString() ?? 'UNKNOWN',
-    keyFunc: (x: Readonly<Item>) => {
-      if (typeof x === 'object') return x?.id ?? x;
+    valueFunc: (x: unknown) => x?.toString() ?? 'UNKNOWN',
+    keyFunc: (x: unknown) => {
+      if (typeof x === 'object') return (x as Record<string, any>)?.id ?? x;
       return x;
     },
     prompt: 'Choose an item...',
@@ -73,7 +67,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (event: 'update:modelValue', value: Item): void;
+  (event: 'update:modelValue', value: unknown): void;
   (event: 'update:shouldToggle', value: boolean): void;
 }>();
 
@@ -102,7 +96,7 @@ function toggle(e?: Event) {
 /**
  * Update the v-model when a new item is selected
  */
-function select(item: Item) {
+function select(item: unknown) {
   emit('update:modelValue', item);
 }
 
@@ -138,7 +132,7 @@ function onKeyup(e: KeyboardEvent) {
 /**
  * Determines if the provided item is currently selected
  */
-function selected(item: Item): boolean {
+function selected(item: unknown): boolean {
   if (typeof props.keyFunc !== 'function') return false;
   return props.keyFunc(props.modelValue) === props.keyFunc(item);
 }
@@ -146,14 +140,14 @@ function selected(item: Item): boolean {
 /**
  * Determines if the provided index is currently highlighted
  */
-function highlighted(item: Item): boolean {
+function highlighted(item: unknown): boolean {
   return item === props.options[currentIndex.value];
 }
 
 /**
  * Event that's fired when the mouse enters an item.
  */
-function enter(item: Item) {
+function enter(item: unknown) {
   const index = props.options.indexOf(item);
   currentIndex.value = index;
 }

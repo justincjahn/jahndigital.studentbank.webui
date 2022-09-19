@@ -1,4 +1,4 @@
-#import "@/graphql/fragments/stockHistory.gql"
+#import "../fragments/stockHistory.gql"
 
 mutation purgeStockHistory(
   $stockId: Long!,

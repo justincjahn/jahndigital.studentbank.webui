@@ -1,4 +1,4 @@
-#import "@/graphql/fragments/transaction.gql"
+#import "../fragments/transaction.gql"
 
 mutation newBulkTransaction(
   $shares: [NewTransactionRequestInput!]!,

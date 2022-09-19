@@ -1,4 +1,4 @@
-#import "@/graphql/fragments/student.gql"
+#import "../fragments/student.gql"
 
 mutation newStudent(
   $accountNumber: String!,

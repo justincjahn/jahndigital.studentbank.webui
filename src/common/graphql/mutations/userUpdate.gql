@@ -1,4 +1,4 @@
-#import "@/graphql/fragments/user.gql"
+#import "../fragments/user.gql"
 
 mutation updateUser (
   $id: Long!,

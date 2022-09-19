@@ -1,4 +1,6 @@
 import { computed, reactive } from 'vue';
+import { newError } from '@/common/events';
+import { publish } from '@/common/services/eventBus';
 
 /**
  * Stores information about errors encountered in the system.
@@ -8,19 +10,22 @@ export function setup() {
     error: null as string | null,
   });
 
-  // Get or set the current error
-  const error = computed({
-    get() {
-      return store.error;
-    },
+  // Get the current error
+  const error = computed(() => store.error);
 
-    set(value) {
-      store.error = value;
-    },
-  });
+  /**
+   * Set the current error message.
+   *
+   * @param val The error message
+   */
+  function setCurrentError(val: string | null = null) {
+    store.error = val;
+    publish(newError, val);
+  }
 
   return {
     error,
+    setCurrentError,
   };
 }
 

@@ -13,10 +13,15 @@ import uuid4 from '@/common/utils/uuid4';
 export type Action<TPayload = undefined> = (payload: TPayload) => void;
 
 /**
+ * Denotes the type of payload for a given event.
+ */
+export type Payload = object | string | number | null | undefined;
+
+/**
  * Information about a registered event.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface EventInfo<TPayload extends object | undefined = any> {
+export interface EventInfo<TPayload extends Payload = any> {
   name: string;
   payload: TPayload;
 }
@@ -44,7 +49,7 @@ const subscriptions: EventSubscriptions = {};
  * @param name The name of the event.
  * @returns An EventInfo object that is used to publish and subscribe to events.
  */
-export function create<TPayload extends object | undefined = undefined>(
+export function create<TPayload extends Payload = undefined>(
   name: string
 ): EventInfo<TPayload> {
   return {

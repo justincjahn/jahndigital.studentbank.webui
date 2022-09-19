@@ -1,5 +1,8 @@
 import { computed, reactive } from 'vue';
-import * as instanceService from '@/services/instance';
+
+import * as instanceService from '@/admin/common/services/instance';
+
+type Instance = instanceService.Instance;
 
 // Instances are global so instead of managing data per store instance, do it globally
 const instanceCache = reactive({
@@ -15,7 +18,7 @@ const instanceCache = reactive({
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup() {
   const store = reactive({
-    selected: null as Instance|null,
+    selected: null as Instance | null,
     loading: false,
   });
 
@@ -40,13 +43,18 @@ export function setup() {
 
     try {
       const data = await instanceService.getInstances(cache);
+      if (!data.instances || !data.instances.nodes) return;
 
       instanceCache.instances = data.instances.nodes;
-      const active = instanceCache.instances.findIndex((x) => x.isActive === true);
+      const active = instanceCache.instances.findIndex(
+        (x) => x.isActive === true
+      );
 
       // Only set the instance if we don't already have a valid one selected
       const sid = store.selected?.id ?? -1;
-      const hasSelected = instanceCache.instances.findIndex((x) => x.id === sid);
+      const hasSelected = instanceCache.instances.findIndex(
+        (x) => x.id === sid
+      );
       if (hasSelected <= 0) {
         selected.value = instanceCache.instances[active > -1 ? active : 0];
       }
@@ -61,7 +69,9 @@ export function setup() {
    * @param input
    * @returns The newly created instance.
    */
-  async function newInstance(input: NewInstanceRequest) {
+  async function newInstance(
+    input: Parameters<typeof instanceService.newInstance>[0]
+  ) {
     const data = await instanceService.newInstance(input);
     instanceCache.instances = [...instanceCache.instances, data.newInstance];
     return data.newInstance;
@@ -73,7 +83,9 @@ export function setup() {
    * @param input
    * @returns The updated instance.
    */
-  async function updateInstance(input: UpdateInstanceRequest) {
+  async function updateInstance(
+    input: Parameters<typeof instanceService.updateInstance>[0]
+  ) {
     const data = await instanceService.updateInstance(input);
 
     // If we've activated an instance, then we need to update all of them
@@ -102,7 +114,9 @@ export function setup() {
   async function deleteInstance(instance: Instance) {
     const data = await instanceService.deleteInstance({ id: instance.id });
     if (data.deleteInstance === true) {
-      instanceCache.instances = instanceCache.instances.filter((x) => x.id !== instance.id);
+      instanceCache.instances = instanceCache.instances.filter(
+        (x) => x.id !== instance.id
+      );
     } else {
       throw new Error('Unable to delete instance: unknown error.');
     }

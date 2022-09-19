@@ -5,6 +5,9 @@ import { defineAsyncComponent, ref, computed } from 'vue';
 import injectStrict from '@/common/utils/injectStrict';
 import { GLOBAL_STORE } from '@/admin/symbols';
 
+// Components
+import LoadingLabel from '@/common/components/LoadingLabel.vue';
+
 const ModalDialog = defineAsyncComponent(
   () => import('@/common/components/ModalDialog.vue')
 );
@@ -75,5 +78,9 @@ async function login() {
         {{ error }}
       </p>
     </form>
+
+    <template #okLabel="{ okLabel: label, canSubmit: enabled }">
+      <loading-label :show="!enabled"> {{ label }} </loading-label>
+    </template>
   </modal-dialog>
 </template>

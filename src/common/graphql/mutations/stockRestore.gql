@@ -1,4 +1,4 @@
-#import "@/graphql/fragments/stock.gql"
+#import "../fragments/stock.gql"
 
 mutation restoreStock($id: Long!) {
   restoreStock(id: $id) {

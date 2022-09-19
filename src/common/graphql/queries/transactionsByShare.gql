@@ -1,5 +1,5 @@
-#import "@/graphql/fragments/pageInfo.gql"
-#import "@/graphql/fragments/transaction.gql"
+#import "../fragments/pageInfo.gql"
+#import "../fragments/transaction.gql"
 
 query transactions(
   $shareId: Long!,
