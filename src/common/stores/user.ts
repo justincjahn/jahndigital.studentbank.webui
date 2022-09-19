@@ -64,7 +64,7 @@ export function setup() {
   });
 
   // Gets the email of the user or student
-  const email = computed(() => store.email || (store.info?.email ?? ''));
+  const email = computed(() => store.email);
 
   // True if the user info has been provided by the auth service
   const hasInfo = computed(() => store.info !== null);

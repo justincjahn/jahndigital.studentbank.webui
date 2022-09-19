@@ -95,7 +95,7 @@ export async function userInfo(): Promise<UserInfo> {
  */
 export async function studentInfo(): Promise<StudentInfo> {
   const { default: g } = await import(
-    '@/common/graphql/queries/currentUser.gql'
+    '@/common/graphql/queries/currentStudent.gql'
   );
 
   const res = await query<CurrentStudentQuery>(g, undefined, 'no-cache');
