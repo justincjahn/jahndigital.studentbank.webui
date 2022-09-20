@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { onUnmounted, ref, watchEffect } from 'vue';
+import { computed, onUnmounted, ref, watchEffect } from 'vue';
 
 /**
  * A custom drop-down component with some customizability and animations.  When an item
  * is selected, the v-model is updated via an update:modelValue event.  Anonymous functions
  * may be passed in that output the name of each item.  When no item is selected, a custom
  * prompt message may be passed in as a param.
+ *
+ * Supports adding additional drop down items that aren't options.  Parent components can
+ * listen for the select event to trigger custom functionality on the index that was clicked.
  *
  * Slots:
  *   + selected: The contents of the button containing the selected item.
@@ -14,17 +17,21 @@ import { onUnmounted, ref, watchEffect } from 'vue';
  *   + list: Create custom list elements for each item.
  *     - options: The list of items to render.
  *     - className: The class that should be applied to each list item.
- *     - select(Item): The function to call when an item is selected.
- *     - selected(Item): Should be called in the class prop for each option.  Returns a boolean.
- *     - highlighted(Item): Should should be called to determine if the item is highlighted.  Returns a boolean.
- *     - enter(Item): Should be called when the user's mouse hovers over the item.
+ *     - select(Item) => void: The function to call when an item is selected.
+ *     - selected(index) => string: Returns the className of a selected item, if selected.
+ *     - highlighted(index) => string: Returns the className of a highlighted item, if highlighted.
+ *     - enter(index) => void: Should be called when the user's mouse hovers over the item.
  *   + option: The contents of each list item.  Can be used to customize the display of each list item.
  *     - option: The object/number/string being rendered.
+ *   + additionalItems: Enables the insertion of additional list elements after the main list is rendered.
+ *     - className: The class that should be applied to each list item.
+ *     - select(Item) => void: The function to call when an item is selected.
+ *     - selected(index) => string: Returns the className of a selected item, if selected.
+ *     - highlighted(index) => string: Returns the className of a highlighted item, if highlighted.
+ *     - enter(index) => void: Should be called when the user's mouse hovers over the item.
  */
 
-/**
- * Function definition that returns a string representation of an item.
- */
+// Function definition that returns a string representation of an item.
 export type Search = (obj: unknown) => string;
 
 const props = withDefaults(
@@ -40,6 +47,8 @@ const props = withDefaults(
 
     // A function that returns a string representing a unique key of the item
     keyFunc?: Search;
+
+    canIncrement?: (index: number) => boolean;
 
     // The prompt to use when there is currently no item selected
     prompt?: string;
@@ -59,6 +68,7 @@ const props = withDefaults(
       if (typeof x === 'object') return (x as Record<string, any>)?.id ?? x;
       return x;
     },
+    canIncrement: undefined,
     prompt: 'Choose an item...',
     width: '10rem',
     disabled: false,
@@ -69,6 +79,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   (event: 'update:modelValue', value: unknown): void;
   (event: 'update:shouldToggle', value: boolean): void;
+  (event: 'select', value: number): void;
 }>();
 
 // True if the select box is open
@@ -77,8 +88,27 @@ const open = ref(false);
 // The current index of the highlight
 const currentIndex = ref(-1);
 
+// The number of additional items detected
+const highestDetectedIndex = ref(0);
+
+// The maximum index that can be selected
+const highestIndex = computed({
+  get() {
+    return Math.max(props.options.length - 1, highestDetectedIndex.value);
+  },
+
+  set(val) {
+    highestDetectedIndex.value = Math.max(props.options.length - 1, val);
+  },
+});
+
 // Stored reference to the root element
 const root = ref<HTMLButtonElement | null>(null);
+
+// The function used to determine if the currentIndex can be incremented
+const canIncrement = computed(
+  () => props.canIncrement ?? ((x) => x <= highestIndex.value)
+);
 
 /**
  * Open and close the select when the user clicks on/off the button.
@@ -96,8 +126,14 @@ function toggle(e?: Event) {
 /**
  * Update the v-model when a new item is selected
  */
-function select(item: unknown) {
-  emit('update:modelValue', item);
+function select(index: number) {
+  const item = props.options[index];
+
+  if (item) {
+    emit('update:modelValue', item);
+  } else {
+    emit('select', index);
+  }
 }
 
 /**
@@ -109,18 +145,17 @@ function onKeyup(e: KeyboardEvent) {
     case 'ArrowUp':
       currentIndex.value =
         currentIndex.value - 1 < 0
-          ? props.options.length - 1
+          ? highestIndex.value
           : currentIndex.value - 1;
       break;
     case 'ArrowDown':
-      currentIndex.value =
-        currentIndex.value + 1 >= props.options.length
-          ? 0
-          : currentIndex.value + 1;
+      currentIndex.value = canIncrement.value(currentIndex.value + 1)
+        ? currentIndex.value + 1
+        : 0;
       break;
     case 'Enter':
       if (currentIndex.value === -1) break;
-      select(props.options[currentIndex.value]);
+      select(currentIndex.value);
       toggle();
       break;
     case 'Escape':
@@ -130,29 +165,44 @@ function onKeyup(e: KeyboardEvent) {
 }
 
 /**
- * Determines if the provided item is currently selected
+ * Get the index of the selected option or return -1.
  */
-function selected(item: unknown): boolean {
-  if (typeof props.keyFunc !== 'function') return false;
-  return props.keyFunc(props.modelValue) === props.keyFunc(item);
+function getSelectedIndex(): number {
+  return props.options.indexOf(props.modelValue) ?? -1;
+}
+
+/**
+ * Determines if the provided index is currently selected
+ */
+function selected(index: number): string {
+  highestIndex.value = index;
+  return index === getSelectedIndex() ? 'selected' : '';
 }
 
 /**
  * Determines if the provided index is currently highlighted
  */
-function highlighted(item: unknown): boolean {
-  return item === props.options[currentIndex.value];
+function highlighted(index: number): string {
+  highestIndex.value = index;
+  return index === currentIndex.value ? 'highlighted' : '';
+}
+
+/**
+ * Calculate an array of classes to apply to an option item.
+ */
+function classes(index: number) {
+  highestIndex.value = Math.max(highestIndex.value, index);
+  return ['select__items__item', selected(index), highlighted(index)];
 }
 
 /**
  * Event that's fired when the mouse enters an item.
  */
-function enter(item: unknown) {
-  const index = props.options.indexOf(item);
+function enter(index: number) {
+  highestIndex.value = index;
   currentIndex.value = index;
 }
 
-// Register global click event when the box is opened and unregister when it closes
 watchEffect(() => {
   if (open.value === true) {
     currentIndex.value = -1;
@@ -171,7 +221,6 @@ watchEffect(() => {
   }
 });
 
-// Unregister a global click event that toggles the selector
 onUnmounted(() => {
   document.removeEventListener('keyup', onKeyup);
   document.removeEventListener('click', toggle);
@@ -182,12 +231,15 @@ onUnmounted(() => {
   <!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
   <!-- eslint-disable vuejs-accessibility/mouse-events-have-key-events -->
 
-  <div class="select" :class="{ 'select--open': open }">
+  <div
+    class="select"
+    :class="{ 'select--open': open }"
+    :style="{ '--width': width }"
+  >
     <button
       ref="root"
       class="select__selected"
       type="button"
-      :class="{ 'select__selected--open': open }"
       :disabled="disabled"
       tabindex="0"
       @click="toggle"
@@ -196,36 +248,41 @@ onUnmounted(() => {
         {{ modelValue ? valueFunc(modelValue) : prompt }}
       </slot>
     </button>
-    <ul
-      v-if="options.length > 0 || true"
-      class="select__items"
-      :class="{ 'select__items--hidden': !open }"
-    >
+
+    <ul class="select__items">
       <slot
         name="list"
+        class-name="select__items__item"
         :options="options"
-        :class-name="'select__items__item'"
-        :selected="selected"
         :highlighted="highlighted"
+        :selected="selected"
+        :classes="classes"
         :enter="enter"
         :select="select"
       >
         <li
-          v-for="option in options"
-          :key="typeof keyFunc === 'function' ? keyFunc(option) : ''"
-          class="select__items__item"
-          :class="{
-            selected: selected(option),
-            highlighted: highlighted(option),
-          }"
-          @click="select(option)"
-          @mouseenter="() => enter(option)"
+          v-for="(option, index) in options"
+          :key="typeof keyFunc === 'function' ? keyFunc(option) : index"
+          :class="classes(index)"
+          @mouseenter="enter(index)"
+          @click="select(index)"
         >
           <slot name="option" :option="option">
             {{ valueFunc(option) }}
           </slot>
         </li>
       </slot>
+
+      <slot
+        name="additionalItems"
+        class-name="select__items__item"
+        :options="options"
+        :highlighted="highlighted"
+        :selected="selected"
+        :classes="classes"
+        :enter="enter"
+        :select="select"
+      />
     </ul>
   </div>
 </template>
@@ -244,7 +301,6 @@ onUnmounted(() => {
 }
 
 .select {
-  --width: 10rem;
   position: static;
   display: inline-block;
 }
@@ -254,8 +310,6 @@ onUnmounted(() => {
   margin: 0;
   outline: 0;
   width: var(--width);
-  height: 2rem;
-  line-height: 1.25em;
   text-align: left;
   vertical-align: middle;
   padding-right: 2em;
@@ -268,7 +322,6 @@ onUnmounted(() => {
 
   background-color: hsl(var(--secondary-bg-color));
   border: 1px solid hsl(var(--secondary-bg-color-dark2));
-  border-radius: 0.25rem;
 }
 
 .select .select__selected:after {
@@ -279,7 +332,7 @@ onUnmounted(() => {
   width: 0;
   height: 0;
   border: 5px solid transparent;
-  border-color: hsla(var(--secondary-font-color) / 0.9) transparent transparent
+  border-color: hsl(var(--secondary-font-color) / 0.9) transparent transparent
     transparent;
   transition: transform 0.1s ease-in-out, top 0.1s ease-in-out;
   transform-origin: center;
@@ -306,7 +359,7 @@ onUnmounted(() => {
   width: var(--width);
   background-color: hsl(var(--secondary-bg-color));
   border: 1px solid hsl(var(--secondary-bg-color-dark2));
-  border-radius: 0 0 0.25rem 0.25rem;
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
 }
 
 .select .select__items__divider {
@@ -316,7 +369,7 @@ onUnmounted(() => {
 
 .select .select__items__divider hr {
   border: none;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgb(0 0 0 / 0.2);
 }
 
 .select .select__items__item {
@@ -324,22 +377,18 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-.select .select__items__item.highlighted {
+.select .select__items__item.highlighted,
+.select .select__items__item:hover {
   background-color: hsl(var(--secondary-bg-color-dark1));
 }
 
 .select .select__items__item.selected {
-  color: hsla(var(--secondary-font-color) / 0.6);
+  color: hsl(var(--secondary-font-color) / 0.6);
   font-style: italic;
-  /* cursor: auto; */
 }
 
-/* .select .select__items__item.selected.highlighted {
-  background-color: inherit;
-} */
-
 .select--open .select__selected {
-  border-radius: 0.25rem 0.25rem 0px 0px;
+  border-radius: var(--border-radius) var(--border-radius) 0px 0px;
 }
 
 .select--open .select__items {

@@ -25,6 +25,7 @@ enum ModalState {
   EDIT,
   DELETE,
   ACTIVE,
+  POST_DIVIDENDS,
   INVITE_CODE,
 }
 
@@ -64,7 +65,18 @@ const id = uuid4();
 // The current state of the modal
 const modalState = ref<ModalState>(ModalState.ADD);
 
+// The array of options presented to the base select component
 const options = computed(() => instanceStore.value.instances.value);
+
+// An object of additional options and indexes added to the base select component
+const indexes = computed(() => ({
+  ADD: options.value.length,
+  RENAME: options.value.length + 1,
+  DELETE: options.value.length + 2,
+  ACTIVATE: options.value.length + 3,
+  POST_DIVIDENDS: options.value.length + 4,
+  INVITE_CODE: options.value.length + 5,
+}));
 
 // The current invite code
 const inviteCode = computed(
@@ -137,7 +149,6 @@ function copyInviteCodeUrl() {
 
 // Cascade the model update
 function update(item: unknown) {
-  console.log('Update called!', item);
   emit('update:modelValue', item as Instance);
 }
 
@@ -184,6 +195,32 @@ function startDelete() {
   if (props.modelValue === null) return;
   modalState.value = ModalState.DELETE;
   toggle();
+}
+
+// Handle the selection of additional options
+function handleSelect(index: number) {
+  switch (index) {
+    case indexes.value.ADD:
+      startAdd();
+      break;
+    case indexes.value.RENAME:
+      startEdit();
+      break;
+    case indexes.value.DELETE:
+      startDelete();
+      break;
+    case indexes.value.ACTIVATE:
+      startActive();
+      break;
+    case indexes.value.POST_DIVIDENDS:
+      toggleDividendPostingModal();
+      break;
+    case indexes.value.INVITE_CODE:
+      startInviteCode();
+      break;
+    default:
+    // Ignore
+  }
 }
 
 // Add a new instance and Update or Delete the selected instance.
@@ -274,6 +311,8 @@ function handleCancel() {
 
 <template>
   <!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
+  <!-- eslint-disable vuejs-accessibility/mouse-events-have-key-events -->
+
   <base-select
     prompt="Select an instance..."
     class="instance-selector"
@@ -282,44 +321,78 @@ function handleCancel() {
     :value="value"
     :model-value="modelValue"
     @update:model-value="update"
+    @select="handleSelect"
   >
     <template #selected="{ option, prompt }">
       <template v-if="(option as Instance)?.isActive ?? false">
         <span class="active">(Active)</span>
-        {{ (option as Instance)?.description ?? 'ERROR' }}
+        {{ (option as Instance)?.description }}
       </template>
       <template v-else>
         {{ (option as Instance)?.description ?? prompt }}
       </template>
     </template>
-    <template #list="{ options: tplOptions, className, select, selected }">
+
+    <template #option="{ option }">
+      <template v-if="(option as Instance)?.isActive ?? false">
+        <span class="active">(Active)</span>
+        {{ (option as Instance)?.description }}
+      </template>
+      <template v-else>
+        {{ (option as Instance)?.description }}
+      </template>
+    </template>
+
+    <template #additionalItems="{ select, classes, enter }">
+      <li class="select__items__divider"><hr /></li>
+
       <li
-        v-for="option in (tplOptions as ServiceInstance[])"
-        :key="option.id"
-        :class="[className, selected(option)]"
-        @click="select(option)"
+        :class="classes(indexes.ADD)"
+        @click="select(indexes.ADD)"
+        @mouseenter="enter(indexes.ADD)"
       >
-        <template v-if="option?.isActive ?? false">
-          <span class="active">(Active)</span> {{ option.description }}
-        </template>
-        <template v-else>
-          {{ option?.description ?? option }}
-        </template>
+        Add...
       </li>
-      <li class="select__items__divider">
-        <hr />
+
+      <li
+        :class="classes(indexes.RENAME)"
+        @click="select(indexes.RENAME)"
+        @mouseenter="enter(indexes.RENAME)"
+      >
+        Rename...
       </li>
-      <li :class="className" @click.prevent="startAdd">Add...</li>
-      <li :class="className" @click.prevent="startEdit">Rename...</li>
-      <li :class="className" @click.prevent="startDelete">Delete...</li>
-      <li :class="className" @click.prevent="startActive">Activate...</li>
-      <li class="select__items__divider">
-        <hr />
+
+      <li
+        :class="classes(indexes.DELETE)"
+        @click="select(indexes.DELETE)"
+        @mouseenter="enter(indexes.DELETE)"
+      >
+        Delete...
       </li>
-      <li :class="className" @click.prevent="toggleDividendPostingModal">
+
+      <li
+        :class="classes(indexes.ACTIVATE)"
+        @click="select(indexes.ACTIVATE)"
+        @mouseenter="enter(indexes.ACTIVATE)"
+      >
+        Activate...
+      </li>
+
+      <li class="select__items__divider"><hr /></li>
+
+      <li
+        :class="classes(indexes.POST_DIVIDENDS)"
+        @click="select(indexes.POST_DIVIDENDS)"
+        @mouseenter="enter(indexes.POST_DIVIDENDS)"
+      >
         Post Dividends...
       </li>
-      <li :class="className" @click.prevent="startInviteCode">
+
+      <li
+        :class="classes(indexes.INVITE_CODE)"
+        @click="select(indexes.INVITE_CODE)"
+        @mouseenter="enter(indexes.INVITE_CODE)"
+      >
         Invite Code...
       </li>
     </template>
