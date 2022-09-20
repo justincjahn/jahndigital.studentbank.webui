@@ -35,7 +35,7 @@
     "@vue/eslint-config-prettier": "^7.0.0",
     "@vue/test-utils": "^2.0.0-rc.18",
     "dotenv": "^16.0.2",
-    "eslint": "^8.23.0",
+    "eslint": "^8.23.1",
     "happy-dom": "^6.0.4",
     "msw": "^0.47.3",
     "node-fetch": "^3.2.10",
