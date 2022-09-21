@@ -2,6 +2,8 @@
 import { ref } from 'vue';
 import { VSelect, VOption, VDivider } from '@/common/components/inputs/select';
 
+import '@/common/styles/common.css';
+
 const test = ref(null);
 </script>
 

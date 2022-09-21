@@ -1,3 +1,3 @@
-export { default as VSelect } from './Select.vue';
-export { default as VOption } from './Option.vue';
-export { default as VDivider } from './Divider.vue';
+export { default as VSelect } from './VSelect.vue';
+export { default as VOption } from './VOption.vue';
+export { default as VDivider } from './VDivider.vue';
