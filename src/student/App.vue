@@ -1,12 +1,19 @@
 <script lang="ts" setup>
-import userStore from '@/common/stores/user';
+import { ref } from 'vue';
+import { VSelect, VOption, VDivider } from '@/common/components/inputs/select';
 
-// setTimeout(() => userStore.login('admin@domain.tld', 'admin'), 3000);
-// userStore.logout();
+const test = ref(null);
 </script>
 
 <template>
   <h1>Vue App!</h1>
-  <p v-if="userStore.isAnonymous.value">Not Logged In</p>
-  <p v-else>{{ userStore.email.value }}</p>
+  <v-select v-model="test">
+    <v-option value="1" />
+    <v-option value="2" />
+    <v-option value="3" />
+    <v-divider />
+    <v-option value="4" />
+    <v-option value="5" />
+    <v-option value="6" />
+  </v-select>
 </template>
