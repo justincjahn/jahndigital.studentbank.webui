@@ -36,6 +36,8 @@ const emit = defineEmits<{
 
 const root = ref<HTMLButtonElement | null>(null);
 
+const items = ref<HTMLElement | null>(null);
+
 const open = ref(false);
 
 const highlighted = ref<unknown | null>();
@@ -43,8 +45,12 @@ const highlighted = ref<unknown | null>();
 const registeredOptions = new Set<unknown>();
 
 const api: SelectApi = {
-  register(option) {
+  register(option, el) {
     registeredOptions.add(option);
+
+    if (items.value !== null) {
+      console.log(Array.from(items.value.children).indexOf(el));
+    }
 
     return () => {
       registeredOptions.delete(option);
@@ -113,7 +119,7 @@ onUnmounted(() => {
       </slot>
     </button>
 
-    <ul class="select__items">
+    <ul ref="items" class="select__items">
       <slot />
     </ul>
   </div>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, useAttrs, watch } from 'vue';
 import injectStrict from '@/common/utils/injectStrict';
 import { SELECT_API } from './symbols';
 
@@ -16,6 +16,7 @@ const props = withDefaults(
   }
 );
 
+const attrs = useAttrs();
 const root = ref<HTMLElement | null>(null);
 const api = injectStrict(SELECT_API);
 let unregister: (() => void) | null = null;
@@ -28,6 +29,7 @@ const styles = computed(() => ({
 
 function select() {
   if (props.disabled) return;
+  if (attrs?.onClick ?? false) return;
   api.select(props.value);
 }
 
@@ -35,6 +37,19 @@ onMounted(() => {
   if (root.value === null) return;
   unregister = api.register(props.value, root.value);
 });
+
+watch(
+  () => props.value,
+  (value) => {
+    if (root.value === null) return;
+
+    if (unregister) {
+      unregister();
+    }
+
+    unregister = api.register(value, root.value);
+  }
+);
 
 onUnmounted(() => {
   if (unregister === null) return;
