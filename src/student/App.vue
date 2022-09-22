@@ -23,6 +23,10 @@ function splice() {
 function update() {
   items.value[0] += 1;
 }
+
+function onAddUser() {
+  console.log('!!!');
+}
 </script>
 
 <template>
@@ -39,6 +43,8 @@ function update() {
 
   <v-select v-model="test">
     <v-option v-for="(item, i) in items" :key="i" :value="item" />
+    <v-divider />
+    <v-option value="ADD_USER" @click="onAddUser" />
   </v-select>
 
   <button type="button" @click="add">Add</button>

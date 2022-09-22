@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted, onUnmounted, useAttrs, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, useAttrs } from 'vue';
 import injectStrict from '@/common/utils/injectStrict';
+import type { OptionRegistration } from './types';
 import { SELECT_API } from './symbols';
 
 const props = withDefaults(
@@ -19,41 +20,32 @@ const props = withDefaults(
 const attrs = useAttrs();
 const root = ref<HTMLElement | null>(null);
 const api = injectStrict(SELECT_API);
-let unregister: (() => void) | null = null;
+let registration: OptionRegistration | null = null;
 
 const styles = computed(() => ({
   selected: api.selected.value === props.value,
-  highlighted: api.highlighted.value === props.value,
+  highlighted: api.highlighted.value === registration?.id,
   disabled: props.disabled,
 }));
 
 function select() {
   if (props.disabled) return;
   if (attrs?.onClick ?? false) return;
-  api.select(props.value);
+  api.emit.select(props.value);
+}
+
+function highlight() {
+  api.emit.highlight(registration?.id ?? -1);
 }
 
 onMounted(() => {
   if (root.value === null) return;
-  unregister = api.register(props.value, root.value);
+  registration = api.register(root.value);
 });
 
-watch(
-  () => props.value,
-  (value) => {
-    if (root.value === null) return;
-
-    if (unregister) {
-      unregister();
-    }
-
-    unregister = api.register(value, root.value);
-  }
-);
-
 onUnmounted(() => {
-  if (unregister === null) return;
-  unregister();
+  if (registration === null) return;
+  registration.unregister();
 });
 </script>
 
@@ -65,7 +57,7 @@ onUnmounted(() => {
     class="select__items__item"
     :class="styles"
     @click="select"
-    @mouseenter="api.highlight(props.value)"
+    @mouseenter="highlight"
   >
     <slot>{{ props.value?.toString() ?? '' }}</slot>
   </li>

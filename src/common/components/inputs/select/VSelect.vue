@@ -1,8 +1,21 @@
 <script lang="ts" setup>
-import { ref, computed, provide, watchEffect, onUnmounted } from 'vue';
+import type { Ref } from 'vue';
+import {
+  ref,
+  reactive,
+  computed,
+  provide,
+  watchEffect,
+  onUnmounted,
+} from 'vue';
 import useDebounce from '@/common/composables/useDebounce';
-import type { SelectApi } from './types';
+import type { OptionRegistration, SelectApi } from './types';
 import { SELECT_API } from './symbols';
+
+interface RegisteredOptions {
+  index: Ref<number>;
+  el: HTMLElement;
+}
 
 const props = withDefaults(
   defineProps<{
@@ -34,35 +47,60 @@ const emit = defineEmits<{
   (event: 'update:shouldToggle', value: boolean): void;
 }>();
 
-const root = ref<HTMLButtonElement | null>(null);
-
+// Reference to the element containing options
 const items = ref<HTMLElement | null>(null);
 
+// A list of registered options
+const registrations = reactive<Record<number, RegisteredOptions>>({});
+
+// True if the selector is open
 const open = ref(false);
 
-const highlighted = ref<unknown | null>();
+// The ID of the node that should be highlighted
+const highlighted = ref<number>(-1);
 
-const registeredOptions = new Set<unknown>();
+// The last ID number issued to an option
+let latestId = 0;
 
 const api: SelectApi = {
-  register(option, el) {
-    registeredOptions.add(option);
-
-    if (items.value !== null) {
-      console.log(Array.from(items.value.children).indexOf(el));
+  register(el) {
+    if (items.value === null) {
+      throw new Error('Item ref is null.');
     }
 
-    return () => {
-      registeredOptions.delete(option);
+    let index = -1;
+    for (let i = 0; i < items.value.children.length; i += 1) {
+      if (items.value.children[i].contains(el)) {
+        index = i;
+        break;
+      }
+    }
+
+    registrations[latestId] = {
+      index: ref(index),
+      el,
     };
+
+    const response: OptionRegistration = {
+      id: latestId,
+
+      unregister() {
+        delete registrations[latestId];
+      },
+    };
+
+    latestId += 1;
+    return response;
   },
 
-  highlight(value) {
-    highlighted.value = value;
-  },
+  emit: {
+    highlight(id) {
+      highlighted.value = id;
+    },
 
-  select(value) {
-    emit('update:modelValue', value);
+    select(value) {
+      emit('update:modelValue', value);
+    },
   },
 
   selected: computed(() => props.modelValue),
@@ -104,24 +142,27 @@ onUnmounted(() => {
     class="select"
     :class="{ open }"
     :style="{ '--width': props.width }"
-    @click.prevent="toggle"
-    @mouseleave="api.highlight(null)"
+    @mouseleave="api.emit.highlight(-1)"
   >
-    <button
-      ref="root"
-      class="select__button"
-      type="button"
-      tabindex="0"
-      :disabled="props.disabled"
-    >
-      <slot name="button">
-        {{ props.modelValue?.toString() ?? props.prompt }}
-      </slot>
-    </button>
+    <slot name="activator" :activate="toggle" :disabled="props.disabled">
+      <button
+        class="select__button"
+        type="button"
+        tabindex="0"
+        :disabled="props.disabled"
+        @click="toggle"
+      >
+        <slot name="activatorLabel">
+          {{ props.modelValue?.toString() ?? props.prompt }}
+        </slot>
+      </button>
+    </slot>
 
-    <ul ref="items" class="select__items">
-      <slot />
-    </ul>
+    <slot name="items">
+      <ul ref="items" class="select__items">
+        <slot />
+      </ul>
+    </slot>
   </div>
 </template>
 
