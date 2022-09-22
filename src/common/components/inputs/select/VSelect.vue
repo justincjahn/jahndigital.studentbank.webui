@@ -1,29 +1,46 @@
 <script lang="ts" setup>
-import { ref, computed, provide } from 'vue';
+import { ref, computed, provide, watchEffect, onUnmounted } from 'vue';
+import useDebounce from '@/common/composables/useDebounce';
 import type { SelectApi } from './types';
 import { SELECT_API } from './symbols';
 
 const props = withDefaults(
   defineProps<{
+    // The currently selected item
     modelValue: unknown | null;
+
+    // The prompt to use when there's currently no item selected
     prompt?: string;
+
+    // The width of the select element
     width?: string;
+
+    // If the entire select element is disabled
+    disabled?: boolean;
+
+    // Set to true if the element should toggle open/closed
+    shouldToggle?: boolean;
   }>(),
   {
     prompt: 'Choose an option...',
     width: '10rem',
+    disabled: false,
+    shouldToggle: false,
   }
 );
 
 const emit = defineEmits<{
   (event: 'update:modelValue', value: unknown | null): void;
+  (event: 'update:shouldToggle', value: boolean): void;
 }>();
 
-const registeredOptions = new Set<unknown>();
+const root = ref<HTMLButtonElement | null>(null);
+
+const open = ref(false);
 
 const highlighted = ref<unknown | null>();
 
-const open = ref(false);
+const registeredOptions = new Set<unknown>();
 
 const api: SelectApi = {
   register(option) {
@@ -47,11 +64,31 @@ const api: SelectApi = {
   highlighted: computed(() => highlighted.value),
 };
 
-function toggle() {
-  open.value = !open.value;
-}
-
 provide(SELECT_API, api);
+
+const toggle = useDebounce(() => {
+  if (!open.value && props.disabled) return;
+  open.value = !open.value;
+}, 10);
+
+watchEffect(() => {
+  if (open.value === true) {
+    document.addEventListener('click', toggle);
+  } else {
+    document.removeEventListener('click', toggle);
+  }
+});
+
+watchEffect(() => {
+  if (props.shouldToggle === true) {
+    toggle();
+    emit('update:shouldToggle', false);
+  }
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', toggle);
+});
 </script>
 
 <template>
@@ -61,10 +98,16 @@ provide(SELECT_API, api);
     class="select"
     :class="{ open }"
     :style="{ '--width': props.width }"
-    @click="toggle"
+    @click.prevent="toggle"
     @mouseleave="api.highlight(null)"
   >
-    <button class="select__button" type="button" tabindex="0">
+    <button
+      ref="root"
+      class="select__button"
+      type="button"
+      tabindex="0"
+      :disabled="props.disabled"
+    >
       <slot name="button">
         {{ props.modelValue?.toString() ?? props.prompt }}
       </slot>
@@ -102,7 +145,6 @@ provide(SELECT_API, api);
   text-align: left;
   vertical-align: middle;
   padding-right: 2em;
-  color: hsl(var(--secondary-font-color));
 
   user-select: none;
   overflow: hidden;
@@ -152,14 +194,5 @@ provide(SELECT_API, api);
   display: block;
   animation: menuOpen 300ms ease-in-out forwards;
   transform-origin: top center;
-}
-
-.select__items__item {
-  padding: 0.25em;
-  cursor: pointer;
-}
-
-.select__items__item.highlighted {
-  background-color: hsl(var(--secondary-bg-color-dark1));
 }
 </style>

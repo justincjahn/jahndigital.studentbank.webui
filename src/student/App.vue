@@ -11,7 +11,7 @@ const test = ref(null);
   <h1>Vue App!</h1>
   <v-select v-model="test">
     <v-option value="1" />
-    <v-option value="2" />
+    <v-option value="2" disabled />
     <v-option value="3" />
     <v-divider />
     <v-option value="4" />
