@@ -44,7 +44,9 @@ function onAddUser() {
   <v-select v-model="test">
     <v-option v-for="(item, i) in items" :key="i" :value="item" />
     <v-divider />
-    <v-option value="ADD_USER" @click="onAddUser" />
+    <div class="additional_options">
+      <v-option value="ADD_USER" @click="onAddUser" />
+    </div>
   </v-select>
 
   <button type="button" @click="add">Add</button>

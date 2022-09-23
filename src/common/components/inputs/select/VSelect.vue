@@ -1,19 +1,12 @@
 <script lang="ts" setup>
-import type { Ref } from 'vue';
-import {
-  ref,
-  reactive,
-  computed,
-  provide,
-  watchEffect,
-  onUnmounted,
-} from 'vue';
+import { ref, computed, provide, watchEffect, onUnmounted } from 'vue';
 import useDebounce from '@/common/composables/useDebounce';
 import type { OptionRegistration, SelectApi } from './types';
 import { SELECT_API } from './symbols';
 
 interface RegisteredOptions {
-  index: Ref<number>;
+  id: number;
+  index: number;
   el: HTMLElement;
 }
 
@@ -51,7 +44,7 @@ const emit = defineEmits<{
 const items = ref<HTMLElement | null>(null);
 
 // A list of registered options
-const registrations = reactive<Record<number, RegisteredOptions>>({});
+const registrations = ref<RegisteredOptions[]>([]);
 
 // True if the selector is open
 const open = ref(false);
@@ -59,37 +52,60 @@ const open = ref(false);
 // The ID of the node that should be highlighted
 const highlighted = ref<number>(-1);
 
+// The index of the currently highlighted option
+const highlightedIndex = computed(() =>
+  registrations.value.findIndex((X) => X.id === highlighted.value)
+);
+
+/**
+ * Calculate the indices of the options objects and sort them for keyboard support.
+ */
+const calculateIndices = useDebounce(() => {
+  if (items.value === null) return;
+
+  const allElements = Array.from(items.value.querySelectorAll('*'));
+  registrations.value.forEach((value, index) => {
+    const elementIndex = allElements.indexOf(value.el);
+    registrations.value[index].index = elementIndex;
+  });
+
+  registrations.value.sort((a, b) => a.index - b.index);
+}, 10);
+
+/**
+ * Toggle the selector open or closed, if enabled.
+ */
+const toggle = useDebounce(() => {
+  if (!open.value && props.disabled) return;
+  open.value = !open.value;
+}, 10);
+
 // The last ID number issued to an option
 let latestId = 0;
 
 const api: SelectApi = {
   register(el) {
     if (items.value === null) {
-      throw new Error('Item ref is null.');
+      throw new Error('Item template ref null. This should not happen.');
     }
 
-    let index = -1;
-    for (let i = 0; i < items.value.children.length; i += 1) {
-      if (items.value.children[i].contains(el)) {
-        index = i;
-        break;
-      }
-    }
-
-    registrations[latestId] = {
-      index: ref(index),
+    registrations.value.push({
+      id: latestId,
+      index: -1,
       el,
-    };
+    });
 
     const response: OptionRegistration = {
       id: latestId,
 
-      unregister() {
-        delete registrations[latestId];
-      },
+      unregister: ((id: number) => () => {
+        registrations.value = registrations.value.filter((x) => x.id !== id);
+        calculateIndices();
+      })(latestId),
     };
 
     latestId += 1;
+    calculateIndices();
     return response;
   },
 
@@ -108,17 +124,57 @@ const api: SelectApi = {
   highlighted: computed(() => highlighted.value),
 };
 
-provide(SELECT_API, api);
+/**
+ * Move the highlighted option upwards, or wrap around
+ */
+function arrowUp() {
+  if (highlightedIndex.value === 0) {
+    highlighted.value = registrations.value[registrations.value.length - 1].id;
+  } else {
+    highlighted.value = registrations.value[highlightedIndex.value - 1].id;
+  }
+}
 
-const toggle = useDebounce(() => {
-  if (!open.value && props.disabled) return;
-  open.value = !open.value;
-}, 10);
+/**
+ * Move the highlighted option downward or wrap around
+ */
+function arrowDown() {
+  if (highlightedIndex.value >= registrations.value.length - 1) {
+    highlighted.value = registrations.value[0].id;
+  } else {
+    highlighted.value = registrations.value[highlightedIndex.value + 1].id;
+  }
+}
+
+/**
+ * Listen for key events and perform various actions.
+ */
+function onKeyup(e: KeyboardEvent) {
+  // eslint-disable-next-line default-case
+  switch (e.code) {
+    case 'ArrowUp':
+      arrowUp();
+      break;
+    case 'ArrowDown':
+      arrowDown();
+      break;
+    case 'Enter':
+      if (highlighted.value === -1) break;
+      registrations.value[highlightedIndex.value].el.click();
+      toggle();
+      break;
+    case 'Escape':
+      toggle();
+      break;
+  }
+}
 
 watchEffect(() => {
   if (open.value === true) {
+    document.addEventListener('keyup', onKeyup);
     document.addEventListener('click', toggle);
   } else {
+    document.removeEventListener('keyup', onKeyup);
     document.removeEventListener('click', toggle);
   }
 });
@@ -131,8 +187,11 @@ watchEffect(() => {
 });
 
 onUnmounted(() => {
+  document.removeEventListener('keyup', onKeyup);
   document.removeEventListener('click', toggle);
 });
+
+provide(SELECT_API, api);
 </script>
 
 <template>
