@@ -40,6 +40,9 @@ const emit = defineEmits<{
   (event: 'update:shouldToggle', value: boolean): void;
 }>();
 
+// Reference to the button, if it wasn't overwritten
+const button = ref<HTMLButtonElement | null>(null);
+
 // Reference to the element containing options
 const items = ref<HTMLElement | null>(null);
 
@@ -75,8 +78,21 @@ const calculateIndices = useDebounce(() => {
 /**
  * Toggle the selector open or closed, if enabled.
  */
-const toggle = useDebounce(() => {
+const toggle = useDebounce((e?: Event) => {
+  // @NOTE: Blurring the button allows the 'Enter' keypress to trigger
+  if (e && !open.value) {
+    (e.target as HTMLButtonElement).blur();
+  }
+
   if (!open.value && props.disabled) return;
+
+  if (open.value && button.value !== null) {
+    // Focus the button again unless Tab was pressed
+    if ((e as KeyboardEvent | undefined)?.code !== 'Tab' ?? true) {
+      button.value.focus();
+    }
+  }
+
   open.value = !open.value;
 }, 10);
 
@@ -128,7 +144,7 @@ const api: SelectApi = {
  * Move the highlighted option upwards, or wrap around
  */
 function arrowUp() {
-  if (highlightedIndex.value === 0) {
+  if (highlightedIndex.value <= 0) {
     highlighted.value = registrations.value[registrations.value.length - 1].id;
   } else {
     highlighted.value = registrations.value[highlightedIndex.value - 1].id;
@@ -159,9 +175,10 @@ function onKeyup(e: KeyboardEvent) {
       arrowDown();
       break;
     case 'Enter':
+    case 'Tab':
       if (highlighted.value === -1) break;
       registrations.value[highlightedIndex.value].el.click();
-      toggle();
+      toggle(e);
       break;
     case 'Escape':
       toggle();
@@ -171,6 +188,7 @@ function onKeyup(e: KeyboardEvent) {
 
 watchEffect(() => {
   if (open.value === true) {
+    highlighted.value = -1;
     document.addEventListener('keyup', onKeyup);
     document.addEventListener('click', toggle);
   } else {
@@ -205,6 +223,7 @@ provide(SELECT_API, api);
   >
     <slot name="activator" :activate="toggle" :disabled="props.disabled">
       <button
+        ref="button"
         class="select__button"
         type="button"
         tabindex="0"
