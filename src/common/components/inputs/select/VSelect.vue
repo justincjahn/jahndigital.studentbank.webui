@@ -222,6 +222,7 @@ watchEffect(() => {
 });
 
 onUnmounted(() => {
+  document.addEventListener('keydown', onKeydown);
   document.removeEventListener('keyup', onKeyup);
   document.removeEventListener('click', toggle);
 });
