@@ -102,6 +102,8 @@ export function setup() {
       ...data.updateInstance,
     ];
 
+    instanceList.sort((a, b) => (a.description > b.description ? 1 : -1));
+
     instanceCache.instances = instanceList;
     return data.updateInstance[0];
   }

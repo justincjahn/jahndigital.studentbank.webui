@@ -57,23 +57,8 @@ const highlighted = ref<number>(-1);
 
 // The index of the currently highlighted option
 const highlightedIndex = computed(() =>
-  registrations.value.findIndex((X) => X.id === highlighted.value)
+  registrations.value.findIndex((x) => x.id === highlighted.value)
 );
-
-/**
- * Calculate the indices of the options objects and sort them for keyboard support.
- */
-const calculateIndices = useDebounce(() => {
-  if (items.value === null) return;
-
-  const allElements = Array.from(items.value.querySelectorAll('*'));
-  registrations.value.forEach((value, index) => {
-    const elementIndex = allElements.indexOf(value.el);
-    registrations.value[index].index = elementIndex;
-  });
-
-  registrations.value.sort((a, b) => a.index - b.index);
-}, 10);
 
 /**
  * Toggle the selector open or closed, if enabled.
@@ -101,10 +86,6 @@ let latestId = 0;
 
 const api: SelectApi = {
   register(el) {
-    if (items.value === null) {
-      throw new Error('Item template ref null. This should not happen.');
-    }
-
     registrations.value.push({
       id: latestId,
       index: -1,
@@ -116,12 +97,10 @@ const api: SelectApi = {
 
       unregister: ((id: number) => () => {
         registrations.value = registrations.value.filter((x) => x.id !== id);
-        calculateIndices();
       })(latestId),
     };
 
     latestId += 1;
-    calculateIndices();
     return response;
   },
 
@@ -141,6 +120,13 @@ const api: SelectApi = {
 };
 
 /**
+ * Scroll the highlighted option into view.
+ */
+function scrollHighlighted() {
+  registrations.value[highlightedIndex.value].el.scrollIntoView();
+}
+
+/**
  * Move the highlighted option upwards, or wrap around
  */
 function arrowUp() {
@@ -149,6 +135,8 @@ function arrowUp() {
   } else {
     highlighted.value = registrations.value[highlightedIndex.value - 1].id;
   }
+
+  scrollHighlighted();
 }
 
 /**
@@ -160,6 +148,8 @@ function arrowDown() {
   } else {
     highlighted.value = registrations.value[highlightedIndex.value + 1].id;
   }
+
+  scrollHighlighted();
 }
 
 /**
@@ -168,12 +158,6 @@ function arrowDown() {
 function onKeyup(e: KeyboardEvent) {
   // eslint-disable-next-line default-case
   switch (e.code) {
-    case 'ArrowUp':
-      arrowUp();
-      break;
-    case 'ArrowDown':
-      arrowDown();
-      break;
     case 'Enter':
     case 'Tab':
       if (highlighted.value === -1) break;
@@ -186,12 +170,45 @@ function onKeyup(e: KeyboardEvent) {
   }
 }
 
+/**
+ * Listen for key events and perform various actions, including when the users holds a key down.
+ */
+function onKeydown(e: KeyboardEvent) {
+  // eslint-disable-next-line default-case
+  switch (e.code) {
+    case 'ArrowUp':
+      arrowUp();
+      break;
+    case 'ArrowDown':
+      arrowDown();
+      break;
+  }
+}
+
+/**
+ * Calculate the indices of the options objects and sort them for keyboard support.
+ */
+function calculateIndices() {
+  if (items.value === null) return;
+
+  const allElements = Array.from(items.value.querySelectorAll('*'));
+  registrations.value.forEach((value, index) => {
+    const elementIndex = allElements.indexOf(value.el);
+    registrations.value[index].index = elementIndex;
+  });
+
+  registrations.value.sort((a, b) => a.index - b.index);
+}
+
 watchEffect(() => {
   if (open.value === true) {
     highlighted.value = -1;
+    document.addEventListener('keydown', onKeydown);
     document.addEventListener('keyup', onKeyup);
     document.addEventListener('click', toggle);
+    calculateIndices();
   } else {
+    document.addEventListener('keydown', onKeydown);
     document.removeEventListener('keyup', onKeyup);
     document.removeEventListener('click', toggle);
   }

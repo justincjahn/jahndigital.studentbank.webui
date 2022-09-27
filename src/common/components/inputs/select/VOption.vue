@@ -7,12 +7,13 @@ import { SELECT_API } from './symbols';
 const props = withDefaults(
   defineProps<{
     // The value this option represents
-    value: unknown;
+    value?: string | number | Record<any, any> | null;
 
     // If the item is disabled
     disabled?: boolean;
   }>(),
   {
+    value: null,
     disabled: false,
   }
 );

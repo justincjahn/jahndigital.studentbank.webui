@@ -12,20 +12,19 @@ import uuid4 from '@/common/utils/uuid4';
 import { GlobalStore } from '@/admin/common/stores/global';
 
 // Components
-import BaseSelect, { Search } from '@/common/components/inputs/BaseSelect.vue';
+import { VOption, VDivider, VSelect } from '@/common/components/inputs/select';
 import ModalDialog from '@/common/components/ModalDialog.vue';
-
-type Instance = ServiceInstance | null;
 
 // @TODO: Fix this.
 // const DividendPostingModal = defineAsyncComponent(() => import('./DividendPostingModal.vue'));
+
+type Instance = ServiceInstance | null;
 
 enum ModalState {
   ADD,
   EDIT,
   DELETE,
   ACTIVE,
-  POST_DIVIDENDS,
   INVITE_CODE,
 }
 
@@ -67,16 +66,6 @@ const modalState = ref<ModalState>(ModalState.ADD);
 
 // The array of options presented to the base select component
 const options = computed(() => instanceStore.value.instances.value);
-
-// An object of additional options and indexes added to the base select component
-const indexes = computed(() => ({
-  ADD: options.value.length,
-  RENAME: options.value.length + 1,
-  DELETE: options.value.length + 2,
-  ACTIVATE: options.value.length + 3,
-  POST_DIVIDENDS: options.value.length + 4,
-  INVITE_CODE: options.value.length + 5,
-}));
 
 // The current invite code
 const inviteCode = computed(
@@ -124,12 +113,6 @@ const modalClass = computed(() => {
 
   return null;
 });
-
-// Return the name of the instance as the value
-const value: Search = (x) =>
-  typeof x === 'object'
-    ? (x as Instance)?.description ?? 'UNKNOWN'
-    : x?.toString() ?? 'UNKNOWN';
 
 // Copy the invite code to the clipboard
 function copyInviteCode() {
@@ -195,32 +178,6 @@ function startDelete() {
   if (props.modelValue === null) return;
   modalState.value = ModalState.DELETE;
   toggle();
-}
-
-// Handle the selection of additional options
-function handleSelect(index: number) {
-  switch (index) {
-    case indexes.value.ADD:
-      startAdd();
-      break;
-    case indexes.value.RENAME:
-      startEdit();
-      break;
-    case indexes.value.DELETE:
-      startDelete();
-      break;
-    case indexes.value.ACTIVATE:
-      startActive();
-      break;
-    case indexes.value.POST_DIVIDENDS:
-      toggleDividendPostingModal();
-      break;
-    case indexes.value.INVITE_CODE:
-      startInviteCode();
-      break;
-    default:
-    // Ignore
-  }
 }
 
 // Add a new instance and Update or Delete the selected instance.
@@ -310,93 +267,52 @@ function handleCancel() {
 </script>
 
 <template>
-  <!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
-  <!-- eslint-disable vuejs-accessibility/mouse-events-have-key-events -->
-
-  <base-select
-    prompt="Select an instance..."
-    class="instance-selector"
-    v-bind="$attrs"
-    :options="options"
-    :value="value"
-    :model-value="modelValue"
-    @update:model-value="update"
-    @select="handleSelect"
-  >
-    <template #selected="{ option, prompt }">
-      <template v-if="(option as Instance)?.isActive ?? false">
+  <v-select :model-value="modelValue" @update:model-value="update">
+    <template #activatorLabel>
+      <template v-if="modelValue?.isActive ?? false">
         <span class="active">(Active)</span>
-        {{ (option as Instance)?.description }}
       </template>
-      <template v-else>
-        {{ (option as Instance)?.description ?? prompt }}
-      </template>
+
+      {{ modelValue?.description ?? 'Select instance...' }}
     </template>
 
-    <template #option="{ option }">
-      <template v-if="(option as Instance)?.isActive ?? false">
+    <v-option v-for="option in options" :key="option.id" :value="option">
+      <template v-if="option.isActive">
         <span class="active">(Active)</span>
-        {{ (option as Instance)?.description }}
       </template>
-      <template v-else>
-        {{ (option as Instance)?.description }}
-      </template>
-    </template>
 
-    <template #additionalItems="{ select, classes, enter }">
-      <li class="select__items__divider"><hr /></li>
+      {{ option.description }}
+    </v-option>
 
-      <li
-        :class="classes(indexes.ADD)"
-        @click="select(indexes.ADD)"
-        @mouseenter="enter(indexes.ADD)"
-      >
-        Add...
-      </li>
+    <v-divider />
 
-      <li
-        :class="classes(indexes.RENAME)"
-        @click="select(indexes.RENAME)"
-        @mouseenter="enter(indexes.RENAME)"
-      >
-        Rename...
-      </li>
+    <v-option @click="startAdd"> Add... </v-option>
 
-      <li
-        :class="classes(indexes.DELETE)"
-        @click="select(indexes.DELETE)"
-        @mouseenter="enter(indexes.DELETE)"
-      >
-        Delete...
-      </li>
+    <v-option :disabled="modelValue === null" @click="startEdit">
+      Rename...
+    </v-option>
 
-      <li
-        :class="classes(indexes.ACTIVATE)"
-        @click="select(indexes.ACTIVATE)"
-        @mouseenter="enter(indexes.ACTIVATE)"
-      >
-        Activate...
-      </li>
+    <v-option :disabled="modelValue === null" @click="startDelete">
+      Delete...
+    </v-option>
 
-      <li class="select__items__divider"><hr /></li>
+    <v-option :disabled="modelValue === null" @click="startActive">
+      Activate...
+    </v-option>
 
-      <li
-        :class="classes(indexes.POST_DIVIDENDS)"
-        @click="select(indexes.POST_DIVIDENDS)"
-        @mouseenter="enter(indexes.POST_DIVIDENDS)"
-      >
-        Post Dividends...
-      </li>
+    <v-divider />
 
-      <li
-        :class="classes(indexes.INVITE_CODE)"
-        @click="select(indexes.INVITE_CODE)"
-        @mouseenter="enter(indexes.INVITE_CODE)"
-      >
-        Invite Code...
-      </li>
-    </template>
-  </base-select>
+    <v-option
+      :disabled="modelValue === null"
+      @click="toggleDividendPostingModal"
+    >
+      Post Dividends...
+    </v-option>
+
+    <v-option :disabled="modelValue === null" @click="startInviteCode">
+      Invite Code...
+    </v-option>
+  </v-select>
 
   <modal-dialog
     :title="modalTitle"
@@ -409,10 +325,12 @@ function handleCancel() {
     <template v-if="modalState === ModalState.DELETE">
       This action cannot be undone!
     </template>
+
     <template v-else-if="modalState === ModalState.ACTIVE">
       <strong>Warning:</strong> Making this instance active will mark all other
       instances inactive. Students in inactive instances cannot log in.
     </template>
+
     <template v-else-if="modalState === ModalState.INVITE_CODE">
       <div class="instance-form instance-form--invite-code">
         <label :for="`instance-form__invite-url--${id}`">Invite Code URL</label>
@@ -450,6 +368,7 @@ function handleCancel() {
         </div>
       </div>
     </template>
+
     <template v-else>
       <div class="instance-form">
         <label :for="`instance-form__instance-name--${id}`">Name</label>

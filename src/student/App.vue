@@ -31,22 +31,11 @@ function onAddUser() {
 
 <template>
   <h1>Vue App!</h1>
-  <!-- <v-select>
-    <v-option value="1" />
-    <v-option value="2" disabled />
-    <v-option value="3" @click="onClick" />
-    <v-divider />
-    <v-option value="4" />
-    <v-option value="5" />
-    <v-option value="6" />
-  </v-select> -->
 
   <v-select v-model="test">
     <v-option v-for="(item, i) in items" :key="i" :value="item" />
     <v-divider />
-    <div class="additional_options">
-      <v-option value="ADD_USER" @click="onAddUser" />
-    </div>
+    <v-option value="ADD_USER" @click="onAddUser" />
   </v-select>
 
   <button type="button" @click="add">Add</button>
