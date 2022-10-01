@@ -15,7 +15,8 @@
   </svg>
 </template>
 
-<style lang="scss">
+<style>
+/*
 @use 'sass:math';
 
 @function spring-wobbly($t) {
@@ -27,11 +28,26 @@
   @return $result;
 }
 
+@keyframes dollar-icon-wobble {
+  @for $i from 1 through 100 {
+    #{$i * 1%} {
+      transform: scale(
+        spring-wobbly(math.div($i, 30)),
+        spring-wobbly(math.div($i, 20))
+      );
+    }
+  }
+}
+
+.dollar-icon {
+  animation: dollar-icon-wobble 4s ease-in-out 4.25s infinite;
+}
+*/
+
 .dollar-icon {
   font-size: 0.75em;
   position: relative;
   overflow: visible;
-  animation: dollar-icon-wobble 4s ease-in-out 4.25s infinite;
   height: 1.5em;
   margin: 0.25em;
 }
@@ -47,32 +63,6 @@
 .dollar-icon .dollar-icon__s {
   stroke-width: 2rem;
 }
-
-.dollar-icon .dollar-icon__l1,
-.dollar-icon .dollar-icon__l2 {
-  opacity: 0;
-  stroke-width: 1.25rem;
-  animation: dollar-icon-down 4s cubic-bezier(0.6, 0.73, 0.12, 1.04) infinite;
-}
-
-.dollar-icon .dollar-icon__l1 {
-  animation-delay: 2s;
-}
-
-.dollar-icon .dollar-icon__l1 {
-  animation-delay: 2.5s;
-}
-
-// @keyframes dollar-icon-wobble {
-//   @for $i from 1 through 100 {
-//     #{$i * 1%} {
-//       transform: scale(
-//         spring-wobbly(math.div($i, 30)),
-//         spring-wobbly(math.div($i, 20))
-//       );
-//     }
-//   }
-// }
 
 @keyframes dollar-icon-down {
   0% {
@@ -91,5 +81,20 @@
   50% {
     opacity: 1;
   }
+}
+
+.dollar-icon .dollar-icon__l1,
+.dollar-icon .dollar-icon__l2 {
+  opacity: 0;
+  stroke-width: 1.25rem;
+  animation: dollar-icon-down 4s cubic-bezier(0.6, 0.73, 0.12, 1.04) infinite;
+}
+
+.dollar-icon .dollar-icon__l1 {
+  animation-delay: 2s;
+}
+
+.dollar-icon .dollar-icon__l1 {
+  animation-delay: 2.5s;
 }
 </style>
