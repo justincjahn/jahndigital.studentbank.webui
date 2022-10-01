@@ -5,14 +5,18 @@ import { computed, ref } from 'vue';
 import type { Instance as ServiceInstance } from '@/admin/common/services/instance';
 import { BASE_URLS } from '@/common/constants';
 
-// Utils
-import uuid4 from '@/common/utils/uuid4';
-
 // Stores
 import { GlobalStore } from '@/admin/common/stores/global';
 
 // Components
-import { VOption, VDivider, VSelect } from '@/common/components/inputs/select';
+import {
+  VOption,
+  VDivider,
+  VSelect,
+  VInput,
+  VCopyInput,
+} from '@/common/components/inputs';
+
 import ModalDialog from '@/common/components/ModalDialog.vue';
 
 // @TODO: Fix this.
@@ -37,6 +41,7 @@ const emit = defineEmits<{
   (event: 'update:modelValue', value: Instance): void;
 }>();
 
+// Convenience property for getting and setting the current error.
 const error = computed({
   get() {
     return props.store.error.error.value;
@@ -47,6 +52,7 @@ const error = computed({
   },
 });
 
+// The InstanceStore this component is attached to
 const instanceStore = computed(() => props.store.instance);
 
 // If the modal is open.
@@ -57,9 +63,6 @@ const showDividendPostingModal = ref(false);
 
 // The input to add/rename an instance
 const input = ref('');
-
-// A unique ID for the form
-const id = uuid4();
 
 // The current state of the modal
 const modalState = ref<ModalState>(ModalState.ADD);
@@ -72,17 +75,11 @@ const inviteCode = computed(
   () => instanceStore.value.selected.value?.inviteCode ?? 'UNKNOWN'
 );
 
-// The input element containing the invite code
-const inviteCodeInput = ref<HTMLInputElement | null>(null);
-
 // URL to send to students
 const inviteUrl = computed(() => {
   const baseUrl = `${window.location.protocol}//${window.location.host}/${BASE_URLS.REGISTER}?i=${inviteCode.value}`;
   return baseUrl;
 });
-
-// The input element containing the invite code url
-const inviteCodeUrlInput = ref<HTMLInputElement | null>(null);
 
 // The title of the modal window
 const modalTitle = computed(() => {
@@ -114,21 +111,14 @@ const modalClass = computed(() => {
   return null;
 });
 
-// Copy the invite code to the clipboard
-function copyInviteCode() {
-  if (!inviteCodeInput.value) return;
-  inviteCodeInput.value.select();
-  inviteCodeInput.value.setSelectionRange(0, 100);
-  document.execCommand('copy');
-}
+// The label assigned to the cancel button (and if it's shown)
+const modalCancelLabel = computed(() => {
+  if (modalState.value === ModalState.INVITE_CODE) {
+    return undefined;
+  }
 
-// Copy the invite code to the clipboard
-function copyInviteCodeUrl() {
-  if (!inviteCodeUrlInput.value) return;
-  inviteCodeUrlInput.value.select();
-  inviteCodeUrlInput.value.setSelectionRange(0, 1000);
-  document.execCommand('copy');
-}
+  return 'Cancel';
+});
 
 // Cascade the model update
 function update(item: unknown) {
@@ -257,6 +247,10 @@ async function handleOk() {
       toggle();
     }
   }
+
+  if (modalState.value === ModalState.INVITE_CODE) {
+    toggle();
+  }
 }
 
 // Reset the input and close the modal.
@@ -318,9 +312,9 @@ function handleCancel() {
     :title="modalTitle"
     :class="modalClass"
     :show="showModal"
-    cancel-label="Cancel"
-    @ok.prevent="handleOk"
-    @cancel.prevent="handleCancel"
+    :cancel-label="modalCancelLabel"
+    @ok="handleOk"
+    @cancel="handleCancel"
   >
     <template v-if="modalState === ModalState.DELETE">
       This action cannot be undone!
@@ -332,53 +326,21 @@ function handleCancel() {
     </template>
 
     <template v-else-if="modalState === ModalState.INVITE_CODE">
-      <div class="instance-form instance-form--invite-code">
-        <label :for="`instance-form__invite-url--${id}`">Invite Code URL</label>
+      <v-copy-input
+        v-model="inviteUrl"
+        name="inviteUrl"
+        label="Invite Code URL"
+      />
 
-        <div class="instance-form--input-wrapper">
-          <input
-            :id="`instance-form__invite-url--${id}`"
-            ref="inviteCodeUrlInput"
-            type="text"
-            readonly
-            :value="inviteUrl"
-            @focus="($event.target as HTMLInputElement).select()"
-          />
-
-          <button type="button" class="secondary" @click="copyInviteCodeUrl">
-            Copy
-          </button>
-        </div>
-
-        <label :for="`instance-form__invite-code--${id}`">Invite Code</label>
-
-        <div class="instance-form--input-wrapper">
-          <input
-            :id="`instance-form__invite-code--${id}`"
-            ref="inviteCodeInput"
-            type="text"
-            readonly
-            :value="inviteCode"
-            @focus="($event.target as HTMLInputElement).select()"
-          />
-
-          <button type="button" class="secondary" @click="copyInviteCode">
-            Copy
-          </button>
-        </div>
-      </div>
+      <v-copy-input
+        v-model="inviteCode"
+        name="inviteCode"
+        label="Invite Code"
+      />
     </template>
 
     <template v-else>
-      <div class="instance-form">
-        <label :for="`instance-form__instance-name--${id}`">Name</label>
-        <input
-          :id="`instance-form__instance-name--${id}`"
-          ref="inputElement"
-          v-model="input"
-          type="text"
-        />
-      </div>
+      <v-input v-model="input" name="instance-name" label="Name" />
     </template>
   </modal-dialog>
 
@@ -396,28 +358,5 @@ function handleCancel() {
 span.active {
   font-size: 0.7em;
   vertical-align: middle;
-}
-
-.instance-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1em;
-}
-
-.instance-form--input-wrapper {
-  display: flex;
-  flex-direction: row;
-}
-
-.instance-form--input-wrapper button {
-  margin: 0;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-}
-
-.instance-form--input-wrapper input {
-  flex-grow: 1;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
 }
 </style>

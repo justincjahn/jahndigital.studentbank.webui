@@ -1,1 +1,3 @@
-<template>Groups Home!</template>
+<template>
+  <p>Groups Home!</p>
+</template>
