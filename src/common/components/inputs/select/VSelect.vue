@@ -131,7 +131,8 @@ function scrollHighlighted() {
  */
 function arrowUp() {
   if (highlightedIndex.value <= 0) {
-    highlighted.value = registrations.value[registrations.value.length - 1].id;
+    highlighted.value =
+      registrations.value[registrations.value.length - 1]?.id ?? -1;
   } else {
     highlighted.value = registrations.value[highlightedIndex.value - 1].id;
   }
@@ -144,7 +145,7 @@ function arrowUp() {
  */
 function arrowDown() {
   if (highlightedIndex.value >= registrations.value.length - 1) {
-    highlighted.value = registrations.value[0].id;
+    highlighted.value = registrations.value[0]?.id ?? -1;
   } else {
     highlighted.value = registrations.value[highlightedIndex.value + 1].id;
   }
@@ -307,7 +308,7 @@ provide(SELECT_API, api);
   width: 0;
   height: 0;
   border: 5px solid transparent;
-  border-color: hsl(var(--secondary-font-color) / 0.9) transparent transparent
+  border-color: hsl(var(--clr-primary-400) / 0.9) transparent transparent
     transparent;
   transition: transform 0.1s ease-in-out, top 0.1s ease-in-out;
   transform-origin: center;
@@ -328,8 +329,8 @@ provide(SELECT_API, api);
   overflow-y: auto;
   user-select: none;
   width: var(--width);
-  background-color: hsl(var(--secondary-bg-color));
-  border: 1px solid hsl(var(--secondary-bg-color-dark2));
+  background-color: hsl(var(--clr-neutral-300));
+  border: 1px solid hsl(var(--clr-neutral-400));
   border-radius: 0 0 var(--border-radius) var(--border-radius);
 }
 

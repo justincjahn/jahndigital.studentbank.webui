@@ -236,7 +236,7 @@ export default defineComponent({
   height: 100%;
   visibility: hidden;
   overflow: hidden;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: hsl(0 0% 0% / 0.5);
   font-size: 1rem; /* Reset fonts for this modal */
   display: flex;
   flex-direction: column;
@@ -253,15 +253,15 @@ export default defineComponent({
 }
 
 .modal .modal__container {
-  background-color: hsl(var(--primary-bg-color));
+  background-color: hsl(var(--clr-neutral-100));
 }
 
 @media screen and (min-width: 700px) {
   .modal .modal__container {
     margin: 0 auto;
     width: clamp(450px, 50vw, 600px);
-    border-bottom-left-radius: 0.25rem;
-    border-bottom-right-radius: 0.25rem;
+    border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
   }
 }
 
@@ -275,16 +275,23 @@ export default defineComponent({
 
 @media screen and (min-width: 700px) and (min-height: 400px) {
   .modal .modal__container {
-    border-radius: 0.25rem;
+    border-radius: var(--border-radius);
   }
 }
 
 .modal .modal__container__title {
-  background-color: hsl(var(--secondary-bg-color));
-  border-bottom: 1px solid hsl(var(--primary-bg-color-dark2));
+  --clr-font: var(--clr-primary-400);
+  --clr-bg: var(--clr-neutral-400);
+  --clr-border: var(--clr-neutral-500);
 
-  @media screen and (min-width: 700px) and (min-height: 400px) {
-    border-radius: 0.25rem 0.25rem 0 0;
+  color: hsl(var(--clr-font));
+  background-color: hsl(var(--clr-bg));
+  border-bottom: 1px solid hsl(var(--clr-border));
+}
+
+@media screen and (min-width: 700px) and (min-height: 400px) {
+  .modal .modal__container__title {
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
   }
 }
 
@@ -315,40 +322,13 @@ export default defineComponent({
 }
 
 .modal.destructive .modal__container__title {
-  color: hsl(var(--destructive-font-color));
-  background-color: hsl(var(--destructive-bg-color));
+  --clr-font: var(--clr-destructive-100);
+  --clr-bg: var(--clr-destructive-400);
 }
 
-.modal.destructive .modal__container__buttons__ok {
-  outline: 0;
-  padding: 0.5em;
-  margin: 0.25em;
-  min-width: 100px;
-  cursor: pointer;
-
-  color: hsl(var(--destructive-font-color));
-  background-color: hsl(var(--destructive-bg-color));
-  border: 1px solid hsl(var(--destructive-bg-color-dark2));
-  border-radius: 3px;
-
-  transition-property: background-color;
-  transition-duration: 0.15s;
-  transition-delay: 0;
-}
-
-.modal.destructive .modal__container__buttons__ok:disabled {
-  cursor: inherit;
-  color: hsla(var(--destructive-font-color) / 0.5);
-  background-color: hsl(--destructive-bg-color-light2);
-  border-color: hsl(--destructive-bg-color-light1);
-}
-
-.modal.destructive .modal__container__buttons__ok:hover,
-.modal.destructive .modal__container__buttons__ok:focus,
-.modal.destructive .modal__container__buttons__ok:active {
-  color: hsla(var(--destructive-font-color) / 0.85);
-  background-color: hsl(var(--destructive-bg-color-dark1));
-  border-color: hsl(var(--destructive-bg-color-dark2));
+.modal.accent1 .modal__container__title {
+  --clr-font: var(--clr-accent1-100);
+  --clr-bg: var(--clr-accent1-400);
 }
 
 .modal.large .modal__container {

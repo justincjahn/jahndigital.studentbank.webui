@@ -5,10 +5,8 @@
 body {
   font-size:               12pt;
   line-height:             1.5;
-  color:                   hsl(var(--primary-font-color));
+  color:                   hsl(var(--clr-primary-400));
   font-family:             Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing:  antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color:        hsl(var(--primary-bg-color));
-  margin:                  0;
 }

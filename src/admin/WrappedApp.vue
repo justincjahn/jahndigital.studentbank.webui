@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import '@/admin/common/styles/layout.css';
+
 import {
   defineAsyncComponent,
   provide,

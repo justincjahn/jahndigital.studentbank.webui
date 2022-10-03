@@ -4,7 +4,7 @@ label {
 
 label span.required {
   font-size: 0.7em;
-  color: hsl(var(--destructive-bg-color));
+  color: hsl(var(--clr-destructive-600));
   vertical-align: super;
 }
 
@@ -12,8 +12,8 @@ input[type=text],
 input[type=password]
 {
   padding: 0.5em 2em 0.5em 0.5em;
-  outline-color: hsl(var(--accent1-bg-color-light1));
-  border: 1px solid hsl(var(--secondary-bg-color-dark1));
+  outline-color: hsl(var(--clr-accent1-400));
+  border: 1px solid hsl(var(--clr-accent1-300));
   border-radius: var(--border-radius);
 }
 
@@ -22,22 +22,26 @@ input[type=password]:invalid,
 input[type=text].error,
 input[type=password].error
 {
-  outline-color: hsl(var(--destructive-bg-color-light1));
-  border: 1px solid hsl(var(--destructive-bg-color-light1));
+  outline-color: hsl(var(--clr-destructive-400));
+  border: 1px solid hsl(var(--clr-destructive-400));
 }
 
 button,
 input[type=submit]
 {
+  --clr-font: var(--clr-primary-400);
+  --clr-bg: var(--clr-neutral-400);
+  --clr-border: var(--clr-neutral-500);
+
   outline: 0;
   padding: 0.5em;
   margin: 0.25em;
   min-width: 100px;
   cursor: pointer;
 
-  color: hsl(var(--secondary-font-color));
-  background-color: hsl(var(--secondary-bg-color));
-  border: 1px solid hsl(var(--secondary-bg-color-dark1));
+  color: hsl(var(--clr-font));
+  background-color: hsl(var(--clr-bg));
+  border: 1px solid hsl(var(--clr-border));
   border-radius: var(--border-radius);
 
   transition-property: filter, background-color;
@@ -50,55 +54,44 @@ input[type=submit]:hover:enabled,
 button:focus:enabled,
 input[type=submit]:focus:enabled
 {
-  filter: brightness(0.95);
+  filter: brightness(0.9);
 }
 
 button:focus:enabled,
 input[type=submit]:focus:enabled
 {
-  border-color: hsl(var(--accent1-bg-color-light2));
-  filter: brightness(1.2);
+  --clr-border: var(--clr-accent1-300);
+  filter: brightness(1.025);
 }
 
 button:active:enabled,
 input[type=submit]:active:enabled
 {
-  filter: brightness(0.9);
+  filter: brightness(0.85);
 }
 
 button:disabled,
 input[type=submit]:disabled
 {
+  --clr-font: var(--clr-font) / 0.5;
   cursor: inherit;
-  color: hsla(var(--primary-font-color) / 0.5);
 }
 
 button.destructive,
-input[type=submit].destructive
+input[type=submit].destructive,
+.modal.destructive button.primary
 {
-  color: hsl(var(--destructive-font-color));
-  background-color: hsl(var(--destructive-bg-color));
-  border: 1px solid hsl(var(--destructive-bg-color-dark1));
-}
-
-button.destructive:disabled,
-input[type=submit].destructive:disabled
-{
-  color: hsla(var(--destructive-font-color) / 0.5);
+  --clr-font: var(--clr-destructive-100);
+  --clr-bg: var(--clr-destructive-400);
+  --clr-border: var(--clr-destructive-500);
 }
 
 button.primary,
 input[type=submit].primary
 {
-  color: hsl(var(--accent1-font-color));
-  background-color: hsl(var(--accent1-bg-color));
-  border: 1px solid hsl(var(--accent1-bg-color-dark1));
-}
-
-button.primary:disabled,
-input[type=submit].primary:disabled
-{
-  color: hsla(var(--accent1-font-color) / 0.5);
+  --clr-font: var(--clr-accent1-100);
+  --clr-bg: var(--clr-accent1-400);
+  --clr-border: var(--clr-accent1-500);
 }
 
 div.fieldset {

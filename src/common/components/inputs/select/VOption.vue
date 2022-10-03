@@ -71,13 +71,13 @@ onUnmounted(() => {
 }
 
 .select__items__item.highlighted {
-  background-color: hsl(var(--secondary-bg-color-dark1));
+  background-color: hsl(var(--clr-neutral-400));
 }
 
 .select__items__item.disabled {
   cursor: inherit;
   font-style: italic;
-  color: hsl(var(--secondary-font-color) / 0.4);
+  color: hsl(var(--clr-primary-400) / 0.4);
 }
 
 .select__items__item.disabled.highlighted {
