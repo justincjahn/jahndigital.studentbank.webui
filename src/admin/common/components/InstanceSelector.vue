@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
 
-// Common
+// Types
+import type { GlobalStore } from '@/admin/common/stores/global';
 import type { Instance as ServiceInstance } from '@/admin/common/services/instance';
-import { BASE_URLS } from '@/common/constants';
 
-// Stores
-import { GlobalStore } from '@/admin/common/stores/global';
+// Utils
+import { BASE_URLS } from '@/common/constants';
 
 // Components
 import {
@@ -65,7 +65,7 @@ const showDividendPostingModal = ref(false);
 const input = ref('');
 
 // The current state of the modal
-const modalState = ref<ModalState>(ModalState.ADD);
+const modalState = ref(ModalState.ADD);
 
 // The array of options presented to the base select component
 const options = computed(() => instanceStore.value.instances.value);
@@ -340,7 +340,7 @@ function handleCancel() {
     </template>
 
     <template v-else>
-      <v-input v-model="input" name="instance-name" label="Name" />
+      <v-input v-model="input" name="instance-name" label="Name" required />
     </template>
   </modal-dialog>
 

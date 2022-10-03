@@ -249,7 +249,7 @@ provide(SELECT_API, api);
         :disabled="props.disabled"
         @click="toggle"
       >
-        <slot name="activatorLabel">
+        <slot name="activatorLabel" :prompt="props.prompt">
           {{ props.modelValue?.toString() ?? props.prompt }}
         </slot>
       </button>
@@ -279,12 +279,13 @@ provide(SELECT_API, api);
 .select {
   position: static;
   display: inline-block;
+  margin: 0.25rem;
 }
 
 .select__button {
   position: relative;
-  margin: 0;
   outline: 0;
+  margin: 0;
   width: var(--width);
   text-align: left;
   vertical-align: middle;

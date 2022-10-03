@@ -7,7 +7,6 @@ import {
   FetchPolicy,
   MutationOptions,
   OperationVariables,
-  QueryOptions,
 } from '@apollo/client/core';
 
 import { setContext } from '@apollo/client/link/context';
@@ -49,10 +48,10 @@ const defaultClient = new ApolloClient({
  */
 export async function query<TReturn, TOptions = OperationVariables>(
   qry: DocumentNode,
-  variables?: QueryOptions<TOptions, TReturn>,
+  variables?: TOptions,
   fetchPolicy?: FetchPolicy
 ): Promise<TReturn> {
-  const res = await defaultClient.query<TReturn>({
+  const res = await defaultClient.query<TReturn, TOptions>({
     query: qry,
     variables,
     fetchPolicy,

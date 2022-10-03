@@ -6,7 +6,7 @@ withDefaults(
     show?: boolean;
   }>(),
   {
-    show: false,
+    show: true,
   }
 );
 </script>
@@ -14,9 +14,8 @@ withDefaults(
 <template>
   <div v-if="show" class="loading-label">
     <dollar-icon />
-
     <div class="loading-label__content">
-      <slot> Please wait... </slot>
+      <slot><span>Please wait...</span></slot>
     </div>
   </div>
   <template v-else>
@@ -25,17 +24,12 @@ withDefaults(
 </template>
 
 <style>
-.loading-label {
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
+.loading-label,
+.loading-label__content {
+  display: inline;
 }
 
 .loading-label__content {
-  font-size: 1em;
-  margin: 0.1em 0 0 0.5em;
-  align-self: center;
+  padding-left: 1ch;
 }
 </style>

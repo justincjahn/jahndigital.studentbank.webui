@@ -1,6 +1,16 @@
 import { computed, reactive, watch } from 'vue';
-import * as groupService from '@/services/group';
-import { InstanceStore } from '@/modules/admin/stores/instance';
+
+// Types
+import type { InstanceStore } from '@//admin/common/stores/instance';
+
+import type {
+  Group,
+  NewGroupRequest,
+  UpdateGroupRequest,
+} from '@/admin/common/services/group';
+
+// Services
+import * as groupService from '@/admin/common/services/group';
 
 /**
  * Stores information regarding the groups of the currently selected Instance and
@@ -11,26 +21,27 @@ import { InstanceStore } from '@/modules/admin/stores/instance';
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup(instanceStore: InstanceStore) {
   const store = reactive({
-    selected: null as Group|null,
+    selected: null as Group | null,
     groups: [] as Group[],
     loading: false,
   });
 
-  // GETs the selected group
-  const selected = computed(() => store.selected);
+  // Get or set the selected group
+  const selected = computed({
+    get() {
+      return store.selected;
+    },
+
+    set(value) {
+      store.selected = value;
+    },
+  });
 
   // GETs the currently loaded list of groups
   const groups = computed(() => store.groups);
 
   // GETs the loading state of the fetch operation
   const loading = computed(() => store.loading);
-
-  /**
-   * SETs the selected group
-   *
-   * @param item
-   */
-  function setSelected(item: Group|null) { store.selected = item; }
 
   /**
    * Fetch the groups of a specific instance.
@@ -43,7 +54,7 @@ export function setup(instanceStore: InstanceStore) {
 
     try {
       const data = await groupService.getGroups({ instanceId, cache });
-      store.groups = data.groups.nodes;
+      store.groups = data.groups?.nodes || [];
     } finally {
       store.loading = false;
     }
@@ -55,7 +66,11 @@ export function setup(instanceStore: InstanceStore) {
    * @param input
    */
   async function newGroup(input: NewGroupRequest) {
-    const data = await groupService.newGroup(input);
+    const data = await groupService.newGroup({
+      ...input,
+      instanceId: instanceStore.selected.value?.id ?? -1,
+    });
+
     const [group] = data.newGroup;
     store.groups = [...store.groups, group];
     return group;
@@ -66,12 +81,19 @@ export function setup(instanceStore: InstanceStore) {
    *
    * @param input
    */
-  async function updateGroup(input: UpdateGroupRequest) {
-    const data = await groupService.updateGroup(input);
-    store.groups = [
+  async function updateGroup(input: Omit<UpdateGroupRequest, 'instanceId'>) {
+    const data = await groupService.updateGroup({
+      ...input,
+      instanceId: instanceStore.selected.value?.id ?? -1,
+    });
+
+    const groupList = [
       ...store.groups.filter((x: Group) => x.id !== data?.updateGroup[0].id),
       ...data.updateGroup,
     ];
+
+    groupList.sort((a, b) => (a.name > b.name ? 1 : -1));
+    store.groups = groupList;
 
     return data.updateGroup[0];
   }
@@ -86,7 +108,9 @@ export function setup(instanceStore: InstanceStore) {
 
     if (data.deleteGroup === true) {
       store.groups = store.groups.filter((x) => x.id !== group.id);
-      if (store.selected === group) { store.selected = null; }
+      if (store.selected === group) {
+        store.selected = null;
+      }
       return;
     }
 
@@ -94,27 +118,32 @@ export function setup(instanceStore: InstanceStore) {
   }
 
   // Watch for selected instance changes and fetch new groups
-  // @NOTE Not using watchEffect here because we don't want to watch store.groups changes.
-  watch(() => instanceStore.selected.value, (newValue, oldValue) => {
-    if (newValue !== oldValue) {
-      if (newValue === null) {
-        store.groups = [];
-      } else if (typeof newValue !== 'undefined') {
-        fetchGroups(newValue.id);
+  watch(
+    () => instanceStore.selected.value,
+    (newValue, oldValue) => {
+      if (newValue !== oldValue) {
+        if (newValue === null) {
+          store.groups = [];
+        } else if (typeof newValue !== 'undefined') {
+          fetchGroups(newValue.id);
+        }
       }
-    }
 
-    if (instanceStore.selected.value?.id !== store.selected?.instanceId ?? false) {
-      store.selected = null;
-    }
-  }, { immediate: true });
+      if (
+        instanceStore.selected.value?.id !== store.selected?.instanceId ??
+        false
+      ) {
+        store.selected = null;
+      }
+    },
+    { immediate: true }
+  );
 
   return {
     selected,
     groups,
     loading,
     instanceStore,
-    setSelected,
     fetchGroups,
     newGroup,
     updateGroup,

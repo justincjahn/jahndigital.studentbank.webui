@@ -45,6 +45,14 @@ main {
   flex-grow: 1;
 }
 
+.sub-menu {
+  margin-top: 1rem;
+  padding: 1rem 0;
+  background-color: hsl(var(--clr-neutral-400));
+  border-top: 1px solid hsl(var(--clr-neutral-500));
+  border-bottom: 1px solid hsl(var(--clr-neutral-500));
+}
+
 footer {
   text-align: center;
   font-size: 0.7em;

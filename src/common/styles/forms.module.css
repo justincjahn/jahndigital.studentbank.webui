@@ -1,3 +1,7 @@
+/*
+ * FORM ELEMENTS
+ */
+
 label {
   font-weight: bold;
 }
@@ -26,17 +30,22 @@ input[type=password].error
   border: 1px solid hsl(var(--clr-destructive-400));
 }
 
+/*
+ * BUTTONS
+ */
+
 button,
 input[type=submit]
 {
   --clr-font: var(--clr-primary-400);
-  --clr-bg: var(--clr-neutral-400);
+  --clr-bg: var(--clr-neutral-300);
   --clr-border: var(--clr-neutral-500);
 
   outline: 0;
   padding: 0.5em;
   margin: 0.25em;
   min-width: 100px;
+  user-select: none;
   cursor: pointer;
 
   color: hsl(var(--clr-font));
@@ -50,32 +59,35 @@ input[type=submit]
 }
 
 button:hover:enabled,
-input[type=submit]:hover:enabled,
-button:focus:enabled,
-input[type=submit]:focus:enabled
+input[type=submit]:hover:enabled
 {
   filter: brightness(0.9);
+}
+
+button:active:enabled,
+input[type=submit]:active:enabled
+{
+  filter: brightness(1);
 }
 
 button:focus:enabled,
 input[type=submit]:focus:enabled
 {
   --clr-border: var(--clr-accent1-300);
-  filter: brightness(1.025);
-}
-
-button:active:enabled,
-input[type=submit]:active:enabled
-{
-  filter: brightness(0.85);
+  text-decoration: underline;
 }
 
 button:disabled,
 input[type=submit]:disabled
 {
-  --clr-font: var(--clr-font) / 0.5;
+  --clr-font: var(--clr-primary-400) / 0.75;
+  font-style: italic;
   cursor: inherit;
 }
+
+/*
+ * BUTTON VARIANT - DESTRUCTIVE
+ */
 
 button.destructive,
 input[type=submit].destructive,
@@ -86,6 +98,24 @@ input[type=submit].destructive,
   --clr-border: var(--clr-destructive-500);
 }
 
+button.destructive:disabled,
+input[type=submit].destructive:disabled,
+.modal.destructive button.primary:disabled
+{
+  --clr-font: var(--clr-destructive-100) / 0.75;
+}
+
+button.destructive:focus,
+input[type=submit].destructive:focus,
+.modal.destructive button.primary:focus
+{
+  --clr-border: var(--clr-destructive-900);
+}
+
+/*
+ * BUTTON VARIANT - PRIMARY
+ */
+
 button.primary,
 input[type=submit].primary
 {
@@ -93,6 +123,22 @@ input[type=submit].primary
   --clr-bg: var(--clr-accent1-400);
   --clr-border: var(--clr-accent1-500);
 }
+
+button.primary:disabled,
+input[type=submit].primary:disabled
+{
+  --clr-font: var(--clr-accent1-100) / 0.75;
+}
+
+button.primary:focus,
+input[type=submit].primary:focus
+{
+  --clr-border: var(--clr-accent1-900);
+}
+
+/*
+ * FIELDSET
+ */
 
 div.fieldset {
   display: flex;

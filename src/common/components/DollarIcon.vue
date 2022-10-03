@@ -45,11 +45,10 @@
 */
 
 .dollar-icon {
-  font-size: 0.75em;
+  height: 0.75em;
   position: relative;
   overflow: visible;
-  height: 1.5em;
-  margin: 0.25em;
+  display: inline;
 }
 
 .dollar-icon .dollar-icon__s,
