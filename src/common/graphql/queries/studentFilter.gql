@@ -1,6 +1,6 @@
 #import "../fragments/pageInfo.gql"
 
-query students(
+query studentsFilter(
   $first: Int = 25,
   $where: StudentFilterInput
 ) {

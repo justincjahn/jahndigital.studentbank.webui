@@ -2866,13 +2866,13 @@ export type StudentsByIdQueryVariables = Exact<{
 
 export type StudentsByIdQuery = { __typename?: 'Query', students?: { __typename?: 'StudentsConnection', nodes?: Array<{ __typename?: 'Student', id: any, accountNumber: string, firstName: string, lastName: string, groupId: any, email?: string | null, dateLastLogin?: any | null, dateRegistered?: any | null, shares: Array<{ __typename?: 'Share', id: any, shareTypeId: any, balance: any, studentId: any, limitedWithdrawalCount: number, shareType: { __typename?: 'ShareType', id: any, name: string, dividendRate: any, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: any, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: any, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: any }> } }>, group: { __typename?: 'Group', id: any, instanceId: any, name: string, instance: { __typename?: 'Instance', id: any, description: string } } }> | null } | null };
 
-export type StudentsQueryVariables = Exact<{
+export type StudentsFilterQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']>;
   where?: InputMaybe<StudentFilterInput>;
 }>;
 
 
-export type StudentsQuery = { __typename?: 'Query', students?: { __typename?: 'StudentsConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Student', accountNumber: string }> | null } | null };
+export type StudentsFilterQuery = { __typename?: 'Query', students?: { __typename?: 'StudentsConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Student', accountNumber: string }> | null } | null };
 
 export type StudentStockHistoryQueryVariables = Exact<{
   studentStockId: Scalars['Long'];
@@ -2895,24 +2895,14 @@ export type StudentStocksQueryVariables = Exact<{
 
 export type StudentStocksQuery = { __typename?: 'Query', studentStocks?: { __typename?: 'StudentStocksConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'StudentStock', id: any, stockId: any, studentId: any, sharesOwned: any, netContribution: any, dateCreated: any, dateLastActive: any, stock: { __typename?: 'Stock', id: any, name: string, symbol: string, currentValue: any, rawDescription: string, formattedDescription: string } }> | null } | null };
 
-export type StudentsWithSharesQueryVariables = Exact<{
-  first?: InputMaybe<Scalars['Int']>;
-  after?: InputMaybe<Scalars['String']>;
-  order?: StudentSortInput;
-  groupId?: InputMaybe<Scalars['Long']>;
-}>;
-
-
-export type StudentsWithSharesQuery = { __typename?: 'Query', students?: { __typename?: 'StudentsConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Student', id: any, accountNumber: string, firstName: string, lastName: string, groupId: any, email?: string | null, dateLastLogin?: any | null, dateRegistered?: any | null, shares: Array<{ __typename?: 'Share', id: any, shareTypeId: any, balance: any, studentId: any, limitedWithdrawalCount: number, shareType: { __typename?: 'ShareType', id: any, name: string, dividendRate: any, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: any, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: any, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: any }> } }>, group: { __typename?: 'Group', id: any, instanceId: any, name: string, instance: { __typename?: 'Instance', id: any, description: string } } }> | null } | null };
-
-export type StudentsByAcccountNumberQueryVariables = Exact<{
+export type StudentsByAccountNumberQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']>;
   order?: StudentSortInput;
   accountNumber: Scalars['String'];
 }>;
 
 
-export type StudentsByAcccountNumberQuery = { __typename?: 'Query', students?: { __typename?: 'StudentsConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Student', id: any, accountNumber: string, firstName: string, lastName: string, groupId: any, email?: string | null, dateLastLogin?: any | null, dateRegistered?: any | null, shares: Array<{ __typename?: 'Share', id: any, shareTypeId: any, balance: any, studentId: any, limitedWithdrawalCount: number, shareType: { __typename?: 'ShareType', id: any, name: string, dividendRate: any, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: any, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: any, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: any }> } }>, group: { __typename?: 'Group', id: any, instanceId: any, name: string, instance: { __typename?: 'Instance', id: any, description: string } } }> | null } | null };
+export type StudentsByAccountNumberQuery = { __typename?: 'Query', students?: { __typename?: 'StudentsConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Student', id: any, accountNumber: string, firstName: string, lastName: string, groupId: any, email?: string | null, dateLastLogin?: any | null, dateRegistered?: any | null, shares: Array<{ __typename?: 'Share', id: any, shareTypeId: any, balance: any, studentId: any, limitedWithdrawalCount: number, shareType: { __typename?: 'ShareType', id: any, name: string, dividendRate: any, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: any, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: any, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: any }> } }>, group: { __typename?: 'Group', id: any, instanceId: any, name: string, instance: { __typename?: 'Instance', id: any, description: string } } }> | null } | null };
 
 export type StudentsByEmailQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']>;
@@ -2931,6 +2921,16 @@ export type StudentsByNameQueryVariables = Exact<{
 
 
 export type StudentsByNameQuery = { __typename?: 'Query', students?: { __typename?: 'StudentsConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Student', id: any, accountNumber: string, firstName: string, lastName: string, groupId: any, email?: string | null, dateLastLogin?: any | null, dateRegistered?: any | null, shares: Array<{ __typename?: 'Share', id: any, shareTypeId: any, balance: any, studentId: any, limitedWithdrawalCount: number, shareType: { __typename?: 'ShareType', id: any, name: string, dividendRate: any, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: any, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: any, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: any }> } }>, group: { __typename?: 'Group', id: any, instanceId: any, name: string, instance: { __typename?: 'Instance', id: any, description: string } } }> | null } | null };
+
+export type StudentsWithSharesQueryVariables = Exact<{
+  first?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']>;
+  order?: StudentSortInput;
+  groupId?: InputMaybe<Scalars['Long']>;
+}>;
+
+
+export type StudentsWithSharesQuery = { __typename?: 'Query', students?: { __typename?: 'StudentsConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Student', id: any, accountNumber: string, firstName: string, lastName: string, groupId: any, email?: string | null, dateLastLogin?: any | null, dateRegistered?: any | null, shares: Array<{ __typename?: 'Share', id: any, shareTypeId: any, balance: any, studentId: any, limitedWithdrawalCount: number, shareType: { __typename?: 'ShareType', id: any, name: string, dividendRate: any, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: any, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: any, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: any }> } }>, group: { __typename?: 'Group', id: any, instanceId: any, name: string, instance: { __typename?: 'Instance', id: any, description: string } } }> | null } | null };
 
 export type TransactionsQueryVariables = Exact<{
   shareId: Scalars['Long'];

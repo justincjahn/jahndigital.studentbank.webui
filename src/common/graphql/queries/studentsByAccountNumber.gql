@@ -1,7 +1,7 @@
 #import "../fragments/pageInfo.gql"
 #import "../fragments/student.gql"
 
-query studentsByAcccountNumber(
+query studentsByAccountNumber(
   $first: Int = 25,
   $order: StudentSortInput! = { accountNumber: ASC },
   $accountNumber: String!

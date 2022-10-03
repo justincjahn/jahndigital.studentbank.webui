@@ -6,6 +6,7 @@ import routerStore from '@/common/stores/router';
 // Routing
 import GroupRouteNames from '@/admin/groups/routeNames';
 import GroupRoutes from '@/admin/groups/routes';
+import StudentRoutes from '@/admin/students/routes';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -15,6 +16,7 @@ const routes: RouteRecordRaw[] = [
   },
 
   ...GroupRoutes,
+  ...StudentRoutes,
 ];
 
 const router = createRouter({

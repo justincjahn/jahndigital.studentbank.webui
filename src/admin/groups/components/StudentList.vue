@@ -1,0 +1,166 @@
+<script lang="ts" setup>
+import { ref, computed, watchEffect, watch } from 'vue';
+
+import type { Student } from '@/common/services/student';
+
+// Routing
+import { useRouter } from 'vue-router';
+import StudentRouteNames from '@/admin/students/routeNames';
+
+// Services
+import selection from '@/admin/groups/services/StudentSelectionService';
+
+// Stores
+import { GlobalStore } from '@/admin/common/stores/global';
+import { setup as setupStudentStore } from '@/admin/common/stores/student';
+
+const props = defineProps<{
+  store: GlobalStore;
+}>();
+
+const studentStore = setupStudentStore();
+const router = useRouter();
+const numClicks = ref(0);
+const delay = 300;
+let timer: ReturnType<typeof setTimeout> | null = null;
+
+const selectedInstance = computed(() => props.store.instance.selected.value);
+const selectedGroup = computed(() => props.store.group.selected.value);
+
+function loginDateFormat(date: string) {
+  if (!date || date.trim().length === 0) return 'Never';
+  return new Date(date).toLocaleDateString('en-US');
+}
+
+function registrationStatus(date: string) {
+  return !date || date.trim().length === 0 ? 'Unregistered' : 'Registered';
+}
+
+function handleClick(student: Student) {
+  numClicks.value += 1;
+
+  if (numClicks.value === 1) {
+    selection.toggleStudent(student);
+
+    timer = setTimeout(() => {
+      numClicks.value = 0;
+    }, delay);
+  } else {
+    if (!timer) return;
+    clearTimeout(timer);
+    selection.toggleStudent(student);
+    numClicks.value = 0;
+    router.push({
+      name: StudentRouteNames.index,
+      params: {
+        studentId: student.id,
+      },
+    });
+  }
+}
+
+watchEffect(() => {
+  if (selectedGroup.value !== null) {
+    studentStore.fetch({
+      groupId: selectedGroup.value.id,
+    });
+  } else {
+    studentStore.clear();
+  }
+});
+
+watch(selectedInstance, (newValue, oldValue) => {
+  if (!oldValue) return;
+
+  if (newValue !== oldValue) {
+    selection.clear();
+  }
+});
+
+const {
+  loading,
+  students,
+  totalPages,
+  hasPreviousPage,
+  hasNextPage,
+  fetchNext,
+  fetchPrevious,
+} = studentStore;
+</script>
+
+<template>
+  <!-- eslint-disable vuejs-accessibility/form-control-has-label -->
+  <div class="student-list" :class="{ 'student-list--loading': loading }">
+    <table class="student-list__list selectable">
+      <thead>
+        <tr>
+          <th>
+            <input
+              type="checkbox"
+              :checked="selection.hasGroup(selectedGroup)"
+              @click="selection.toggleGroup(selectedGroup)"
+            />
+          </th>
+          <th>Account Number</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Email Address</th>
+          <th>Last Login</th>
+          <th>Registration</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-if="selectedGroup === null">
+          <td class="student-list__select-group center" colspan="7">
+            Please select a group...
+          </td>
+        </tr>
+        <template v-else>
+          <tr
+            v-for="student in students"
+            :key="student.id"
+            :class="{ selected: selection.hasStudent(student) }"
+            class="student-list__student"
+            @click="handleClick(student)"
+          >
+            <td>
+              <input type="checkbox" :checked="selection.hasStudent(student)" />
+            </td>
+            <td>{{ student.accountNumber }}</td>
+            <td>{{ student.firstName }}</td>
+            <td>{{ student.lastName }}</td>
+            <td>{{ student.email }}</td>
+            <td>{{ loginDateFormat(student.dateLastLogin) }}</td>
+            <td>{{ registrationStatus(student.dateRegistered) }}</td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+    <div v-if="totalPages > 1" class="pagination-buttons">
+      <button
+        type="button"
+        :disabled="!hasPreviousPage"
+        @click.passive="fetchPrevious"
+      >
+        Previous
+      </button>
+      <button type="button" :disabled="!hasNextPage" @click.passive="fetchNext">
+        Next
+      </button>
+    </div>
+  </div>
+</template>
+
+<style>
+.student-list table {
+  width: 100%;
+}
+
+.student-list th {
+  text-align: left;
+}
+
+.student-list--loading {
+  opacity: 0.4;
+}
+</style>
