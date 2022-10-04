@@ -1,6 +1,8 @@
 @import url('./reset.module.css');
 @import url('./theme.module.css');
+@import url('./tables.module.css');
 @import url('./forms.module.css');
+@import url('./utility.module.css');
 
 body {
   font-size:               12pt;

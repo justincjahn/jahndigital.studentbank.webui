@@ -3,8 +3,6 @@ import { defineAsyncComponent, computed } from 'vue';
 import injectStrict from '@/common/utils/injectStrict';
 import { GLOBAL_STORE } from '@/admin/symbols';
 
-import StudentList from '@/admin/groups/components/StudentList.vue';
-
 // Components
 import LoadingLabel from '@/common/components/LoadingLabel.vue';
 
@@ -12,9 +10,9 @@ const GroupSelector = defineAsyncComponent(
   () => import('@/admin/common/components/GroupSelector.vue')
 );
 
-// const StudentList = defineAsyncComponent(
-//   () => import('@/admin/groups/components/StudentList.vue')
-// );
+const StudentList = defineAsyncComponent(
+  () => import('@/admin/groups/components/StudentList.vue')
+);
 
 const globalStore = injectStrict(GLOBAL_STORE);
 
@@ -51,7 +49,19 @@ const selectedGroup = computed({
     </div>
   </div>
 
-  <suspense>
-    <student-list :store="globalStore" />
-  </suspense>
+  <div class="main-content">
+    <suspense>
+      <student-list class="student-list" :store="globalStore" />
+    </suspense>
+  </div>
 </template>
+
+<style>
+.student-list {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 1em;
+}
+</style>

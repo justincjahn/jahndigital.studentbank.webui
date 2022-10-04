@@ -1,16 +1,13 @@
-html,
-body {
-  height: 100vh;
-  min-height: 100vh;
-}
-
 html {
   background-color: hsl(var(--clr-neutral-400));
 }
 
 body {
+  height: 100vh;
+  min-height: 100vh;
   max-width: 900px;
   margin: 0 auto;
+  overflow-y: scroll;
 
   background-color: hsl(var(--clr-neutral-100));
   border-left: 2px solid hsl(var(--clr-neutral-500));
@@ -18,10 +15,10 @@ body {
 }
 
 #app {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  height: 100%;
 }
 
 header {
@@ -42,7 +39,10 @@ header {
 }
 
 main {
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
+  align-items: stretch;
 }
 
 .sub-menu {
@@ -51,6 +51,12 @@ main {
   background-color: hsl(var(--clr-neutral-400));
   border-top: 1px solid hsl(var(--clr-neutral-500));
   border-bottom: 1px solid hsl(var(--clr-neutral-500));
+}
+
+.main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 footer {

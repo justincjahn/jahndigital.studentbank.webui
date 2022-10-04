@@ -1,0 +1,44 @@
+table {
+  width: 100%;
+  border-spacing: 0;
+}
+
+table td,
+table th {
+  text-align: left;
+}
+
+table tr:last-child th {
+  padding-bottom: 0.25em;
+  border-bottom: 1px solid hsl(var(--clr-neutral-400));
+}
+
+table tr th {
+  padding-top: 0.5em;
+}
+
+table tr td {
+  padding: 0.5em 0.25em;
+}
+
+table tr:nth-child(even) {
+  background-color: hsl(var(--clr-neutral-300));
+}
+
+table.selectable tr {
+  cursor: pointer;
+  user-select: none;
+}
+
+table.selectable tbody tr:hover {
+  background-color: hsl(var(--clr-neutral-400));
+}
+
+table.selectable tr.selected {
+  color: hsl(var(--clr-accent1-900));
+  background-color: hsl(var(--clr-accent1-200));
+}
+
+table.selectable tr.selected:hover {
+  background-color: hsl(var(--clr-accent1-300));
+}

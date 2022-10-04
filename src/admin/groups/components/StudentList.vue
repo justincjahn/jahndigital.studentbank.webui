@@ -14,6 +14,9 @@ import selection from '@/admin/groups/services/StudentSelectionService';
 import { GlobalStore } from '@/admin/common/stores/global';
 import { setup as setupStudentStore } from '@/admin/common/stores/student';
 
+// Components
+import { VCheckbox } from '@/common/components/inputs';
+
 const props = defineProps<{
   store: GlobalStore;
 }>();
@@ -95,10 +98,11 @@ const {
       <thead>
         <tr>
           <th>
-            <input
-              type="checkbox"
-              :checked="selection.hasGroup(selectedGroup)"
-              @click="selection.toggleGroup(selectedGroup)"
+            <v-checkbox
+              name="select-all"
+              class="student-list__checkbox"
+              :model-value="selection.hasGroup(selectedGroup)"
+              @update:model-value="selection.toggleGroup(selectedGroup)"
             />
           </th>
           <th>Account Number</th>
@@ -124,7 +128,11 @@ const {
             @click="handleClick(student)"
           >
             <td>
-              <input type="checkbox" :checked="selection.hasStudent(student)" />
+              <v-checkbox
+                class="student-list__checkbox"
+                :name="`student-${student.id}`"
+                :model-value="selection.hasStudent(student)"
+              />
             </td>
             <td>{{ student.accountNumber }}</td>
             <td>{{ student.firstName }}</td>
@@ -151,15 +159,7 @@ const {
   </div>
 </template>
 
-<style>
-.student-list table {
-  width: 100%;
-}
-
-.student-list th {
-  text-align: left;
-}
-
+<style scoped>
 .student-list--loading {
   opacity: 0.4;
 }

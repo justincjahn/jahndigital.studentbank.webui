@@ -43,7 +43,7 @@ const attrs = useAttrs();
 <template>
   <v-input
     v-bind="{ ...props, ...attrs }"
-    class="inline"
+    :class="attrs.class ?? 'inline'"
     @update:model-value="(value: string | boolean) => $emit('update:modelValue', value)"
     @update:error="(value: string | false) => $emit('update:error', value)"
   >
