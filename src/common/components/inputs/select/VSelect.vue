@@ -1,9 +1,24 @@
-<script lang="ts" setup>
-import { ref, computed, provide, watchEffect, onUnmounted } from 'vue';
+<script lang="ts">
+import {
+  useAttrs,
+  ref,
+  computed,
+  provide,
+  watchEffect,
+  onUnmounted,
+} from 'vue';
+
+import useUniqueId from '@/common/composables/useUniqueId';
 import useDebounce from '@/common/composables/useDebounce';
 import type { OptionRegistration, SelectApi } from './types';
 import { SELECT_API } from './symbols';
 
+export default {
+  inheritAttrs: false,
+};
+</script>
+
+<script lang="ts" setup>
 interface RegisteredOptions {
   id: number;
   index: number;
@@ -15,8 +30,20 @@ const props = withDefaults(
     // The currently selected item
     modelValue: unknown | null;
 
+    // A unique name for this component
+    name: string;
+
+    // A unique ID for this component
+    id?: string;
+
     // The prompt to use when there's currently no item selected
     prompt?: string;
+
+    // The label displayed above the select box
+    label?: string;
+
+    // Helper text displayed above the select box
+    helpText?: string;
 
     // The width of the select element
     width?: string;
@@ -24,12 +51,19 @@ const props = withDefaults(
     // If the entire select element is disabled
     disabled?: boolean;
 
+    // If the value is required
+    required?: boolean;
+
     // Set to true if the element should toggle open/closed
     shouldToggle?: boolean;
   }>(),
   {
+    id: `input-${useUniqueId().toString()}`,
     prompt: 'Choose an option...',
+    label: '',
+    helpText: '',
     width: '10rem',
+    required: false,
     disabled: false,
     shouldToggle: false,
   }
@@ -39,6 +73,14 @@ const emit = defineEmits<{
   (event: 'update:modelValue', value: unknown | null): void;
   (event: 'update:shouldToggle', value: boolean): void;
 }>();
+
+const attrs = useAttrs();
+
+const inputAttrs = computed(() => ({
+  'aria-labelledby': props.label.length > 0 ? props.id : undefined,
+  'aria-label': props.label.length > 0 ? undefined : props.name,
+  ...attrs,
+}));
 
 // Reference to the button, if it wasn't overwritten
 const button = ref<HTMLButtonElement | null>(null);
@@ -234,32 +276,77 @@ provide(SELECT_API, api);
 <template>
   <!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
   <!-- eslint-disable vuejs-accessibility/mouse-events-have-key-events -->
+
   <div
-    class="select"
-    :class="{ open }"
-    :style="{ '--width': props.width }"
-    @mouseleave="api.emit.highlight(-1)"
+    class="fieldset"
+    :class="[$attrs.class ?? '', required ? 'required' : '']"
   >
-    <slot name="activator" :activate="toggle" :disabled="props.disabled">
-      <button
-        ref="button"
-        class="select__button"
-        type="button"
-        tabindex="0"
-        :disabled="props.disabled"
-        @click="toggle"
-      >
-        <slot name="activatorLabel" :prompt="props.prompt">
-          {{ props.modelValue?.toString() ?? props.prompt }}
-        </slot>
-      </button>
+    <slot
+      :id="props.id"
+      :attrs="inputAttrs"
+      :classes="{}"
+      :help-text="helpText"
+      :input-name="name"
+      :label="label"
+      :model-value="modelValue"
+      :required="required"
+      :activate="toggle"
+      name="label"
+    >
+      <label v-if="label" :for="props.id" @click.prevent="toggle">
+        <template v-if="required">
+          {{ label }}<span class="required">*</span>
+        </template>
+        <template v-else>
+          {{ label }}
+        </template>
+      </label>
     </slot>
 
-    <slot name="items">
-      <ul ref="items" class="select__items">
-        <slot />
-      </ul>
+    <slot
+      :id="props.id"
+      :attrs="inputAttrs"
+      :classes="{ 'help-text': true }"
+      :help-text="helpText"
+      :input-name="name"
+      :label="label"
+      :model-value="modelValue"
+      :required="required"
+      :activator="toggle"
+      name="help"
+    >
+      <p v-if="helpText" class="help-text">
+        {{ helpText }}
+      </p>
     </slot>
+
+    <div
+      class="select"
+      :class="{ open }"
+      :style="{ '--width': props.width }"
+      @mouseleave="api.emit.highlight(-1)"
+    >
+      <slot name="activator" :activate="toggle" :disabled="props.disabled">
+        <button
+          ref="button"
+          class="select__button"
+          type="button"
+          tabindex="0"
+          :disabled="props.disabled"
+          @click="toggle"
+        >
+          <slot name="activatorLabel" :prompt="props.prompt">
+            {{ props.modelValue?.toString() ?? props.prompt }}
+          </slot>
+        </button>
+      </slot>
+
+      <slot name="items">
+        <ul ref="items" class="select__items">
+          <slot />
+        </ul>
+      </slot>
+    </div>
   </div>
 </template>
 

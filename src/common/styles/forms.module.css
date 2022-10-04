@@ -145,6 +145,12 @@ div.fieldset {
   flex-direction: column;
 }
 
+div.fieldset label + .select {
+  /* No margin if a label is provided */
+
+  margin: 0;
+}
+
 div.fieldset input {
   width: 100%;
 }

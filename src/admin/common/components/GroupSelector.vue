@@ -5,6 +5,9 @@ import { computed, defineAsyncComponent, ref } from 'vue';
 import type { Group as ServiceGroup } from '@/admin/common/services/group';
 import type { GlobalStore } from '@/admin/common/stores/global';
 
+// Utils
+import useUniqueId from '@/common/composables/useUniqueId';
+
 // Components
 import { VOption, VDivider, VSelect, VInput } from '@/common/components/inputs';
 
@@ -20,10 +23,46 @@ enum ModalState {
   DELETE,
 }
 
-const props = defineProps<{
-  modelValue: Group;
-  store: GlobalStore;
-}>();
+const props = withDefaults(
+  defineProps<{
+    modelValue: Group;
+
+    store: GlobalStore;
+    // A unique name for this component
+    name?: string;
+
+    // A unique ID for this component
+    id?: string;
+
+    // The prompt to use when there's currently no item selected
+    prompt?: string;
+
+    // The label displayed above the select box
+    label?: string;
+
+    // Helper text displayed above the select box
+    helpText?: string;
+
+    // The width of the select element
+    width?: string;
+
+    // If the entire select element is disabled
+    disabled?: boolean;
+
+    // If the value is required
+    required?: boolean;
+  }>(),
+  {
+    name: `group-selector-${useUniqueId()}`,
+    id: `input-${useUniqueId().toString()}`,
+    prompt: 'Choose a group...',
+    label: '',
+    helpText: '',
+    width: '10rem',
+    disabled: false,
+    required: false,
+  }
+);
 
 const emit = defineEmits<{
   (event: 'update:modelValue', value: Group): void;
@@ -154,13 +193,9 @@ function handleModalCancel() {
 </script>
 
 <template>
-  <v-select
-    :model-value="modelValue"
-    prompt="Select group..."
-    @update:model-value="handleUpdate"
-  >
-    <template #activatorLabel="{ prompt }">
-      {{ modelValue?.name ?? prompt }}
+  <v-select v-bind="{ ...props, ...$attrs }" @update:model-value="handleUpdate">
+    <template #activatorLabel="{ prompt: promptText }">
+      {{ modelValue?.name ?? promptText }}
     </template>
 
     <v-option v-for="option in options" :key="option.id" :value="option">

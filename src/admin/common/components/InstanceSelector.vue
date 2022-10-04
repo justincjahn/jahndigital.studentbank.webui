@@ -7,6 +7,7 @@ import type { Instance as ServiceInstance } from '@/admin/common/services/instan
 
 // Utils
 import { BASE_URLS } from '@/common/constants';
+import useUniqueId from '@/common/composables/useUniqueId';
 
 // Components
 import {
@@ -32,10 +33,47 @@ enum ModalState {
   INVITE_CODE,
 }
 
-const props = defineProps<{
-  modelValue: Instance;
-  store: GlobalStore;
-}>();
+const props = withDefaults(
+  defineProps<{
+    modelValue: Instance;
+
+    store: GlobalStore;
+
+    // A unique name for this component
+    name?: string;
+
+    // A unique ID for this component
+    id?: string;
+
+    // The prompt to use when there's currently no item selected
+    prompt?: string;
+
+    // The label displayed above the select box
+    label?: string;
+
+    // Helper text displayed above the select box
+    helpText?: string;
+
+    // The width of the select element
+    width?: string;
+
+    // If the entire select element is disabled
+    disabled?: boolean;
+
+    // If the value is required
+    required?: boolean;
+  }>(),
+  {
+    name: `instance-selector-${useUniqueId()}`,
+    id: `input-${useUniqueId().toString()}`,
+    prompt: 'Choose instance...',
+    label: '',
+    helpText: '',
+    width: '10rem',
+    disabled: false,
+    required: false,
+  }
+);
 
 const emit = defineEmits<{
   (event: 'update:modelValue', value: Instance): void;
@@ -261,7 +299,7 @@ function handleCancel() {
 </script>
 
 <template>
-  <v-select :model-value="modelValue" @update:model-value="update">
+  <v-select v-bind="{ ...props, ...$attrs }" @update:model-value="update">
     <template #activatorLabel>
       <template v-if="modelValue?.isActive ?? false">
         <span class="active">(Active)</span>
