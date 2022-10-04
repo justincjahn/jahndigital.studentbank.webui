@@ -10,25 +10,21 @@ import StudentRouteNames from '@/admin/students/routeNames';
 // Services
 import selection from '@/admin/groups/services/StudentSelectionService';
 
-// Stores
-import { GlobalStore } from '@/admin/common/stores/global';
-import { setup as setupStudentStore } from '@/admin/common/stores/student';
+// Utils
+import { GLOBAL_STORE } from '@/admin/symbols';
+import injectStrict from '@/common/utils/injectStrict';
 
 // Components
 import { VCheckbox } from '@/common/components/inputs';
 
-const props = defineProps<{
-  store: GlobalStore;
-}>();
-
-const studentStore = setupStudentStore();
 const router = useRouter();
 const numClicks = ref(0);
 const delay = 300;
 let timer: ReturnType<typeof setTimeout> | null = null;
 
-const selectedInstance = computed(() => props.store.instance.selected.value);
-const selectedGroup = computed(() => props.store.group.selected.value);
+const globalStore = injectStrict(GLOBAL_STORE);
+const selectedInstance = computed(() => globalStore.instance.selected.value);
+const selectedGroup = computed(() => globalStore.group.selected.value);
 
 function loginDateFormat(date: string) {
   if (!date || date.trim().length === 0) return 'Never';
@@ -64,11 +60,11 @@ function handleClick(student: Student) {
 
 watchEffect(() => {
   if (selectedGroup.value !== null) {
-    studentStore.fetch({
+    globalStore.student.fetch({
       groupId: selectedGroup.value.id,
     });
   } else {
-    studentStore.clear();
+    globalStore.student.clear();
   }
 });
 
@@ -88,7 +84,7 @@ const {
   hasNextPage,
   fetchNext,
   fetchPrevious,
-} = studentStore;
+} = globalStore.student;
 </script>
 
 <template>

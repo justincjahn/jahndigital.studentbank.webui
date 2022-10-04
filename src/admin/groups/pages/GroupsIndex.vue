@@ -1,7 +1,15 @@
 <script lang="ts" setup>
-import { defineAsyncComponent, computed } from 'vue';
-import injectStrict from '@/common/utils/injectStrict';
+import { defineAsyncComponent, ref, computed } from 'vue';
+
+// Types
+import type { Group } from '@/admin/common/services/group';
+
+// Services
+import selection from '@/admin/groups/services/StudentSelectionService';
+
+// Utils
 import { GLOBAL_STORE } from '@/admin/symbols';
+import injectStrict from '@/common/utils/injectStrict';
 
 // Components
 import LoadingLabel from '@/common/components/LoadingLabel.vue';
@@ -14,7 +22,22 @@ const StudentList = defineAsyncComponent(
   () => import('@/admin/groups/components/StudentList.vue')
 );
 
+const BulkMoveModal = defineAsyncComponent(
+  () => import('@/admin/groups/components/BulkMoveModal.vue')
+);
+
+enum ModalState {
+  None,
+  BulkMove,
+}
+
+const loading = ref(false);
+
+const modalState = ref(ModalState.None);
+
 const globalStore = injectStrict(GLOBAL_STORE);
+
+const hasSelection = computed(() => selection.length > 0);
 
 const selectedGroup = computed({
   get() {
@@ -25,6 +48,35 @@ const selectedGroup = computed({
     globalStore.group.selected.value = value;
   },
 });
+
+async function refetchStudents() {
+  if (!selectedGroup.value) return;
+
+  await globalStore.student.fetch({
+    groupId: selectedGroup.value.id,
+  });
+}
+
+function startBulkMove() {
+  modalState.value = ModalState.BulkMove;
+}
+
+async function handleBulkMoveOk(group: Group) {
+  loading.value = true;
+
+  try {
+    const students = await selection.resolve();
+    await globalStore.student.bulkMove(group, students);
+    modalState.value = ModalState.None;
+    await refetchStudents();
+  } finally {
+    loading.value = false;
+  }
+}
+
+function handleBulkMoveCancel() {
+  modalState.value = ModalState.None;
+}
 </script>
 
 <template>
@@ -40,10 +92,19 @@ const selectedGroup = computed({
     </div>
 
     <div class="sub-menu__bulk-buttons">
-      <button type="button" disabled>Clear Selection</button>
-      <button type="button">Move Selected</button>
-      <button type="button">New Transaction</button>
-      <button type="button">New Share</button>
+      <button
+        type="button"
+        :disabled="!hasSelection"
+        @click="selection.clear()"
+      >
+        Clear Selection
+      </button>
+
+      <button type="button" :disabled="!hasSelection" @click="startBulkMove">
+        Move Selected
+      </button>
+      <button type="button" :disabled="!hasSelection">New Transaction</button>
+      <button type="button" :disabled="!hasSelection">New Share</button>
       <button type="button">New Student</button>
       <button type="button">Bulk Import</button>
     </div>
@@ -51,13 +112,24 @@ const selectedGroup = computed({
 
   <div class="main-content">
     <suspense>
-      <student-list class="student-list" :store="globalStore" />
+      <student-list class="student-list" />
     </suspense>
   </div>
+
+  <suspense>
+    <bulk-move-modal
+      :show="modalState === ModalState.BulkMove"
+      :loading="loading"
+      @ok="handleBulkMoveOk"
+      @cancel="handleBulkMoveCancel"
+    />
+  </suspense>
 </template>
 
 <style>
 .student-list {
+  /* Make pagination buttons always appear at the bottom. */
+
   flex-grow: 1;
   display: flex;
   flex-direction: column;
