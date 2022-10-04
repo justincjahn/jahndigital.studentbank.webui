@@ -49,14 +49,6 @@ const selectedGroup = computed({
   },
 });
 
-async function refetchStudents() {
-  if (!selectedGroup.value) return;
-
-  await globalStore.student.fetch({
-    groupId: selectedGroup.value.id,
-  });
-}
-
 function startBulkMove() {
   modalState.value = ModalState.BulkMove;
 }
@@ -68,7 +60,7 @@ async function handleBulkMoveOk(group: Group) {
     const students = await selection.resolve();
     await globalStore.student.bulkMove(group, students);
     modalState.value = ModalState.None;
-    await refetchStudents();
+    selectedGroup.value = group;
   } finally {
     loading.value = false;
   }
