@@ -97,16 +97,14 @@ watchEffect(() => {
 
     <footer>&copy; 2022 Jahn Digital v{{ VERSION }}</footer>
 
-    <suspense>
-      <modal-dialog
-        :show="error !== null && error.length > 0"
-        class="destructive"
-        title="Error"
-        @ok="() => (error = null)"
-      >
-        {{ error }}
-      </modal-dialog>
-    </suspense>
+    <modal-dialog
+      :show="error !== null && error.length > 0"
+      class="destructive"
+      title="Error"
+      @ok="() => (error = null)"
+    >
+      {{ error }}
+    </modal-dialog>
   </template>
   <template v-else>
     <login-dialog />

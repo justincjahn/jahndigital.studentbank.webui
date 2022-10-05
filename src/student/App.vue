@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { VSelect, VOption, VDivider } from '@/common/components/inputs/select';
+import { VSelect, VOption, VDivider } from '@/common/components/inputs';
 
 import '@/common/styles/common.css';
 
@@ -32,7 +32,7 @@ function onAddUser() {
 <template>
   <h1>Vue App!</h1>
 
-  <v-select v-model="test">
+  <v-select v-model="test" name="test">
     <v-option v-for="(item, i) in items" :key="i" :value="item" />
     <v-divider />
     <v-option value="ADD_USER" @click="onAddUser" />
