@@ -90,56 +90,58 @@ const {
 <template>
   <!-- eslint-disable vuejs-accessibility/form-control-has-label -->
   <div class="student-list" :class="{ 'student-list--loading': loading }">
-    <table class="student-list__list selectable">
-      <thead>
-        <tr>
-          <th>
-            <v-checkbox
-              name="select-all"
-              class="student-list__checkbox"
-              :model-value="selection.hasGroup(selectedGroup)"
-              @update:model-value="selection.toggleGroup(selectedGroup)"
-            />
-          </th>
-          <th>Account Number</th>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Email Address</th>
-          <th>Last Login</th>
-          <th>Registration</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-if="selectedGroup === null">
-          <td class="student-list__select-group center" colspan="7">
-            Please select a group...
-          </td>
-        </tr>
-        <template v-else>
-          <tr
-            v-for="student in students"
-            :key="student.id"
-            :class="{ selected: selection.hasStudent(student) }"
-            class="student-list__student"
-            @click="handleClick(student)"
-          >
-            <td>
+    <div class="scroll-wrapper">
+      <table class="student-list__list selectable">
+        <thead>
+          <tr>
+            <th>
               <v-checkbox
+                name="select-all"
                 class="student-list__checkbox"
-                :name="`student-${student.id}`"
-                :model-value="selection.hasStudent(student)"
+                :model-value="selection.hasGroup(selectedGroup)"
+                @update:model-value="selection.toggleGroup(selectedGroup)"
               />
-            </td>
-            <td>{{ student.accountNumber }}</td>
-            <td>{{ student.firstName }}</td>
-            <td>{{ student.lastName }}</td>
-            <td>{{ student.email }}</td>
-            <td>{{ loginDateFormat(student.dateLastLogin) }}</td>
-            <td>{{ registrationStatus(student.dateRegistered) }}</td>
+            </th>
+            <th>Account Number</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email Address</th>
+            <th>Last Login</th>
+            <th>Registration</th>
           </tr>
-        </template>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <tr v-if="selectedGroup === null">
+            <td class="student-list__select-group center" colspan="7">
+              Please select a group...
+            </td>
+          </tr>
+          <template v-else>
+            <tr
+              v-for="student in students"
+              :key="student.id"
+              :class="{ selected: selection.hasStudent(student) }"
+              class="student-list__student"
+              @click="handleClick(student)"
+            >
+              <td>
+                <v-checkbox
+                  class="student-list__checkbox"
+                  :name="`student-${student.id}`"
+                  :model-value="selection.hasStudent(student)"
+                />
+              </td>
+              <td>{{ student.accountNumber }}</td>
+              <td>{{ student.firstName }}</td>
+              <td>{{ student.lastName }}</td>
+              <td>{{ student.email }}</td>
+              <td>{{ loginDateFormat(student.dateLastLogin) }}</td>
+              <td>{{ registrationStatus(student.dateRegistered) }}</td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
     <div v-if="totalPages > 1" class="pagination-buttons">
       <button
         type="button"
@@ -156,6 +158,12 @@ const {
 </template>
 
 <style scoped>
+.student-list--wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+
 .student-list--loading {
   opacity: 0.4;
 }
