@@ -1,38 +1,36 @@
 import { reactive, computed } from 'vue';
 
 // Types
+import type { StudentSelection } from '@/admin/groups/services/StudentSelectionService';
 import type { Student } from '@/common/services/student';
 import type { Share } from '@/common/services/share';
 import type { ShareType } from '@/admin/common/services/shareType';
-
-import type {
-  Transaction,
-  NewTransactionRequestInput,
-} from '@/common/services/transaction';
+import type { Transaction } from '@/common/services/transaction';
 
 // Services
-import selection from '@/admin/groups/services/StudentSelectionService';
 import { newBulkTransaction } from '@/common/services/transaction';
 
 // Utils
-import sample from '@/common/utils/sample';
 import Money from '@/common/utils/Money';
+import sample from '@/common/utils/sample';
+import useDebounce from '@/common/composables/useDebounce';
+
+// Validators
 import validateAmount from '@/common/validators/validateAmount';
 import validateTransactionComment from '@/common/validators/validateTransactionComment';
-import useDebounce from '@/common/composables/useDebounce';
 
 /**
  * Specifies how the system handles shares without funds to cover the transaction.
  */
 export enum PostingPolicy {
   // Do nothing.  Shares without the necessary funds will cause an error.
-  none,
+  None,
 
   // Skip shares without the necessary funds
-  skip,
+  Skip,
 
   // Take shares without the necessary funds negative
-  take,
+  Take,
 }
 
 /**
@@ -45,88 +43,188 @@ const STEP_COUNT = 3;
 /**
  * Store that handles the multi-step workflow to post transactions to students' shares.
  */
-export function setup() {
+export function setup(selection: StudentSelection) {
   const store = reactive({
+    // State
     loading: false,
     currentStep: 1,
-    selectedShareType: null as ShareType | null,
-    selectedShares: [] as Share[],
-    studentMap: new Map<number, Student>(),
-    sampleShares: [] as Share[],
-    noncompliantShares: [] as Share[],
-    selectedStudents: [] as Student[],
-    errors: {} as Record<number, string | null>,
+
+    // Form data
+    shareType: null as ShareType | null,
     comment: '',
-    amount: Money.fromNumber(0),
-    postingPolicy: PostingPolicy.none as PostingPolicy,
+    amount: '0',
+    postingPolicy: PostingPolicy.None,
+
+    // Intermediate data
+    selectedShares: [] as Share[],
+    selectedStudents: [] as Student[],
+
+    // Validation
+    errors: {} as Record<number, string | null>,
+    noncompliantShares: [] as Share[],
+    sampleShares: [] as Share[],
   });
 
-  // If the store is currently loading data from the server.
+  // True if the store is loading data
   const loading = computed(() => store.loading);
 
   // The current form step.
   const currentStep = computed(() => store.currentStep);
 
-  // A list of errors with the state.
+  // A dictionary of the step as a key and an error message as a value
   const errors = computed(() => store.errors);
 
-  // If the form has a next step.
+  // True if the form has a next step
   const hasNextStep = computed(() => store.currentStep < STEP_COUNT);
 
-  // If the form has a previous step.
+  // True if the form has a previous step
   const hasPreviousStep = computed(() => store.currentStep > 1);
 
-  // The list of students affected by the bulk transaction.
+  // A list of students affected by the bulk transaction
   const students = computed(() => store.selectedStudents);
-
-  // The Share Type transactions should be posted to.
-  const selectedShareType = computed(() => store.selectedShareType);
-
-  // The shares which will be posted to.
-  const selectedShares = computed(() => store.selectedShares);
-
-  // The shares which a transaction of the given amount will fail.
-  const noncompliantShares = computed(() => store.noncompliantShares);
 
   // A sampling of shares affected by this transaction.
   const sampleShares = computed(() => store.sampleShares);
 
-  // A map of Share IDs to Student objects.
-  const studentMap = computed(() => store.studentMap);
+  /**
+   * Generate a list of shares to sample.
+   */
+  function generateSample(count = 10) {
+    if (store.selectedShares.length <= 0) {
+      store.sampleShares = [];
+      return;
+    }
 
-  // The current transaction amount.
-  const amount = computed(() => store.amount);
+    store.sampleShares = sample(
+      store.selectedShares,
+      Math.min(count, store.selectedShares.length)
+    );
+  }
 
-  // The current comment.
-  const comment = computed(() => store.comment);
+  /**
+   * Resolve a list of shares for the shareType and students
+   */
+  function resolve() {
+    if (store.shareType === null) return;
 
-  // The current posting policy.
-  const postingPolicy = computed(() => store.postingPolicy);
+    const shareTypeId = store.shareType.id;
 
-  // Returns true if the store is in a valid state for the given step.
+    // Select students with at least one share of the selected type
+    const studentsWithShare = store.selectedStudents.filter(
+      (student) =>
+        student.shares.findIndex(
+          (share) => share.shareTypeId === shareTypeId
+        ) >= 0
+    );
+
+    const diff = store.selectedStudents.length - studentsWithShare.length;
+    if (diff > 0) {
+      store.errors[1] = `Warning: There are ${diff} students without the selected
+                         share type and will not receive this transaction.`;
+    } else {
+      store.errors[1] = null;
+    }
+
+    store.selectedShares = studentsWithShare.map(
+      (student) =>
+        student.shares
+          .filter((share) => share.shareTypeId === shareTypeId)
+          .sort((a, b) => a.id - b.id)[0]
+    );
+
+    generateSample();
+  }
+
+  // Get or set the selected share type.
+  const shareType = computed({
+    get() {
+      return store.shareType;
+    },
+
+    set(value) {
+      store.shareType = value;
+
+      if (value === null) {
+        store.selectedShares = [];
+      }
+
+      resolve();
+    },
+  });
+
+  // Ensure that the posting policy, transaction amount, and comment are valid.
+  /// Generate additional errors and warnings for the user.
+  const validatePostingPolicy = useDebounce(() => {
+    const transactionAmount = Money.fromStringOrDefault(
+      store.amount
+    ).getAmount();
+
+    if (transactionAmount >= 0) {
+      store.noncompliantShares = [];
+      store.errors[2] = null;
+      return;
+    }
+
+    store.noncompliantShares = store.selectedShares.filter(
+      (share) => share.balance + transactionAmount < 0
+    );
+
+    const numNoncompliant = store.noncompliantShares.length;
+
+    if (numNoncompliant === 0) {
+      store.errors[2] = null;
+      return;
+    }
+
+    // Determine what the result of the transaction will be and provide a warning
+    let errorMsg = 'An unknown error occurred.';
+
+    if (store.postingPolicy === PostingPolicy.None) {
+      errorMsg = `Error: ${numNoncompliant} shares(s) do not have the funds to cover the specified
+                  amount and the transaction will fail. Choose another Posting Policy to continue.`;
+    } else if (store.postingPolicy === PostingPolicy.Take) {
+      errorMsg = `Warning: ${numNoncompliant} share(s) will have a negative balance as a result of
+                  this transaction.`;
+    } else if (store.postingPolicy === PostingPolicy.Skip) {
+      errorMsg = `Warning: ${numNoncompliant} share(s) will be skipped because they do not have the
+                  funds to cover the specified amount. An NSF comment will be applied to the
+                  affected shares.`;
+    }
+
+    store.errors[2] = errorMsg;
+  }, 200);
+
+  // Returns true if the store is in a valid state for the given step and provide
+  /// the user with a high-level error message if it's in an invalid state.
   const isValid = computed<string | true>(() => {
-    if (store.loading) return 'Please wait...';
-    if (store.selectedStudents.length === 0)
+    if (store.selectedStudents.length === 0) {
       return 'No students are currently selected.';
+    }
 
-    if (store.currentStep >= 1) {
-      if (store.selectedShareType === null)
-        return 'Please select a Share Type.';
+    if (store.currentStep >= 1 && store.shareType === null) {
+      return 'Please select a Share Type.';
     }
 
     if (store.currentStep >= 2) {
-      const validAmount = validateAmount(store.amount.getAmount().toString());
-      if (validAmount !== true) return validAmount.toString();
+      const validAmount = validateAmount(store.amount);
+      if (validAmount !== true) {
+        return validAmount.toString();
+      }
 
-      if (store.amount.getAmount() === 0 && store.comment.length === 0) {
+      if (
+        Money.fromStringOrDefault(store.amount).compare(0) === 0 &&
+        store.comment.trim().length === 0
+      ) {
         return 'Transactions of $0.00 must have a transaction comment.';
       }
 
       const validComment = validateTransactionComment(store.comment);
-      if (validComment !== true) return validComment.toString();
+      if (validComment !== true) {
+        return validComment.toString();
+      }
 
       if (
-        store.postingPolicy === PostingPolicy.none &&
+        store.postingPolicy === PostingPolicy.None &&
         store.noncompliantShares.length > 0
       ) {
         return 'Currently selected posting policy will result in a posting error because shares will be taken negative.';
@@ -136,30 +234,55 @@ export function setup() {
     return true;
   });
 
-  /**
-   * Reset the store back to the default state.
-   */
-  function reset() {
-    store.currentStep = 1;
-    store.errors = {};
-    store.selectedShareType = null;
-    store.selectedShares = [];
-    store.noncompliantShares = [];
-    store.postingPolicy = PostingPolicy.none;
-    store.amount = Money.fromNumber(0);
-    store.comment = '';
-    store.studentMap = new Map<number, Student>();
-  }
+  // Get or set the amount of the transaction
+  const amount = computed({
+    get() {
+      return store.amount;
+    },
 
-  /**
-   * Set the error message for the given step.
-   *
-   * @param {number} step The step number the error represents.
-   * @param {string|null} error The error message.
-   */
-  function setError(step: number, error: string | null) {
-    store.errors[step] = error;
-  }
+    set(value) {
+      const valid = validateAmount(value);
+
+      if (!valid) {
+        store.errors[1] = valid.toString();
+        return;
+      }
+
+      store.amount = value;
+      validatePostingPolicy();
+    },
+  });
+
+  // Get or set the comment
+  const comment = computed({
+    get() {
+      return store.comment;
+    },
+
+    set(value) {
+      const valid = validateTransactionComment(value);
+
+      if (!valid) {
+        store.errors[1] = valid.toString();
+        return;
+      }
+
+      store.comment = value;
+      validatePostingPolicy();
+    },
+  });
+
+  // Get or set the posting policy
+  const postingPolicy = computed({
+    get() {
+      return store.postingPolicy;
+    },
+
+    set(value) {
+      store.postingPolicy = value;
+      validatePostingPolicy();
+    },
+  });
 
   /**
    * Increment the step.
@@ -176,220 +299,45 @@ export function setup() {
   }
 
   /**
-   * Fetch the student object of the currently selected students and groups.
+   * Estimate the effective balance of the given share after the transaction is posted.
+   *
+   * @param share The share to get the effective balance of.
+   * @returns The estimated balance of the share after the transaction is posted.
    */
-  async function fetchSelection() {
+  function getEffectiveBalance(share: Share) {
+    const currentBalance = Money.fromNumber(share.balance);
+    const transactionAmount = Money.fromStringOrDefault(store.amount);
+
+    if (transactionAmount.compare(0) >= 0) {
+      return transactionAmount.add(currentBalance);
+    }
+
+    if (
+      store.postingPolicy === PostingPolicy.Skip &&
+      currentBalance.compare(transactionAmount.abs()) === -1
+    ) {
+      return currentBalance;
+    }
+
+    return currentBalance.add(transactionAmount);
+  }
+
+  /**
+   * Fetch students from the selection.
+   *
+   * @returns
+   */
+  async function fetchStudents() {
     store.loading = true;
 
     try {
       store.selectedStudents = await selection.resolve();
     } catch (e) {
-      if (e instanceof Error) {
-        setError(1, `Unable to fetch selected students: ${e?.message ?? e}`);
-      }
-
-      throw e;
+      if (!(e instanceof Error)) return;
+      store.errors[1] = `Unable to fetch selected students: ${e.message}`;
     } finally {
       store.loading = false;
     }
-  }
-
-  /**
-   * Select a group of Shares that should appear in the summary step.
-   */
-  function generateSample(count = 10) {
-    if (store.selectedShares.length <= 0) {
-      store.sampleShares = [];
-      return;
-    }
-
-    store.sampleShares = sample(
-      store.selectedShares,
-      Math.min(count, store.selectedShares.length)
-    );
-  }
-
-  /**
-   * Set the selected share type and compute the affected shares.
-   *
-   * @param {ShareType|null} shareType The selected share type.
-   */
-  function setSelectedShareType(shareType: ShareType | null) {
-    store.selectedShareType = shareType;
-
-    if (shareType === null) {
-      store.selectedShares = [];
-      return;
-    }
-
-    // Loop through each selected student and pull out those with at least one of the given share type
-    const studentsWithShares = store.selectedStudents.filter(
-      (student) =>
-        (student.shares?.findIndex(
-          (share) => share.shareTypeId === shareType.id
-        ) ?? -1) >= 0
-    );
-
-    // Get a list of shares from that list with the correct type, and create a map that links a share ID
-    /// back to its original Student.
-    // TODO: Refactor GQL queries and TS types to include Share.studentId.
-    const shares: Share[] = [];
-    const map = new Map<number, Student>();
-    studentsWithShares.forEach((student) => {
-      if (typeof student.shares === 'undefined') return;
-
-      const studentShares = [...student.shares];
-      studentShares.sort((a, b) => a.id - b.id);
-      const share = studentShares.find((sh) => sh.shareTypeId === shareType.id);
-
-      if (share) {
-        shares.push(share);
-        map.set(share.id, student);
-      }
-    });
-
-    // Determine if any of the selected students didn't have the share type chosen
-    const diff = store.selectedStudents.length - studentsWithShares.length;
-    if (diff > 0) {
-      setError(
-        1,
-        `Warning: There are ${diff} students without the selected share type and will not receive this transaction.`
-      );
-    } else {
-      setError(1, null);
-    }
-
-    store.selectedShares = shares;
-    store.studentMap = map;
-    generateSample();
-  }
-
-  /**
-   * Ensure that the current amount complies with the selected posting policy.
-   */
-  function validatePostingPolicy() {
-    const amt = store.amount.getAmount();
-
-    // Posting policies only affect withdrawals
-    if (amt >= 0) {
-      store.noncompliantShares = [];
-      store.loading = false;
-
-      if (amt === 0 && store.comment.length === 0) {
-        setError(
-          2,
-          'Error: Transactions of $0.00 must have a transaction comment.'
-        );
-        return;
-      }
-
-      setError(2, null);
-      return;
-    }
-
-    // Get a list of shares that will be taken negative
-    const shares: Share[] = [];
-    store.selectedShares.forEach((share) => {
-      const newBalance = share.balance + amt;
-      if (newBalance < 0) shares.push(share);
-    });
-
-    store.noncompliantShares = shares;
-
-    // If there weren't any, then we're all good!
-    if (shares.length === 0) {
-      setError(2, null);
-      store.loading = false;
-      return;
-    }
-
-    // Determine what the result of the transaction will be and provide a warning
-    let errorMsg = '';
-    switch (store.postingPolicy) {
-      case PostingPolicy.none:
-        errorMsg = `Error: ${shares.length} shares(s) do not have the funds to cover the specified amount and the transaction will fail.
-        Choose another Posting Policy to continue.`;
-        break;
-      case PostingPolicy.take:
-        errorMsg = `Warning: ${shares.length} share(s) will have a negative balance as a result of this transaction.`;
-        break;
-      case PostingPolicy.skip:
-        errorMsg = `Warning: ${shares.length} share(s) will be skipped because they do not have the funds to cover the specified amount.
-        An NSF comment will be applied to the affected shares.`;
-        break;
-      default:
-        errorMsg = 'An unknown error occurred.';
-    }
-
-    setError(2, errorMsg);
-    store.loading = false;
-  }
-
-  /**
-   * Called every time setAmount is called, which may be every keystroke.
-   */
-  const validateAmountDebounced = useDebounce(validatePostingPolicy, 200);
-
-  /**
-   * Set the amount and validate that it won't cause an error when posting.
-   *
-   * @param {string} value The amount.
-   * @throws {Error} If the amount is invalid.
-   */
-  function setAmount(value: string) {
-    const valid = validateAmount(value);
-    if (valid !== true) throw new Error(valid.toString());
-    store.amount = Money.fromStringOrDefault(value);
-    store.loading = true;
-    validateAmountDebounced();
-  }
-
-  /**
-   * Set the transaction comment and validate that it won't cause an error when posting.
-   *
-   * @param {string} value The comment.
-   * @throws {Error} If the comment is invalid.
-   */
-  function setComment(value: string) {
-    const valid = validateTransactionComment(value);
-    if (valid !== true) throw new Error(valid.toString());
-    store.comment = value;
-    validateAmountDebounced();
-  }
-
-  /**
-   * Set the posting policy and validate that it won't cause an error when posting.
-   *
-   * @param {PostingPolicy} value
-   */
-  function setPostingPolicy(value: PostingPolicy) {
-    store.postingPolicy = value;
-    store.loading = true;
-    validateAmountDebounced();
-  }
-
-  /**
-   * Estimate the effective balance of the given share after the transaction is posted.
-   *
-   * @param {Share} share The share to get the effective balance of.
-   * @returns The estimated balance of the share after the transaction is posted.
-   */
-  function getEffectiveBalance(share: Share) {
-    const curBalance = share.balance;
-    const transactionAmount = store.amount.getAmount();
-
-    if (transactionAmount >= 0) {
-      return curBalance + transactionAmount;
-    }
-
-    if (
-      store.postingPolicy === PostingPolicy.skip &&
-      curBalance < Math.abs(transactionAmount)
-    ) {
-      return curBalance;
-    }
-
-    return curBalance + transactionAmount;
   }
 
   /**
@@ -398,25 +346,34 @@ export function setup() {
    * @returns A Promise containing a list of posted Transactions.
    */
   async function post(): Promise<Transaction[]> {
+    if (!isValid.value) {
+      throw new Error(
+        'Transaction state is not valid.  Please correct errors and try again.'
+      );
+    }
+
     store.loading = true;
 
     const req: Parameters<typeof newBulkTransaction>[0] = {
       shares: [],
-      skipNegative: store.postingPolicy === PostingPolicy.skip,
+      skipNegative: store.postingPolicy === PostingPolicy.Skip,
     };
 
-    const takeNegative = store.postingPolicy === PostingPolicy.take;
-    const transactionComment =
-      store.comment.length > 0 ? store.comment : undefined;
+    const takeNegative = store.postingPolicy === PostingPolicy.Take;
 
-    store.selectedShares.forEach((share) => {
-      (req.shares as NewTransactionRequestInput[]).push({
-        shareId: share.id,
-        amount: store.amount.getAmount(),
-        comment: transactionComment,
-        takeNegative,
-      });
-    });
+    const transactionAmount = Money.fromStringOrDefault(
+      store.amount
+    ).getAmount();
+
+    const transactionComment =
+      store.comment.trim().length > 0 ? store.comment : undefined;
+
+    req.shares = store.selectedShares.map((share) => ({
+      shareId: share.id,
+      amount: transactionAmount,
+      comment: transactionComment,
+      takeNegative,
+    }));
 
     try {
       const data = await newBulkTransaction(req);
@@ -431,26 +388,17 @@ export function setup() {
     currentStep,
     hasNextStep,
     hasPreviousStep,
+    incrementStep,
+    decrementStep,
+    shareType,
     students,
-    selectedShareType,
-    selectedShares,
-    noncompliantShares,
+    fetchStudents,
     sampleShares,
-    studentMap,
     amount,
     comment,
     postingPolicy,
-    errors,
     isValid,
-    reset,
-    incrementStep,
-    decrementStep,
-    fetchSelection,
-    setSelectedShareType,
-    setAmount,
-    setComment,
-    setPostingPolicy,
-    generateSample,
+    errors,
     getEffectiveBalance,
     post,
   };

@@ -110,6 +110,33 @@ export default class Money {
   }
 
   /**
+   * Returns the absolute value.
+   */
+  abs(): Money {
+    return new Money(Math.abs(this.amount));
+  }
+
+  /**
+   * Compare this object with the provided number.
+   *
+   * @param b The second number.
+   * @returns 0 if equal, 1 if greater, or -1 if lesser.
+   */
+  compare(b: Money | number): number {
+    let num = -1;
+
+    if (b instanceof Money) {
+      num = b.getAmount();
+    } else {
+      num = b;
+    }
+
+    if (this.amount === num) return 0;
+    if (this.amount > num) return 1;
+    return -1;
+  }
+
+  /**
    * Converts the object into a currency string.
    *
    * @returns String in the format $1.00.
@@ -130,7 +157,7 @@ export default class Money {
   static round(num: number, precision = 2): number {
     const power = num * 10 ** precision;
     let rounded = Math.round(power);
-    // eslint-disable-next-line no-nested-ternary
+    // eslint-disable-next-line no-nested-ternary, prettier/prettier
     rounded = Math.abs(power) % 1 === 0.5 ? (rounded % 2 === 0 ? rounded : rounded - 1) : rounded;
     return rounded / 10 ** precision;
   }
