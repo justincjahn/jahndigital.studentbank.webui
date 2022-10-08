@@ -32,7 +32,7 @@
               :class="[cancelButtonClass]"
               :disabled="!canCancel"
               type="button"
-              @click.prevent="handleCancel"
+              @click="handleCancel"
             >
               <slot
                 name="cancelLabel"
@@ -48,7 +48,7 @@
               :class="[okButtonClass]"
               :disabled="!canSubmit"
               type="button"
-              @click.prevent="handleOk"
+              @click="handleOk"
             >
               <slot name="okLabel" :ok-label="okLabel" :can-submit="canSubmit">
                 {{ okLabel }}
@@ -96,7 +96,7 @@ export default defineComponent({
     cancelLabel: {
       type: String,
       required: false,
-      default: null,
+      default: undefined,
     },
     cancelButtonClass: {
       type: String,
@@ -140,10 +140,7 @@ export default defineComponent({
 
     // If the OK/Cancel button is focused and the enter key is pressed, prevent sending the event twice.
     const handleOk = useDebounce(ok, 100);
-    const handleCancel = useDebounce(
-      props.cancelLabel ? cancel : () => undefined,
-      100
-    );
+    const handleCancel = useDebounce(cancel, 100);
 
     // Watch for Escape and Enter key-presses and call the appropriate handler.
     function handleKeyPress(e: KeyboardEvent) {

@@ -5,6 +5,7 @@ import type { GlobalStore } from '@/admin/common/stores/global';
 import { VSelect, VOption, VDivider } from '@/common/components/inputs';
 import { buildFormData } from './useShareTypeForm';
 import ShareTypeAddEditForm from './ShareTypeAddEditForm.vue';
+import ShareTypeLinkUnlinkModal from './ShareTypeLinkUnlinkModal.vue';
 
 const ModalDialog = defineAsyncComponent(
   () => import('@/common/components/ModalDialog.vue')
@@ -64,10 +65,6 @@ const emit = defineEmits<{
   (event: 'update:modelValue', value: ShareType): void;
 }>();
 
-const formData = buildFormData();
-
-const formValid = ref(false);
-
 // const error = computed({
 //   get: () => props.store.error.error.value,
 //   set: (value: string | null) => props.store.error.setCurrentError(value),
@@ -77,24 +74,19 @@ const shareTypeStore = computed(() => props.store.shareType);
 
 const options = computed(() => shareTypeStore.value.shareTypes.value);
 
-const input = ref('');
+const formValid = ref(false);
+
+const formData = buildFormData();
 
 const modalShown = ref(false);
 
 const modalState = ref(ModalState.ADD);
 
 const modalFormValid = computed(() => {
-  if (
-    modalState.value === ModalState.ADD ||
-    modalState.value === ModalState.EDIT
-  ) {
+  if (modalState.value === ModalState.EDIT) {
     return formValid.value && !shareTypeStore.value.loading.value;
   }
 
-  return !shareTypeStore.value.loading.value;
-});
-
-const modalFormCanCancel = computed(() => {
   return !shareTypeStore.value.loading.value;
 });
 
@@ -108,6 +100,25 @@ const modalTitle = computed(() => {
   }
 
   return 'Remove and Unlink';
+});
+
+const modalOkLabel = computed(() => {
+  if (
+    modalState.value === ModalState.ADD ||
+    modalState.value === ModalState.DELETE
+  ) {
+    return 'Close';
+  }
+
+  return 'Save';
+});
+
+const modalCancelLabel = computed(() => {
+  if (modalState.value === ModalState.EDIT) {
+    return 'Cancel';
+  }
+
+  return undefined;
 });
 
 const modalClass = computed(() => ({
@@ -124,20 +135,17 @@ function modalToggle() {
 }
 
 function startAdd() {
-  input.value = '';
   modalState.value = ModalState.ADD;
   modalToggle();
 }
 
 function startEdit() {
   if (!props.modelValue) return;
-  input.value = props.modelValue.name;
   modalState.value = ModalState.EDIT;
   modalToggle();
 }
 
 function startDelete() {
-  input.value = '';
   modalState.value = ModalState.DELETE;
   modalToggle();
 }
@@ -148,7 +156,6 @@ function handleModalOk() {
 }
 
 function handleModalCancel() {
-  input.value = '';
   modalToggle();
 }
 </script>
@@ -177,21 +184,29 @@ function handleModalCancel() {
   </v-select>
 
   <modal-dialog
-    cancel-label="Cancel"
     :class="modalClass"
     :title="modalTitle"
     :show="modalShown"
+    :ok-label="modalOkLabel"
+    :cancel-label="modalCancelLabel"
+    :handle-enter="modalState === ModalState.EDIT"
     :can-submit="modalFormValid"
-    :can-cancel="modalFormCanCancel"
     @ok="handleModalOk"
     @cancel="handleModalCancel"
   >
-    <div v-if="modalState === ModalState.ADD || modalState === ModalState.EDIT">
-      <share-type-add-edit-form
-        v-model="formData"
-        v-model:is-valid="formValid"
-        :share-type="modalState === ModalState.EDIT ? modelValue : null"
+    <div v-if="modalState === ModalState.ADD">
+      <share-type-link-unlink-modal
+        v-model:valid="formValid"
+        :selected="modelValue"
       />
     </div>
+
+    <form v-if="modalState === ModalState.EDIT" @submit.prevent="handleModalOk">
+      <share-type-add-edit-form
+        v-model="formData"
+        v-model:valid="formValid"
+        :selected="modelValue"
+      />
+    </form>
   </modal-dialog>
 </template>
