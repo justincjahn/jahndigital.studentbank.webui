@@ -18,6 +18,11 @@ const GroupSelector = defineAsyncComponent(
   () => import('@/admin/common/components/GroupSelector.vue')
 );
 
+const ShareTypeSelector = defineAsyncComponent(
+  () =>
+    import('@/admin/common/components/ShareTypeSelector/ShareTypeSelector.vue')
+);
+
 const StudentList = defineAsyncComponent(
   () => import('@/admin/groups/components/StudentList.vue')
 );
@@ -51,6 +56,13 @@ const selectedGroup = computed({
 
   set(value) {
     globalStore.group.selected.value = value;
+  },
+});
+
+const selectedShareType = computed({
+  get: () => globalStore.shareType.selected.value,
+  set(value) {
+    globalStore.shareType.selected.value = value;
   },
 });
 
@@ -93,6 +105,13 @@ function handleBulkPostCancel() {
     <div>
       <suspense>
         <group-selector v-model="selectedGroup" :store="globalStore" />
+
+        <template #fallback>
+          <button type="button" disabled><loading-label /></button>
+        </template>
+      </suspense>
+      <suspense>
+        <share-type-selector v-model="selectedShareType" :store="globalStore" />
 
         <template #fallback>
           <button type="button" disabled><loading-label /></button>

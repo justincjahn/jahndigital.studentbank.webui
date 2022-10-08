@@ -20,13 +20,13 @@ import { query, mutate, mutateCustom } from '@/common/services/apollo';
 import { FETCH_OPTIONS } from '@/common/constants';
 
 // Graphql
-import gqlShareTypes from '@/graphql/queries/shareTypes.gql';
-import gqlNewShareType from '@/graphql/mutations/shareTypeCreate.gql';
-import gqlUpdateShareType from '@/graphql/mutations/shareTypeUpdate.gql';
-import gqlLinkShareType from '@/graphql/mutations/shareTypeLink.gql';
-import gqlUnlinkShareType from '@/graphql/mutations/shareTypeUnlink.gql';
-import gqlDeleteShareType from '@/graphql/mutations/shareTypeDelete.gql';
-import gqlDividendPosting from '@/graphql/mutations/shareTypeDividend.gql';
+import gqlShareTypes from '@/common/graphql/queries/shareTypes.gql';
+import gqlNewShareType from '@/common/graphql/mutations/shareTypeCreate.gql';
+import gqlUpdateShareType from '@/common/graphql/mutations/shareTypeUpdate.gql';
+import gqlLinkShareType from '@/common/graphql/mutations/shareTypeLink.gql';
+import gqlUnlinkShareType from '@/common/graphql/mutations/shareTypeUnlink.gql';
+import gqlDeleteShareType from '@/common/graphql/mutations/shareTypeDelete.gql';
+import gqlDividendPosting from '@/common/graphql/mutations/shareTypeDividend.gql';
 
 /**
  * Options used to fetch Share Types from the API.

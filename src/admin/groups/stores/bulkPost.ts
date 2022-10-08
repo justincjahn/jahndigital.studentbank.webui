@@ -74,6 +74,9 @@ export function setup(selection: StudentSelection) {
   // A dictionary of the step as a key and an error message as a value
   const errors = computed(() => store.errors);
 
+  // An array of current errors, if any.
+  const currentErrors = computed(() => store.errors[store.currentStep] ?? []);
+
   // True if the form has a next step
   const hasNextStep = computed(() => store.currentStep < STEP_COUNT);
 
@@ -384,21 +387,27 @@ export function setup(selection: StudentSelection) {
   }
 
   return {
+    // State
     loading,
-    currentStep,
-    hasNextStep,
-    hasPreviousStep,
-    incrementStep,
-    decrementStep,
     shareType,
     students,
-    fetchStudents,
     sampleShares,
     amount,
     comment,
     postingPolicy,
     isValid,
     errors,
+    currentErrors,
+
+    // Steps
+    currentStep,
+    hasNextStep,
+    hasPreviousStep,
+    incrementStep,
+    decrementStep,
+
+    // Actions
+    fetchStudents,
     getEffectiveBalance,
     post,
   };

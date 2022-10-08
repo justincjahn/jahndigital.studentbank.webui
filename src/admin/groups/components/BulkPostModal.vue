@@ -25,13 +25,14 @@ const emit = defineEmits<{
 
 const bulkPostStore = setupBulkPostStore(selection);
 
-const loading = computed(() => bulkPostStore.loading.value);
-
-const isValid = computed(() => bulkPostStore.isValid.value);
-
-const errors = computed(
-  () => bulkPostStore.errors.value[bulkPostStore.currentStep.value] ?? []
-);
+const {
+  loading,
+  isValid,
+  currentErrors,
+  currentStep,
+  incrementStep,
+  decrementStep,
+} = bulkPostStore;
 
 const modalOkLabel = computed(() => {
   if (loading.value) return 'Loading...';
@@ -87,14 +88,10 @@ watchEffect(() => {
       </loading-label>
     </template>
 
-    <p v-if="isValid !== true" class="error">
-      {{ isValid }}
-    </p>
-
-    <ul v-if="errors.length > 0">
-      <li v-for="(error, idx) in errors" :key="idx">
-        {{ error }}
-      </li>
-    </ul>
+    <form @submit.prevent>
+      <div v-if="currentStep == 1">
+        <h2>Step 1: Select a Share Type</h2>
+      </div>
+    </form>
   </modal-dialog>
 </template>

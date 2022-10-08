@@ -7,5 +7,5 @@ let uniqueId = 0;
  */
 export default function useUniqueId() {
   uniqueId += 1;
-  return uniqueId;
+  return uniqueId.toString();
 }

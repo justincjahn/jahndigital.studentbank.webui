@@ -1,9 +1,6 @@
 <script lang="ts">
 import { computed, useAttrs } from 'vue';
 
-// Utils
-import useUniqueId from '@/common/composables/useUniqueId';
-
 import validateRate from '@/common/validators/validateRate';
 import validateRateNonzero from '@/common/validators/validateRateNonzero';
 import validateRateNonnegative from '@/common/validators/validateRateNonnegative';
@@ -36,12 +33,12 @@ const props = withDefaults(
   {
     allowNegative: true,
     allowZero: true,
-    error: '',
-    helpText: '',
-    id: `input-${useUniqueId().toString()}`,
-    label: '',
-    required: false,
-    validator: () => false,
+    error: undefined,
+    helpText: 'Enter a rate as a decimal or percentage.  E.g., 0.01 or 10%.',
+    id: undefined,
+    label: undefined,
+    required: undefined,
+    validator: undefined,
   }
 );
 
@@ -61,7 +58,7 @@ const inputProps = computed(() => ({
   id: props.id,
   label: props.label,
   required: props.required,
-  placeholder: attrs.placeholder ?? '0.0000',
+  placeholder: (attrs.placeholder as string) ?? '0.0000',
   ...attrs,
 }));
 
@@ -84,24 +81,6 @@ const validator = computed(() => {
   }
 
   return func;
-});
-
-// Normalize the value returned by the input into a percentage.
-const normalize = (value: string): string => {
-  if (!value || value.trim().length === 0) return '';
-  return `${value.replaceAll('%', '')}%`;
-};
-
-// Remove the percentage from the modelValue for display in the box
-const inputValue = computed(() => {
-  if (!props.modelValue || props.modelValue.trim().length === 0) return '';
-
-  const idx = props.modelValue.indexOf('%');
-  if (idx >= 0) {
-    return props.modelValue.substring(0, idx);
-  }
-
-  return props.modelValue;
 });
 
 function handleKeypress(e: KeyboardEvent) {
@@ -131,49 +110,24 @@ function handleKeypress(e: KeyboardEvent) {
   <v-input
     v-bind="inputProps"
     :validator="validator"
-    @update:model-value="(value: string | boolean) => $emit('update:modelValue', normalize(value.toString()))"
+    @update:model-value="(value: string | boolean) => $emit('update:modelValue', value.toString())"
     @update:error="(value: string | false) => $emit('update:error', value)"
   >
     <template
       #default="{ attrs: inputAttrs, classes, id: inputId, inputName, update }"
     >
-      <div class="rate-input">
-        <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
-        <input
-          :id="inputId"
-          :class="classes"
-          :name="inputName"
-          :value="inputValue"
-          v-bind="inputAttrs"
-          type="text"
-          @keypress="handleKeypress($event)"
-          @input="update(($event?.target as HTMLTextAreaElement).value)"
-          @focus="($event?.target as HTMLInputElement)?.select()"
-        />
-
-        <span class="rate-input__percent">%</span>
-      </div>
+      <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
+      <input
+        :id="inputId"
+        :class="classes"
+        :name="inputName"
+        :value="modelValue"
+        v-bind="inputAttrs"
+        type="text"
+        @keypress="handleKeypress($event)"
+        @input="update(($event?.target as HTMLTextAreaElement).value)"
+        @focus="($event?.target as HTMLInputElement)?.select()"
+      />
     </template>
   </v-input>
 </template>
-
-<style lang="scss">
-.rate-input {
-  display: inline-block;
-  position: relative;
-
-  input {
-    width: 12ch;
-    padding-right: 3ch !important;
-  }
-
-  &__percent {
-    position: absolute;
-    font-size: 0.9em;
-    top: 0.35em;
-    right: 1ch;
-    user-select: none;
-    color: #999;
-  }
-}
-</style>

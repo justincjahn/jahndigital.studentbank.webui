@@ -21,7 +21,7 @@ const props = withDefaults(
     validator?: ValidationFunc;
   }>(),
   {
-    id: `input-${useUniqueId().toString()}`,
+    id: undefined,
     modelValue: '',
     helpText: '',
     error: '',
@@ -38,13 +38,15 @@ const emit = defineEmits<{
 
 const attrs = useAttrs();
 
+const inputId = computed(() => props.id ?? `input-${useUniqueId()}`);
+
 const inputClasses = computed(() => ({
   error: props.error.length > 0,
   required: props.required,
 }));
 
 const inputAttrs = computed(() => ({
-  'aria-labelledby': props.label.length > 0 ? props.id : undefined,
+  'aria-labelledby': props.label.length > 0 ? inputId.value : undefined,
   'aria-label': props.label.length > 0 ? undefined : props.name,
   ...attrs,
 }));
@@ -68,7 +70,7 @@ watchEffect(async () => {
     :class="[$attrs.class ?? '', required ? 'required' : '']"
   >
     <slot
-      :id="props.id"
+      :id="inputId"
       :attrs="inputAttrs"
       :classes="{}"
       :error="props.error"
@@ -81,7 +83,7 @@ watchEffect(async () => {
       :update="handleUpdate"
       name="label"
     >
-      <label v-if="label" :for="props.id">
+      <label v-if="label" :for="inputId">
         <template v-if="required">
           {{ label }}<span class="required">*</span>
         </template>
@@ -92,7 +94,7 @@ watchEffect(async () => {
     </slot>
 
     <slot
-      :id="props.id"
+      :id="inputId"
       :attrs="inputAttrs"
       :classes="{ 'help-text': true }"
       :error="props.error"
@@ -111,7 +113,7 @@ watchEffect(async () => {
     </slot>
 
     <slot
-      :id="props.id"
+      :id="inputId"
       :attrs="inputAttrs"
       :classes="inputClasses"
       :error="props.error"
@@ -125,7 +127,7 @@ watchEffect(async () => {
     >
       <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
       <input
-        :id="props.id"
+        :id="inputId"
         type="text"
         :name="name"
         :value="modelValue"
@@ -138,7 +140,7 @@ watchEffect(async () => {
     </slot>
 
     <slot
-      :id="props.id"
+      :id="inputId"
       :attrs="inputAttrs"
       :classes="inputClasses"
       :error="props.error"

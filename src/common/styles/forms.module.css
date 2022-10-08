@@ -19,6 +19,7 @@ input[type=password]
   outline-color: hsl(var(--clr-accent1-400));
   border: 1px solid hsl(var(--clr-accent1-300));
   border-radius: var(--border-radius);
+  width: 100%;
 }
 
 input[type=text]:invalid,
@@ -28,6 +29,11 @@ input[type=password].error
 {
   outline-color: hsl(var(--clr-destructive-400));
   border: 1px solid hsl(var(--clr-destructive-400));
+}
+
+input:is([type=text], [type=password]):disabled {
+  border-color: hsl(var(--clr-neutral-400));
+  color: hsl(var(--clr-primary-400) / 0.75);
 }
 
 /*
@@ -140,31 +146,27 @@ input[type=submit].primary:focus
  * FIELDSET
  */
 
-div.fieldset {
+:is(.form, form) .fieldset {
   display: flex;
   flex-direction: column;
 }
 
-div.fieldset label + .select {
-  /* No margin if a label is provided */
-
-  margin: 0;
+:is(.form, form) .fieldset + .fieldset {
+  margin-top: 1em;
 }
 
-div.fieldset input {
-  width: 100%;
-}
-
-div.fieldset.inline {
+:is(.form, form) .fieldset.inline {
+  display: flex;
   flex-direction: row;
   align-items: center;
+  gap: 1em;
 }
 
-div.fieldset.inline input {
-  width: auto;
-  margin-left: 1em;
+:is(.form, form) .fieldset.inline label {
+  width: 12em;
 }
 
-div.fieldset + div.fieldset {
-  margin-top: 1em;
+.fieldset.inline {
+  /* Inline input components not in a form should be displayed side by side. */
+  display: inline-block;
 }

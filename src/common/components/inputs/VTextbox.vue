@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, useAttrs } from 'vue';
-import useUniqueId from '@/common/composables/useUniqueId';
 import type { ValidationFunc } from './types';
 import VInput from './VInput.vue';
 
@@ -17,13 +16,13 @@ const props = withDefaults(
     maxLines?: number;
   }>(),
   {
-    id: `input-${useUniqueId().toString()}`,
-    modelValue: '',
-    helpText: '',
-    error: '',
-    label: '',
-    required: false,
-    validator: () => false,
+    id: undefined,
+    modelValue: undefined,
+    helpText: undefined,
+    error: undefined,
+    label: undefined,
+    required: undefined,
+    validator: undefined,
     maxLines: 10,
   }
 );

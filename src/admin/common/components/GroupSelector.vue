@@ -27,7 +27,9 @@ const props = withDefaults(
   defineProps<{
     modelValue: Group;
 
+    // The store to use when querying and performing CRUD operations
     store: GlobalStore;
+
     // A unique name for this component
     name?: string;
 
@@ -53,14 +55,14 @@ const props = withDefaults(
     required?: boolean;
   }>(),
   {
-    name: `group-selector-${useUniqueId()}`,
-    id: `input-${useUniqueId().toString()}`,
     prompt: 'Choose a group...',
-    label: '',
-    helpText: '',
-    width: '10rem',
-    disabled: false,
-    required: false,
+    name: undefined,
+    id: undefined,
+    label: undefined,
+    helpText: undefined,
+    width: undefined,
+    disabled: undefined,
+    required: undefined,
   }
 );
 
@@ -77,6 +79,11 @@ const error = computed({
     props.store.error.setCurrentError(val);
   },
 });
+
+const inputProps = computed(() => ({
+  ...props,
+  name: props.name ?? `group-selector-${useUniqueId()}`,
+}));
 
 const groupStore = computed(() => props.store.group);
 
@@ -193,7 +200,10 @@ function handleModalCancel() {
 </script>
 
 <template>
-  <v-select v-bind="{ ...props, ...$attrs }" @update:model-value="handleUpdate">
+  <v-select
+    v-bind="{ ...inputProps, ...$attrs }"
+    @update:model-value="handleUpdate"
+  >
     <template #activatorLabel="{ prompt: promptText }">
       {{ modelValue?.name ?? promptText }}
     </template>

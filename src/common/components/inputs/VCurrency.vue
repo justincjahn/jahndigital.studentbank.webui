@@ -1,9 +1,6 @@
 <script lang="ts">
 import { useAttrs, computed } from 'vue';
 
-// Utils
-import useUniqueId from '@/common/composables/useUniqueId';
-
 // Validators
 import validateAmount from '@/common/validators/validateAmount';
 import validateAmountNonzero from '@/common/validators/validateAmountNonzero';
@@ -37,12 +34,12 @@ const props = withDefaults(
   {
     allowNegative: true,
     allowZero: true,
-    error: '',
-    helpText: '',
-    id: `input-${useUniqueId().toString()}`,
-    label: '',
-    required: false,
-    validator: () => false,
+    error: undefined,
+    helpText: undefined,
+    id: undefined,
+    label: undefined,
+    required: undefined,
+    validator: undefined,
   }
 );
 
@@ -62,7 +59,7 @@ const inputProps = computed(() => ({
   id: props.id,
   label: props.label,
   required: props.required,
-  placeholder: attrs.placeholder ?? '0.00',
+  placeholder: (attrs.placeholder as string) ?? '0.00',
   ...attrs,
 }));
 
@@ -97,6 +94,7 @@ const normalize = (value: string): string => {
   <v-input
     v-bind="inputProps"
     :validator="validator"
+    :placeholder="inputProps.placeholder"
     @update:model-value="(value: string | boolean) => $emit('update:modelValue', normalize(value.toString()))"
     @update:error="(value: string | false) => $emit('update:error', value)"
   >

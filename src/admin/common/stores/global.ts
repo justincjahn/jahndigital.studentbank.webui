@@ -4,11 +4,14 @@ import errorStore from '@/common/stores/error';
 import { setup as setupInstanceStore } from '@/admin/common/stores/instance';
 import { setup as setupGroupStore } from '@/admin/common/stores/group';
 import { setup as setupStudentStore } from '@/admin/common/stores/student';
+import { setup as setupShareTypeStore } from '@/admin/common/stores/shareType';
 
 export function setup() {
   const instanceStore = setupInstanceStore();
   const groupStore = setupGroupStore(instanceStore);
   const studentStore = setupStudentStore();
+  const shareTypeStore = setupShareTypeStore(instanceStore);
+  const availableShareTypeStore = setupShareTypeStore();
 
   function dispose() {
     // Ignore
@@ -21,6 +24,8 @@ export function setup() {
     instance: instanceStore,
     group: groupStore,
     student: studentStore,
+    shareType: shareTypeStore,
+    availableShareType: availableShareTypeStore,
     dispose,
   };
 }

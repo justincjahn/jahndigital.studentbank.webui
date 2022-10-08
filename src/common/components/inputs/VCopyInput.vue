@@ -1,30 +1,18 @@
 <script setup lang="ts">
 import { ref, useAttrs, computed } from 'vue';
-import useUniqueId from '@/common/composables/useUniqueId';
 import type { ValidationFunc } from './types';
 import VInput from './VInput.vue';
 
-const props = withDefaults(
-  defineProps<{
-    name: string;
-    id?: string;
-    modelValue?: string | boolean;
-    helpText?: string;
-    error?: string;
-    label?: string;
-    required?: boolean;
-    validator?: ValidationFunc;
-  }>(),
-  {
-    id: `input-${useUniqueId().toString()}`,
-    modelValue: '',
-    helpText: '',
-    error: '',
-    label: '',
-    required: false,
-    validator: () => false,
-  }
-);
+const props = defineProps<{
+  name: string;
+  id?: string;
+  modelValue?: string | boolean;
+  helpText?: string;
+  error?: string;
+  label?: string;
+  required?: boolean;
+  validator?: ValidationFunc;
+}>();
 
 defineEmits<{
   (event: 'update:modelValue', value: string | boolean): void;
@@ -47,7 +35,7 @@ const inputProps = computed(() => ({
 function handleCopy() {
   if (!input.value) return;
   input.value.select();
-  input.value.setSelectionRange(0, props.modelValue.toString().length);
+  input.value.setSelectionRange(0, input.value.value.length);
   document.execCommand('copy');
 }
 </script>

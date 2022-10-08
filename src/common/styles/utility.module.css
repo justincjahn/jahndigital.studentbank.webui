@@ -6,3 +6,9 @@
   max-width: 100%;
   overflow-y: auto;
 }
+
+.help-text {
+  font-size: 0.85em;
+  font-style: italic;
+  line-height: 2;
+}

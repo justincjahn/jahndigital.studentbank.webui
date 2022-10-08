@@ -8,10 +8,13 @@ import {
   onUnmounted,
 } from 'vue';
 
+// Utils
 import useUniqueId from '@/common/composables/useUniqueId';
 import useDebounce from '@/common/composables/useDebounce';
-import type { OptionRegistration, SelectApi } from './types';
 import { SELECT_API } from './symbols';
+
+// Types
+import type { OptionRegistration, SelectApi } from './types';
 
 export default {
   inheritAttrs: false,
@@ -31,7 +34,7 @@ const props = withDefaults(
     modelValue: unknown | null;
 
     // A unique name for this component
-    name: string;
+    name?: string;
 
     // A unique ID for this component
     id?: string;
@@ -58,7 +61,8 @@ const props = withDefaults(
     shouldToggle?: boolean;
   }>(),
   {
-    id: `input-${useUniqueId().toString()}`,
+    id: undefined,
+    name: undefined,
     prompt: 'Choose an option...',
     label: '',
     helpText: '',
@@ -76,9 +80,13 @@ const emit = defineEmits<{
 
 const attrs = useAttrs();
 
+const inputId = computed(() => props.id ?? `input-${useUniqueId()}`);
+
+const inputName = computed(() => props.name ?? inputId.value);
+
 const inputAttrs = computed(() => ({
-  'aria-labelledby': props.label.length > 0 ? props.id : undefined,
-  'aria-label': props.label.length > 0 ? undefined : props.name,
+  'aria-labelledby': props.label.length > 0 ? inputId.value : undefined,
+  'aria-label': props.label.length > 0 ? undefined : inputName.value,
   ...attrs,
 }));
 
@@ -101,6 +109,24 @@ const highlighted = ref<number>(-1);
 const highlightedIndex = computed(() =>
   registrations.value.findIndex((x) => x.id === highlighted.value)
 );
+
+// The classes to apply to the fieldset
+const classes = computed(() => {
+  const value = {
+    required: props.required,
+    inline: false,
+  };
+
+  if (typeof attrs.class === 'undefined') {
+    value.inline = props.label.trim().length === 0;
+  }
+
+  return [
+    'fieldset',
+    value,
+    attrs.class as string | string[] | Record<string, boolean> | undefined,
+  ];
+});
 
 /**
  * Toggle the selector open or closed, if enabled.
@@ -277,14 +303,10 @@ provide(SELECT_API, api);
   <!-- eslint-disable vuejs-accessibility/click-events-have-key-events -->
   <!-- eslint-disable vuejs-accessibility/mouse-events-have-key-events -->
 
-  <div
-    class="fieldset"
-    :class="[$attrs.class ?? '', required ? 'required' : '']"
-  >
+  <div :class="classes">
     <slot
-      :id="props.id"
+      :id="inputId"
       :attrs="inputAttrs"
-      :classes="{}"
       :help-text="helpText"
       :input-name="name"
       :label="label"
@@ -293,7 +315,7 @@ provide(SELECT_API, api);
       :activate="toggle"
       name="label"
     >
-      <label v-if="label" :for="props.id" @click.prevent="toggle">
+      <label v-if="label" :for="inputId" @click.prevent="toggle">
         <template v-if="required">
           {{ label }}<span class="required">*</span>
         </template>
@@ -304,7 +326,7 @@ provide(SELECT_API, api);
     </slot>
 
     <slot
-      :id="props.id"
+      :id="inputId"
       :attrs="inputAttrs"
       :classes="{ 'help-text': true }"
       :help-text="helpText"
@@ -326,7 +348,12 @@ provide(SELECT_API, api);
       :style="{ '--width': props.width }"
       @mouseleave="api.emit.highlight(-1)"
     >
-      <slot name="activator" :activate="toggle" :disabled="props.disabled">
+      <slot
+        name="activator"
+        :activate="toggle"
+        :disabled="props.disabled"
+        :attrs="inputAttrs"
+      >
         <button
           ref="button"
           class="select__button"
@@ -367,6 +394,10 @@ provide(SELECT_API, api);
   position: static;
   display: inline-block;
   margin: 0.25rem;
+}
+
+.fieldset label + .select {
+  margin: 0;
 }
 
 .select__button {

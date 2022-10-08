@@ -18,6 +18,7 @@ export type DecoratorFunc = (value: string) => string;
 export interface UseValidationOptions {
   decorator?: DecoratorFunc | Ref<DecoratorFunc>;
   value?: Ref<string>;
+  error?: Ref<string>;
   immediate?: boolean;
 }
 
@@ -37,7 +38,7 @@ export default function useValidation(
 } {
   const opts = options || {};
   const value = opts?.value ?? ref('');
-  const error = ref<string>('');
+  const error = opts?.error ?? ref('');
   const loading = ref(false);
   let initialValidation = true;
 
