@@ -11,15 +11,14 @@ import validateNumberPositive from '@/common/validators/validateNumberPositive';
 
 // Types
 import type { ComputedRef } from 'vue';
-import type { ShareType } from '@/admin/common/services/shareType';
-import type { PeriodStrings } from '@/common/types/PeriodStrings';
+import { ShareType, Period } from '@/admin/common/services/shareType';
 
 export interface ShareTypeDTO {
   id: number;
   name: string;
   dividendRate: string;
   withdrawalLimitCount: string;
-  withdrawalLimitPeriod: PeriodStrings;
+  withdrawalLimitPeriod: Period;
   withdrawalLimitShouldFee: boolean;
   withdrawalLimitFee: string;
 }
@@ -43,9 +42,9 @@ export function buildFormData() {
   return reactive<ShareTypeDTO>({
     id: -1,
     name: '',
-    dividendRate: '',
+    dividendRate: '0.0000',
     withdrawalLimitCount: '0',
-    withdrawalLimitPeriod: 'DAILY',
+    withdrawalLimitPeriod: Period.Daily,
     withdrawalLimitShouldFee: false,
     withdrawalLimitFee: '',
   });
@@ -114,7 +113,8 @@ export default function useShareTypeForm(
     data.withdrawalLimitCount =
       shareType?.withdrawalLimitCount.toString() ?? '0';
 
-    data.withdrawalLimitPeriod = shareType?.withdrawalLimitPeriod ?? 'DAILY';
+    data.withdrawalLimitPeriod =
+      shareType?.withdrawalLimitPeriod ?? Period.Daily;
 
     data.withdrawalLimitShouldFee =
       shareType?.withdrawalLimitShouldFee ?? false;

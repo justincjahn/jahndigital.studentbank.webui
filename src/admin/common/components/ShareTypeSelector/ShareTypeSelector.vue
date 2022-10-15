@@ -3,9 +3,11 @@ import { computed, defineAsyncComponent, ref } from 'vue';
 import type { ShareType as ServiceShareType } from '@/admin/common/services/shareType';
 import type { GlobalStore } from '@/admin/common/stores/global';
 import { VSelect, VOption, VDivider } from '@/common/components/inputs';
+import Rate from '@/common/utils/Rate';
+import Money from '@/common/utils/Money';
 import { buildFormData } from './useShareTypeForm';
 import ShareTypeAddEditForm from './ShareTypeAddEditForm.vue';
-import ShareTypeLinkUnlinkModal from './ShareTypeLinkUnlinkModal.vue';
+import ShareTypeSelectorAddLinkModal from './ShareTypeSelectorAddLinkModal.vue';
 
 const ModalDialog = defineAsyncComponent(
   () => import('@/common/components/ModalDialog.vue')
@@ -23,6 +25,7 @@ const props = withDefaults(
   defineProps<{
     modelValue: ShareType;
 
+    // The store to use for querying and state
     store: GlobalStore;
 
     // A unique name for this component
@@ -92,14 +95,14 @@ const modalFormValid = computed(() => {
 
 const modalTitle = computed(() => {
   if (modalState.value === ModalState.ADD) {
-    return 'Create and Link';
+    return 'Create and Link Share Types';
   }
 
   if (modalState.value === ModalState.EDIT) {
-    return 'Edit';
+    return 'Edit Share Type';
   }
 
-  return 'Remove and Unlink';
+  return 'Remove and Unlink Share Types';
 });
 
 const modalOkLabel = computed(() => {
@@ -150,9 +153,31 @@ function startDelete() {
   modalToggle();
 }
 
-function handleModalOk() {
+async function handleModalOk() {
   if (!modalFormValid.value) return;
-  modalToggle();
+
+  if (modalState.value === ModalState.EDIT) {
+    try {
+      await props.store.shareType.update({
+        id: formData.id,
+        name: formData.name,
+        dividendRate: Rate.fromStringOrDefault(formData.dividendRate).getRate(),
+        withdrawalLimitCount: +formData.withdrawalLimitCount,
+        withdrawalLimitShouldFee: formData.withdrawalLimitShouldFee,
+        withdrawalLimitPeriod: formData.withdrawalLimitPeriod,
+        withdrawalLimitFee: Money.fromStringOrDefault(
+          formData.withdrawalLimitFee
+        ).getAmount(),
+      });
+
+      modalToggle();
+    } catch (e) {
+      if (!(e instanceof Error)) return;
+      props.store.error.setCurrentError(e.message);
+    }
+  } else {
+    modalToggle();
+  }
 }
 
 function handleModalCancel() {
@@ -195,9 +220,11 @@ function handleModalCancel() {
     @cancel="handleModalCancel"
   >
     <div v-if="modalState === ModalState.ADD">
-      <share-type-link-unlink-modal
+      <share-type-selector-add-link-modal
         v-model:valid="formValid"
         :selected="modelValue"
+        :store="props.store"
+        :show="modalState == ModalState.ADD"
       />
     </div>
 

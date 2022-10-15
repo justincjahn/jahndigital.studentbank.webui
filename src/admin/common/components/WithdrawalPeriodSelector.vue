@@ -1,11 +1,8 @@
 <script lang="ts">
 import { computed } from 'vue';
 
-// Types
-import type { PeriodStrings } from '@/common/types/PeriodStrings';
-
 // Enums
-import Period from '@/common/enums/Period';
+import { Period } from '@/admin/common/services/shareType';
 
 // Components
 import { VSelect, VOption } from '@/common/components/inputs';
@@ -16,11 +13,9 @@ export default {
 </script>
 
 <script lang="ts" setup>
-const options = Object.keys(Period);
-
 const props = defineProps<{
   // The currently selected item
-  modelValue: string;
+  modelValue: Period | null;
 
   // A unique name for this component
   name?: string;
@@ -49,7 +44,10 @@ const props = defineProps<{
 
 const labelValue = computed(() => {
   if (!props.modelValue) return undefined;
-  return Period[props.modelValue as PeriodStrings] ?? 'UNKNOWN';
+  return (
+    Object.keys(Period)[Object.values(Period).indexOf(props.modelValue)] ??
+    'Unknown'
+  );
 });
 
 defineEmits<{
@@ -66,8 +64,12 @@ defineEmits<{
       {{ labelValue ?? promptText }}
     </template>
 
-    <v-option v-for="option in options" :key="option" :value="option">
-      {{ Period[option as PeriodStrings] }}
+    <v-option
+      v-for="[key, value] in Object.entries(Period)"
+      :key="key"
+      :value="value"
+    >
+      {{ key }}
     </v-option>
   </v-select>
 </template>

@@ -1,4 +1,5 @@
 import type {
+  Period,
   ShareTypesQuery,
   ShareTypesQueryVariables,
   NewShareTypeMutation,
@@ -27,6 +28,9 @@ import gqlLinkShareType from '@/common/graphql/mutations/shareTypeLink.gql';
 import gqlUnlinkShareType from '@/common/graphql/mutations/shareTypeUnlink.gql';
 import gqlDeleteShareType from '@/common/graphql/mutations/shareTypeDelete.gql';
 import gqlDividendPosting from '@/common/graphql/mutations/shareTypeDividend.gql';
+
+export { Period } from '@/generated/graphql';
+export type PeriodStrings = keyof typeof Period;
 
 /**
  * Options used to fetch Share Types from the API.

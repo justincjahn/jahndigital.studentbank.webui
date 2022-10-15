@@ -34,7 +34,7 @@ const props = withDefaults(
     allowNegative: true,
     allowZero: true,
     error: undefined,
-    helpText: 'Enter a rate as a decimal or percentage.  E.g., 0.01 or 10%.',
+    helpText: 'Enter a rate as a decimal or percentage.  E.g. 0.01 or 10%.',
     id: undefined,
     label: undefined,
     required: undefined,

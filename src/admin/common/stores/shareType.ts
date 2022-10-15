@@ -140,6 +140,13 @@ export function setup(instanceStore?: InstanceStore) {
     },
   });
 
+  function sort(arr: ShareType[]) {
+    arr.sort((a, b) =>
+      // eslint-disable-next-line no-nested-ternary
+      a.name > b.name ? 1 : b.name > a.name ? -1 : 0
+    );
+  }
+
   /**
    * Create a new share type and add it to the store if it's in the same instance as
    * selected.
@@ -155,12 +162,13 @@ export function setup(instanceStore?: InstanceStore) {
       (x) => x.instanceId === instanceId
     );
 
-    if (store.instances.length > 0 && hasInstance >= 0) {
-      store.shareTypes = [...store.shareTypes, shareType];
-    }
-
-    if (store.instances.length <= 0) {
-      store.shareTypes = [...store.shareTypes, shareType];
+    if (
+      (store.instances.length > 0 && hasInstance >= 0) ||
+      store.instances.length <= 0
+    ) {
+      const newShareTypes = [...store.shareTypes, shareType];
+      sort(newShareTypes);
+      store.shareTypes = newShareTypes;
     }
   }
 
@@ -178,6 +186,7 @@ export function setup(instanceStore?: InstanceStore) {
     if (isListed >= 0) {
       const newShareTypes = [...store.shareTypes];
       newShareTypes[isListed] = shareType;
+      sort(newShareTypes);
       store.shareTypes = newShareTypes;
 
       if (store.selected && store.selected.id === input.id) {
@@ -201,6 +210,10 @@ export function setup(instanceStore?: InstanceStore) {
     if (isListed >= 0) {
       const newShareTypes = [...store.shareTypes];
       [newShareTypes[isListed]] = data.linkShareType;
+      store.shareTypes = newShareTypes;
+    } else if (store.instances.includes(input.instanceId)) {
+      const newShareTypes = [...store.shareTypes, ...data.linkShareType];
+      sort(newShareTypes);
       store.shareTypes = newShareTypes;
     }
 

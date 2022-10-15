@@ -1,0 +1,131 @@
+<script lang="ts" setup>
+import type { GlobalStore } from '@/admin/common/stores/global';
+import type { ShareType } from '@/admin/common/services/shareType';
+import { ref, computed, watchEffect } from 'vue';
+import { setup as setupShareTypeStore } from '@/admin/common/stores/shareType';
+import Rate from '@/common/utils/Rate';
+import Money from '@/common/utils/Money';
+import ShareTypeMultiSelector from '@/admin/common/components/ShareTypeMultiSelector.vue';
+import ShareTypeAddEditForm from './ShareTypeAddEditForm.vue';
+import { buildFormData } from './useShareTypeForm';
+
+const props = defineProps<{
+  selected: ShareType | null;
+  valid: boolean;
+  store: GlobalStore;
+  show: boolean;
+}>();
+
+const emit = defineEmits<{
+  (event: 'update:valid', value: boolean): void;
+}>();
+
+const currentInstance = computed(() => props.store.instance.selected.value);
+
+const shareTypeStore = setupShareTypeStore();
+
+const selected = ref<ShareType[]>([]);
+
+const loading = computed(() => {
+  if (shareTypeStore.loading.value) return true;
+  return false;
+});
+
+const shareTypes = computed(() => {
+  const instanceId = currentInstance.value?.id ?? -1;
+
+  const filtered = shareTypeStore.shareTypes.value.filter(
+    (shareType) =>
+      !shareType.shareTypeInstances.find(
+        (instance) => instance.instanceId === instanceId
+      )
+  );
+
+  return filtered;
+});
+
+const valid = computed({
+  get: () => props.valid,
+  set: (value) => emit('update:valid', value),
+});
+
+const formData = buildFormData();
+
+async function handleAdd() {
+  try {
+    const data = {
+      name: formData.name,
+      dividendRate: Rate.fromStringOrDefault(formData.dividendRate).getRate(),
+      withdrawalLimitCount: +formData.withdrawalLimitCount,
+      withdrawalLimitPeriod: formData.withdrawalLimitPeriod,
+      withdrawalLimitShouldFee: formData.withdrawalLimitShouldFee,
+      withdrawalLimitFee: Money.fromStringOrDefault(
+        formData.withdrawalLimitFee
+      ).getAmount(),
+    };
+
+    await shareTypeStore.create(data);
+    Object.assign(formData, buildFormData());
+  } catch (e) {
+    if (!(e instanceof Error)) return;
+    props.store.error.setCurrentError(e.message);
+  }
+}
+
+async function handleLink() {
+  if (!currentInstance.value) return;
+  const instanceId = currentInstance.value.id;
+
+  try {
+    const promises = selected.value.map((shareType) =>
+      props.store.shareType.link({
+        shareTypeId: shareType.id,
+        instanceId,
+      })
+    );
+
+    await Promise.all(promises);
+  } catch (e) {
+    if (!(e instanceof Error)) return;
+    props.store.error.setCurrentError(e.message);
+  }
+}
+
+watchEffect(() => {
+  if (props.show) {
+    shareTypeStore.fetch({ cache: false });
+  }
+});
+</script>
+
+<template>
+  <form class="stslum" @submit.prevent="handleAdd">
+    <share-type-add-edit-form v-model="formData" v-model:valid="valid" />
+    <button type="submit" class="primary">Create</button>
+  </form>
+
+  <form class="stslum" @submit.prevent="handleLink">
+    <share-type-multi-selector
+      v-model="selected"
+      :options="shareTypes"
+      :loading="loading"
+    />
+
+    <button type="submit" class="primary">Link</button>
+  </form>
+</template>
+
+<style>
+.stslum {
+  margin: 1em;
+  padding: 1em;
+  border: 1px solid hsl(var(--clr-neutral-500));
+  border-radius: var(--border-radius);
+}
+
+.stslum button {
+  width: 100%;
+  margin: 0;
+  margin-top: 2em;
+}
+</style>

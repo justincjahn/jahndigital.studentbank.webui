@@ -43,7 +43,7 @@ describe('useValidation.ts', () => {
 
   it('should pass in the value to the validation function', async () => {
     const data = 'This is a test!';
-    let received: string | null = '';
+    let received = '';
 
     const validationFunc: ValidationFunc = (s) => {
       received = s;
@@ -64,7 +64,7 @@ describe('useValidation.ts', () => {
     const data = 'This is a test!';
     const decoratorData = ' Data to be appended.';
     const expectedData = `${data}${decoratorData}`;
-    let received: string | null = '';
+    let received = '';
 
     const validationFunc: ValidationFunc = (s) => {
       received = s;
@@ -89,7 +89,7 @@ describe('useValidation.ts', () => {
   it('should use the provided value', async () => {
     const data = 'This is a test!';
     const value = ref('');
-    let received: string | null = '';
+    let received = '';
 
     const validationFunc: ValidationFunc = (s) => {
       received = s;
@@ -112,7 +112,7 @@ describe('useValidation.ts', () => {
   it('should output the provided error message from validation func', async () => {
     const data = 'This is a test!';
     const errorMessage = 'This is an error message.';
-    let received: string | null = '';
+    let received = '';
 
     const validationFunc: ValidationFunc = (s) => {
       received = s;
@@ -135,7 +135,7 @@ describe('useValidation.ts', () => {
     const errorMessage = 'Values do not match';
     const field2 = ref('');
     let timesFired = 0;
-    let received: string | null = '';
+    let received = '';
     let receivedSecond = '';
 
     function validateSecondaryEffects(repeat: Ref<string>): ValidationFunc {
@@ -155,7 +155,7 @@ describe('useValidation.ts', () => {
 
     const { value, error } = useValidation(validateSecondaryEffects(field2));
     expect(error.value).toEqual('');
-    expect(value.value).toEqual(null);
+    expect(value.value).toEqual('');
 
     value.value = data;
 

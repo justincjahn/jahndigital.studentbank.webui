@@ -3,21 +3,21 @@ import { ref, Ref, unref, watchEffect } from 'vue';
 /**
  * Callback function passed to validator utilities to check input values.
  */
-export type ValidationFunc<T = string> = (
-  value: T | null
+export type ValidationFunc = (
+  value: string
 ) => string | boolean | Promise<string | boolean>;
 
 /**
  * Function called to format a value before it's validated.
  */
-export type DecoratorFunc<T = string> = (value: T | null) => T | null;
+export type DecoratorFunc = (value: string) => string;
 
 /**
  * Options object passed to the useValidation function.
  */
-export interface UseValidationOptions<T = string> {
-  decorator?: DecoratorFunc<T> | Ref<DecoratorFunc<T>>;
-  value?: Ref<T | null>;
+export interface UseValidationOptions {
+  decorator?: DecoratorFunc | Ref<DecoratorFunc>;
+  value?: Ref<string>;
   error?: Ref<string>;
   immediate?: boolean;
 }
@@ -28,21 +28,21 @@ export interface UseValidationOptions<T = string> {
  * @param validator
  * @param options
  */
-export default function useValidation<T = string>(
-  validator: ValidationFunc<T> | Ref<ValidationFunc<T>>,
-  options?: UseValidationOptions<T>
+export default function useValidation(
+  validator: ValidationFunc | Ref<ValidationFunc>,
+  options?: UseValidationOptions
 ): {
-  value: Ref<T | null>;
+  value: Ref<string>;
   error: Ref<string>;
   loading: Ref<boolean>;
 } {
   const opts = options || {};
-  const value = opts?.value ?? (ref(null) as Ref<T | null>);
+  const value = opts?.value ?? ref('');
   const error = opts?.error ?? ref('');
   const loading = ref(false);
   let initialValidation = true;
 
-  async function runValidation(newValue: T | null) {
+  async function runValidation(newValue: string) {
     if (initialValidation) {
       initialValidation = false;
 
