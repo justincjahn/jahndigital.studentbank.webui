@@ -26,24 +26,22 @@ withDefaults(
 .loading-overlay,
 .loading-inline {
   overflow: hidden;
+  pointer-events: none;
   text-align: center;
-  user-select: none;
   font-size: 4rem;
 }
 
 .loading-overlay {
-  position: fixed;
+  position: absolute;
   z-index: 800; /* Important: don't set larger than the lowest modal at 900. */
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: var(--primary-bg-color);
-}
-
-.loading-overlay .loading-overlay__container {
-  margin: auto;
-  text-align: center;
+  background-color: hsl(var(--clr-neutral-100));
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .loading-overlay .loading-overlay__container__icon {
