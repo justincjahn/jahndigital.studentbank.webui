@@ -22,6 +22,8 @@ const emit = defineEmits<{
 
 const currentInstance = computed(() => props.store.instance.selected.value);
 
+// Use our own store to fetch all available share types instead of those
+/// only for the currently selected instance.
 const shareTypeStore = setupShareTypeStore();
 
 const selected = ref<ShareType[]>([]);
@@ -85,6 +87,7 @@ async function handleLink() {
     );
 
     await Promise.all(promises);
+    await shareTypeStore.fetch({ cache: false });
   } catch (e) {
     if (!(e instanceof Error)) return;
     props.store.error.setCurrentError(e.message);
