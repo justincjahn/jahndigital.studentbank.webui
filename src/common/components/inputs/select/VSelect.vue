@@ -277,7 +277,7 @@ watchEffect(() => {
     document.addEventListener('click', toggle);
     calculateIndices();
   } else {
-    document.addEventListener('keydown', onKeydown);
+    document.removeEventListener('keydown', onKeydown);
     document.removeEventListener('keyup', onKeyup);
     document.removeEventListener('click', toggle);
   }
@@ -291,7 +291,7 @@ watchEffect(() => {
 });
 
 onUnmounted(() => {
-  document.addEventListener('keydown', onKeydown);
+  document.removeEventListener('keydown', onKeydown);
   document.removeEventListener('keyup', onKeyup);
   document.removeEventListener('click', toggle);
 });
