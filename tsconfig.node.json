@@ -4,10 +4,11 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
   },
   "include": [
     "vite.config.ts",
+    "graphql-codegen.ts",
     ".eslintrc.cjs",
     "apollo.config.cjs",
     "package.json"

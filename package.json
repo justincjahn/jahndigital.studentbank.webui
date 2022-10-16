@@ -2,7 +2,6 @@
   "name": "jahndigital.studentbank.webui",
   "private": true,
   "version": "0.0.19-alpha.202208062148",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build --emptyOutDir",
@@ -12,7 +11,7 @@
     "format": "prettier . --write",
     "certgen": "bin/generateCertificate.sh",
     "graphql:download-schema": "pwsh bin/downloadSchema.ps1",
-    "graphql:codegen": "graphql-codegen --config graphql-codegen.yml"
+    "graphql:codegen": "graphql-codegen --config graphql-codegen.ts"
   },
   "dependencies": {
     "@apollo/client": "^3.6.9",

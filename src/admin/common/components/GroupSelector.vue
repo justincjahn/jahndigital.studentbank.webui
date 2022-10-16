@@ -148,7 +148,7 @@ async function handleModalOk() {
 
     try {
       const group = await groupStore.value.newGroup({
-        instanceId: props.store.instance.selected.value,
+        instanceId: props.store.instance.selected.value.id,
         name: input.value,
       });
 

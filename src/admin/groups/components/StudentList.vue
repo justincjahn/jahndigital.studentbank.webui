@@ -26,12 +26,12 @@ const globalStore = injectStrict(GLOBAL_STORE);
 const selectedInstance = computed(() => globalStore.instance.selected.value);
 const selectedGroup = computed(() => globalStore.group.selected.value);
 
-function loginDateFormat(date: string) {
+function loginDateFormat(date?: string | null) {
   if (!date || date.trim().length === 0) return 'Never';
   return new Date(date).toLocaleDateString('en-US');
 }
 
-function registrationStatus(date: string) {
+function registrationStatus(date?: string | null) {
   return !date || date.trim().length === 0 ? 'Unregistered' : 'Registered';
 }
 

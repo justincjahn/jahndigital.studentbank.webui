@@ -66,7 +66,11 @@ export function setup(instanceStore?: InstanceStore) {
       };
 
       if (opts.instances) {
-        store.instances = opts.instances;
+        if (Array.isArray(opts.instances)) {
+          store.instances = opts.instances;
+        } else {
+          store.instances = [opts.instances];
+        }
       }
 
       store.loading = true;

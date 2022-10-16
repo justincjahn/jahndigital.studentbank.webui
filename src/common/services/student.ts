@@ -9,6 +9,8 @@ import type {
   StudentsByIdQueryVariables,
   StudentsWithSharesQuery,
   StudentsWithSharesQueryVariables,
+  StudentsFilterQuery,
+  StudentsFilterQueryVariables,
   UpdateStudentMutation,
   UpdateStudentMutationVariables,
   StudentRegistrationMutation,
@@ -208,14 +210,14 @@ export async function getStudentsByGroup(
 export async function getStudentIdsByGroup(
   groupIds: number[],
   options: FetchOptionsBase = {}
-): Promise<StudentsWithSharesQuery> {
-  const where: StudentsWithSharesQueryVariables = {
-    groupId: { in: groupIds.map((x) => x) },
-  };
-
-  const opts = {
+): Promise<StudentsFilterQuery> {
+  const opts: StudentsFilterQueryVariables = {
     ...options,
-    where,
+    where: {
+      groupId: {
+        in: groupIds.map((x) => x),
+      },
+    },
   };
 
   return query<StudentsWithSharesQuery>(gqlStudentFilter, opts, 'network-only');
