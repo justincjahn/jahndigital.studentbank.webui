@@ -7,7 +7,9 @@ import type { Instance as ServiceInstance } from '@/admin/common/services/instan
 
 // Utils
 import { BASE_URLS } from '@/common/constants';
-import useUniqueId from '@/common/composables/useUniqueId';
+
+// Validators
+import validateStringLength from '@/common/validators/validateStringLength';
 
 // Components
 import {
@@ -20,9 +22,6 @@ import {
 
 import ModalDialog from '@/common/components/ModalDialog.vue';
 
-// @TODO: Fix this.
-// const DividendPostingModal = defineAsyncComponent(() => import('./DividendPostingModal.vue'));
-
 type Instance = ServiceInstance | null;
 
 enum ModalState {
@@ -31,12 +30,14 @@ enum ModalState {
   DELETE,
   ACTIVE,
   INVITE_CODE,
+  DIVIDEND,
 }
 
 const props = withDefaults(
   defineProps<{
     modelValue: Instance;
 
+    // The store to use when querying and performing CRUD operations
     store: GlobalStore;
 
     // A unique name for this component
@@ -64,14 +65,14 @@ const props = withDefaults(
     required?: boolean;
   }>(),
   {
-    name: `instance-selector-${useUniqueId()}`,
-    id: `input-${useUniqueId().toString()}`,
-    prompt: 'Choose instance...',
-    label: '',
-    helpText: '',
-    width: '10rem',
-    disabled: false,
-    required: false,
+    prompt: 'Choose an instance...',
+    name: undefined,
+    id: undefined,
+    label: undefined,
+    helpText: undefined,
+    width: undefined,
+    disabled: undefined,
+    required: undefined,
   }
 );
 
@@ -94,13 +95,13 @@ const error = computed({
 const instanceStore = computed(() => props.store.instance);
 
 // If the modal is open.
-const showModal = ref(false);
-
-// If the dividend posting modal is open.
-const showDividendPostingModal = ref(false);
+const modalShown = ref(false);
 
 // The input to add/rename an instance
 const input = ref('');
+
+// The error message, if there was an error
+const inputError = ref('');
 
 // The current state of the modal
 const modalState = ref(ModalState.ADD);
@@ -121,23 +122,20 @@ const inviteUrl = computed(() => {
 
 // The title of the modal window
 const modalTitle = computed(() => {
-  if (modalState.value === ModalState.ADD) {
-    return 'Create an Instance';
+  switch (modalState.value) {
+    case ModalState.ADD:
+      return 'Create an Instance';
+    case ModalState.EDIT:
+      return 'Rename an Instance';
+    case ModalState.ACTIVE:
+      return 'Activate an Instance';
+    case ModalState.INVITE_CODE:
+      return 'Invite Code';
+    case ModalState.DIVIDEND:
+      return 'Post Dividends';
+    default:
+      return 'Are you sure?';
   }
-
-  if (modalState.value === ModalState.EDIT) {
-    return 'Rename Instance';
-  }
-
-  if (modalState.value === ModalState.ACTIVE) {
-    return 'Activate Instance';
-  }
-
-  if (modalState.value === ModalState.INVITE_CODE) {
-    return 'Invite Code';
-  }
-
-  return 'Are you sure?';
 });
 
 // The class of the modal window
@@ -158,39 +156,43 @@ const modalCancelLabel = computed(() => {
   return 'Cancel';
 });
 
+// True if the modal is in a state that would permit submission
+const modalCanSubmit = computed(() => {
+  if ([ModalState.ADD, ModalState.EDIT].includes(modalState.value)) {
+    if (inputError.value.length > 0) return false;
+  }
+
+  return true;
+});
+
 // Cascade the model update
 function update(item: unknown) {
   emit('update:modelValue', item as Instance);
 }
 
 // Open or close the New Instance form.
-function toggle() {
-  showModal.value = !showModal.value;
-}
-
-// Open or close the Dividend Posting Modal
-function toggleDividendPostingModal() {
-  showDividendPostingModal.value = !showDividendPostingModal.value;
+function modalToggle() {
+  modalShown.value = !modalShown.value;
 }
 
 // Begin the invite code process
 function startInviteCode() {
   modalState.value = ModalState.INVITE_CODE;
-  toggle();
+  modalToggle();
 }
 
 // Begin the make active process and open the modal.
 function startActive() {
   modalState.value = ModalState.ACTIVE;
   input.value = '';
-  toggle();
+  modalToggle();
 }
 
 // Begin the new instance process and open the modal.
 function startAdd() {
   modalState.value = ModalState.ADD;
   input.value = '';
-  toggle();
+  modalToggle();
 }
 
 // Begin the rename process and open the modal.
@@ -198,14 +200,21 @@ function startEdit() {
   if (props.modelValue === null) return;
   modalState.value = ModalState.EDIT;
   input.value = props.modelValue?.description ?? 'ERROR';
-  toggle();
+  modalToggle();
 }
 
 // Open the delete confirmation dialog when the user wishes to delete an instance.
 function startDelete() {
   if (props.modelValue === null) return;
   modalState.value = ModalState.DELETE;
-  toggle();
+  modalToggle();
+}
+
+// Open the dividend posting modal
+function startDividend() {
+  if (!props.modelValue) return;
+  modalState.value = ModalState.DIVIDEND;
+  modalToggle();
 }
 
 // Add a new instance and Update or Delete the selected instance.
@@ -221,7 +230,7 @@ async function handleOk() {
         description: input.value,
       });
       update(instance);
-      toggle();
+      modalToggle();
     } catch (e) {
       if (e instanceof Error) {
         error.value = e.message;
@@ -244,7 +253,7 @@ async function handleOk() {
       });
 
       update(instance);
-      toggle();
+      modalToggle();
     } catch (e) {
       if (e instanceof Error) {
         error.value = e.message;
@@ -262,7 +271,7 @@ async function handleOk() {
       });
 
       update(instance);
-      toggle();
+      modalToggle();
     } catch (e) {
       if (e instanceof Error) {
         error.value = e.message;
@@ -282,30 +291,30 @@ async function handleOk() {
         error.value = e.message;
       }
     } finally {
-      toggle();
+      modalToggle();
     }
   }
 
   if (modalState.value === ModalState.INVITE_CODE) {
-    toggle();
+    modalToggle();
   }
 }
 
 // Reset the input and close the modal.
 function handleCancel() {
   input.value = '';
-  toggle();
+  modalToggle();
 }
 </script>
 
 <template>
   <v-select v-bind="{ ...props, ...$attrs }" @update:model-value="update">
-    <template #activatorLabel>
-      <template v-if="modelValue?.isActive ?? false">
+    <template #activatorLabel="{ prompt: labelText }">
+      <template v-if="modelValue?.isActive">
         <span class="active">(Active)</span>
       </template>
 
-      {{ modelValue?.description ?? 'Select instance...' }}
+      {{ modelValue?.description ?? labelText }}
     </template>
 
     <v-option v-for="option in options" :key="option.id" :value="option">
@@ -334,10 +343,7 @@ function handleCancel() {
 
     <v-divider />
 
-    <v-option
-      :disabled="modelValue === null"
-      @click="toggleDividendPostingModal"
-    >
+    <v-option :disabled="modelValue === null" @click="startDividend">
       Post Dividends...
     </v-option>
 
@@ -349,8 +355,9 @@ function handleCancel() {
   <modal-dialog
     :title="modalTitle"
     :class="modalClass"
-    :show="showModal"
+    :show="modalShown"
     :cancel-label="modalCancelLabel"
+    :can-submit="modalCanSubmit"
     @ok="handleOk"
     @cancel="handleCancel"
   >
@@ -377,19 +384,21 @@ function handleCancel() {
       />
     </template>
 
+    <template v-else-if="modalState === ModalState.DIVIDEND">
+      <p>Dividend Posting goes here...</p>
+    </template>
+
     <template v-else>
-      <v-input v-model="input" name="instance-name" label="Name" required />
+      <v-input
+        v-model="input"
+        v-model:error="inputError"
+        :validator="validateStringLength(3)"
+        name="instance-name"
+        label="Name"
+        required
+      />
     </template>
   </modal-dialog>
-
-  <!--<suspense>
-    <dividend-posting-modal
-      :show="showDividendPostingModal"
-      :store="store"
-      :instance="modelValue"
-      @ok="toggleDividendPostingModal"
-    />
-  </suspense>-->
 </template>
 
 <style scoped>

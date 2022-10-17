@@ -39,17 +39,11 @@ const props = withDefaults(
     // A unique ID for this component
     id?: string;
 
-    // The prompt to use when there's currently no item selected
-    prompt?: string;
-
     // The label displayed above the select box
     label?: string;
 
     // Helper text displayed above the select box
     helpText?: string;
-
-    // The width of the select element
-    width?: string;
 
     // If the entire select element is disabled
     disabled?: boolean;
@@ -59,17 +53,22 @@ const props = withDefaults(
 
     // Set to true if the element should toggle open/closed
     shouldToggle?: boolean;
+
+    // The prompt to use when there's currently no item selected
+    prompt?: string;
+
+    // The width of the select element
+    width?: string;
   }>(),
   {
     id: undefined,
     name: undefined,
+    label: undefined,
+    helpText: undefined,
+    required: undefined,
+    disabled: undefined,
     prompt: 'Choose an option...',
-    label: '',
-    helpText: '',
     width: '10rem',
-    required: false,
-    disabled: false,
-    shouldToggle: false,
   }
 );
 
@@ -85,8 +84,8 @@ const inputId = computed(() => props.id ?? `input-${useUniqueId()}`);
 const inputName = computed(() => props.name ?? inputId.value);
 
 const inputAttrs = computed(() => ({
-  'aria-labelledby': props.label.length > 0 ? inputId.value : undefined,
-  'aria-label': props.label.length > 0 ? undefined : inputName.value,
+  'aria-labelledby': (props.label?.length ?? 0) > 0 ? inputId.value : undefined,
+  'aria-label': (props.label?.length ?? 0) > 0 ? undefined : inputName.value,
   ...attrs,
 }));
 
@@ -118,7 +117,7 @@ const classes = computed(() => {
   };
 
   if (typeof attrs.class === 'undefined') {
-    value.inline = props.label.trim().length === 0;
+    value.inline = (props.label?.trim() ?? '').length === 0;
   }
 
   return [
@@ -378,7 +377,7 @@ provide(SELECT_API, api);
 </template>
 
 <style>
-@keyframes menuOpen {
+@keyframes menu-open {
   0% {
     transform: scaleY(0);
   }
@@ -455,7 +454,13 @@ provide(SELECT_API, api);
 
 .select.open .select__items {
   display: block;
-  animation: menuOpen 300ms ease-in-out forwards;
+  animation: menu-open 300ms ease-in-out forwards;
   transform-origin: top center;
+}
+
+/** Needed to play nice with dialog elements */
+dialog .select__items,
+.modal .select__items {
+  position: static;
 }
 </style>

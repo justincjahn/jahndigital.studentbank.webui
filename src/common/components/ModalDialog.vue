@@ -1,341 +1,242 @@
-<template>
-  <teleport to="#modal">
-    <div
-      ref="root"
-      class="modal"
-      :style="modalStyle"
-      :class="[{ 'modal--open': show, 'modal--hidden': !show && closedBefore }]"
-      v-bind="$attrs"
-    >
-      <div class="modal__container">
-        <div v-if="title" class="modal__container__title">
-          <slot name="title">
-            <h1>{{ title }}</h1>
-          </slot>
-        </div>
-        <div class="modal__container__content">
-          <slot />
-        </div>
-        <div class="modal__container__buttons">
-          <slot
-            name="buttons"
-            :cancel-label="cancelLabel"
-            :ok-label="okLabel"
-            :handle-cancel="handleCancel"
-            :handle-ok="handleOk"
-            :can-submit="canSubmit"
-            :can-cancel="canCancel"
-          >
-            <button
-              v-if="cancelLabel"
-              class="modal__container__buttons__cancel"
-              :class="[cancelButtonClass]"
-              :disabled="!canCancel"
-              type="button"
-              @click="handleCancel"
-            >
-              <slot
-                name="cancelLabel"
-                :cancel-label="cancelLabel"
-                :can-cancel="canCancel"
-              >
-                {{ cancelLabel }}
-              </slot>
-            </button>
-            <button
-              ref="okButton"
-              class="modal__container__buttons__ok"
-              :class="[okButtonClass]"
-              :disabled="!canSubmit"
-              type="button"
-              @click="handleOk"
-            >
-              <slot name="okLabel" :ok-label="okLabel" :can-submit="canSubmit">
-                {{ okLabel }}
-              </slot>
-            </button>
-          </slot>
-        </div>
-      </div>
-    </div>
-  </teleport>
-</template>
+<script lang="ts" setup>
+import { ref, computed, watchEffect, onUnmounted } from 'vue';
 
-<script lang="ts">
-import { computed, defineComponent, onUnmounted, ref, watchEffect } from 'vue';
-import modalStore from '@/common/stores/modal';
-import useDebounce from '@/common/composables/useDebounce';
+const props = withDefaults(
+  defineProps<{
+    show: boolean;
 
-/**
- * Describes the possible event types that might be provided to the callback functions.
- */
-export type ModalEvent = MouseEvent | KeyboardEvent | KeyboardEvent | null;
+    // The title of the modal dialog
+    title?: string;
 
-export default defineComponent({
-  props: {
-    show: {
-      type: Boolean,
-      required: true,
-      default: false,
-    },
-    title: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    okLabel: {
-      type: String,
-      required: false,
-      default: 'Ok',
-    },
-    okButtonClass: {
-      type: String,
-      required: false,
-      default: 'primary',
-    },
-    cancelLabel: {
-      type: String,
-      required: false,
-      default: undefined,
-    },
-    cancelButtonClass: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    canSubmit: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
-    canCancel: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
-    handleEnter: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
-    handleEscape: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
+    // If the dialog can be cancelled
+    canCancel?: boolean;
+
+    // If the dialog can be submitted
+    canSubmit?: boolean;
+
+    // The label of the cancel button
+    cancelLabel?: string;
+
+    // The label of the submit button
+    submitLabel?: string;
+  }>(),
+  {
+    title: undefined,
+    canCancel: true,
+    canSubmit: true,
+    cancelLabel: undefined,
+    submitLabel: 'Ok',
+  }
+);
+
+const emit = defineEmits<{
+  (event: 'ok'): void;
+  (event: 'cancel'): void;
+}>();
+
+// Reference to the dialog element
+const dialogElement = ref<HTMLDialogElement>();
+
+// Reference to the dialog's form element
+const formElement = ref<HTMLFormElement>();
+
+// Classes applied to the dialog element
+const dialogClass = computed(() => [
+  'modal',
+
+  {
+    closing: !props.show,
   },
-  emits: ['ok', 'cancel', 'focus'],
-  setup(props, { emit }) {
-    const root = ref<HTMLDivElement | null>(null);
-    const okButton = ref<HTMLButtonElement | null>(null);
-    const closedBefore = ref(false);
+]);
 
-    function ok(e: ModalEvent) {
-      emit('ok', e);
-    }
+// Handle the dialog's close event
+function handleDialogClose(e?: Event) {
+  e?.preventDefault();
 
-    function cancel(e: ModalEvent) {
-      emit('cancel', e);
-    }
+  // This will get fired again when the parent closes us and may trigger an infinite loop
+  if (dialogElement.value?.returnValue === 'parent') return;
 
-    // If the OK/Cancel button is focused and the enter key is pressed, prevent sending the event twice.
-    const handleOk = useDebounce(ok, 100);
-    const handleCancel = useDebounce(cancel, 100);
-
-    // Watch for Escape and Enter key-presses and call the appropriate handler.
-    function handleKeyPress(e: KeyboardEvent) {
-      // Ignore keypress if we're not the top modal
-      if (root.value === null || modalStore.topmost.value !== root.value) {
-        return;
-      }
-
-      if (e.key === 'Escape' && props.handleEscape) {
-        e.preventDefault();
-
-        if (props.cancelLabel) {
-          handleCancel(e);
-        } else {
-          handleOk(e);
-        }
-      }
-
-      if (e.key === 'Enter' && props.handleEnter) {
-        e.preventDefault();
-        handleOk(e);
-      }
-    }
-
-    // Fired when the modal is shown or hidden.
-    watchEffect(() => {
-      if (props.show === true) {
-        closedBefore.value = true;
-        setTimeout(
-          () => document.addEventListener('keyup', handleKeyPress),
-          100
-        );
-
-        if (root.value !== null) {
-          modalStore.open(root.value);
-        }
-      } else if (root.value !== null) {
-        modalStore.close(root.value);
-      }
-
-      if (props.show === false) {
-        document.removeEventListener('keyup', handleKeyPress);
-      }
-    });
-
-    // When the modal is at the top level, emit a focus event.
-    watchEffect(() => {
-      if (root.value !== null && modalStore.topmost.value === root.value) {
-        if (document.activeElement) {
-          (document.activeElement as HTMLElement).blur();
-        }
-
-        emit('focus', root.value);
-      }
-    });
-
-    onUnmounted(() => {
-      document.removeEventListener('keyup', handleKeyPress);
-
-      if (root.value !== null) {
-        modalStore.close(root.value);
-      }
-    });
-
-    const modalStyle = computed(() => ({
-      zIndex:
-        root.value !== null && modalStore.topmost.value === root.value
-          ? 1000
-          : 900,
-    }));
-
-    return {
-      handleOk,
-      handleCancel,
-      root,
-      okButton,
-      closedBefore,
-      modalStyle,
-    };
-  },
-});
-</script>
-
-<style>
-.modal {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  visibility: hidden;
-  overflow: hidden;
-  background-color: hsl(0 0% 0% / 0.5);
-  font-size: 1rem; /* Reset fonts for this modal */
-  display: flex;
-  flex-direction: column;
+  if (!props.canSubmit) return;
+  emit('ok');
 }
 
-.modal.modal--hidden {
-  animation: modal-fade-out 0.2s;
-}
+// Handle the dialog's cancel event (Esc key) or a cancel button press
+function handleDialogCancel(e?: Event) {
+  e?.preventDefault();
 
-.modal.modal--open {
-  opacity: 1;
-  visibility: visible;
-  animation: modal-fade-in 0.2s;
-}
-
-.modal .modal__container {
-  background-color: hsl(var(--clr-neutral-100));
-}
-
-@media screen and (min-width: 700px) {
-  .modal .modal__container {
-    margin: 0 auto;
-    width: clamp(450px, 50vw, 600px);
-    border-bottom-left-radius: var(--border-radius);
-    border-bottom-right-radius: var(--border-radius);
+  if (props.cancelLabel) {
+    if (!props.canCancel) return;
+    emit('cancel');
+  } else {
+    // No cancel button exists, try to submit the form
+    if (!formElement.value) return;
+    formElement.value.requestSubmit();
   }
 }
 
-@media screen and (min-height: 400px) {
-  .modal .modal__container {
-    margin-top: 30vmin;
-    max-height: calc(100% - 30vmin);
+// Handle the form's submit event
+function handleFormSubmit(e: SubmitEvent) {
+  e?.preventDefault();
+
+  if (!dialogElement.value) return;
+
+  dialogElement.value.returnValue =
+    (e.submitter as HTMLButtonElement)?.value ?? 'submit';
+
+  dialogElement.value.dispatchEvent(new Event('close'));
+}
+
+// Close the dialog after the animation completes
+function handleDialogAnimation() {
+  if (!dialogElement.value) return;
+
+  dialogElement.value.removeEventListener(
+    'animationend',
+    handleDialogAnimation
+  );
+
+  dialogElement.value.close('parent');
+}
+
+watchEffect(() => {
+  if (!dialogElement.value) return;
+
+  if (props.show === true) {
+    dialogElement.value.showModal();
+  } else if (dialogElement.value.open) {
+    dialogElement.value.addEventListener('animationend', handleDialogAnimation);
+  }
+});
+
+onUnmounted(() => {
+  if (!dialogElement.value) return;
+
+  dialogElement.value.removeEventListener(
+    'animationend',
+    handleDialogAnimation
+  );
+});
+</script>
+
+<template>
+  <dialog
+    ref="dialogElement"
+    :class="dialogClass"
+    @close="handleDialogClose"
+    @cancel="handleDialogCancel"
+  >
+    <div v-if="title" class="modal__title">
+      <slot name="title">
+        <h1>{{ title }}</h1>
+      </slot>
+    </div>
+
+    <form
+      ref="formElement"
+      method="dialog"
+      @submit="(e) => handleFormSubmit(e as SubmitEvent)"
+    >
+      <div class="modal__content">
+        <slot />
+      </div>
+
+      <div class="modal__actions">
+        <slot name="actions" :activate-cancel="handleDialogCancel">
+          <button
+            v-if="props.cancelLabel"
+            type="button"
+            class="secondary"
+            :disabled="!props.canCancel"
+            @click="handleDialogCancel"
+          >
+            <slot name="cancelLabel" :label="props.cancelLabel">
+              {{ props.cancelLabel }}
+            </slot>
+          </button>
+
+          <button type="submit" class="primary" :disabled="!props.canSubmit">
+            <slot name="submitLabel" :label="props.submitLabel">
+              {{ props.submitLabel }}
+            </slot>
+          </button>
+        </slot>
+      </div>
+    </form>
+  </dialog>
+</template>
+
+<style scoped>
+dialog {
+  margin: 0 auto;
+  width: clamp(30rem, 50vw, 40rem);
+
+  font-size: 1rem;
+  color: hsl(var(--clr-primary-400));
+  background-color: hsl(var(--clr-neutral-100));
+
+  border: none;
+  border-bottom-left-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+}
+
+dialog::backdrop {
+  background-color: hsl(0 0% 0% / 0.5);
+}
+
+dialog[open],
+dialog[open]::backdrop {
+  animation: modal-fade-in 0.2s;
+}
+
+dialog.closing,
+dialog.closing::backdrop {
+  animation: modal-fade-out 0.2s;
+}
+
+@media screen and (min-height: 40rem) {
+  dialog {
+    margin-top: 20vmin;
+    max-height: calc(100% - 20vmin);
     overflow-y: auto;
   }
 }
 
-@media screen and (min-width: 700px) and (min-height: 400px) {
-  .modal .modal__container {
+@media screen and (min-height: 40rem) {
+  dialog {
     border-radius: var(--border-radius);
   }
 }
 
-.modal .modal__container__title {
+.modal__title {
   --clr-font: var(--clr-primary-400);
   --clr-bg: var(--clr-neutral-400);
   --clr-border: var(--clr-neutral-500);
+
+  padding: 0.5em 1em;
 
   color: hsl(var(--clr-font));
   background-color: hsl(var(--clr-bg));
   border-bottom: 1px solid hsl(var(--clr-border));
 }
 
-@media screen and (min-width: 700px) and (min-height: 400px) {
-  .modal .modal__container__title {
-    border-radius: var(--border-radius) var(--border-radius) 0 0;
-  }
-}
-
-.modal .modal__container__title h1 {
-  font-size: 1.75rem;
-}
-
-.modal .modal__container__title,
-.modal .modal__container__buttons {
-  padding: 1em;
-}
-
-.modal .modal__container__content {
-  padding: 1em;
-  min-height: 0px;
-}
-
-.modal .modal__container__buttons {
-  display: flex;
-  flex-direction: column;
-}
-
-@media screen and (min-width: 300px) {
-  .modal .modal__container__buttons {
-    flex-direction: row;
-    justify-content: flex-end;
-  }
-}
-
-.modal.destructive .modal__container__title {
+dialog.destructive .modal__title {
   --clr-font: var(--clr-destructive-100);
   --clr-bg: var(--clr-destructive-400);
 }
 
-.modal.accent1 .modal__container__title {
+dialog.accent1 .modal__title {
   --clr-font: var(--clr-accent1-100);
   --clr-bg: var(--clr-accent1-400);
 }
 
-.modal.large .modal__container {
-  margin: 0 auto;
-  width: 90%;
-  max-width: 1080px;
-  max-height: 90vh;
-  overflow: auto;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+.modal__content {
+  padding: 1em;
+}
+
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 1em 1em 1em;
 }
 
 @keyframes modal-fade-in {
@@ -350,11 +251,9 @@ export default defineComponent({
 @keyframes modal-fade-out {
   from {
     opacity: 1;
-    visibility: visible;
   }
   to {
     opacity: 0;
-    visibility: hidden;
   }
 }
 </style>

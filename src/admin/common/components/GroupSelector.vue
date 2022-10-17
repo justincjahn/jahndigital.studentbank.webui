@@ -1,19 +1,13 @@
 <script lang="ts" setup>
-import { computed, defineAsyncComponent, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 // Types
 import type { Group as ServiceGroup } from '@/admin/common/services/group';
 import type { GlobalStore } from '@/admin/common/stores/global';
 
-// Utils
-import useUniqueId from '@/common/composables/useUniqueId';
-
 // Components
 import { VOption, VDivider, VSelect, VInput } from '@/common/components/inputs';
-
-const ModalDialog = defineAsyncComponent(
-  () => import('@/common/components/ModalDialog.vue')
-);
+import ModalDialog from '@/common/components/ModalDialog.vue';
 
 type Group = ServiceGroup | null;
 
@@ -80,12 +74,9 @@ const error = computed({
   },
 });
 
-const inputProps = computed(() => ({
-  ...props,
-  name: props.name ?? `group-selector-${useUniqueId()}`,
-}));
-
 const groupStore = computed(() => props.store.group);
+
+const instanceId = computed(() => props.store.instance.selected.value?.id);
 
 const options = computed(() => groupStore.value.groups.value);
 
@@ -96,15 +87,14 @@ const modalShown = ref(false);
 const modalState = ref(ModalState.ADD);
 
 const modalTitle = computed(() => {
-  if (modalState.value === ModalState.ADD) {
-    return 'Create a Group';
+  switch (modalState.value) {
+    case ModalState.ADD:
+      return 'Create a Group';
+    case ModalState.EDIT:
+      return 'Rename a Group';
+    default:
+      return 'Are you sure?';
   }
-
-  if (modalState.value === ModalState.EDIT) {
-    return 'Edit Group';
-  }
-
-  return 'Delete Group';
 });
 
 const modalClass = computed(() => {
@@ -144,11 +134,11 @@ function startDelete() {
 
 async function handleModalOk() {
   if (modalState.value === ModalState.ADD) {
-    if (!props.store.instance.selected.value) return;
+    if (!instanceId.value) return;
 
     try {
       const group = await groupStore.value.newGroup({
-        instanceId: props.store.instance.selected.value.id,
+        instanceId: instanceId.value,
         name: input.value,
       });
 
@@ -162,7 +152,6 @@ async function handleModalOk() {
 
   if (modalState.value === ModalState.EDIT) {
     if (!props.modelValue) return;
-    if (!props.store.instance.selected.value) return;
 
     try {
       const group = await groupStore.value.updateGroup({
@@ -200,10 +189,7 @@ function handleModalCancel() {
 </script>
 
 <template>
-  <v-select
-    v-bind="{ ...inputProps, ...$attrs }"
-    @update:model-value="handleUpdate"
-  >
+  <v-select v-bind="{ ...props, ...$attrs }" @update:model-value="handleUpdate">
     <template #activatorLabel="{ prompt: promptText }">
       {{ modelValue?.name ?? promptText }}
     </template>
@@ -233,6 +219,12 @@ function handleModalCancel() {
     @ok="handleModalOk"
     @cancel="handleModalCancel"
   >
-    <v-input v-model="input" name="group-name" label="Name" required />
+    <template v-if="modalState === ModalState.DELETE">
+      This action cannot be undone!
+    </template>
+
+    <template v-else>
+      <v-input v-model="input" name="group-name" label="Name" required />
+    </template>
   </modal-dialog>
 </template>

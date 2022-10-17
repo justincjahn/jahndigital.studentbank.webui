@@ -1,10 +1,13 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { VSelect, VOption, VDivider } from '@/common/components/inputs';
+import { VInput, VSelect, VOption, VDivider } from '@/common/components/inputs';
+import ModalDialog from '@/common/components/ModalDialog.vue';
 
 import '@/common/styles/common.css';
 
 const test = ref(null);
+
+const show = ref(false);
 
 const items = ref([1, 2, 3, 4, 5, 6]);
 
@@ -27,6 +30,10 @@ function update() {
 function onAddUser() {
   console.log('!!!');
 }
+
+function toggleModal() {
+  show.value = !show.value;
+}
 </script>
 
 <template>
@@ -42,4 +49,16 @@ function onAddUser() {
   <button type="button" @click="remove">Remove</button>
   <button type="button" @click="splice">Splice</button>
   <button type="button" @click="update">Update</button>
+
+  <button type="button" @click="toggleModal">Show Modal</button>
+
+  <modal-dialog
+    :show="show"
+    title="Test Modal"
+    cancel-label="Cancel"
+    @cancel="toggleModal"
+    @ok="toggleModal"
+  >
+    <v-input name="test-input" label="Testing" required />
+  </modal-dialog>
 </template>

@@ -36,7 +36,7 @@ function handleCopy() {
   if (!input.value) return;
   input.value.select();
   input.value.setSelectionRange(0, input.value.value.length);
-  document.execCommand('copy');
+  navigator.clipboard.writeText(input.value.value);
 }
 </script>
 
@@ -74,9 +74,7 @@ function handleCopy() {
           @focus="($event?.target as HTMLInputElement).select()"
         />
 
-        <button type="button" class="secondary" @click="handleCopy">
-          Copy
-        </button>
+        <button type="button" @click="handleCopy">Copy</button>
       </div>
     </template>
   </v-input>

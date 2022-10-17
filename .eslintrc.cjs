@@ -9,5 +9,13 @@ module.exports = {
   ],
   rules: {
     'import/extensions': 0,
+    'vue/html-button-has-type': [
+      'error',
+      {
+        button: true,
+        submit: true,
+        reset: true,
+      },
+    ],
   },
 };

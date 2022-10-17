@@ -142,6 +142,15 @@ input[type=submit].primary:focus
   --clr-border: var(--clr-accent1-900);
 }
 
+button.secondary {
+  border: none;
+  background-color: transparent;
+}
+
+button.secondary:hover {
+  text-decoration: underline;
+}
+
 /*
  * FIELDSET
  */
