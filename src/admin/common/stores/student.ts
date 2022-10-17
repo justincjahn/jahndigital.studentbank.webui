@@ -9,9 +9,9 @@ import {
   getStudentsByAccountNumber,
   getStudentsByEmail,
   getStudentsByName,
-  newStudent as ssNewStudent,
-  updateStudent as ssUpdateStudent,
-  deleteStudent as ssDeleteStudent,
+  newStudent,
+  updateStudent,
+  deleteStudent,
   bulkMoveStudents,
 } from '@/common/services/student';
 
@@ -151,23 +151,6 @@ export function setup() {
   }
 
   /**
-   * Create a new student using the provided information.
-   *
-   * @param input The student to create.
-   * @throws {Error} If an issue was encountered while attempting to create the student.
-   */
-  async function newStudent(input: Parameters<typeof ssNewStudent>[0]) {
-    const data = await ssNewStudent(input);
-    const [student] = data.newStudent;
-
-    if (store.students[0]?.groupId === input.groupId ?? true) {
-      store.students = [...store.students, student];
-    }
-
-    return student;
-  }
-
-  /**
    * Fetch a specific student by ID and return it.
    *
    * @param id The ID number of the student.
@@ -222,13 +205,30 @@ export function setup() {
   }
 
   /**
+   * Create a new student using the provided information.
+   *
+   * @param input The student to create.
+   * @throws {Error} If an issue was encountered while attempting to create the student.
+   */
+  async function create(input: Parameters<typeof newStudent>[0]) {
+    const data = await newStudent(input);
+    const [student] = data.newStudent;
+
+    if (store.students[0]?.groupId === input.groupId ?? true) {
+      store.students = [...store.students, student];
+    }
+
+    return student;
+  }
+
+  /**
    * Persist changes to the provided Student object.
    *
    * @param student The student to update.
    * @throws {Error} If an issue was encountered while attempting the API call.
    */
-  async function updateStudent(student: Student) {
-    const data = await ssUpdateStudent({
+  async function update(student: Student) {
+    const data = await updateStudent({
       id: student.id,
       groupId: student.groupId,
       accountNumber: student.accountNumber.padStart(10, '0'),
@@ -257,7 +257,7 @@ export function setup() {
    * @throws {Error} If an issue was encountered while attempting the API call.
    */
   async function updatePassword(id: number, password: string) {
-    const data = await ssUpdateStudent({
+    const data = await updateStudent({
       id,
       password,
     });
@@ -287,8 +287,8 @@ export function setup() {
    * @param student The student to delete.
    * @throws {Error} If an issue was encountered while attempting to delete the student.
    */
-  async function deleteStudent(student: Student) {
-    const data = await ssDeleteStudent(student);
+  async function remove(student: Student) {
+    const data = await deleteStudent(student);
 
     if (data.deleteStudent === true) {
       const isListed = store.students.findIndex((x) => x.id === student.id);
@@ -319,15 +319,15 @@ export function setup() {
     fetchPrevious,
 
     // CRUD
-    newStudent,
     getById,
     getByAccountNumber,
     getByEmail,
     getByName,
-    updateStudent,
+    create,
+    update,
     updatePassword,
     bulkMove,
-    deleteStudent,
+    remove,
   };
 }
 

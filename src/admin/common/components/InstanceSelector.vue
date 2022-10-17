@@ -226,15 +226,15 @@ async function handleOk() {
     }
 
     try {
-      const instance = await instanceStore.value.newInstance({
+      const instance = await instanceStore.value.create({
         description: input.value,
       });
+
       update(instance);
       modalToggle();
     } catch (e) {
-      if (e instanceof Error) {
-        error.value = e.message;
-      }
+      if (!(e instanceof Error)) return;
+      error.value = e.message;
     }
   }
 
@@ -247,7 +247,7 @@ async function handleOk() {
     if (props.modelValue === null) return;
 
     try {
-      const instance = await instanceStore.value.updateInstance({
+      const instance = await instanceStore.value.update({
         id: props.modelValue?.id ?? -1,
         description: input.value,
       });
@@ -255,9 +255,8 @@ async function handleOk() {
       update(instance);
       modalToggle();
     } catch (e) {
-      if (e instanceof Error) {
-        error.value = e.message;
-      }
+      if (!(e instanceof Error)) return;
+      error.value = e.message;
     }
   }
 
@@ -265,7 +264,7 @@ async function handleOk() {
     if (props.modelValue === null) return;
 
     try {
-      const instance = await instanceStore.value.updateInstance({
+      const instance = await instanceStore.value.update({
         id: props.modelValue?.id ?? -1,
         isActive: true,
       });
@@ -273,23 +272,20 @@ async function handleOk() {
       update(instance);
       modalToggle();
     } catch (e) {
-      if (e instanceof Error) {
-        error.value = e.message;
-      }
+      if (!(e instanceof Error)) return;
+      error.value = e.message;
     }
   }
 
   if (modalState.value === ModalState.DELETE) {
-    if (props.modelValue === null) return;
+    if (!props.modelValue) return;
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      await instanceStore.value.deleteInstance(props.modelValue!);
+      await instanceStore.value.remove(props.modelValue);
       update(null);
     } catch (e) {
-      if (e instanceof Error) {
-        error.value = e.message;
-      }
+      if (!(e instanceof Error)) return;
+      error.value = e.message;
     } finally {
       modalToggle();
     }

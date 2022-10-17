@@ -66,7 +66,7 @@ const currentInstance = computed({
 
 watchEffect(() => {
   if (isAuthenticated.value && !currentInstance.value) {
-    globalStore.instance.fetchInstances();
+    globalStore.instance.fetch();
   }
 });
 </script>

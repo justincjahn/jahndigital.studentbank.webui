@@ -137,7 +137,7 @@ async function handleModalOk() {
     if (!instanceId.value) return;
 
     try {
-      const group = await groupStore.value.newGroup({
+      const group = await groupStore.value.create({
         instanceId: instanceId.value,
         name: input.value,
       });
@@ -154,7 +154,7 @@ async function handleModalOk() {
     if (!props.modelValue) return;
 
     try {
-      const group = await groupStore.value.updateGroup({
+      const group = await groupStore.value.update({
         id: props.modelValue.id,
         name: input.value,
       });
@@ -171,7 +171,7 @@ async function handleModalOk() {
     if (!props.modelValue) return;
 
     try {
-      await groupStore.value.deleteGroup(props.modelValue);
+      await groupStore.value.remove(props.modelValue);
       handleUpdate(null);
     } catch (e) {
       if (!(e instanceof Error)) return;

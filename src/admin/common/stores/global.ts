@@ -11,7 +11,6 @@ export function setup() {
   const groupStore = setupGroupStore(instanceStore);
   const studentStore = setupStudentStore();
   const shareTypeStore = setupShareTypeStore(instanceStore);
-  const availableShareTypeStore = setupShareTypeStore();
 
   function dispose() {
     // Ignore
@@ -25,7 +24,6 @@ export function setup() {
     group: groupStore,
     student: studentStore,
     shareType: shareTypeStore,
-    availableShareType: availableShareTypeStore,
     dispose,
   };
 }

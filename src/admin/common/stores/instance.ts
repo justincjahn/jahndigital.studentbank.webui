@@ -1,8 +1,13 @@
 import { computed, reactive } from 'vue';
 
-import * as instanceService from '@/admin/common/services/instance';
+import type { Instance } from '@/admin/common/services/instance';
 
-type Instance = instanceService.Instance;
+import {
+  getInstances,
+  newInstance,
+  updateInstance,
+  deleteInstance,
+} from '@/admin/common/services/instance';
 
 // Instances are global so instead of managing data per store instance, do it globally
 const instanceCache = reactive({
@@ -15,13 +20,13 @@ const instanceCache = reactive({
  * with their own groups, students, stocks, share types, etc.  They are most often used to create
  * new environments for new terms/groups of students/people.
  */
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function setup() {
   const store = reactive({
     selected: null as Instance | null,
     loading: false,
   });
 
+  // Get or set the currently selected instance
   const selected = computed({
     get: () => store.selected,
     set: (value: Instance | null) => {
@@ -29,12 +34,14 @@ export function setup() {
     },
   });
 
+  // Get a list of instances
   const instances = computed(() => instanceCache.instances);
 
+  // True if the store is fetching data
   const loading = computed(() => store.loading);
 
   /**
-   * Fetch instances from the server.
+   * Fetch instances from the server and select one if nothing is selected.
    *
    * @param cache
    */
@@ -42,10 +49,11 @@ export function setup() {
     store.loading = true;
 
     try {
-      const data = await instanceService.getInstances(cache);
+      const data = await getInstances(cache);
       if (!data.instances || !data.instances.nodes) return;
 
       instanceCache.instances = data.instances.nodes;
+
       const active = instanceCache.instances.findIndex(
         (x) => x.isActive === true
       );
@@ -69,10 +77,8 @@ export function setup() {
    * @param input
    * @returns The newly created instance.
    */
-  async function newInstance(
-    input: Parameters<typeof instanceService.newInstance>[0]
-  ) {
-    const data = await instanceService.newInstance(input);
+  async function create(input: Parameters<typeof newInstance>[0]) {
+    const data = await newInstance(input);
     instanceCache.instances = [...instanceCache.instances, data.newInstance];
     return data.newInstance;
   }
@@ -83,10 +89,8 @@ export function setup() {
    * @param input
    * @returns The updated instance.
    */
-  async function updateInstance(
-    input: Parameters<typeof instanceService.updateInstance>[0]
-  ) {
-    const data = await instanceService.updateInstance(input);
+  async function update(input: Parameters<typeof updateInstance>[0]) {
+    const data = await updateInstance(input);
 
     // If we've activated an instance, then we need to update all of them
     let existing = [...instanceCache.instances];
@@ -113,8 +117,9 @@ export function setup() {
    *
    * @param instance
    */
-  async function deleteInstance(instance: Instance) {
-    const data = await instanceService.deleteInstance({ id: instance.id });
+  async function remove(instance: Instance) {
+    const data = await deleteInstance({ id: instance.id });
+
     if (data.deleteInstance === true) {
       instanceCache.instances = instanceCache.instances.filter(
         (x) => x.id !== instance.id
@@ -128,10 +133,10 @@ export function setup() {
     selected,
     instances,
     loading,
-    fetchInstances: fetch,
-    newInstance,
-    updateInstance,
-    deleteInstance,
+    fetch,
+    create,
+    update,
+    remove,
   };
 }
 

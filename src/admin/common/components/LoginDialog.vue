@@ -7,6 +7,7 @@ import { GLOBAL_STORE } from '@/admin/symbols';
 
 // Components
 import LoadingLabel from '@/common/components/LoadingLabel.vue';
+import { VInput } from '@/common/components/inputs';
 
 const ModalDialog = defineAsyncComponent(
   () => import('@/common/components/ModalDialog.vue')
@@ -17,8 +18,10 @@ const username = ref('');
 const password = ref('');
 const error = ref('');
 
+const isLoading = computed(() => globalStore.user.loading.value);
+
 const canSubmit = computed(() => {
-  if (globalStore.user.loading.value) return false;
+  if (isLoading.value) return false;
   if (username.value.length === 0) return false;
   if (password.value.length === 0) return false;
   return true;
@@ -28,6 +31,7 @@ async function login() {
   if (!canSubmit.value) return;
 
   error.value = '';
+
   try {
     await globalStore.user.login(username.value, password.value, false);
   } catch (e: unknown) {
@@ -46,41 +50,34 @@ async function login() {
     ok-label="Login"
     :show="true"
     :can-cancel="false"
-    :handle-escape="false"
     :can-submit="canSubmit"
-    :handle-enter="canSubmit"
     @ok="login"
   >
-    <form class="admin-login" @submit.prevent="login">
-      <div class="fieldset">
-        <label for="username">Email Address</label>
-        <input
-          id="username"
-          v-model="username"
-          type="text"
-          name="username"
-          autocomplete="username"
-        />
-      </div>
+    <v-input
+      v-model="username"
+      name="username"
+      label="Email Address"
+      autocomplete="username"
+      required
+    />
 
-      <div class="fieldset">
-        <label for="password">Password</label>
-        <input
-          id="password"
-          v-model="password"
-          type="password"
-          name="password"
-          autocomplete="current-password"
-        />
-      </div>
+    <v-input
+      v-model="password"
+      name="password"
+      label="Password"
+      type="password"
+      autocomplete="current-password"
+      required
+    />
 
-      <p v-if="error" class="error">
-        {{ error }}
-      </p>
-    </form>
+    <p v-if="error" class="error">
+      {{ error }}
+    </p>
 
-    <template #okLabel="{ okLabel: label, canSubmit: enabled }">
-      <loading-label :show="!enabled"> {{ label }} </loading-label>
+    <template #submitLabel="{ label }">
+      <loading-label :show="isLoading">
+        {{ label }}
+      </loading-label>
     </template>
   </modal-dialog>
 </template>

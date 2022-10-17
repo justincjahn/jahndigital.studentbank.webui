@@ -207,6 +207,13 @@ dialog.closing::backdrop {
   }
 }
 
+dialog.large {
+  margin-top: 0;
+  width: clamp(25rem, 50rem, 50rem);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
 .modal__title {
   --clr-font: var(--clr-primary-400);
   --clr-bg: var(--clr-neutral-400);

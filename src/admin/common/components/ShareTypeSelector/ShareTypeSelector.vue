@@ -8,6 +8,7 @@ import Money from '@/common/utils/Money';
 import { buildFormData } from './useShareTypeForm';
 import ShareTypeAddEditForm from './ShareTypeAddEditForm.vue';
 import ShareTypeSelectorAddLinkModal from './ShareTypeSelectorAddLinkModal.vue';
+import ShareTypeSelectorRemoveUnlinkModal from './ShareTypeSelectorRemoveUnlinkModal.vue';
 
 const ModalDialog = defineAsyncComponent(
   () => import('@/common/components/ModalDialog.vue')
@@ -199,12 +200,10 @@ function handleModalCancel() {
 
     <v-option @click="startAdd">Add....</v-option>
 
+    <v-option @click="startDelete"> Unlink... </v-option>
+
     <v-option :disabled="modelValue === null" @click="startEdit">
       Edit...
-    </v-option>
-
-    <v-option :disabled="modelValue === null" @click="startDelete">
-      Delete...
     </v-option>
   </v-select>
 
@@ -212,9 +211,8 @@ function handleModalCancel() {
     :class="modalClass"
     :title="modalTitle"
     :show="modalShown"
-    :ok-label="modalOkLabel"
+    :submit-label="modalOkLabel"
     :cancel-label="modalCancelLabel"
-    :handle-enter="modalState === ModalState.EDIT"
     :can-submit="modalFormValid"
     @ok="handleModalOk"
     @cancel="handleModalCancel"
@@ -228,12 +226,16 @@ function handleModalCancel() {
       />
     </div>
 
-    <form v-if="modalState === ModalState.EDIT" @submit.prevent="handleModalOk">
+    <div v-if="modalState === ModalState.EDIT" @submit.prevent="handleModalOk">
       <share-type-add-edit-form
         v-model="formData"
         v-model:valid="formValid"
         :selected="modelValue"
       />
-    </form>
+    </div>
+
+    <div v-if="modalState === ModalState.DELETE">
+      <share-type-selector-remove-unlink-modal :store="props.store" />
+    </div>
   </modal-dialog>
 </template>

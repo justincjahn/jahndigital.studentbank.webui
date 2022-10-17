@@ -10,7 +10,12 @@ import type {
 } from '@/admin/common/services/group';
 
 // Services
-import * as groupService from '@/admin/common/services/group';
+import {
+  getGroups,
+  newGroup,
+  updateGroup,
+  deleteGroup,
+} from '@/admin/common/services/group';
 
 /**
  * Stores information regarding the groups of the currently selected Instance and
@@ -49,11 +54,11 @@ export function setup(instanceStore: InstanceStore) {
    * @param instanceId
    * @param cache
    */
-  async function fetchGroups(instanceId: number, cache = true) {
+  async function fetch(instanceId: number, cache = true) {
     store.loading = true;
 
     try {
-      const data = await groupService.getGroups({ instanceId, cache });
+      const data = await getGroups({ instanceId, cache });
       store.groups = data.groups?.nodes || [];
     } finally {
       store.loading = false;
@@ -65,8 +70,8 @@ export function setup(instanceStore: InstanceStore) {
    *
    * @param input
    */
-  async function newGroup(input: NewGroupRequest) {
-    const data = await groupService.newGroup({
+  async function create(input: NewGroupRequest) {
+    const data = await newGroup({
       ...input,
       instanceId: instanceStore.selected.value?.id ?? -1,
     });
@@ -81,8 +86,8 @@ export function setup(instanceStore: InstanceStore) {
    *
    * @param input
    */
-  async function updateGroup(input: Omit<UpdateGroupRequest, 'instanceId'>) {
-    const data = await groupService.updateGroup({
+  async function update(input: Omit<UpdateGroupRequest, 'instanceId'>) {
+    const data = await updateGroup({
       ...input,
       instanceId: instanceStore.selected.value?.id ?? -1,
     });
@@ -103,8 +108,8 @@ export function setup(instanceStore: InstanceStore) {
    *
    * @param group
    */
-  async function deleteGroup(group: Group) {
-    const data = await groupService.deleteGroup(group);
+  async function remove(group: Group) {
+    const data = await deleteGroup(group);
 
     if (data.deleteGroup === true) {
       store.groups = store.groups.filter((x) => x.id !== group.id);
@@ -125,7 +130,7 @@ export function setup(instanceStore: InstanceStore) {
         if (newValue === null) {
           store.groups = [];
         } else if (typeof newValue !== 'undefined') {
-          fetchGroups(newValue.id);
+          fetch(newValue.id);
         }
       }
 
@@ -144,10 +149,10 @@ export function setup(instanceStore: InstanceStore) {
     groups,
     loading,
     instanceStore,
-    fetchGroups,
-    newGroup,
-    updateGroup,
-    deleteGroup,
+    fetch,
+    create,
+    update,
+    remove,
   };
 }
 
