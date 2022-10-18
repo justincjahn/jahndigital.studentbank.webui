@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, watchEffect, useAttrs } from 'vue';
+import { computed, ref, useAttrs, watchEffect } from 'vue';
 import useUniqueId from '@/common/composables/useUniqueId';
 import type { ValidationFunc } from './types';
 
@@ -11,8 +11,8 @@ export default {
 <script setup lang="ts">
 const props = withDefaults(
   defineProps<{
-    name: string;
     id?: string;
+    name?: string;
     modelValue?: string | boolean;
     helpText?: string;
     error?: string;
@@ -22,10 +22,11 @@ const props = withDefaults(
   }>(),
   {
     id: undefined,
-    modelValue: '',
-    helpText: '',
-    error: '',
-    label: '',
+    name: undefined,
+    modelValue: undefined,
+    helpText: undefined,
+    error: undefined,
+    label: undefined,
     required: false,
     validator: () => false,
   }
@@ -33,34 +34,72 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (event: 'update:modelValue', value: string | boolean): void;
-  (event: 'update:error', error: string | false): void;
+  (event: 'update:error', error: string): void;
 }>();
 
 const attrs = useAttrs();
 
+const inputElement = ref<HTMLInputElement>();
+
 const inputId = computed(() => props.id ?? `input-${useUniqueId()}`);
 
+const inputName = computed(() => props.name ?? inputId.value);
+
+const internalError = ref('');
+
+const error = computed({
+  get() {
+    return typeof props.error !== 'undefined'
+      ? props.error
+      : internalError.value;
+  },
+
+  set(value) {
+    if (typeof props.error !== 'undefined') {
+      emit('update:error', value);
+    } else {
+      internalError.value = value;
+    }
+  },
+});
+
+const hasErrors = computed(() => error.value.length > 0);
+
+const hasLabel = computed(() => (props.label?.length ?? 0) > 0);
+
 const inputClasses = computed(() => ({
-  error: props.error.length > 0,
+  error: hasErrors.value,
   required: props.required,
 }));
 
 const inputAttrs = computed(() => ({
-  'aria-labelledby': props.label.length > 0 ? inputId.value : undefined,
-  'aria-label': props.label.length > 0 ? undefined : props.name,
+  'aria-labelledby': hasLabel.value ? inputId.value : undefined,
+  'aria-label': hasLabel.value ? undefined : props.name,
   ...attrs,
 }));
 
-function handleUpdate(value: string | boolean) {
+async function handleUpdate(value: string | boolean) {
   emit('update:modelValue', value);
+
+  if (!props.validator) return;
+
+  const validationError = await Promise.resolve(
+    props.validator(value.toString())
+  );
+
+  if (validationError === true) {
+    error.value = '';
+  } else if (validationError === false) {
+    error.value = 'An unknown error occurred.';
+  } else {
+    error.value = validationError;
+  }
 }
 
-watchEffect(async () => {
-  const { modelValue, validator } = props;
-  if (!validator) return;
-
-  const error = await Promise.resolve(validator(modelValue.toString()));
-  emit('update:error', error === true ? '' : error);
+watchEffect(() => {
+  if (inputElement.value) {
+    inputElement.value.setCustomValidity(error.value);
+  }
 });
 </script>
 
@@ -73,13 +112,13 @@ watchEffect(async () => {
       :id="inputId"
       :attrs="inputAttrs"
       :classes="{}"
-      :error="props.error"
+      :error="error"
       :help-text="helpText"
-      :input-name="name"
+      :input-name="inputName"
       :label="label"
       :model-value="modelValue"
       :required="required"
-      :has-errors="props.error.length > 0"
+      :has-errors="hasErrors"
       :update="handleUpdate"
       name="label"
     >
@@ -96,14 +135,14 @@ watchEffect(async () => {
     <slot
       :id="inputId"
       :attrs="inputAttrs"
-      :classes="{ 'help-text': true }"
-      :error="props.error"
+      :classes="['help-text']"
+      :error="error"
       :help-text="helpText"
-      :input-name="name"
+      :input-name="inputName"
       :label="label"
       :model-value="modelValue"
       :required="required"
-      :has-errors="props.error.length > 0"
+      :has-errors="hasErrors"
       :update="handleUpdate"
       name="help"
     >
@@ -116,24 +155,25 @@ watchEffect(async () => {
       :id="inputId"
       :attrs="inputAttrs"
       :classes="inputClasses"
-      :error="props.error"
+      :error="error"
       :help-text="helpText"
-      :input-name="name"
+      :input-name="inputName"
       :label="label"
       :model-value="modelValue"
       :required="required"
-      :has-errors="props.error.length > 0"
+      :has-errors="hasErrors"
       :update="handleUpdate"
     >
       <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
       <input
         :id="inputId"
-        type="text"
-        :name="name"
+        ref="inputElement"
+        :name="inputName"
         :value="modelValue"
         :class="inputClasses"
         :required="required"
         v-bind="inputAttrs"
+        type="text"
         @input="handleUpdate(($event?.target as HTMLInputElement)?.value)"
         @focus="($event?.target as HTMLInputElement)?.select()"
       />
@@ -143,17 +183,17 @@ watchEffect(async () => {
       :id="inputId"
       :attrs="inputAttrs"
       :classes="inputClasses"
-      :error="props.error"
+      :error="error"
       :help-text="helpText"
-      :input-name="name"
+      :input-name="inputName"
       :label="label"
       :model-value="modelValue"
       :required="required"
-      :has-errors="props.error.length > 0"
+      :has-errors="hasErrors"
       :update="handleUpdate"
       name="error"
     >
-      <p v-if="error" class="error">
+      <p class="error">
         {{ error }}
       </p>
     </slot>

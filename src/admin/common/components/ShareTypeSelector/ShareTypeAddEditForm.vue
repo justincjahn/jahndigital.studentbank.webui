@@ -47,7 +47,7 @@ watchEffect(() => {
 <template>
   <v-input
     v-model="data.name"
-    :error="errors.name"
+    v-model:error="errors.name"
     name="share-type-name"
     label="Name"
     required
@@ -55,7 +55,8 @@ watchEffect(() => {
 
   <v-rate
     v-model="data.dividendRate"
-    :error="errors.dividendRate"
+    v-model:error="errors.dividendRate"
+    :allow-negative="false"
     name="share-type-rate"
     label="Dividend Rate"
     required
@@ -63,7 +64,7 @@ watchEffect(() => {
 
   <v-input
     v-model="data.withdrawalLimitCount"
-    :error="errors.withdrawalLimitCount"
+    v-model:error="errors.withdrawalLimitCount"
     name="share-type-wd-limit"
     label="Maximum Withdrawals"
   />

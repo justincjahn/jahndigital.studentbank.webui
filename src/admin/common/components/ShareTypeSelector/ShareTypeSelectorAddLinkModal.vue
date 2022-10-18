@@ -3,7 +3,6 @@ import type { GlobalStore } from '@/admin/common/stores/global';
 import type { ShareType } from '@/admin/common/services/shareType';
 import { ref, computed, watchEffect } from 'vue';
 import { setup as setupShareTypeStore } from '@/admin/common/stores/shareType';
-import Rate from '@/common/utils/Rate';
 import Money from '@/common/utils/Money';
 import ShareTypeMultiSelector from '@/admin/common/components/ShareTypeMultiSelector.vue';
 import ShareTypeAddEditForm from './ShareTypeAddEditForm.vue';
@@ -57,7 +56,7 @@ async function handleAdd() {
   try {
     const data = {
       name: formData.name,
-      dividendRate: Rate.fromStringOrDefault(formData.dividendRate).getRate(),
+      dividendRate: formData.dividendRate.getRate(),
       withdrawalLimitCount: +formData.withdrawalLimitCount,
       withdrawalLimitPeriod: formData.withdrawalLimitPeriod,
       withdrawalLimitShouldFee: formData.withdrawalLimitShouldFee,

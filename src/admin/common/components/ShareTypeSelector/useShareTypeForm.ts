@@ -1,12 +1,14 @@
 import { reactive, computed, isReactive, toRefs } from 'vue';
 
+import type { IRate } from '@/common/utils/Rate';
+import Rate from '@/common/utils/Rate';
+
 // Composables
 import useValidation from '@/common/composables/useValidation';
 
 // Validators
 import validateStringLength from '@/common/validators/validateStringLength';
 import validateAmountNonnegative from '@/common/validators/validateAmountNonnegative';
-import validateRateNonnegative from '@/common/validators/validateRateNonnegative';
 import validateNumberPositive from '@/common/validators/validateNumberPositive';
 
 // Types
@@ -16,7 +18,7 @@ import { ShareType, Period } from '@/admin/common/services/shareType';
 export interface ShareTypeDTO {
   id: number;
   name: string;
-  dividendRate: string;
+  dividendRate: IRate;
   withdrawalLimitCount: string;
   withdrawalLimitPeriod: Period;
   withdrawalLimitShouldFee: boolean;
@@ -38,11 +40,11 @@ export interface UseShareTypeForm {
   reset: (shareType?: ShareType) => void;
 }
 
-export function buildFormData() {
+export function buildFormData(): ShareTypeDTO {
   return reactive<ShareTypeDTO>({
     id: -1,
     name: '',
-    dividendRate: '0.0000',
+    dividendRate: Rate.fromNumber(0),
     withdrawalLimitCount: '0',
     withdrawalLimitPeriod: Period.Daily,
     withdrawalLimitShouldFee: false,
@@ -85,11 +87,6 @@ export default function useShareTypeForm(
     error: errorRefs.name,
   });
 
-  useValidation(validateRateNonnegative, {
-    value: dataRefs.dividendRate,
-    error: errorRefs.dividendRate,
-  });
-
   useValidation(validateAmountNonnegative, {
     value: dataRefs.withdrawalLimitFee,
     error: errorRefs.withdrawalLimitFee,
@@ -108,7 +105,7 @@ export default function useShareTypeForm(
     data.id = shareType?.id ?? -1;
     data.name = shareType?.name ?? '';
 
-    data.dividendRate = shareType?.dividendRate.toString() ?? '0.0000';
+    data.dividendRate = Rate.fromNumber(shareType?.dividendRate ?? 0);
 
     data.withdrawalLimitCount =
       shareType?.withdrawalLimitCount.toString() ?? '0';

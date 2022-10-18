@@ -1,5 +1,8 @@
 <script lang="ts">
-import { computed, useAttrs } from 'vue';
+import { ref, computed, useAttrs, watch, watchEffect } from 'vue';
+
+import type { IRate } from '@/common/utils/Rate';
+import Rate from '@/common/utils/Rate';
 
 import validateRate from '@/common/validators/validateRate';
 import validateRateNonzero from '@/common/validators/validateRateNonzero';
@@ -19,8 +22,8 @@ export default {
 <script setup lang="ts">
 const props = withDefaults(
   defineProps<{
-    name: string;
-    modelValue: string;
+    modelValue: IRate;
+    name?: string;
     error?: string;
     allowNegative?: boolean;
     allowZero?: boolean;
@@ -33,6 +36,7 @@ const props = withDefaults(
   {
     allowNegative: true,
     allowZero: true,
+    name: undefined,
     error: undefined,
     helpText: 'Enter a rate as a decimal or percentage.  E.g. 0.01 or 10%.',
     id: undefined,
@@ -42,24 +46,54 @@ const props = withDefaults(
   }
 );
 
-defineEmits<{
-  (event: 'update:modelValue', value: string): void;
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: IRate): void;
   (event: 'update:error', value: string): void;
 }>();
 
 const attrs = useAttrs();
 
+const inputElement = ref<HTMLInputElement>();
+
+const internalError = ref('');
+
+const error = computed({
+  get() {
+    return typeof props.error !== 'undefined'
+      ? props.error
+      : internalError.value;
+  },
+
+  set(value) {
+    if (typeof props.error !== 'undefined') {
+      emit('update:error', value);
+    } else {
+      internalError.value = value;
+    }
+
+    if (inputElement.value) {
+      inputElement.value.setCustomValidity(value);
+    }
+  },
+});
+
+const input = ref('0.0000');
+
+// Because we support modifiers (%), store the rate that was last sent to the parent
+/// allowing a comparison to see if the parent initiated a model change, or we did.
+let lastModelUpdate: IRate = Rate.fromNumber(0);
+
 // Remove this component's props from what's passed down to the VInput component
 const inputProps = computed(() => ({
+  ...attrs,
   name: props.name,
-  modelValue: props.modelValue,
-  error: props.error,
+  modelValue: input.value,
+  error: error.value,
   helpText: props.helpText,
   id: props.id,
   label: props.label,
   required: props.required,
   placeholder: (attrs.placeholder as string) ?? '0.0000',
-  ...attrs,
 }));
 
 const validator = computed(() => {
@@ -86,6 +120,10 @@ const validator = computed(() => {
 function handleKeypress(e: KeyboardEvent) {
   const SupportedCharactersRegex = /[0-9.%-]/;
 
+  if (['Enter', 'Escape', 'Tab'].includes(e.key)) {
+    return;
+  }
+
   if (!SupportedCharactersRegex.test(e.key)) {
     e.preventDefault();
   }
@@ -104,14 +142,43 @@ function handleKeypress(e: KeyboardEvent) {
     e.preventDefault();
   }
 }
+
+function handleInput(value: string | boolean) {
+  input.value = value.toString();
+  lastModelUpdate = Rate.fromStringOrDefault(input.value);
+  emit('update:modelValue', lastModelUpdate);
+}
+
+watch(
+  () => props.modelValue,
+
+  (newValue) => {
+    if (newValue.getRate() === lastModelUpdate.getRate()) {
+      return;
+    }
+
+    lastModelUpdate = newValue;
+    input.value = newValue.getRate().toString();
+  },
+
+  {
+    immediate: true,
+  }
+);
+
+watchEffect(() => {
+  if (inputElement.value) {
+    inputElement.value.setCustomValidity(error.value);
+  }
+});
 </script>
 
 <template>
   <v-input
     v-bind="inputProps"
     :validator="validator"
-    @update:model-value="(value: string | boolean) => $emit('update:modelValue', value.toString())"
-    @update:error="(value: string | false) => $emit('update:error', value)"
+    @update:model-value="handleInput"
+    @update:error="(value: string) => error = value"
   >
     <template
       #default="{ attrs: inputAttrs, classes, id: inputId, inputName, update }"
@@ -119,13 +186,14 @@ function handleKeypress(e: KeyboardEvent) {
       <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
       <input
         :id="inputId"
+        ref="inputElement"
         :class="classes"
         :name="inputName"
-        :value="modelValue"
+        :value="input"
         v-bind="inputAttrs"
         type="text"
         @keypress="handleKeypress($event)"
-        @input="update(($event?.target as HTMLTextAreaElement).value)"
+        @input="update(($event?.target as HTMLTextAreaElement)?.value)"
         @focus="($event?.target as HTMLInputElement)?.select()"
       />
     </template>
