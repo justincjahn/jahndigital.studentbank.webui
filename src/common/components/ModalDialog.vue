@@ -125,17 +125,18 @@ onUnmounted(() => {
     @close="handleDialogClose"
     @cancel="handleDialogCancel"
   >
-    <div v-if="title" class="modal__title">
-      <slot name="title">
-        <h1>{{ title }}</h1>
-      </slot>
-    </div>
-
     <form
       ref="formElement"
       method="dialog"
+      class="modal__form"
       @submit="(e) => handleFormSubmit(e as SubmitEvent)"
     >
+      <div v-if="title" class="modal__title">
+        <slot name="title">
+          <h1>{{ title }}</h1>
+        </slot>
+      </div>
+
       <div class="modal__content">
         <slot />
       </div>
@@ -183,6 +184,24 @@ dialog::backdrop {
   background-color: hsl(0 0% 0% / 0.5);
 }
 
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 dialog[open],
 dialog[open]::backdrop {
   animation: modal-fade-in 0.2s;
@@ -195,9 +214,7 @@ dialog.closing::backdrop {
 
 @media screen and (min-height: 40rem) {
   dialog {
-    margin-top: 20vmin;
-    max-height: calc(100% - 20vmin);
-    overflow-y: auto;
+    margin-top: 20vh;
   }
 }
 
@@ -219,11 +236,15 @@ dialog.large {
   --clr-bg: var(--clr-neutral-400);
   --clr-border: var(--clr-neutral-500);
 
-  padding: 0.5em 1em;
-
   color: hsl(var(--clr-font));
   background-color: hsl(var(--clr-bg));
   border-bottom: 1px solid hsl(var(--clr-border));
+
+  position: sticky;
+  top: 0;
+  z-index: 900;
+
+  padding: 0.5em 1em;
 }
 
 dialog.destructive .modal__title {
@@ -237,30 +258,21 @@ dialog.accent1 .modal__title {
 }
 
 .modal__content {
-  padding: 1em;
+  padding: 1em 1em 0 1em;
 }
 
 .modal__actions {
+  background-color: hsl(var(--clr-neutral-100));
+
+  position: sticky;
+  bottom: 0;
+  z-index: 900;
+
   display: flex;
+  flex-direction: row;
   justify-content: flex-end;
-  padding: 0 1em 1em 1em;
-}
+  align-items: center;
 
-@keyframes modal-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes modal-fade-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
+  padding: 1em;
 }
 </style>
