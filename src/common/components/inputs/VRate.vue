@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ref, computed, useAttrs, watch, watchEffect } from 'vue';
+import { ref, computed, useAttrs, watch } from 'vue';
 
 import type { IRate } from '@/common/utils/Rate';
 import Rate from '@/common/utils/Rate';
@@ -69,10 +69,6 @@ const error = computed({
       emit('update:error', value);
     } else {
       internalError.value = value;
-    }
-
-    if (inputElement.value) {
-      inputElement.value.setCustomValidity(value);
     }
   },
 });
@@ -165,12 +161,6 @@ watch(
     immediate: true,
   }
 );
-
-watchEffect(() => {
-  if (inputElement.value) {
-    inputElement.value.setCustomValidity(error.value);
-  }
-});
 </script>
 
 <template>
@@ -178,10 +168,21 @@ watchEffect(() => {
     v-bind="inputProps"
     :validator="validator"
     @update:model-value="handleInput"
-    @update:error="(value: string) => error = value"
+    @update:error="(value) => (error = value)"
   >
+    <template v-for="slotName in Object.keys($slots)" #[slotName]="slotData">
+      <slot :name="slotName" v-bind="slotData" />
+    </template>
+
     <template
-      #default="{ attrs: inputAttrs, classes, id: inputId, inputName, update }"
+      #default="{
+        modelValue: val,
+        attrs: inputAttrs,
+        classes,
+        id: inputId,
+        inputName,
+        update,
+      }"
     >
       <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
       <input
@@ -189,12 +190,12 @@ watchEffect(() => {
         ref="inputElement"
         :class="classes"
         :name="inputName"
-        :value="input"
+        :value="val"
         v-bind="inputAttrs"
         type="text"
-        @keypress="handleKeypress($event)"
-        @input="update(($event?.target as HTMLTextAreaElement)?.value)"
-        @focus="($event?.target as HTMLInputElement)?.select()"
+        @keypress="handleKeypress"
+        @input="update"
+        @focus="($event.target as HTMLInputElement).select()"
       />
     </template>
   </v-input>

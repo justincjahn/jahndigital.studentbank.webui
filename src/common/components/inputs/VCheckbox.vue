@@ -10,7 +10,7 @@ export default {
 
 <script setup lang="ts">
 const props = defineProps<{
-  name: string;
+  name?: string;
   id?: string;
   modelValue?: string | boolean;
   helpText?: string;
@@ -57,7 +57,9 @@ const attrs = useAttrs();
         :required="isReq"
         type="checkbox"
         v-bind="inputAttrs"
-        @input="update(($event?.target as HTMLInputElement)?.checked)"
+        @input="
+          update($event, () => ($event.target as HTMLInputElement).checked)
+        "
       />
     </template>
   </v-input>

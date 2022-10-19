@@ -98,6 +98,10 @@ const normalize = (value: string): string => {
     @update:model-value="(value: string | boolean) => $emit('update:modelValue', normalize(value.toString()))"
     @update:error="(value: string | false) => $emit('update:error', value)"
   >
+    <template v-for="slotName in Object.keys($slots)" #[slotName]="slotData">
+      <slot :name="slotName" v-bind="slotData" />
+    </template>
+
     <template
       #default="{
         attrs: inputAttrs,
@@ -121,8 +125,8 @@ const normalize = (value: string): string => {
           :value="val"
           v-bind="inputAttrs"
           type="text"
-          @input="update(($event?.target as HTMLInputElement).value)"
-          @focus="($event?.target as HTMLInputElement).select()"
+          @input="update"
+          @focus="($event.target as HTMLInputElement).select()"
         />
       </div>
     </template>

@@ -1,6 +1,14 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { VInput, VSelect, VOption, VDivider } from '@/common/components/inputs';
+
+import {
+  VInput,
+  VSelect,
+  VOption,
+  VDivider,
+  VCheckbox,
+} from '@/common/components/inputs';
+
 import ModalDialog from '@/common/components/ModalDialog.vue';
 
 import '@/common/styles/common.css';
@@ -61,4 +69,15 @@ function toggleModal() {
   >
     <v-input name="test-input" label="Testing" required />
   </modal-dialog>
+
+  <v-input
+    name="another-test-input"
+    label="Test Input"
+    type="number"
+    min="0"
+    max="100"
+    required
+  />
+
+  <v-checkbox v-model="show" name="another-text-input-01" label="Check me" />
 </template>

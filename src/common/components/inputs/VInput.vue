@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, ref, useAttrs, watchEffect } from 'vue';
+import { computed, ref, useAttrs } from 'vue';
 import useUniqueId from '@/common/composables/useUniqueId';
 import type { ValidationFunc } from './types';
 
@@ -28,7 +28,7 @@ const props = withDefaults(
     error: undefined,
     label: undefined,
     required: false,
-    validator: () => false,
+    validator: undefined,
   }
 );
 
@@ -39,11 +39,27 @@ const emit = defineEmits<{
 
 const attrs = useAttrs();
 
-const inputElement = ref<HTMLInputElement>();
-
 const inputId = computed(() => props.id ?? `input-${useUniqueId()}`);
 
 const inputName = computed(() => props.name ?? inputId.value);
+
+const internalModelValue = ref<string | boolean>('');
+
+const input = computed({
+  get() {
+    return typeof props.modelValue !== 'undefined'
+      ? props.modelValue
+      : internalModelValue.value;
+  },
+
+  set(value) {
+    if (typeof props.modelValue !== 'undefined') {
+      emit('update:modelValue', value);
+    } else {
+      internalModelValue.value = value;
+    }
+  },
+});
 
 const internalError = ref('');
 
@@ -65,42 +81,40 @@ const error = computed({
 
 const hasErrors = computed(() => error.value.length > 0);
 
-const hasLabel = computed(() => (props.label?.length ?? 0) > 0);
-
 const inputClasses = computed(() => ({
   error: hasErrors.value,
   required: props.required,
 }));
 
 const inputAttrs = computed(() => ({
-  'aria-labelledby': hasLabel.value ? inputId.value : undefined,
-  'aria-label': hasLabel.value ? undefined : props.name,
+  'aria-labelledby': (props.label?.length ?? 0) > 0 ? inputId.value : undefined,
+  'aria-label': (props.label?.length ?? 0) > 0 ? undefined : props.name,
   ...attrs,
 }));
 
-async function handleUpdate(value: string | boolean) {
-  emit('update:modelValue', value);
+async function handleUpdate(e: Event, v?: (e: Event) => string | boolean) {
+  if (!e.target) return;
+  const el = e.target as HTMLInputElement;
+  const value = typeof v === 'function' ? v(e) : el.value;
 
-  if (!props.validator) return;
+  input.value = value;
 
-  const validationError = await Promise.resolve(
-    props.validator(value.toString())
-  );
+  if (props.validator) {
+    const validationError = await Promise.resolve(
+      props.validator(value.toString())
+    );
 
-  if (validationError === true) {
-    error.value = '';
-  } else if (validationError === false) {
-    error.value = 'An unknown error occurred.';
-  } else {
-    error.value = validationError;
+    if (validationError === true) {
+      el.setCustomValidity('');
+    } else if (validationError === false) {
+      el.setCustomValidity('An unknown error occurred.');
+    } else {
+      el.setCustomValidity(validationError);
+    }
   }
+
+  error.value = el.validationMessage;
 }
-
-watchEffect(() => {
-  if (inputElement.value) {
-    inputElement.value.setCustomValidity(error.value);
-  }
-});
 </script>
 
 <template>
@@ -116,7 +130,7 @@ watchEffect(() => {
       :help-text="helpText"
       :input-name="inputName"
       :label="label"
-      :model-value="modelValue"
+      :model-value="input"
       :required="required"
       :has-errors="hasErrors"
       :update="handleUpdate"
@@ -140,7 +154,7 @@ watchEffect(() => {
       :help-text="helpText"
       :input-name="inputName"
       :label="label"
-      :model-value="modelValue"
+      :model-value="input"
       :required="required"
       :has-errors="hasErrors"
       :update="handleUpdate"
@@ -159,23 +173,24 @@ watchEffect(() => {
       :help-text="helpText"
       :input-name="inputName"
       :label="label"
-      :model-value="modelValue"
+      :model-value="input"
       :required="required"
       :has-errors="hasErrors"
       :update="handleUpdate"
     >
+      <!-- @NOTE Order is important -->
       <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
       <input
         :id="inputId"
         ref="inputElement"
         :name="inputName"
-        :value="modelValue"
+        :value="input"
         :class="inputClasses"
         :required="required"
-        v-bind="inputAttrs"
         type="text"
-        @input="handleUpdate(($event?.target as HTMLInputElement)?.value)"
-        @focus="($event?.target as HTMLInputElement)?.select()"
+        v-bind="inputAttrs"
+        @input="handleUpdate"
+        @focus="($event.target as HTMLInputElement).select()"
       />
     </slot>
 
@@ -187,7 +202,7 @@ watchEffect(() => {
       :help-text="helpText"
       :input-name="inputName"
       :label="label"
-      :model-value="modelValue"
+      :model-value="input"
       :required="required"
       :has-errors="hasErrors"
       :update="handleUpdate"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useAttrs } from 'vue';
+import { useAttrs } from 'vue';
 import type { ValidationFunc } from './types';
 import VInput from './VInput.vue';
 
@@ -32,18 +32,17 @@ defineEmits<{
   (event: 'update:error', error: string | false): void;
 }>();
 
-const textarea = ref<HTMLTextAreaElement | null>(null);
-
 const attrs = useAttrs();
 
-function handleInput(value: string, callback: (value: string) => void) {
-  if (textarea.value instanceof HTMLTextAreaElement) {
-    const maxLineBreaks = props.maxLines;
-    const numLineBreaks = (value.match(/\n/g) || []).length + 1;
-    textarea.value.rows = Math.min(numLineBreaks, Number(maxLineBreaks));
-  }
+function handleInput(e: Event, callback: (e: Event) => void) {
+  const el = e.target as HTMLTextAreaElement;
+  const { value } = el;
 
-  callback(value);
+  const maxLineBreaks = props.maxLines;
+  const numLineBreaks = (value.match(/\n/g) || []).length + 1;
+  el.rows = Math.min(numLineBreaks, Number(maxLineBreaks));
+
+  callback(e);
 }
 </script>
 
@@ -71,15 +70,12 @@ function handleInput(value: string, callback: (value: string) => void) {
       <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
       <textarea
         :id="inputId"
-        ref="textarea"
         :name="inputName"
         :value="val.toString()"
         :class="classes"
         :required="isReq"
         v-bind="inputAttrs"
-        @input="
-          handleInput(($event?.target as HTMLTextAreaElement).value, update)
-        "
+        @input="handleInput($event, update)"
         @focus="($event?.target as HTMLTextAreaElement).select()"
       />
     </template>

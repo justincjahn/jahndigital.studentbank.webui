@@ -70,8 +70,8 @@ function handleCopy() {
           :value="val"
           v-bind="inputAttrs"
           type="text"
-          @input="update(($event?.target as HTMLInputElement).value)"
-          @focus="($event?.target as HTMLInputElement).select()"
+          @input="update"
+          @focus="($event.target as HTMLInputElement).select()"
         />
 
         <button type="button" @click="handleCopy">Copy</button>
