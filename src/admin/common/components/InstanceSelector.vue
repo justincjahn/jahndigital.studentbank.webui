@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { defineAsyncComponent, computed, ref, watchEffect } from 'vue';
 
 // Types
+import type { ShareType } from '@/admin/common/services/shareType';
 import type { GlobalStore } from '@/admin/common/stores/global';
 import type { Instance as ServiceInstance } from '@/admin/common/services/instance';
 
@@ -20,7 +21,17 @@ import {
   VCopyInput,
 } from '@/common/components/inputs';
 
+import LoadingLabel from '@/common/components/LoadingLabel.vue';
+
 import ModalDialog from '@/common/components/ModalDialog.vue';
+
+const ShareTypeSelector = defineAsyncComponent(async () => {
+  const { ShareTypeSelector: component } = await import(
+    '@/admin/common/components/ShareTypeSelector'
+  );
+
+  return component;
+});
 
 type Instance = ServiceInstance | null;
 
@@ -94,8 +105,14 @@ const error = computed({
 // The InstanceStore this component is attached to
 const instanceStore = computed(() => props.store.instance);
 
+// True when the data is being processed
+const loading = ref(false);
+
 // If the modal is open.
 const modalShown = ref(false);
+
+// The value of the selected share type
+const selectedShareType = ref<ShareType | null>(null);
 
 // The input to add/rename an instance
 const input = ref('');
@@ -158,12 +175,22 @@ const modalCancelLabel = computed(() => {
 
 // True if the modal is in a state that would permit submission
 const modalCanSubmit = computed(() => {
+  if (loading.value) return false;
+
   if ([ModalState.ADD, ModalState.EDIT].includes(modalState.value)) {
     if (inputError.value.length > 0) return false;
   }
 
+  if (modalState.value === ModalState.DIVIDEND) {
+    if (inputError.value.length > 0) return false;
+    if (selectedShareType.value === null) return false;
+  }
+
   return true;
 });
+
+// True if the modal is in a state that would permit cancellation.
+const modalCanCancel = computed(() => !loading.value);
 
 // Cascade the model update
 function update(item: unknown) {
@@ -225,6 +252,8 @@ async function handleOk() {
       return;
     }
 
+    loading.value = true;
+
     try {
       const instance = await instanceStore.value.create({
         description: input.value,
@@ -235,6 +264,8 @@ async function handleOk() {
     } catch (e) {
       if (!(e instanceof Error)) return;
       error.value = e.message;
+    } finally {
+      loading.value = false;
     }
   }
 
@@ -245,6 +276,8 @@ async function handleOk() {
     }
 
     if (props.modelValue === null) return;
+
+    loading.value = true;
 
     try {
       const instance = await instanceStore.value.update({
@@ -257,11 +290,15 @@ async function handleOk() {
     } catch (e) {
       if (!(e instanceof Error)) return;
       error.value = e.message;
+    } finally {
+      loading.value = false;
     }
   }
 
   if (modalState.value === ModalState.ACTIVE) {
     if (props.modelValue === null) return;
+
+    loading.value = true;
 
     try {
       const instance = await instanceStore.value.update({
@@ -274,20 +311,46 @@ async function handleOk() {
     } catch (e) {
       if (!(e instanceof Error)) return;
       error.value = e.message;
+    } finally {
+      loading.value = false;
     }
   }
 
   if (modalState.value === ModalState.DELETE) {
     if (!props.modelValue) return;
 
+    loading.value = true;
+
     try {
       await instanceStore.value.remove(props.modelValue);
       update(null);
+      modalToggle();
     } catch (e) {
       if (!(e instanceof Error)) return;
       error.value = e.message;
     } finally {
+      loading.value = false;
+    }
+  }
+
+  if (modalState.value === ModalState.DIVIDEND) {
+    if (!instanceStore.value.selected.value) return;
+    if (!selectedShareType.value) return;
+
+    loading.value = true;
+
+    try {
+      await props.store.shareType.postDividends({
+        instances: instanceStore.value.selected.value.id,
+        shareTypeId: selectedShareType.value.id,
+      });
+
       modalToggle();
+    } catch (e) {
+      if (!(e instanceof Error)) return;
+      error.value = e.message;
+    } finally {
+      loading.value = false;
     }
   }
 
@@ -299,8 +362,19 @@ async function handleOk() {
 // Reset the input and close the modal.
 function handleCancel() {
   input.value = '';
+  selectedShareType.value = null;
   modalToggle();
 }
+
+watchEffect(() => {
+  if (selectedShareType.value === null) return;
+
+  if (selectedShareType.value.dividendRate > 0) {
+    inputError.value = '';
+  } else {
+    inputError.value = 'The selected share type has a dividend rate of 0%.';
+  }
+});
 </script>
 
 <template>
@@ -354,9 +428,16 @@ function handleCancel() {
     :show="modalShown"
     :cancel-label="modalCancelLabel"
     :can-submit="modalCanSubmit"
+    :can-cancel="modalCanCancel"
     @ok="handleOk"
     @cancel="handleCancel"
   >
+    <template #submitLabel="{ label: labelText }">
+      <loading-label :show="loading">
+        {{ loading ? 'Loading...' : labelText }}
+      </loading-label>
+    </template>
+
     <template v-if="modalState === ModalState.DELETE">
       This action cannot be undone!
     </template>
@@ -381,7 +462,14 @@ function handleCancel() {
     </template>
 
     <template v-else-if="modalState === ModalState.DIVIDEND">
-      <p>Dividend Posting goes here...</p>
+      <share-type-selector
+        v-model="selectedShareType"
+        :store="props.store"
+        label="Share Type"
+        help-text="Select the Share Type you want to post dividends for."
+      />
+
+      <p v-if="inputError.length > 0" class="error">{{ inputError }}</p>
     </template>
 
     <template v-else>
