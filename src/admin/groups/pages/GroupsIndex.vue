@@ -158,6 +158,7 @@ function handleBulkPostCancel() {
   <suspense>
     <bulk-post-modal
       :show="modalState === ModalState.BulkPost"
+      :store="globalStore"
       @ok="handleBulkPostOk"
       @cancel="handleBulkPostCancel"
     />

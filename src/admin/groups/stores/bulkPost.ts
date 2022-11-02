@@ -52,7 +52,7 @@ export function setup(selection: StudentSelection) {
     // Form data
     shareType: null as ShareType | null,
     comment: '',
-    amount: '0',
+    amount: Money.fromDatabase(0),
     postingPolicy: PostingPolicy.None,
 
     // Intermediate data
@@ -60,7 +60,7 @@ export function setup(selection: StudentSelection) {
     selectedStudents: [] as Student[],
 
     // Validation
-    errors: {} as Record<number, string | null>,
+    warnings: {} as Record<number, string | null>,
     noncompliantShares: [] as Share[],
     sampleShares: [] as Share[],
   });
@@ -72,10 +72,12 @@ export function setup(selection: StudentSelection) {
   const currentStep = computed(() => store.currentStep);
 
   // A dictionary of the step as a key and an error message as a value
-  const errors = computed(() => store.errors);
+  const warnings = computed(() => store.warnings);
 
   // An array of current errors, if any.
-  const currentErrors = computed(() => store.errors[store.currentStep] ?? []);
+  const currentWarnings = computed(
+    () => store.warnings[store.currentStep] ?? null
+  );
 
   // True if the form has a next step
   const hasNextStep = computed(() => store.currentStep < STEP_COUNT);
@@ -122,10 +124,10 @@ export function setup(selection: StudentSelection) {
 
     const diff = store.selectedStudents.length - studentsWithShare.length;
     if (diff > 0) {
-      store.errors[1] = `Warning: There are ${diff} students without the selected
+      store.warnings[1] = `Warning: There are ${diff} students without the selected
                          share type and will not receive this transaction.`;
     } else {
-      store.errors[1] = null;
+      store.warnings[1] = null;
     }
 
     store.selectedShares = studentsWithShare.map(
@@ -138,33 +140,14 @@ export function setup(selection: StudentSelection) {
     generateSample();
   }
 
-  // Get or set the selected share type.
-  const shareType = computed({
-    get() {
-      return store.shareType;
-    },
-
-    set(value) {
-      store.shareType = value;
-
-      if (value === null) {
-        store.selectedShares = [];
-      }
-
-      resolve();
-    },
-  });
-
   // Ensure that the posting policy, transaction amount, and comment are valid.
   /// Generate additional errors and warnings for the user.
   const validatePostingPolicy = useDebounce(() => {
-    const transactionAmount = Money.fromStringOrDefault(
-      store.amount
-    ).getAmount();
+    const transactionAmount = store.amount.getAmount();
 
     if (transactionAmount >= 0) {
       store.noncompliantShares = [];
-      store.errors[2] = null;
+      store.warnings[2] = null;
       return;
     }
 
@@ -175,7 +158,7 @@ export function setup(selection: StudentSelection) {
     const numNoncompliant = store.noncompliantShares.length;
 
     if (numNoncompliant === 0) {
-      store.errors[2] = null;
+      store.warnings[2] = null;
       return;
     }
 
@@ -194,7 +177,7 @@ export function setup(selection: StudentSelection) {
                   affected shares.`;
     }
 
-    store.errors[2] = errorMsg;
+    store.warnings[2] = errorMsg;
   }, 200);
 
   // Returns true if the store is in a valid state for the given step and provide
@@ -209,15 +192,12 @@ export function setup(selection: StudentSelection) {
     }
 
     if (store.currentStep >= 2) {
-      const validAmount = validateAmount(store.amount);
+      const validAmount = validateAmount(store.amount.getAmount().toString());
       if (validAmount !== true) {
         return validAmount.toString();
       }
 
-      if (
-        Money.fromStringOrDefault(store.amount).compare(0) === 0 &&
-        store.comment.trim().length === 0
-      ) {
+      if (store.amount.compare(0) === 0 && store.comment.trim().length === 0) {
         return 'Transactions of $0.00 must have a transaction comment.';
       }
 
@@ -237,6 +217,24 @@ export function setup(selection: StudentSelection) {
     return true;
   });
 
+  // Get or set the selected share type.
+  const shareType = computed({
+    get() {
+      return store.shareType;
+    },
+
+    set(value) {
+      store.shareType = value;
+
+      if (value === null) {
+        store.selectedShares = [];
+      }
+
+      resolve();
+      validatePostingPolicy();
+    },
+  });
+
   // Get or set the amount of the transaction
   const amount = computed({
     get() {
@@ -244,13 +242,6 @@ export function setup(selection: StudentSelection) {
     },
 
     set(value) {
-      const valid = validateAmount(value);
-
-      if (!valid) {
-        store.errors[1] = valid.toString();
-        return;
-      }
-
       store.amount = value;
       validatePostingPolicy();
     },
@@ -266,7 +257,7 @@ export function setup(selection: StudentSelection) {
       const valid = validateTransactionComment(value);
 
       if (!valid) {
-        store.errors[1] = valid.toString();
+        store.warnings[1] = valid.toString();
         return;
       }
 
@@ -309,20 +300,19 @@ export function setup(selection: StudentSelection) {
    */
   function getEffectiveBalance(share: Share) {
     const currentBalance = Money.fromNumber(share.balance);
-    const transactionAmount = Money.fromStringOrDefault(store.amount);
 
-    if (transactionAmount.compare(0) >= 0) {
-      return transactionAmount.add(currentBalance);
+    if (store.amount.compare(0) >= 0) {
+      return store.amount.add(currentBalance);
     }
 
     if (
       store.postingPolicy === PostingPolicy.Skip &&
-      currentBalance.compare(transactionAmount.abs()) === -1
+      currentBalance.compare(store.amount.abs()) === -1
     ) {
       return currentBalance;
     }
 
-    return currentBalance.add(transactionAmount);
+    return currentBalance.add(store.amount as Money);
   }
 
   /**
@@ -337,7 +327,7 @@ export function setup(selection: StudentSelection) {
       store.selectedStudents = await selection.resolve();
     } catch (e) {
       if (!(e instanceof Error)) return;
-      store.errors[1] = `Unable to fetch selected students: ${e.message}`;
+      store.warnings[1] = `Unable to fetch selected students: ${e.message}`;
     } finally {
       store.loading = false;
     }
@@ -364,16 +354,12 @@ export function setup(selection: StudentSelection) {
 
     const takeNegative = store.postingPolicy === PostingPolicy.Take;
 
-    const transactionAmount = Money.fromStringOrDefault(
-      store.amount
-    ).getAmount();
-
     const transactionComment =
       store.comment.trim().length > 0 ? store.comment : undefined;
 
     req.shares = store.selectedShares.map((share) => ({
       shareId: share.id,
-      amount: transactionAmount,
+      amount: store.amount.getAmount(),
       comment: transactionComment,
       takeNegative,
     }));
@@ -386,6 +372,17 @@ export function setup(selection: StudentSelection) {
     }
   }
 
+  function reset() {
+    store.currentStep = 1;
+    store.warnings = {};
+    store.shareType = null;
+    store.selectedShares = [];
+    store.noncompliantShares = [];
+    store.postingPolicy = PostingPolicy.None;
+    store.amount = Money.fromNumber(0);
+    store.comment = '';
+  }
+
   return {
     // State
     loading,
@@ -396,8 +393,8 @@ export function setup(selection: StudentSelection) {
     comment,
     postingPolicy,
     isValid,
-    errors,
-    currentErrors,
+    warnings,
+    currentWarnings,
 
     // Steps
     currentStep,
@@ -410,6 +407,7 @@ export function setup(selection: StudentSelection) {
     fetchStudents,
     getEffectiveBalance,
     post,
+    reset,
   };
 }
 

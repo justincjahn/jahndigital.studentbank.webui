@@ -392,11 +392,6 @@ provide(SELECT_API, api);
 .select {
   position: static;
   display: inline-block;
-  margin: 0.25rem;
-}
-
-.fieldset label + .select {
-  margin: 0;
 }
 
 .select__button {

@@ -12,3 +12,7 @@
   font-style: italic;
   line-height: 2;
 }
+
+.error {
+  color: hsl(var(--clr-destructive-500));
+}

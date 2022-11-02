@@ -49,7 +49,6 @@ input[type=submit]
 
   outline: 0;
   padding: 0.5em;
-  margin: 0.25em;
   min-width: 100px;
   user-select: none;
   cursor: pointer;

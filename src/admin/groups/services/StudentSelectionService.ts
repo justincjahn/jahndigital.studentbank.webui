@@ -320,9 +320,13 @@ export class StudentSelection extends Array<IStudentSelection> {
         const studentList = await query<
           StudentsWithSharesQuery,
           StudentsWithSharesQueryVariables
-        >(gqlStudentsWithShares, {
-          groupId: group.id,
-        });
+        >(
+          gqlStudentsWithShares,
+          {
+            groupId: group.id,
+          },
+          'no-cache'
+        );
 
         students = [...students, ...(studentList.students?.nodes ?? [])];
       })
