@@ -1,19 +1,20 @@
 import { reactive, computed, isReactive, toRefs } from 'vue';
 
+import type { ComputedRef } from 'vue';
+import { ShareType, Period } from '@/admin/common/services/shareType';
+
 import type { IRate } from '@/common/utils/Rate';
 import Rate from '@/common/utils/Rate';
+
+import type { IMoney } from '@/common/utils/Money';
+import Money from '@/common/utils/Money';
 
 // Composables
 import useValidation from '@/common/composables/useValidation';
 
 // Validators
 import validateStringLength from '@/common/validators/validateStringLength';
-import validateAmountNonnegative from '@/common/validators/validateAmountNonnegative';
 import validateNumberPositive from '@/common/validators/validateNumberPositive';
-
-// Types
-import type { ComputedRef } from 'vue';
-import { ShareType, Period } from '@/admin/common/services/shareType';
 
 export interface ShareTypeDTO {
   id: number;
@@ -22,7 +23,7 @@ export interface ShareTypeDTO {
   withdrawalLimitCount: string;
   withdrawalLimitPeriod: Period;
   withdrawalLimitShouldFee: boolean;
-  withdrawalLimitFee: string;
+  withdrawalLimitFee: IMoney;
 }
 
 export interface ShareTypeErrorsDTO {
@@ -48,7 +49,7 @@ export function buildFormData(): ShareTypeDTO {
     withdrawalLimitCount: '0',
     withdrawalLimitPeriod: Period.Daily,
     withdrawalLimitShouldFee: false,
-    withdrawalLimitFee: '',
+    withdrawalLimitFee: Money.fromNumber(0),
   });
 }
 
@@ -87,11 +88,6 @@ export default function useShareTypeForm(
     error: errorRefs.name,
   });
 
-  useValidation(validateAmountNonnegative, {
-    value: dataRefs.withdrawalLimitFee,
-    error: errorRefs.withdrawalLimitFee,
-  });
-
   useValidation(validateNumberPositive, {
     value: dataRefs.withdrawalLimitCount,
     error: errorRefs.withdrawalLimitCount,
@@ -116,8 +112,9 @@ export default function useShareTypeForm(
     data.withdrawalLimitShouldFee =
       shareType?.withdrawalLimitShouldFee ?? false;
 
-    data.withdrawalLimitFee =
-      shareType?.withdrawalLimitFee.toString() ?? '0.00';
+    data.withdrawalLimitFee = Money.fromNumber(
+      shareType?.withdrawalLimitFee ?? 0
+    );
 
     errors.name = '';
     errors.dividendRate = '';

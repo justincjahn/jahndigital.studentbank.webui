@@ -3,7 +3,6 @@ import { computed, defineAsyncComponent, ref } from 'vue';
 import type { ShareType as ServiceShareType } from '@/admin/common/services/shareType';
 import type { GlobalStore } from '@/admin/common/stores/global';
 import { VSelect, VOption, VDivider } from '@/common/components/inputs';
-import Money from '@/common/utils/Money';
 import { buildFormData } from './useShareTypeForm';
 import ShareTypeAddEditForm from './ShareTypeAddEditForm.vue';
 import ShareTypeSelectorAddLinkModal from './ShareTypeSelectorAddLinkModal.vue';
@@ -165,9 +164,7 @@ async function handleModalOk() {
         withdrawalLimitCount: +formData.withdrawalLimitCount,
         withdrawalLimitShouldFee: formData.withdrawalLimitShouldFee,
         withdrawalLimitPeriod: formData.withdrawalLimitPeriod,
-        withdrawalLimitFee: Money.fromStringOrDefault(
-          formData.withdrawalLimitFee
-        ).getAmount(),
+        withdrawalLimitFee: formData.withdrawalLimitFee.getAmount(),
       });
 
       modalToggle();

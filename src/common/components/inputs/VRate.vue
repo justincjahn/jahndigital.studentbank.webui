@@ -7,12 +7,9 @@ import Rate from '@/common/utils/Rate';
 import validateRate from '@/common/validators/validateRate';
 import validateRateNonzero from '@/common/validators/validateRateNonzero';
 import validateRateNonnegative from '@/common/validators/validateRateNonnegative';
-
-// Components
-import VInput from './VInput.vue';
-
-// Types
 import type { ValidationFunc } from './types';
+
+import VInput from './VInput.vue';
 
 export default {
   inheritAttrs: false,
@@ -52,8 +49,6 @@ const emit = defineEmits<{
 }>();
 
 const attrs = useAttrs();
-
-const inputElement = ref<HTMLInputElement>();
 
 const internalError = ref('');
 
@@ -154,7 +149,7 @@ watch(
     }
 
     lastModelUpdate = newValue;
-    input.value = newValue.getRate().toString();
+    input.value = newValue.getRate().toFixed(4);
   },
 
   {
@@ -187,7 +182,6 @@ watch(
       <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
       <input
         :id="inputId"
-        ref="inputElement"
         :class="classes"
         :name="inputName"
         :value="val"

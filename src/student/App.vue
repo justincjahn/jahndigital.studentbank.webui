@@ -7,17 +7,21 @@ import {
   VOption,
   VDivider,
   VCheckbox,
+  VCurrency,
 } from '@/common/components/inputs';
 
 import ModalDialog from '@/common/components/ModalDialog.vue';
 
 import '@/common/styles/common.css';
+import Money, { IMoney } from '@/common/utils/Money';
 
 const test = ref(null);
 
 const show = ref(false);
 
 const items = ref([1, 2, 3, 4, 5, 6]);
+
+const dollars = ref<IMoney>(Money.fromNumber(0));
 
 function add() {
   items.value.push(items.value.length + 1);
@@ -80,4 +84,10 @@ function toggleModal() {
   />
 
   <v-checkbox v-model="show" name="another-text-input-01" label="Check me" />
+
+  <form>
+    <v-currency v-model="dollars" label="Gimme" :allow-zero="false" required />
+  </form>
+
+  {{ dollars.toString() }}
 </template>

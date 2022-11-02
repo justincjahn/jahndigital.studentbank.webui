@@ -1,16 +1,15 @@
 <script lang="ts">
-import { useAttrs, computed } from 'vue';
+import { ref, computed, useAttrs, watch } from 'vue';
 
-// Validators
+import type { IMoney } from '@/common/utils/Money';
+import Money from '@/common/utils/Money';
+
 import validateAmount from '@/common/validators/validateAmount';
 import validateAmountNonzero from '@/common/validators/validateAmountNonzero';
 import validateAmountNonnegative from '@/common/validators/validateAmountNonnegative';
-
-// Components
-import VInput from './VInput.vue';
-
-// Types
 import type { ValidationFunc } from './types';
+
+import VInput from './VInput.vue';
 
 export default {
   inheritAttrs: false,
@@ -20,8 +19,8 @@ export default {
 <script lang="ts" setup>
 const props = withDefaults(
   defineProps<{
-    name: string;
-    modelValue: string;
+    modelValue: IMoney;
+    name?: string;
     error?: string;
     allowNegative?: boolean;
     allowZero?: boolean;
@@ -34,6 +33,7 @@ const props = withDefaults(
   {
     allowNegative: true,
     allowZero: true,
+    name: undefined,
     error: undefined,
     helpText: undefined,
     id: undefined,
@@ -43,24 +43,45 @@ const props = withDefaults(
   }
 );
 
-defineEmits<{
-  (event: 'update:modelValue', value: string | boolean): void;
-  (event: 'update:error', error: string | false): void;
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: IMoney): void;
+  (event: 'update:error', error: string): void;
 }>();
 
 const attrs = useAttrs();
 
+const internalError = ref('');
+
+const error = computed({
+  get() {
+    return typeof props.error !== 'undefined'
+      ? props.error
+      : internalError.value;
+  },
+
+  set(value) {
+    if (typeof props.error !== 'undefined') {
+      emit('update:error', value);
+    } else {
+      internalError.value = value;
+    }
+  },
+});
+
+const input = ref('0.00');
+let lastModelUpdate: IMoney = Money.fromNumber(0);
+
 // Remove this component's props from what's passed down to the VInput component
 const inputProps = computed(() => ({
+  ...attrs,
   name: props.name,
-  modelValue: props.modelValue,
-  error: props.error,
+  modelValue: input.value,
+  error: error.value,
   helpText: props.helpText,
   id: props.id,
   label: props.label,
   required: props.required,
   placeholder: (attrs.placeholder as string) ?? '0.00',
-  ...attrs,
 }));
 
 const validator = computed(() => {
@@ -84,10 +105,28 @@ const validator = computed(() => {
   return func;
 });
 
-const normalize = (value: string): string => {
-  if (typeof value !== 'string') return '0.00';
-  return value;
-};
+function handleInput(value: string | boolean) {
+  input.value = value.toString();
+  lastModelUpdate = Money.fromStringOrDefault(input.value);
+  emit('update:modelValue', lastModelUpdate);
+}
+
+watch(
+  () => props.modelValue,
+
+  (newValue) => {
+    if (newValue.getAmount() === lastModelUpdate.getAmount()) {
+      return;
+    }
+
+    lastModelUpdate = newValue;
+    input.value = newValue.getAmount().toFixed(2);
+  },
+
+  {
+    immediate: true,
+  }
+);
 </script>
 
 <template>
@@ -95,8 +134,8 @@ const normalize = (value: string): string => {
     v-bind="inputProps"
     :validator="validator"
     :placeholder="inputProps.placeholder"
-    @update:model-value="(value: string | boolean) => $emit('update:modelValue', normalize(value.toString()))"
-    @update:error="(value: string | false) => $emit('update:error', value)"
+    @update:model-value="handleInput"
+    @update:error="(value: string) => (error = value)"
   >
     <template v-for="slotName in Object.keys($slots)" #[slotName]="slotData">
       <slot :name="slotName" v-bind="slotData" />
@@ -104,12 +143,11 @@ const normalize = (value: string): string => {
 
     <template
       #default="{
+        modelValue: val,
         attrs: inputAttrs,
         classes,
         id: inputId,
         inputName,
-        modelValue: val,
-        required: isReq,
         update,
       }"
     >
@@ -119,9 +157,8 @@ const normalize = (value: string): string => {
         <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
         <input
           :id="inputId"
-          :class="classes"
+          :class="[classes, 'current-input__input']"
           :name="inputName"
-          :required="isReq"
           :value="val"
           v-bind="inputAttrs"
           type="text"
@@ -139,7 +176,7 @@ const normalize = (value: string): string => {
   position: relative;
 }
 
-.currency-input input {
+.currency-input .current-input__input {
   padding-left: 3ch;
 }
 

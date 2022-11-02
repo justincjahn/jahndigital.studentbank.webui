@@ -1,3 +1,5 @@
+import type { Public } from '@/common/types/Public';
+
 /**
  * Quick and dirty class to work with monetary values stored in databases as integers.
  */
@@ -162,3 +164,5 @@ export default class Money {
     return rounded / 10 ** precision;
   }
 }
+
+export type IMoney = Public<Money>;

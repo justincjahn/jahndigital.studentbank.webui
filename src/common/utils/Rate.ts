@@ -1,4 +1,5 @@
 import type { Public } from '@/common/types/Public';
+
 /**
  * Quick and dirty class to work with rate values stored in databases as integers.
  */
