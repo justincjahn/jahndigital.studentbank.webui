@@ -38,6 +38,7 @@ export type UserInfo = CurrentUserQuery['currentUser'][0];
  */
 export function setup() {
   const store = reactive({
+    hydrated: false,
     loading: false,
     id: -1,
     username: '',
@@ -66,14 +67,16 @@ export function setup() {
   // Gets the email of the user or student
   const email = computed(() => store.email);
 
-  // True if the user info has been provided by the auth service
-  const hasInfo = computed(() => store.info !== null);
+  // True if the store has completed first load hydration of user information
+  const isHydrated = computed(() => store.hydrated);
 
-  // True if the use has not logged in before
+  // True if the user is not currently authenticated and has never logged in before
   const isAnonymous = computed(() => tokenStore.isAnonymous.value);
 
-  // True if the user is authenticated or has logged in before and may have a valid refresh token
-  const isAuthenticated = computed(() => tokenStore.isAuthenticated.value);
+  // True if the user is authenticated and the store contains user data
+  const isAuthenticated = computed(
+    () => tokenStore.isAuthenticated.value && store.info !== null
+  );
 
   // True if the user is preauthorized for registration
   const isPreauthorized = computed(() => tokenStore.isPreauthorized.value);
@@ -88,7 +91,11 @@ export function setup() {
    * Get user information from the API and publish a login event.
    */
   async function getInfo() {
-    if (tokenStore.state.value === null) return;
+    if (tokenStore.state.value === null) {
+      store.hydrated = true;
+      return;
+    }
+
     if (tokenStore.isPreauthorized.value) return;
 
     store.loading = true;
@@ -115,6 +122,7 @@ export function setup() {
       if (e.message === ERROR_CODES.NOT_AUTHORIZED) return;
       throw e;
     } finally {
+      store.hydrated = true;
       store.loading = false;
     }
   }
@@ -131,6 +139,7 @@ export function setup() {
 
     try {
       let data: string | null = null;
+
       if (student) {
         const { studentLogin } = await import('@/common/services/auth');
         data = await studentLogin({ username: user, password });
@@ -189,7 +198,7 @@ export function setup() {
     store.email = data.email;
   });
 
-  // Get info from the API when the token is hydrated
+  // Get info from the API when the token state is set
   watch(
     tokenStore.state,
 
@@ -208,7 +217,7 @@ export function setup() {
     id,
     username,
     email,
-    hasInfo,
+    isHydrated,
     isAnonymous,
     isAuthenticated,
     isPreauthorized,

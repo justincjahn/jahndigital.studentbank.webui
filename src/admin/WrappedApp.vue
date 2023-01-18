@@ -41,9 +41,9 @@ onUnmounted(() => globalStore.dispose());
 
 const isLoading = computed(() => globalStore.router.loading.value);
 
-const isAuthenticated = computed(() => globalStore.user.isAuthenticated.value);
+const isHydrated = computed(() => globalStore.user.isHydrated.value);
 
-const isAnonymous = computed(() => globalStore.user.isAnonymous.value);
+const isAuthenticated = computed(() => globalStore.user.isAuthenticated.value);
 
 const error = computed({
   get() {
@@ -72,7 +72,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <template v-if="!isAnonymous">
+  <template v-if="isAuthenticated">
     <header>
       <h1>
         <template v-if="SITE_LOGO">
@@ -105,6 +105,9 @@ watchEffect(() => {
     >
       {{ error }}
     </modal-dialog>
+  </template>
+  <template v-else-if="!isHydrated">
+    <loading-page />
   </template>
   <template v-else>
     <login-dialog />

@@ -82,7 +82,7 @@ function setup() {
       store.state === UserState.STUDENT_PREREGISTRATION
   );
 
-  // True if the user is authenticated
+  // True if the user is currently authenticated or has logged in before
   const isAuthenticated = computed(
     () => store.token !== null || store.state !== null
   );

@@ -47,7 +47,7 @@ async function login() {
 <template>
   <modal-dialog
     title="Please login"
-    ok-label="Login"
+    submit-label="Login"
     :show="true"
     :can-cancel="false"
     :can-submit="canSubmit"
