@@ -204,7 +204,9 @@ export function setup() {
 
     (newValue, oldValue) => {
       if (newValue === oldValue) return;
-      getInfo();
+      getInfo().catch(() => {
+        // Don't need to do anything- the auth manager will clear the store
+      });
     },
 
     {
