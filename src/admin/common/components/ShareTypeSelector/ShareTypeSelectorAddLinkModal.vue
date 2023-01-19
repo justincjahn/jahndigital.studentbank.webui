@@ -100,7 +100,7 @@ watchEffect(() => {
 <template>
   <form class="stsalm" @submit.prevent="handleAdd">
     <share-type-add-edit-form v-model="formData" v-model:valid="valid" />
-    <button type="submit" class="primary">Create</button>
+    <button type="submit" class="primary" :disabled="!valid">Create</button>
   </form>
 
   <form class="stsalm" @submit.prevent="handleLink">

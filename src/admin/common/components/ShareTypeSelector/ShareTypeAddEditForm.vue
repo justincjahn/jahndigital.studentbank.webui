@@ -85,11 +85,11 @@ watchEffect(() => {
 
   <v-currency
     v-model="data.withdrawalLimitFee"
-    :error="errors.withdrawalLimitFee"
+    v-model:error="errors.withdrawalLimitFee"
     label="Withdrawal Fee"
     name="share-type-wd-fee"
     :allow-negative="false"
     :allow-zero="true"
-    :disabled="!withdrawalEnabled"
+    :disabled="!withdrawalEnabled || !data.withdrawalLimitShouldFee"
   />
 </template>

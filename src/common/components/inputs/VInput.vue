@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, ref, useAttrs } from 'vue';
+import { computed, watch, ref, useAttrs } from 'vue';
 import useUniqueId from '@/common/composables/useUniqueId';
 import type { ValidationFunc } from './types';
 
@@ -42,6 +42,8 @@ const attrs = useAttrs();
 const inputId = computed(() => props.id ?? `input-${useUniqueId()}`);
 
 const inputName = computed(() => props.name ?? inputId.value);
+
+let inputEl: HTMLInputElement | null = null;
 
 const internalModelValue = ref<string | boolean>('');
 
@@ -97,6 +99,7 @@ async function handleUpdate(e: Event, v?: (e: Event) => string | boolean) {
   const el = e.target as HTMLInputElement;
   const value = typeof v === 'function' ? v(e) : el.value;
 
+  inputEl = el;
   input.value = value;
 
   if (props.validator) {
@@ -113,8 +116,16 @@ async function handleUpdate(e: Event, v?: (e: Event) => string | boolean) {
     }
   }
 
-  error.value = el.validationMessage;
+  if (error.value !== el.validationMessage) {
+    error.value = el.validationMessage;
+  }
 }
+
+// If the error was updated from props, sync with the element
+watch(error, (newValue) => {
+  if (inputEl === null || inputEl.validationMessage === newValue) return;
+  inputEl.setCustomValidity(newValue);
+});
 </script>
 
 <template>
@@ -182,7 +193,6 @@ async function handleUpdate(e: Event, v?: (e: Event) => string | boolean) {
       <!-- eslint-disable-next-line vuejs-accessibility/form-control-has-label -->
       <input
         :id="inputId"
-        ref="inputElement"
         :name="inputName"
         :value="input"
         :class="inputClasses"
