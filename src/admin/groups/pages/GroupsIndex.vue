@@ -35,10 +35,15 @@ const BulkPostModal = defineAsyncComponent(
   () => import('@/admin/groups/components/BulkPostModal.vue')
 );
 
+const NewStudentModal = defineAsyncComponent(
+  () => import('@/admin/groups/components/NewStudentModal.vue')
+);
+
 enum ModalState {
   None,
   BulkMove,
   BulkPost,
+  NewStudent,
 }
 
 const loading = ref(false);
@@ -98,6 +103,14 @@ function handleBulkPostOk() {
 function handleBulkPostCancel() {
   modalState.value = ModalState.None;
 }
+
+function startNewStudent() {
+  modalState.value = ModalState.NewStudent;
+}
+
+function handleNewStudentCancel() {
+  modalState.value = ModalState.None;
+}
 </script>
 
 <template>
@@ -135,7 +148,7 @@ function handleBulkPostCancel() {
         New Transaction
       </button>
       <button type="button" :disabled="!hasSelection">New Share</button>
-      <button type="button">New Student</button>
+      <button type="button" @click="startNewStudent">New Student</button>
       <button type="button">Bulk Import</button>
     </div>
   </div>
@@ -161,6 +174,14 @@ function handleBulkPostCancel() {
       :store="globalStore"
       @ok="handleBulkPostOk"
       @cancel="handleBulkPostCancel"
+    />
+  </suspense>
+
+  <suspense>
+    <new-student-modal
+      :show="modalState == ModalState.NewStudent"
+      :store="globalStore"
+      @cancel="handleNewStudentCancel"
     />
   </suspense>
 </template>
