@@ -1,4 +1,5 @@
 import { ref, Ref, unref, watchEffect } from 'vue';
+import useDebounce from './useDebounce';
 
 /**
  * Callback function passed to validator utilities to check input values.
@@ -20,6 +21,7 @@ export interface UseValidationOptions {
   value?: Ref<string>;
   error?: Ref<string>;
   immediate?: boolean;
+  debounceTime?: number;
 }
 
 /**
@@ -74,9 +76,17 @@ export default function useValidation(
     error.value = isValid;
   }
 
+  const run = opts.debounceTime
+    ? useDebounce(runValidation, opts.debounceTime)
+    : runValidation;
+
   watchEffect(() => {
     if (unref(validator)) {
-      runValidation(value.value);
+      if (opts.debounceTime) {
+        loading.value = true;
+      }
+
+      run(value.value);
     }
   });
 
