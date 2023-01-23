@@ -183,7 +183,7 @@ watch(
 .currency-input__currency {
   position: absolute;
   font-size: 0.9em;
-  top: 0.35em;
+  top: 0.33em;
   left: 1ch;
   user-select: none;
   color: #999;
