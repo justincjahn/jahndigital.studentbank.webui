@@ -57,4 +57,11 @@ watchEffect(() => {
     label="Last Name"
     required
   />
+
+  <v-input
+    v-model="data.email"
+    v-model:error="errors.email"
+    name="student-email"
+    label="Email Address"
+  />
 </template>
