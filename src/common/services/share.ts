@@ -9,9 +9,9 @@ import type {
 
 import { query, mutate } from '@/common/services/apollo';
 
-import gqlNewShare from '@/graphql/mutations/shareCreate.gql';
-import gqlDeleteShare from '@/graphql/mutations/shareDelete.gql';
-import gqlSharesByStudentId from '@/graphql/queries/sharesByStudentId.gql';
+import gqlNewShare from '@/common/graphql/mutations/shareCreate.gql';
+import gqlDeleteShare from '@/common/graphql/mutations/shareDelete.gql';
+import gqlSharesByStudentId from '@/common/graphql/queries/sharesByStudentId.gql';
 
 export interface FetchOptions extends SharesByStudentIdQueryVariables {
   cache?: boolean;
