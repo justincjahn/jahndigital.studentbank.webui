@@ -108,6 +108,10 @@ function startNewStudent() {
   modalState.value = ModalState.NewStudent;
 }
 
+function handleNewStudentOk() {
+  modalState.value = ModalState.None;
+}
+
 function handleNewStudentCancel() {
   modalState.value = ModalState.None;
 }
@@ -148,7 +152,13 @@ function handleNewStudentCancel() {
         New Transaction
       </button>
       <button type="button" :disabled="!hasSelection">New Share</button>
-      <button type="button" @click="startNewStudent">New Student</button>
+      <button
+        type="button"
+        :disabled="selectedGroup === null"
+        @click="startNewStudent"
+      >
+        New Student
+      </button>
       <button type="button">Bulk Import</button>
     </div>
   </div>
@@ -181,6 +191,7 @@ function handleNewStudentCancel() {
     <new-student-modal
       :show="modalState == ModalState.NewStudent"
       :store="globalStore"
+      @ok="handleNewStudentOk"
       @cancel="handleNewStudentCancel"
     />
   </suspense>
