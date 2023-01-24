@@ -1,7 +1,6 @@
 {
   "editor.tabSize": 2,
   "editor.useTabStops": false,
-  "vetur.experimental.templateInterpolationService": true,
   "eslint.validate": [
     "javascript",
     "typescript",
@@ -20,5 +19,9 @@
     "utyp",
     "VITE"
   ],
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.suggest.paths": false,
+  "path-intellisense.mappings": {
+      "@": "${workspaceFolder}/src",
+  },
 }
