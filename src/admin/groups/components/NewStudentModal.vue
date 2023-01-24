@@ -37,7 +37,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'cancel'): void;
-  (event: 'ok'): void;
+  (event: 'submit'): void;
 }>();
 
 const formData = buildFormData();
@@ -115,7 +115,7 @@ async function handleOk() {
     serverLoading.value = false;
   }
 
-  emit('ok');
+  emit('submit');
 }
 
 watchEffect(() => {
@@ -140,7 +140,7 @@ watchEffect(() => {
     :can-submit="formValid"
     cancel-label="Cancel"
     @cancel="$emit('cancel')"
-    @ok="handleOk"
+    @submit="handleOk"
   >
     <template #submitLabel="{ label }">
       <loading-label :show="isLoading">{{ label }}</loading-label>

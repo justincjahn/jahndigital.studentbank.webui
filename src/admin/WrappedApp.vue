@@ -101,7 +101,7 @@ watchEffect(() => {
       :show="error !== null && error.length > 0"
       class="destructive"
       title="Error"
-      @ok="() => (error = null)"
+      @submit="() => (error = null)"
     >
       {{ error }}
     </modal-dialog>

@@ -30,7 +30,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (event: 'ok'): void;
+  (event: 'submit'): void;
   (event: 'cancel'): void;
 }>();
 
@@ -57,7 +57,7 @@ function handleDialogClose(e?: Event) {
   if (dialogElement.value?.returnValue === 'parent') return;
 
   if (!props.canSubmit) return;
-  emit('ok');
+  emit('submit');
 }
 
 // Handle the dialog's cancel event (Esc key) or a cancel button press

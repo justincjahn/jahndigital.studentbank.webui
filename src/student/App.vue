@@ -69,7 +69,7 @@ function toggleModal() {
     title="Test Modal"
     cancel-label="Cancel"
     @cancel="toggleModal"
-    @ok="toggleModal"
+    @submit="toggleModal"
   >
     <v-input name="test-input" label="Testing" required />
   </modal-dialog>

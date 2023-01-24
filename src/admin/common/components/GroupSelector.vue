@@ -216,7 +216,7 @@ function handleModalCancel() {
     :class="modalClass"
     :show="modalShown"
     cancel-label="Cancel"
-    @ok="handleModalOk"
+    @submit="handleModalOk"
     @cancel="handleModalCancel"
   >
     <template v-if="modalState === ModalState.DELETE">

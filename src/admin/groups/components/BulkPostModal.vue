@@ -36,7 +36,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (event: 'ok'): void;
+  (event: 'submit'): void;
   (event: 'cancel'): void;
 }>();
 
@@ -87,7 +87,7 @@ async function handleOk() {
 
   try {
     await bulkPostStore.post();
-    emit('ok');
+    emit('submit');
   } catch (e) {
     if (!(e instanceof Error)) {
       return;
@@ -161,7 +161,7 @@ watchEffect(() => {
     :submit-label="modalOkLabel"
     :can-cancel="!loading"
     :cancel-label="modalCancelLabel"
-    @ok="handleOk"
+    @submit="handleOk"
     @cancel="handleCancel"
   >
     <template #okLabel="{ okLabel }">

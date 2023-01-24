@@ -429,7 +429,7 @@ watchEffect(() => {
     :cancel-label="modalCancelLabel"
     :can-submit="modalCanSubmit"
     :can-cancel="modalCanCancel"
-    @ok="handleOk"
+    @submit="handleOk"
     @cancel="handleCancel"
   >
     <template #submitLabel="{ label: labelText }">

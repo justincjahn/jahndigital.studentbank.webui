@@ -173,7 +173,7 @@ function handleNewStudentCancel() {
     <bulk-move-modal
       :show="modalState === ModalState.BulkMove"
       :loading="loading"
-      @ok="handleBulkMoveOk"
+      @submit="handleBulkMoveOk"
       @cancel="handleBulkMoveCancel"
     />
   </suspense>
@@ -182,7 +182,7 @@ function handleNewStudentCancel() {
     <bulk-post-modal
       :show="modalState === ModalState.BulkPost"
       :store="globalStore"
-      @ok="handleBulkPostOk"
+      @submit="handleBulkPostOk"
       @cancel="handleBulkPostCancel"
     />
   </suspense>
@@ -191,7 +191,7 @@ function handleNewStudentCancel() {
     <new-student-modal
       :show="modalState == ModalState.NewStudent"
       :store="globalStore"
-      @ok="handleNewStudentOk"
+      @submit="handleNewStudentOk"
       @cancel="handleNewStudentCancel"
     />
   </suspense>

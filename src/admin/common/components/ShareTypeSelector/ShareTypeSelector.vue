@@ -210,7 +210,7 @@ function handleModalCancel() {
     :submit-label="modalOkLabel"
     :cancel-label="modalCancelLabel"
     :can-submit="modalFormValid"
-    @ok="handleModalOk"
+    @submit="handleModalOk"
     @cancel="handleModalCancel"
   >
     <div v-if="modalState === ModalState.ADD">

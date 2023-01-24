@@ -51,7 +51,7 @@ async function login() {
     :show="true"
     :can-cancel="false"
     :can-submit="canSubmit"
-    @ok="login"
+    @submit="login"
   >
     <v-input
       v-model="username"

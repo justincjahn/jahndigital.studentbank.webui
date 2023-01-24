@@ -68,7 +68,7 @@ watchEffect(() => {
     :can-cancel="props.loading === false"
     :handle-enter="canSubmit"
     :handle-escape="props.loading === false"
-    @ok="handleOk"
+    @submit="handleOk"
     @cancel="handleCancel"
   >
     <template #okLabel="{ okLabel }">
