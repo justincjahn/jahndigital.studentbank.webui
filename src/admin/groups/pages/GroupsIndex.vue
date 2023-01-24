@@ -35,6 +35,10 @@ const BulkPostModal = defineAsyncComponent(
   () => import('@/admin/groups/components/BulkPostModal.vue')
 );
 
+const BulkShareModal = defineAsyncComponent(
+  () => import('@/admin/groups/components/BulkShareModal.vue')
+);
+
 const NewStudentModal = defineAsyncComponent(
   () => import('@/admin/groups/components/NewStudentModal.vue')
 );
@@ -43,6 +47,7 @@ enum ModalState {
   None,
   BulkMove,
   BulkPost,
+  BulkShare,
   NewStudent,
 }
 
@@ -63,6 +68,8 @@ const selectedGroup = computed({
     globalStore.group.selected.value = value;
   },
 });
+
+const hasGroup = computed(() => selectedGroup.value !== null);
 
 const selectedShareType = computed({
   get: () => globalStore.shareType.selected.value,
@@ -101,6 +108,18 @@ function handleBulkPostOk() {
 }
 
 function handleBulkPostCancel() {
+  modalState.value = ModalState.None;
+}
+
+function startBulkShare() {
+  modalState.value = ModalState.BulkShare;
+}
+
+function handleBulkShareOk() {
+  modalState.value = ModalState.None;
+}
+
+function handleBulkShareCancel() {
   modalState.value = ModalState.None;
 }
 
@@ -148,17 +167,19 @@ function handleNewStudentCancel() {
       <button type="button" :disabled="!hasSelection" @click="startBulkMove">
         Move Selected
       </button>
+
       <button type="button" :disabled="!hasSelection" @click="startBulkPost">
         New Transaction
       </button>
-      <button type="button" :disabled="!hasSelection">New Share</button>
-      <button
-        type="button"
-        :disabled="selectedGroup === null"
-        @click="startNewStudent"
-      >
+
+      <button type="button" :disabled="!hasSelection" @click="startBulkShare">
+        New Share
+      </button>
+
+      <button type="button" :disabled="!hasGroup" @click="startNewStudent">
         New Student
       </button>
+
       <button type="button">Bulk Import</button>
     </div>
   </div>
@@ -184,6 +205,15 @@ function handleNewStudentCancel() {
       :store="globalStore"
       @submit="handleBulkPostOk"
       @cancel="handleBulkPostCancel"
+    />
+  </suspense>
+
+  <suspense>
+    <bulk-share-modal
+      :show="modalState === ModalState.BulkShare"
+      :store="globalStore"
+      @submit="handleBulkShareOk"
+      @cancel="handleBulkShareCancel"
     />
   </suspense>
 
