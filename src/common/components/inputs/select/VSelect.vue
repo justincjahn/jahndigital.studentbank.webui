@@ -233,6 +233,7 @@ function onKeyup(e: KeyboardEvent) {
       toggle(e);
       break;
     case 'Escape':
+      e.preventDefault();
       toggle();
       break;
   }
@@ -245,9 +246,11 @@ function onKeydown(e: KeyboardEvent) {
   // eslint-disable-next-line default-case
   switch (e.code) {
     case 'ArrowUp':
+      e.preventDefault();
       arrowUp();
       break;
     case 'ArrowDown':
+      e.preventDefault();
       arrowDown();
       break;
   }
