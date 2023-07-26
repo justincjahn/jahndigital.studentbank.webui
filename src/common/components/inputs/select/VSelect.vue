@@ -11,6 +11,7 @@ import {
 // Utils
 import useUniqueId from '@/common/composables/useUniqueId';
 import useDebounce from '@/common/composables/useDebounce';
+import isElementInViewport from '@/common/utils/isElementInViewport';
 import { SELECT_API } from './symbols';
 
 // Types
@@ -190,7 +191,13 @@ const api: SelectApi = {
  * Scroll the highlighted option into view.
  */
 function scrollHighlighted() {
-  registrations.value[highlightedIndex.value].el.scrollIntoView();
+  const selected = registrations.value[highlightedIndex.value].el;
+
+  if (!isElementInViewport(selected)) {
+    selected.scrollIntoView({
+      behavior: 'smooth',
+    });
+  }
 }
 
 /**
