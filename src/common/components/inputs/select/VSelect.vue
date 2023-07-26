@@ -445,7 +445,7 @@ provide(SELECT_API, api);
 .select__items {
   position: absolute;
   display: none;
-  z-index: 800;
+  z-index: 1000;
   list-style: none;
   margin: 0;
   max-height: clamp(150px, 30vh, 350px);
@@ -461,11 +461,5 @@ provide(SELECT_API, api);
   display: block;
   animation: menu-open 300ms ease-in-out forwards;
   transform-origin: top center;
-}
-
-/** Needed to play nice with dialog elements */
-dialog .select__items,
-.modal .select__items {
-  position: static;
 }
 </style>
