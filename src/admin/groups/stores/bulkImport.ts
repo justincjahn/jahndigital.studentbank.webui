@@ -7,7 +7,7 @@ import type { Instance } from '@/admin/common/services/instance';
 import type { Group } from '@/admin/common/services/group';
 import type { Student } from '@/common/services/student';
 import type { Share } from '@/common/services/share';
-import type { ShareTypeTemplate } from '@/admin/common/components/ShareTypeTemplateBuilder.vue';
+import type { ShareTypeTemplate } from '@/admin/common/types/ShareTypeTemplate';
 import type { Transaction } from '@/common/services/transaction';
 
 // Utils
@@ -231,7 +231,7 @@ export function setup() {
         }
 
         try {
-          const amount = Money.fromString(shareType.initialDeposit);
+          const amount = shareType.initialDeposit;
 
           if (amount.round() < 0) {
             return 'One or more Share Type templates has a negative amount.';
@@ -690,9 +690,7 @@ export function setup() {
     const sharesToCreate: NewShareRequestWithDeposit[] = [];
     studentIds.forEach((studentId) => {
       store.shareTypes.forEach((shareType) => {
-        const initialDeposit = Money.fromStringOrDefault(
-          shareType.initialDeposit
-        );
+        const { initialDeposit } = shareType;
 
         if (shareType.shareType === null) {
           throw new Error('Missing Share Type during share creation pass.');
@@ -793,11 +791,12 @@ export function setup() {
             (x) => (x.shareType?.id ?? -1) === share.shareTypeId
           );
 
-          const initialDeposit = shareType?.initialDeposit ?? '0';
+          const initialDeposit =
+            shareType?.initialDeposit ?? Money.fromNumber(0);
 
           shares.push({
             ...share,
-            balance: Money.fromStringOrDefault(initialDeposit).getAmount(),
+            balance: initialDeposit.getAmount(),
           });
         });
 

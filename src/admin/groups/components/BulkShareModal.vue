@@ -11,7 +11,7 @@ import type {
 import type { GlobalStore } from '@/admin/common/stores/global';
 import type { Student } from '@/common/services/student';
 import type { Share } from '@/common/services/share';
-import type { ShareTypeTemplate } from '@/admin/common/components/ShareTypeTemplateBuilder.vue';
+import type { ShareTypeTemplate } from '@/admin/common/types/ShareTypeTemplate';
 
 // Services
 import { API_MAX_CONCURRENCY } from '@/common/constants';

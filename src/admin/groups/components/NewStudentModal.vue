@@ -3,7 +3,7 @@ import { defineAsyncComponent, ref, computed, watchEffect } from 'vue';
 
 // Types
 import type { GlobalStore } from '@/admin/common/stores/global';
-import type { ShareTypeTemplate } from '@/admin/common/components/ShareTypeTemplateBuilder.vue';
+import type { ShareTypeTemplate } from '@/admin/common/types/ShareTypeTemplate';
 
 // Utils
 import generatePassword from '@/common/utils/generatePassword';

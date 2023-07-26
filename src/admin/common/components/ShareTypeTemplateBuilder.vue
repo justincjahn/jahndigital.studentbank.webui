@@ -1,17 +1,10 @@
 <script lang="ts" setup>
 import { defineAsyncComponent } from 'vue';
 
-import type { IMoney } from '@/common/utils/Money';
 import type { GlobalStore } from '@/admin/common/stores/global';
-import type { ShareType } from '@/admin/common/services/shareType';
+import type { ShareTypeTemplate } from '@/admin/common/types/ShareTypeTemplate';
 import Money from '@/common/utils/Money';
 import { VCurrency } from '@/common/components/inputs';
-
-export interface ShareTypeTemplate {
-  shareType: ShareType | null;
-  initialDeposit: IMoney;
-  error: string;
-}
 
 const ShareTypeSelector = defineAsyncComponent(
   async () =>
