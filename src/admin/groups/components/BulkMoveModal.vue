@@ -24,7 +24,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (event: 'ok', group: Group): void;
+  (event: 'submit', group: Group): void;
   (event: 'cancel'): void;
 }>();
 
@@ -43,7 +43,7 @@ const canSubmit = computed(() => {
 function handleOk() {
   if (!canSubmit.value) return;
   if (newGroup.value === null) return;
-  emit('ok', newGroup.value);
+  emit('submit', newGroup.value);
 }
 
 function handleCancel() {

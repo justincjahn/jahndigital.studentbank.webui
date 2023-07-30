@@ -39,6 +39,10 @@ const BulkShareModal = defineAsyncComponent(
   () => import('@/admin/groups/components/BulkShareModal.vue')
 );
 
+const BulkImportModal = defineAsyncComponent(
+  () => import('@/admin/groups/components/BulkImportModal.vue')
+);
+
 const NewStudentModal = defineAsyncComponent(
   () => import('@/admin/groups/components/NewStudentModal.vue')
 );
@@ -48,6 +52,7 @@ enum ModalState {
   BulkMove,
   BulkPost,
   BulkShare,
+  BulkImport,
   NewStudent,
 }
 
@@ -87,6 +92,7 @@ async function handleBulkMoveOk(group: Group) {
 
   try {
     const students = await selection.resolve();
+    console.log(group);
     await globalStore.student.bulkMove(group, students);
     modalState.value = ModalState.None;
     selectedGroup.value = group;
@@ -132,6 +138,18 @@ function handleNewStudentOk() {
 }
 
 function handleNewStudentCancel() {
+  modalState.value = ModalState.None;
+}
+
+function startBulkImport() {
+  modalState.value = ModalState.BulkImport;
+}
+
+function handleBulkImportOk() {
+  modalState.value = ModalState.None;
+}
+
+function handleBulkImportCancel() {
   modalState.value = ModalState.None;
 }
 </script>
@@ -180,7 +198,7 @@ function handleNewStudentCancel() {
         New Student
       </button>
 
-      <button type="button">Bulk Import</button>
+      <button type="button" @click="startBulkImport">Bulk Import</button>
     </div>
   </div>
 
@@ -223,6 +241,14 @@ function handleNewStudentCancel() {
       :store="globalStore"
       @submit="handleNewStudentOk"
       @cancel="handleNewStudentCancel"
+    />
+  </suspense>
+
+  <suspense>
+    <bulk-import-modal
+      :show="modalState == ModalState.BulkImport"
+      @submit="handleBulkImportOk"
+      @cancel="handleBulkImportCancel"
     />
   </suspense>
 </template>

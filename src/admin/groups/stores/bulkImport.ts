@@ -3,6 +3,7 @@ import { computed, reactive } from 'vue';
 import { API_MAX_CONCURRENCY } from '@/common/constants';
 
 // Types
+import type { GlobalStore } from '@/admin/common/stores/global';
 import type { Instance } from '@/admin/common/services/instance';
 import type { Group } from '@/admin/common/services/group';
 import type { Student } from '@/common/services/student';
@@ -20,9 +21,6 @@ import Money from '@/common/utils/Money';
 import { getStudentIdsByGroup } from '@/common/services/student';
 import { newShare } from '@/common/services/share';
 import { newBulkTransaction } from '@/common/services/transaction';
-
-// Stores
-import { setup as defineGlobalStore } from '@/admin/common/stores/global';
 
 /**
  * Enum that describes the steps for the Bulk Import multi-part form.
@@ -114,9 +112,8 @@ type NewTransactionRequest = NewBulkTransactionRequest['shares'];
 /**
  * Store that handles the multi-step workflow to post transactions to students' shares.
  */
-export function setup() {
+export function setup(globalStore: GlobalStore) {
   const stepCount = Object.keys(BulkImportStep).length / 2;
-  const globalStore = defineGlobalStore();
 
   const store = reactive({
     loading: false,
