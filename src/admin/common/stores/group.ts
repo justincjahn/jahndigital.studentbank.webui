@@ -71,11 +71,7 @@ export function setup(instanceStore: InstanceStore) {
    * @param input
    */
   async function create(input: NewGroupRequest) {
-    const data = await newGroup({
-      ...input,
-      instanceId: instanceStore.selected.value?.id ?? -1,
-    });
-
+    const data = await newGroup(input);
     const [group] = data.newGroup;
     store.groups = [...store.groups, group];
     return group;
