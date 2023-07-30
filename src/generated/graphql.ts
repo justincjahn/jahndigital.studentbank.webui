@@ -3,23 +3,25 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: string;
-  String: string;
-  Boolean: boolean;
-  Int: number;
-  Float: number;
+  ID: { input: string; output: string; }
+  String: { input: string; output: string; }
+  Boolean: { input: boolean; output: boolean; }
+  Int: { input: number; output: number; }
+  Float: { input: number; output: number; }
   /** The `DateTime` scalar represents an ISO-8601 compliant date time type. */
-  DateTime: string;
+  DateTime: { input: string; output: string; }
   /** The built-in `Decimal` scalar type. */
-  Decimal: number;
+  Decimal: { input: number; output: number; }
   /** The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1. */
-  Long: number;
+  Long: { input: number; output: number; }
   /** US Currency as a float (preferred) or string without the dollar symbol. E.g 10.33 is $10.33. */
-  Money: number;
+  Money: { input: number; output: number; }
   /** API/Interest Rate represented as a float.  E.g. 0.02 is 0.02% */
-  Rate: number;
+  Rate: { input: number; output: number; }
 };
 
 export enum ApplyPolicy {
@@ -28,95 +30,95 @@ export enum ApplyPolicy {
 }
 
 export type AuthenticateRequestInput = {
-  password: Scalars['String'];
-  username: Scalars['String'];
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 };
 
 export type AuthenticateResponse = {
   __typename?: 'AuthenticateResponse';
-  id: Scalars['Long'];
-  jwtToken: Scalars['String'];
-  username: Scalars['String'];
+  id: Scalars['Long']['output'];
+  jwtToken: Scalars['String']['output'];
+  username: Scalars['String']['output'];
 };
 
 export type BooleanOperationFilterInput = {
-  eq?: InputMaybe<Scalars['Boolean']>;
-  neq?: InputMaybe<Scalars['Boolean']>;
+  eq?: InputMaybe<Scalars['Boolean']['input']>;
+  neq?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type ComparableDateTimeOperationFilterInput = {
-  eq?: InputMaybe<Scalars['DateTime']>;
-  gt?: InputMaybe<Scalars['DateTime']>;
-  gte?: InputMaybe<Scalars['DateTime']>;
-  in?: InputMaybe<Array<Scalars['DateTime']>>;
-  lt?: InputMaybe<Scalars['DateTime']>;
-  lte?: InputMaybe<Scalars['DateTime']>;
-  neq?: InputMaybe<Scalars['DateTime']>;
-  ngt?: InputMaybe<Scalars['DateTime']>;
-  ngte?: InputMaybe<Scalars['DateTime']>;
-  nin?: InputMaybe<Array<Scalars['DateTime']>>;
-  nlt?: InputMaybe<Scalars['DateTime']>;
-  nlte?: InputMaybe<Scalars['DateTime']>;
+  eq?: InputMaybe<Scalars['DateTime']['input']>;
+  gt?: InputMaybe<Scalars['DateTime']['input']>;
+  gte?: InputMaybe<Scalars['DateTime']['input']>;
+  in?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  lt?: InputMaybe<Scalars['DateTime']['input']>;
+  lte?: InputMaybe<Scalars['DateTime']['input']>;
+  neq?: InputMaybe<Scalars['DateTime']['input']>;
+  ngt?: InputMaybe<Scalars['DateTime']['input']>;
+  ngte?: InputMaybe<Scalars['DateTime']['input']>;
+  nin?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  nlt?: InputMaybe<Scalars['DateTime']['input']>;
+  nlte?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type ComparableDecimalOperationFilterInput = {
-  eq?: InputMaybe<Scalars['Decimal']>;
-  gt?: InputMaybe<Scalars['Decimal']>;
-  gte?: InputMaybe<Scalars['Decimal']>;
-  in?: InputMaybe<Array<Scalars['Decimal']>>;
-  lt?: InputMaybe<Scalars['Decimal']>;
-  lte?: InputMaybe<Scalars['Decimal']>;
-  neq?: InputMaybe<Scalars['Decimal']>;
-  ngt?: InputMaybe<Scalars['Decimal']>;
-  ngte?: InputMaybe<Scalars['Decimal']>;
-  nin?: InputMaybe<Array<Scalars['Decimal']>>;
-  nlt?: InputMaybe<Scalars['Decimal']>;
-  nlte?: InputMaybe<Scalars['Decimal']>;
+  eq?: InputMaybe<Scalars['Decimal']['input']>;
+  gt?: InputMaybe<Scalars['Decimal']['input']>;
+  gte?: InputMaybe<Scalars['Decimal']['input']>;
+  in?: InputMaybe<Array<Scalars['Decimal']['input']>>;
+  lt?: InputMaybe<Scalars['Decimal']['input']>;
+  lte?: InputMaybe<Scalars['Decimal']['input']>;
+  neq?: InputMaybe<Scalars['Decimal']['input']>;
+  ngt?: InputMaybe<Scalars['Decimal']['input']>;
+  ngte?: InputMaybe<Scalars['Decimal']['input']>;
+  nin?: InputMaybe<Array<Scalars['Decimal']['input']>>;
+  nlt?: InputMaybe<Scalars['Decimal']['input']>;
+  nlte?: InputMaybe<Scalars['Decimal']['input']>;
 };
 
 export type ComparableInt32OperationFilterInput = {
-  eq?: InputMaybe<Scalars['Int']>;
-  gt?: InputMaybe<Scalars['Int']>;
-  gte?: InputMaybe<Scalars['Int']>;
-  in?: InputMaybe<Array<Scalars['Int']>>;
-  lt?: InputMaybe<Scalars['Int']>;
-  lte?: InputMaybe<Scalars['Int']>;
-  neq?: InputMaybe<Scalars['Int']>;
-  ngt?: InputMaybe<Scalars['Int']>;
-  ngte?: InputMaybe<Scalars['Int']>;
-  nin?: InputMaybe<Array<Scalars['Int']>>;
-  nlt?: InputMaybe<Scalars['Int']>;
-  nlte?: InputMaybe<Scalars['Int']>;
+  eq?: InputMaybe<Scalars['Int']['input']>;
+  gt?: InputMaybe<Scalars['Int']['input']>;
+  gte?: InputMaybe<Scalars['Int']['input']>;
+  in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  lt?: InputMaybe<Scalars['Int']['input']>;
+  lte?: InputMaybe<Scalars['Int']['input']>;
+  neq?: InputMaybe<Scalars['Int']['input']>;
+  ngt?: InputMaybe<Scalars['Int']['input']>;
+  ngte?: InputMaybe<Scalars['Int']['input']>;
+  nin?: InputMaybe<Array<Scalars['Int']['input']>>;
+  nlt?: InputMaybe<Scalars['Int']['input']>;
+  nlte?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type ComparableInt64OperationFilterInput = {
-  eq?: InputMaybe<Scalars['Long']>;
-  gt?: InputMaybe<Scalars['Long']>;
-  gte?: InputMaybe<Scalars['Long']>;
-  in?: InputMaybe<Array<Scalars['Long']>>;
-  lt?: InputMaybe<Scalars['Long']>;
-  lte?: InputMaybe<Scalars['Long']>;
-  neq?: InputMaybe<Scalars['Long']>;
-  ngt?: InputMaybe<Scalars['Long']>;
-  ngte?: InputMaybe<Scalars['Long']>;
-  nin?: InputMaybe<Array<Scalars['Long']>>;
-  nlt?: InputMaybe<Scalars['Long']>;
-  nlte?: InputMaybe<Scalars['Long']>;
+  eq?: InputMaybe<Scalars['Long']['input']>;
+  gt?: InputMaybe<Scalars['Long']['input']>;
+  gte?: InputMaybe<Scalars['Long']['input']>;
+  in?: InputMaybe<Array<Scalars['Long']['input']>>;
+  lt?: InputMaybe<Scalars['Long']['input']>;
+  lte?: InputMaybe<Scalars['Long']['input']>;
+  neq?: InputMaybe<Scalars['Long']['input']>;
+  ngt?: InputMaybe<Scalars['Long']['input']>;
+  ngte?: InputMaybe<Scalars['Long']['input']>;
+  nin?: InputMaybe<Array<Scalars['Long']['input']>>;
+  nlt?: InputMaybe<Scalars['Long']['input']>;
+  nlte?: InputMaybe<Scalars['Long']['input']>;
 };
 
 export type ComparableNullableOfDateTimeOperationFilterInput = {
-  eq?: InputMaybe<Scalars['DateTime']>;
-  gt?: InputMaybe<Scalars['DateTime']>;
-  gte?: InputMaybe<Scalars['DateTime']>;
-  in?: InputMaybe<Array<InputMaybe<Scalars['DateTime']>>>;
-  lt?: InputMaybe<Scalars['DateTime']>;
-  lte?: InputMaybe<Scalars['DateTime']>;
-  neq?: InputMaybe<Scalars['DateTime']>;
-  ngt?: InputMaybe<Scalars['DateTime']>;
-  ngte?: InputMaybe<Scalars['DateTime']>;
-  nin?: InputMaybe<Array<InputMaybe<Scalars['DateTime']>>>;
-  nlt?: InputMaybe<Scalars['DateTime']>;
-  nlte?: InputMaybe<Scalars['DateTime']>;
+  eq?: InputMaybe<Scalars['DateTime']['input']>;
+  gt?: InputMaybe<Scalars['DateTime']['input']>;
+  gte?: InputMaybe<Scalars['DateTime']['input']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  lt?: InputMaybe<Scalars['DateTime']['input']>;
+  lte?: InputMaybe<Scalars['DateTime']['input']>;
+  neq?: InputMaybe<Scalars['DateTime']['input']>;
+  ngt?: InputMaybe<Scalars['DateTime']['input']>;
+  ngte?: InputMaybe<Scalars['DateTime']['input']>;
+  nin?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  nlt?: InputMaybe<Scalars['DateTime']['input']>;
+  nlte?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 /** A connection to a list of items. */
@@ -128,14 +130,14 @@ export type DeletedGroupsConnection = {
   nodes?: Maybe<Array<Group>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type DeletedGroupsEdge = {
   __typename?: 'DeletedGroupsEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: Group;
 };
@@ -149,14 +151,14 @@ export type DeletedInstancesConnection = {
   nodes?: Maybe<Array<Instance>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type DeletedInstancesEdge = {
   __typename?: 'DeletedInstancesEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: Instance;
 };
@@ -170,14 +172,14 @@ export type DeletedProductsConnection = {
   nodes?: Maybe<Array<Product>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type DeletedProductsEdge = {
   __typename?: 'DeletedProductsEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: Product;
 };
@@ -191,14 +193,14 @@ export type DeletedShareTypesConnection = {
   nodes?: Maybe<Array<ShareType>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type DeletedShareTypesEdge = {
   __typename?: 'DeletedShareTypesEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: ShareType;
 };
@@ -212,14 +214,14 @@ export type DeletedSharesConnection = {
   nodes?: Maybe<Array<Share>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type DeletedSharesEdge = {
   __typename?: 'DeletedSharesEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: Share;
 };
@@ -233,14 +235,14 @@ export type DeletedStocksConnection = {
   nodes?: Maybe<Array<Stock>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type DeletedStocksEdge = {
   __typename?: 'DeletedStocksEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: Stock;
 };
@@ -254,26 +256,26 @@ export type DeletedStudentsConnection = {
   nodes?: Maybe<Array<Student>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type DeletedStudentsEdge = {
   __typename?: 'DeletedStudentsEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: Student;
 };
 
 export type Group = {
   __typename?: 'Group';
-  dateCreated: Scalars['DateTime'];
-  dateDeleted?: Maybe<Scalars['DateTime']>;
-  id: Scalars['Long'];
+  dateCreated: Scalars['DateTime']['output'];
+  dateDeleted?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['Long']['output'];
   instance: Instance;
-  instanceId: Scalars['Long'];
-  name: Scalars['String'];
+  instanceId: Scalars['Long']['output'];
+  name: Scalars['String']['output'];
   students: Array<Student>;
 };
 
@@ -307,27 +309,27 @@ export type GroupsConnection = {
   nodes?: Maybe<Array<Group>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type GroupsEdge = {
   __typename?: 'GroupsEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: Group;
 };
 
 export type Instance = {
   __typename?: 'Instance';
-  dateCreated: Scalars['DateTime'];
-  dateDeleted?: Maybe<Scalars['DateTime']>;
-  description: Scalars['String'];
+  dateCreated: Scalars['DateTime']['output'];
+  dateDeleted?: Maybe<Scalars['DateTime']['output']>;
+  description: Scalars['String']['output'];
   groups: Array<Group>;
-  id: Scalars['Long'];
-  inviteCode: Scalars['String'];
-  isActive: Scalars['Boolean'];
+  id: Scalars['Long']['output'];
+  inviteCode: Scalars['String']['output'];
+  isActive: Scalars['Boolean']['output'];
   productInstances: Array<ProductInstance>;
   shareTypeInstances: Array<ShareTypeInstance>;
   stockInstances: Array<StockInstance>;
@@ -366,140 +368,140 @@ export type InstancesConnection = {
   nodes?: Maybe<Array<Instance>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type InstancesEdge = {
   __typename?: 'InstancesEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: Instance;
 };
 
 export type LinkProductRequestInput = {
-  instanceId: Scalars['Long'];
-  productId: Scalars['Long'];
+  instanceId: Scalars['Long']['input'];
+  productId: Scalars['Long']['input'];
 };
 
 /** Request to link or unlink a share type to an Instance. */
 export type LinkShareTypeRequestInput = {
   /** The instance to link to. */
-  instanceId: Scalars['Long'];
+  instanceId: Scalars['Long']['input'];
   /** The share type to link. */
-  shareTypeId: Scalars['Long'];
+  shareTypeId: Scalars['Long']['input'];
 };
 
 /** Request to link or unlink a stock to an Instance. */
 export type LinkStockRequestInput = {
   /** The instance to link to. */
-  instanceId: Scalars['Long'];
+  instanceId: Scalars['Long']['input'];
   /** The stock to link. */
-  stockId: Scalars['Long'];
+  stockId: Scalars['Long']['input'];
 };
 
 export type ListFilterInputTypeOfGroupFilterInput = {
   all?: InputMaybe<GroupFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
   none?: InputMaybe<GroupFilterInput>;
   some?: InputMaybe<GroupFilterInput>;
 };
 
 export type ListFilterInputTypeOfProductImageFilterInput = {
   all?: InputMaybe<ProductImageFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
   none?: InputMaybe<ProductImageFilterInput>;
   some?: InputMaybe<ProductImageFilterInput>;
 };
 
 export type ListFilterInputTypeOfProductInstanceFilterInput = {
   all?: InputMaybe<ProductInstanceFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
   none?: InputMaybe<ProductInstanceFilterInput>;
   some?: InputMaybe<ProductInstanceFilterInput>;
 };
 
 export type ListFilterInputTypeOfRefreshTokenFilterInput = {
   all?: InputMaybe<RefreshTokenFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
   none?: InputMaybe<RefreshTokenFilterInput>;
   some?: InputMaybe<RefreshTokenFilterInput>;
 };
 
 export type ListFilterInputTypeOfRolePrivilegeFilterInput = {
   all?: InputMaybe<RolePrivilegeFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
   none?: InputMaybe<RolePrivilegeFilterInput>;
   some?: InputMaybe<RolePrivilegeFilterInput>;
 };
 
 export type ListFilterInputTypeOfShareFilterInput = {
   all?: InputMaybe<ShareFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
   none?: InputMaybe<ShareFilterInput>;
   some?: InputMaybe<ShareFilterInput>;
 };
 
 export type ListFilterInputTypeOfShareTypeInstanceFilterInput = {
   all?: InputMaybe<ShareTypeInstanceFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
   none?: InputMaybe<ShareTypeInstanceFilterInput>;
   some?: InputMaybe<ShareTypeInstanceFilterInput>;
 };
 
 export type ListFilterInputTypeOfStockHistoryFilterInput = {
   all?: InputMaybe<StockHistoryFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
   none?: InputMaybe<StockHistoryFilterInput>;
   some?: InputMaybe<StockHistoryFilterInput>;
 };
 
 export type ListFilterInputTypeOfStockInstanceFilterInput = {
   all?: InputMaybe<StockInstanceFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
   none?: InputMaybe<StockInstanceFilterInput>;
   some?: InputMaybe<StockInstanceFilterInput>;
 };
 
 export type ListFilterInputTypeOfStudentFilterInput = {
   all?: InputMaybe<StudentFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
   none?: InputMaybe<StudentFilterInput>;
   some?: InputMaybe<StudentFilterInput>;
 };
 
 export type ListFilterInputTypeOfStudentPurchaseFilterInput = {
   all?: InputMaybe<StudentPurchaseFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
   none?: InputMaybe<StudentPurchaseFilterInput>;
   some?: InputMaybe<StudentPurchaseFilterInput>;
 };
 
 export type ListFilterInputTypeOfStudentPurchaseItemFilterInput = {
   all?: InputMaybe<StudentPurchaseItemFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
   none?: InputMaybe<StudentPurchaseItemFilterInput>;
   some?: InputMaybe<StudentPurchaseItemFilterInput>;
 };
 
 export type ListFilterInputTypeOfStudentStockFilterInput = {
   all?: InputMaybe<StudentStockFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
   none?: InputMaybe<StudentStockFilterInput>;
   some?: InputMaybe<StudentStockFilterInput>;
 };
 
 export type ListFilterInputTypeOfStudentStockHistoryFilterInput = {
   all?: InputMaybe<StudentStockHistoryFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
   none?: InputMaybe<StudentStockHistoryFilterInput>;
   some?: InputMaybe<StudentStockHistoryFilterInput>;
 };
 
 export type ListFilterInputTypeOfTransactionFilterInput = {
   all?: InputMaybe<TransactionFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
   none?: InputMaybe<TransactionFilterInput>;
   some?: InputMaybe<TransactionFilterInput>;
 };
@@ -520,21 +522,21 @@ export type MoneySortInput = {
 export type Mutation = {
   __typename?: 'Mutation';
   /** Delete a Group. */
-  deleteGroup: Scalars['Boolean'];
+  deleteGroup: Scalars['Boolean']['output'];
   /** Soft-delete an Instance. */
-  deleteInstance: Scalars['Boolean'];
+  deleteInstance: Scalars['Boolean']['output'];
   /** Soft-delete a Product. */
-  deleteProduct: Scalars['Boolean'];
+  deleteProduct: Scalars['Boolean']['output'];
   /** Soft-delete a Share . */
-  deleteShare: Scalars['Boolean'];
+  deleteShare: Scalars['Boolean']['output'];
   /** Soft-delete a ShareType. */
-  deleteShareType: Scalars['Boolean'];
+  deleteShareType: Scalars['Boolean']['output'];
   /** Soft-delete a stock. */
-  deleteStock: Scalars['Boolean'];
+  deleteStock: Scalars['Boolean']['output'];
   /** Delete a student. */
-  deleteStudent: Scalars['Boolean'];
+  deleteStudent: Scalars['Boolean']['output'];
   /** Delete a user. */
-  deleteUser: Scalars['Boolean'];
+  deleteUser: Scalars['Boolean']['output'];
   /** Link a Product with the provided Group. */
   linkProduct: Array<Product>;
   /** Link a ShareType to an Instance.abstract */
@@ -568,7 +570,7 @@ export type Mutation = {
   /** Create a new user. */
   newUser: Array<User>;
   /** Post dividends for a specific ShareType and a group of Instance. */
-  postDividends: Scalars['Boolean'];
+  postDividends: Scalars['Boolean']['output'];
   /** Purge stock history for a given stock to a given date. */
   purgeStockHistory: Array<StockHistory>;
   /** Restore a soft-deleted Group. */
@@ -594,7 +596,7 @@ export type Mutation = {
    * **Returns:**
    * A temporary JWT token if preauthorization is successful.
    */
-  studentPreregistration: Scalars['String'];
+  studentPreregistration: Scalars['String']['output'];
   /** Obtain a new JWT token using a refresh token. */
   studentRefreshToken: AuthenticateResponse;
   /**
@@ -604,9 +606,9 @@ export type Mutation = {
    * **Returns:**
    * True if registration is successful, otherwise an error message.
    */
-  studentRegistration: Scalars['Boolean'];
+  studentRegistration: Scalars['Boolean']['output'];
   /** Revoke a refresh token. */
-  studentRevokeRefreshToken: Scalars['Boolean'];
+  studentRevokeRefreshToken: Scalars['Boolean']['output'];
   /** Unlink a Product from the provided Group. */
   unlinkProduct: Array<Product>;
   /** Unlink a ShareType from an Instance. */
@@ -636,55 +638,55 @@ export type Mutation = {
   /** Obtain a new JWT token using a refresh token. */
   userRefreshToken: AuthenticateResponse;
   /** Revoke a refresh token. */
-  userRevokeRefreshToken: Scalars['Boolean'];
+  userRevokeRefreshToken: Scalars['Boolean']['output'];
 };
 
 
 /** CRUD operations for User entities. */
 export type MutationDeleteGroupArgs = {
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 };
 
 
 /** CRUD operations for User entities. */
 export type MutationDeleteInstanceArgs = {
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 };
 
 
 /** CRUD operations for User entities. */
 export type MutationDeleteProductArgs = {
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 };
 
 
 /** CRUD operations for User entities. */
 export type MutationDeleteShareArgs = {
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 };
 
 
 /** CRUD operations for User entities. */
 export type MutationDeleteShareTypeArgs = {
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 };
 
 
 /** CRUD operations for User entities. */
 export type MutationDeleteStockArgs = {
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 };
 
 
 /** CRUD operations for User entities. */
 export type MutationDeleteStudentArgs = {
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 };
 
 
 /** CRUD operations for User entities. */
 export type MutationDeleteUserArgs = {
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 };
 
 
@@ -709,7 +711,7 @@ export type MutationLinkStockArgs = {
 /** CRUD operations for User entities. */
 export type MutationNewBulkTransactionArgs = {
   input: Array<NewTransactionRequestInput>;
-  skipBelowNegative?: Scalars['Boolean'];
+  skipBelowNegative?: Scalars['Boolean']['input'];
 };
 
 
@@ -799,43 +801,43 @@ export type MutationPurgeStockHistoryArgs = {
 
 /** CRUD operations for User entities. */
 export type MutationRestoreGroupArgs = {
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 };
 
 
 /** CRUD operations for User entities. */
 export type MutationRestoreInstanceArgs = {
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 };
 
 
 /** CRUD operations for User entities. */
 export type MutationRestoreProductArgs = {
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 };
 
 
 /** CRUD operations for User entities. */
 export type MutationRestoreShareArgs = {
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 };
 
 
 /** CRUD operations for User entities. */
 export type MutationRestoreShareTypeArgs = {
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 };
 
 
 /** CRUD operations for User entities. */
 export type MutationRestoreStockArgs = {
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 };
 
 
 /** CRUD operations for User entities. */
 export type MutationRestoreStudentArgs = {
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 };
 
 
@@ -853,7 +855,7 @@ export type MutationStudentPreregistrationArgs = {
 
 /** CRUD operations for User entities. */
 export type MutationStudentRefreshTokenArgs = {
-  token?: InputMaybe<Scalars['String']>;
+  token?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -865,7 +867,7 @@ export type MutationStudentRegistrationArgs = {
 
 /** CRUD operations for User entities. */
 export type MutationStudentRevokeRefreshTokenArgs = {
-  token?: InputMaybe<Scalars['String']>;
+  token?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -949,129 +951,129 @@ export type MutationUserLoginArgs = {
 
 /** CRUD operations for User entities. */
 export type MutationUserRefreshTokenArgs = {
-  token?: InputMaybe<Scalars['String']>;
+  token?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 /** CRUD operations for User entities. */
 export type MutationUserRevokeRefreshTokenArgs = {
-  token?: InputMaybe<Scalars['String']>;
+  token?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Request data to create a group. */
 export type NewGroupRequestInput = {
   /** Get or set the Instance ID of the group. */
-  instanceId: Scalars['Long'];
+  instanceId: Scalars['Long']['input'];
   /** Get or set the name of the group. */
-  name?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type NewInstanceRequestInput = {
   /** Get or set the description of the instance. */
-  description?: InputMaybe<Scalars['String']>;
+  description?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type NewProductRequestInput = {
-  cost?: InputMaybe<Scalars['Money']>;
-  description?: InputMaybe<Scalars['String']>;
-  isLimitedQuantity: Scalars['Boolean'];
-  name?: InputMaybe<Scalars['String']>;
-  quantity: Scalars['Int'];
+  cost?: InputMaybe<Scalars['Money']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  isLimitedQuantity: Scalars['Boolean']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  quantity: Scalars['Int']['input'];
 };
 
 export type NewShareRequestInput = {
-  shareTypeId: Scalars['Long'];
-  studentId: Scalars['Long'];
+  shareTypeId: Scalars['Long']['input'];
+  studentId: Scalars['Long']['input'];
 };
 
 /** Request data to create a Share Type. */
 export type NewShareTypeRequestInput = {
   /** Get or set the dividend rate. */
-  dividendRate: Scalars['Rate'];
+  dividendRate: Scalars['Rate']['input'];
   /** Get or set the name of the share type. */
-  name: Scalars['String'];
+  name: Scalars['String']['input'];
   /** Get or set the number of withdrawals allowed per period.  Use zero to disable. */
-  withdrawalLimitCount?: InputMaybe<Scalars['Int']>;
+  withdrawalLimitCount?: InputMaybe<Scalars['Int']['input']>;
   /** Get or set the amount to fee if WithdrawalLimitShouldFee is true. */
-  withdrawalLimitFee?: InputMaybe<Scalars['Money']>;
+  withdrawalLimitFee?: InputMaybe<Scalars['Money']['input']>;
   /** Get or set the withdrawal limit period to use when resetting the withdrawal limit counters. */
   withdrawalLimitPeriod?: InputMaybe<Period>;
   /** Get or set if withdrawals over the WithdrawalLimitCount should fee instead of being declined. */
-  withdrawalLimitShouldFee?: InputMaybe<Scalars['Boolean']>;
+  withdrawalLimitShouldFee?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type NewStockRequestInput = {
   /** The current value of the stock. */
-  currentValue: Scalars['Money'];
+  currentValue: Scalars['Money']['input'];
   /** Name of the company */
-  name: Scalars['String'];
+  name: Scalars['String']['input'];
   /** The description of the stock. */
-  rawDescription?: InputMaybe<Scalars['String']>;
+  rawDescription?: InputMaybe<Scalars['String']['input']>;
   /** Unique symbol of the stock. */
-  symbol: Scalars['String'];
+  symbol: Scalars['String']['input'];
 };
 
 /** Data fields for a new student. */
 export type NewStudentRequestInput = {
   /** Get or set the student's account number. */
-  accountNumber?: InputMaybe<Scalars['String']>;
+  accountNumber?: InputMaybe<Scalars['String']['input']>;
   /** Get or set the student's email address. */
-  email?: InputMaybe<Scalars['String']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   /** Get or set the student's first name. */
-  firstName?: InputMaybe<Scalars['String']>;
+  firstName?: InputMaybe<Scalars['String']['input']>;
   /** Get or set the student's group ID. */
-  groupId: Scalars['Long'];
+  groupId: Scalars['Long']['input'];
   /** Get or set the student's last name. */
-  lastName?: InputMaybe<Scalars['String']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
   /** Get or set the student's password. */
-  password?: InputMaybe<Scalars['String']>;
+  password?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Represents a request to post a monetary transaction. */
 export type NewTransactionRequestInput = {
   /** Get or set the amount to post. */
-  amount: Scalars['Money'];
+  amount: Scalars['Money']['input'];
   /** Get or set an optional comment for the transaction. */
-  comment?: InputMaybe<Scalars['String']>;
+  comment?: InputMaybe<Scalars['String']['input']>;
   /** Get or set the Share ID to post to. */
-  shareId: Scalars['Long'];
+  shareId: Scalars['Long']['input'];
   /** Allow the transaction to take the account negative. */
-  takeNegative?: InputMaybe<Scalars['Boolean']>;
+  takeNegative?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 /** Request to transfer funds from one share to another. */
 export type NewTransferRequestInput = {
   /** The amount to transfer. */
-  amount: Scalars['Money'];
+  amount: Scalars['Money']['input'];
   /** Get or set an optional comment. */
-  comment?: InputMaybe<Scalars['String']>;
+  comment?: InputMaybe<Scalars['String']['input']>;
   /** The destination Share ID. */
-  destinationShareId: Scalars['Long'];
+  destinationShareId: Scalars['Long']['input'];
   /** The source Share ID. */
-  sourceShareId: Scalars['Long'];
+  sourceShareId: Scalars['Long']['input'];
 };
 
 /** Data fields to create a user. */
 export type NewUserRequestInput = {
   /** Get or set the user's email address. */
-  email?: InputMaybe<Scalars['String']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   /** Get or set the user's password. */
-  password?: InputMaybe<Scalars['String']>;
+  password?: InputMaybe<Scalars['String']['input']>;
   /** Get or set the user's role. */
-  roleId: Scalars['Long'];
+  roleId: Scalars['Long']['input'];
 };
 
 /** Information about pagination in a connection. */
 export type PageInfo = {
   __typename?: 'PageInfo';
   /** When paginating forwards, the cursor to continue. */
-  endCursor?: Maybe<Scalars['String']>;
+  endCursor?: Maybe<Scalars['String']['output']>;
   /** Indicates whether more edges exist following the set defined by the clients arguments. */
-  hasNextPage: Scalars['Boolean'];
+  hasNextPage: Scalars['Boolean']['output'];
   /** Indicates whether more edges exist prior the set defined by the clients arguments. */
-  hasPreviousPage: Scalars['Boolean'];
+  hasPreviousPage: Scalars['Boolean']['output'];
   /** When paginating backwards, the cursor to continue. */
-  startCursor?: Maybe<Scalars['String']>;
+  startCursor?: Maybe<Scalars['String']['output']>;
 };
 
 export enum Period {
@@ -1090,16 +1092,16 @@ export type PeriodOperationFilterInput = {
 };
 
 export type PostDividendsRequestInput = {
-  instances: Array<Scalars['Long']>;
-  shareTypeId: Scalars['Long'];
+  instances: Array<Scalars['Long']['input']>;
+  shareTypeId: Scalars['Long']['input'];
 };
 
 export type Privilege = {
   __typename?: 'Privilege';
-  dateCreated: Scalars['DateTime'];
-  description: Scalars['String'];
-  id: Scalars['Long'];
-  name: Scalars['String'];
+  dateCreated: Scalars['DateTime']['output'];
+  description: Scalars['String']['output'];
+  id: Scalars['Long']['output'];
+  name: Scalars['String']['output'];
   rolePrivileges: Array<RolePrivilege>;
 };
 
@@ -1115,17 +1117,17 @@ export type PrivilegeFilterInput = {
 
 export type Product = {
   __typename?: 'Product';
-  cost: Scalars['Money'];
-  dateCreated: Scalars['DateTime'];
-  dateDeleted?: Maybe<Scalars['DateTime']>;
-  description: Scalars['String'];
-  id: Scalars['Long'];
+  cost: Scalars['Money']['output'];
+  dateCreated: Scalars['DateTime']['output'];
+  dateDeleted?: Maybe<Scalars['DateTime']['output']>;
+  description: Scalars['String']['output'];
+  id: Scalars['Long']['output'];
   images: Array<ProductImage>;
-  isLimitedQuantity: Scalars['Boolean'];
-  name: Scalars['String'];
+  isLimitedQuantity: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
   productInstances: Array<ProductInstance>;
-  quantity: Scalars['Int'];
-  rawCost: Scalars['Long'];
+  quantity: Scalars['Int']['output'];
+  rawCost: Scalars['Long']['output'];
 };
 
 export type ProductFilterInput = {
@@ -1146,8 +1148,8 @@ export type ProductFilterInput = {
 
 export type ProductImage = {
   __typename?: 'ProductImage';
-  id: Scalars['Long'];
-  url: Scalars['String'];
+  id: Scalars['Long']['output'];
+  url: Scalars['String']['output'];
 };
 
 export type ProductImageFilterInput = {
@@ -1160,9 +1162,9 @@ export type ProductImageFilterInput = {
 export type ProductInstance = {
   __typename?: 'ProductInstance';
   instance: Instance;
-  instanceId: Scalars['Long'];
+  instanceId: Scalars['Long']['output'];
   product: Product;
-  productId: Scalars['Long'];
+  productId: Scalars['Long']['output'];
 };
 
 export type ProductInstanceFilterInput = {
@@ -1195,26 +1197,26 @@ export type ProductsConnection = {
   nodes?: Maybe<Array<Product>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type ProductsEdge = {
   __typename?: 'ProductsEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: Product;
 };
 
 export type PurchaseRequestInput = {
   items: Array<PurchaseRequestItemInput>;
-  shareId: Scalars['Long'];
+  shareId: Scalars['Long']['input'];
 };
 
 export type PurchaseRequestItemInput = {
-  count: Scalars['Int'];
-  productId: Scalars['Long'];
+  count: Scalars['Int']['input'];
+  productId: Scalars['Long']['input'];
 };
 
 export enum PurchaseStatus {
@@ -1232,9 +1234,9 @@ export type PurchaseStatusOperationFilterInput = {
 };
 
 export type PurchaseStockRequestInput = {
-  quantity: Scalars['Int'];
-  shareId: Scalars['Long'];
-  stockId: Scalars['Long'];
+  quantity: Scalars['Int']['input'];
+  shareId: Scalars['Long']['input'];
+  stockId: Scalars['Long']['input'];
 };
 
 /** A connection to a list of items. */
@@ -1246,14 +1248,14 @@ export type PurchasesConnection = {
   nodes?: Maybe<Array<StudentPurchase>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type PurchasesEdge = {
   __typename?: 'PurchasesEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: StudentPurchase;
 };
@@ -1261,9 +1263,9 @@ export type PurchasesEdge = {
 /** A request to purge the history of a given stock. */
 export type PurgeStockRequestInput = {
   /** A cutoff date.  Stock history entries older than this date will be purged. */
-  date: Scalars['DateTime'];
+  date: Scalars['DateTime']['input'];
   /** The stock for which to purge history. */
-  stockId: Scalars['Long'];
+  stockId: Scalars['Long']['input'];
 };
 
 /** Allows students to list their purchases and admins to list all purchases. */
@@ -1292,7 +1294,7 @@ export type Query = {
   /** Get instances if authorized (Manage Instances) */
   instances?: Maybe<InstancesConnection>;
   /** Returns true if the user is authenticated. */
-  isAuthenticated: Scalars['Boolean'];
+  isAuthenticated: Scalars['Boolean']['output'];
   /** Lists all products available to a given student. */
   products?: Maybe<ProductsConnection>;
   /** Get the purchases the user has available to them. */
@@ -1322,10 +1324,10 @@ export type Query = {
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryDeletedGroupsArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<GroupSortInput>>;
   where?: InputMaybe<GroupFilterInput>;
 };
@@ -1333,10 +1335,10 @@ export type QueryDeletedGroupsArgs = {
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryDeletedInstancesArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<InstanceSortInput>>;
   where?: InputMaybe<InstanceFilterInput>;
 };
@@ -1344,10 +1346,10 @@ export type QueryDeletedInstancesArgs = {
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryDeletedProductsArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<ProductSortInput>>;
   where?: InputMaybe<ProductFilterInput>;
 };
@@ -1355,10 +1357,10 @@ export type QueryDeletedProductsArgs = {
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryDeletedShareTypesArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<ShareTypeSortInput>>;
   where?: InputMaybe<ShareTypeFilterInput>;
 };
@@ -1366,10 +1368,10 @@ export type QueryDeletedShareTypesArgs = {
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryDeletedSharesArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<ShareSortInput>>;
   where?: InputMaybe<ShareFilterInput>;
 };
@@ -1377,10 +1379,10 @@ export type QueryDeletedSharesArgs = {
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryDeletedStocksArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<StockSortInput>>;
   where?: InputMaybe<StockFilterInput>;
 };
@@ -1388,10 +1390,10 @@ export type QueryDeletedStocksArgs = {
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryDeletedStudentsArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<StudentSortInput>>;
   where?: InputMaybe<StudentFilterInput>;
 };
@@ -1399,10 +1401,10 @@ export type QueryDeletedStudentsArgs = {
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryGroupsArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<GroupSortInput>>;
   where?: InputMaybe<GroupFilterInput>;
 };
@@ -1410,10 +1412,10 @@ export type QueryGroupsArgs = {
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryInstancesArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<InstanceSortInput>>;
   where?: InputMaybe<InstanceFilterInput>;
 };
@@ -1421,10 +1423,10 @@ export type QueryInstancesArgs = {
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryProductsArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<ProductSortInput>>;
   where?: InputMaybe<ProductFilterInput>;
 };
@@ -1432,10 +1434,10 @@ export type QueryProductsArgs = {
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryPurchasesArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<StudentPurchaseSortInput>>;
   where?: InputMaybe<StudentPurchaseFilterInput>;
 };
@@ -1443,11 +1445,11 @@ export type QueryPurchasesArgs = {
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryShareTypesArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  instances?: InputMaybe<Array<Scalars['Long']>>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  instances?: InputMaybe<Array<Scalars['Long']['input']>>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<ShareTypeSortInput>>;
   where?: InputMaybe<ShareTypeFilterInput>;
 };
@@ -1455,10 +1457,10 @@ export type QueryShareTypesArgs = {
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QuerySharesArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<ShareSortInput>>;
   where?: InputMaybe<ShareFilterInput>;
 };
@@ -1466,23 +1468,23 @@ export type QuerySharesArgs = {
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryStockHistoryArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<StockHistorySortInput>>;
-  stockId: Scalars['Long'];
+  stockId: Scalars['Long']['input'];
   where?: InputMaybe<StockHistoryFilterInput>;
 };
 
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryStocksArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  instances?: InputMaybe<Array<Scalars['Long']>>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  instances?: InputMaybe<Array<Scalars['Long']['input']>>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<StockSortInput>>;
   where?: InputMaybe<StockFilterInput>;
 };
@@ -1490,40 +1492,40 @@ export type QueryStocksArgs = {
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryStudentArgs = {
-  studentId: Scalars['Long'];
+  studentId: Scalars['Long']['input'];
 };
 
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryStudentStockHistoryArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<StudentStockHistorySortInput>>;
-  studentStockId: Scalars['Long'];
+  studentStockId: Scalars['Long']['input'];
   where?: InputMaybe<StudentStockHistoryFilterInput>;
 };
 
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryStudentStocksArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<StudentStockSortInput>>;
-  studentId: Scalars['Long'];
+  studentId: Scalars['Long']['input'];
   where?: InputMaybe<StudentStockFilterInput>;
 };
 
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryStudentsArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<StudentSortInput>>;
   where?: InputMaybe<StudentFilterInput>;
 };
@@ -1531,22 +1533,22 @@ export type QueryStudentsArgs = {
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryTransactionsArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<TransactionSortInput>>;
-  shareId: Scalars['Long'];
+  shareId: Scalars['Long']['input'];
   where?: InputMaybe<TransactionFilterInput>;
 };
 
 
 /** Allows students to list their purchases and admins to list all purchases. */
 export type QueryUsersArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<UserSortInput>>;
   where?: InputMaybe<UserFilterInput>;
 };
@@ -1580,11 +1582,11 @@ export type RefreshTokenFilterInput = {
 
 export type Role = {
   __typename?: 'Role';
-  dateCreated: Scalars['DateTime'];
-  description?: Maybe<Scalars['String']>;
-  id: Scalars['Long'];
-  isBuiltIn: Scalars['Boolean'];
-  name: Scalars['String'];
+  dateCreated: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['Long']['output'];
+  isBuiltIn: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
   rolePrivileges: Array<RolePrivilege>;
 };
 
@@ -1602,9 +1604,9 @@ export type RoleFilterInput = {
 export type RolePrivilege = {
   __typename?: 'RolePrivilege';
   privilege: Privilege;
-  privilegeId: Scalars['Long'];
+  privilegeId: Scalars['Long']['output'];
   role: Role;
-  roleId: Scalars['Long'];
+  roleId: Scalars['Long']['output'];
 };
 
 export type RolePrivilegeFilterInput = {
@@ -1626,21 +1628,21 @@ export type RoleSortInput = {
 
 export type Share = {
   __typename?: 'Share';
-  balance: Scalars['Money'];
-  dateCreated: Scalars['DateTime'];
-  dateDeleted?: Maybe<Scalars['DateTime']>;
-  dateLastActive: Scalars['DateTime'];
-  dividendLastAmount: Scalars['Money'];
-  id: Scalars['Long'];
-  limitedWithdrawalCount: Scalars['Int'];
-  rawBalance: Scalars['Long'];
-  rawDividendLastAmount: Scalars['Long'];
-  rawTotalDividends: Scalars['Long'];
+  balance: Scalars['Money']['output'];
+  dateCreated: Scalars['DateTime']['output'];
+  dateDeleted?: Maybe<Scalars['DateTime']['output']>;
+  dateLastActive: Scalars['DateTime']['output'];
+  dividendLastAmount: Scalars['Money']['output'];
+  id: Scalars['Long']['output'];
+  limitedWithdrawalCount: Scalars['Int']['output'];
+  rawBalance: Scalars['Long']['output'];
+  rawDividendLastAmount: Scalars['Long']['output'];
+  rawTotalDividends: Scalars['Long']['output'];
   shareType: ShareType;
-  shareTypeId: Scalars['Long'];
+  shareTypeId: Scalars['Long']['output'];
   student: Student;
-  studentId: Scalars['Long'];
-  totalDividends: Scalars['Money'];
+  studentId: Scalars['Long']['output'];
+  totalDividends: Scalars['Money']['output'];
 };
 
 export type ShareFilterInput = {
@@ -1684,20 +1686,20 @@ export type ShareSortInput = {
 
 export type ShareType = {
   __typename?: 'ShareType';
-  dateCreated: Scalars['DateTime'];
-  dateDeleted?: Maybe<Scalars['DateTime']>;
-  dividendRate: Scalars['Rate'];
-  id: Scalars['Long'];
-  name: Scalars['String'];
-  rawDividendRate: Scalars['Long'];
-  rawWithdrawalLimitFee: Scalars['Long'];
+  dateCreated: Scalars['DateTime']['output'];
+  dateDeleted?: Maybe<Scalars['DateTime']['output']>;
+  dividendRate: Scalars['Rate']['output'];
+  id: Scalars['Long']['output'];
+  name: Scalars['String']['output'];
+  rawDividendRate: Scalars['Long']['output'];
+  rawWithdrawalLimitFee: Scalars['Long']['output'];
   shareTypeInstances: Array<ShareTypeInstance>;
   shares: Array<Share>;
-  withdrawalLimitCount: Scalars['Int'];
-  withdrawalLimitFee: Scalars['Money'];
-  withdrawalLimitLastReset: Scalars['DateTime'];
+  withdrawalLimitCount: Scalars['Int']['output'];
+  withdrawalLimitFee: Scalars['Money']['output'];
+  withdrawalLimitLastReset: Scalars['DateTime']['output'];
   withdrawalLimitPeriod: Period;
-  withdrawalLimitShouldFee: Scalars['Boolean'];
+  withdrawalLimitShouldFee: Scalars['Boolean']['output'];
 };
 
 export type ShareTypeFilterInput = {
@@ -1722,9 +1724,9 @@ export type ShareTypeFilterInput = {
 export type ShareTypeInstance = {
   __typename?: 'ShareTypeInstance';
   instance: Instance;
-  instanceId: Scalars['Long'];
+  instanceId: Scalars['Long']['output'];
   shareType: ShareType;
-  shareTypeId: Scalars['Long'];
+  shareTypeId: Scalars['Long']['output'];
 };
 
 export type ShareTypeInstanceFilterInput = {
@@ -1760,14 +1762,14 @@ export type ShareTypesConnection = {
   nodes?: Maybe<Array<ShareType>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type ShareTypesEdge = {
   __typename?: 'ShareTypesEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: ShareType;
 };
@@ -1781,14 +1783,14 @@ export type SharesConnection = {
   nodes?: Maybe<Array<Share>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type SharesEdge = {
   __typename?: 'SharesEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: Share;
 };
@@ -1800,18 +1802,18 @@ export enum SortEnumType {
 
 export type Stock = {
   __typename?: 'Stock';
-  currentValue: Scalars['Money'];
-  dateCreated: Scalars['DateTime'];
-  dateDeleted?: Maybe<Scalars['DateTime']>;
-  formattedDescription: Scalars['String'];
+  currentValue: Scalars['Money']['output'];
+  dateCreated: Scalars['DateTime']['output'];
+  dateDeleted?: Maybe<Scalars['DateTime']['output']>;
+  formattedDescription: Scalars['String']['output'];
   history: Array<StockHistory>;
-  id: Scalars['Long'];
-  name: Scalars['String'];
-  rawCurrentValue: Scalars['Long'];
-  rawDescription: Scalars['String'];
+  id: Scalars['Long']['output'];
+  name: Scalars['String']['output'];
+  rawCurrentValue: Scalars['Long']['output'];
+  rawDescription: Scalars['String']['output'];
   stockInstances: Array<StockInstance>;
   studentStock: Array<StudentStock>;
-  symbol: Scalars['String'];
+  symbol: Scalars['String']['output'];
 };
 
 export type StockFilterInput = {
@@ -1833,12 +1835,12 @@ export type StockFilterInput = {
 
 export type StockHistory = {
   __typename?: 'StockHistory';
-  dateChanged: Scalars['DateTime'];
-  id: Scalars['Long'];
-  rawValue: Scalars['Long'];
+  dateChanged: Scalars['DateTime']['output'];
+  id: Scalars['Long']['output'];
+  rawValue: Scalars['Long']['output'];
   stock: Stock;
-  stockId: Scalars['Long'];
-  value: Scalars['Money'];
+  stockId: Scalars['Long']['output'];
+  value: Scalars['Money']['output'];
 };
 
 /** A connection to a list of items. */
@@ -1850,14 +1852,14 @@ export type StockHistoryConnection = {
   nodes?: Maybe<Array<StockHistory>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type StockHistoryEdge = {
   __typename?: 'StockHistoryEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: StockHistory;
 };
@@ -1885,9 +1887,9 @@ export type StockHistorySortInput = {
 export type StockInstance = {
   __typename?: 'StockInstance';
   instance: Instance;
-  instanceId: Scalars['Long'];
+  instanceId: Scalars['Long']['output'];
   stock: Stock;
-  stockId: Scalars['Long'];
+  stockId: Scalars['Long']['output'];
 };
 
 export type StockInstanceFilterInput = {
@@ -1920,47 +1922,47 @@ export type StocksConnection = {
   nodes?: Maybe<Array<Stock>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type StocksEdge = {
   __typename?: 'StocksEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: Stock;
 };
 
 export type StringOperationFilterInput = {
   and?: InputMaybe<Array<StringOperationFilterInput>>;
-  contains?: InputMaybe<Scalars['String']>;
-  endsWith?: InputMaybe<Scalars['String']>;
-  eq?: InputMaybe<Scalars['String']>;
-  in?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
-  ncontains?: InputMaybe<Scalars['String']>;
-  nendsWith?: InputMaybe<Scalars['String']>;
-  neq?: InputMaybe<Scalars['String']>;
-  nin?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
-  nstartsWith?: InputMaybe<Scalars['String']>;
+  contains?: InputMaybe<Scalars['String']['input']>;
+  endsWith?: InputMaybe<Scalars['String']['input']>;
+  eq?: InputMaybe<Scalars['String']['input']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  ncontains?: InputMaybe<Scalars['String']['input']>;
+  nendsWith?: InputMaybe<Scalars['String']['input']>;
+  neq?: InputMaybe<Scalars['String']['input']>;
+  nin?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  nstartsWith?: InputMaybe<Scalars['String']['input']>;
   or?: InputMaybe<Array<StringOperationFilterInput>>;
-  startsWith?: InputMaybe<Scalars['String']>;
-  startsWithInvariant?: InputMaybe<Scalars['String']>;
+  startsWith?: InputMaybe<Scalars['String']['input']>;
+  startsWithInvariant?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Student = {
   __typename?: 'Student';
-  accountNumber: Scalars['String'];
-  dateCreated: Scalars['DateTime'];
-  dateDeleted?: Maybe<Scalars['DateTime']>;
-  dateLastLogin?: Maybe<Scalars['DateTime']>;
-  dateRegistered?: Maybe<Scalars['DateTime']>;
-  email?: Maybe<Scalars['String']>;
-  firstName: Scalars['String'];
+  accountNumber: Scalars['String']['output'];
+  dateCreated: Scalars['DateTime']['output'];
+  dateDeleted?: Maybe<Scalars['DateTime']['output']>;
+  dateLastLogin?: Maybe<Scalars['DateTime']['output']>;
+  dateRegistered?: Maybe<Scalars['DateTime']['output']>;
+  email?: Maybe<Scalars['String']['output']>;
+  firstName: Scalars['String']['output'];
   group: Group;
-  groupId: Scalars['Long'];
-  id: Scalars['Long'];
-  lastName: Scalars['String'];
+  groupId: Scalars['Long']['output'];
+  id: Scalars['Long']['output'];
+  lastName: Scalars['String']['output'];
   purchases: Array<StudentPurchase>;
   shares: Array<Share>;
 };
@@ -1986,20 +1988,20 @@ export type StudentFilterInput = {
 };
 
 export type StudentPreauthenticationRequestInput = {
-  accountNumber: Scalars['String'];
-  inviteCode: Scalars['String'];
+  accountNumber: Scalars['String']['input'];
+  inviteCode: Scalars['String']['input'];
 };
 
 export type StudentPurchase = {
   __typename?: 'StudentPurchase';
-  dateCreated: Scalars['DateTime'];
-  id: Scalars['Long'];
+  dateCreated: Scalars['DateTime']['output'];
+  id: Scalars['Long']['output'];
   items: Array<StudentPurchaseItem>;
-  rawTotalCost: Scalars['Long'];
+  rawTotalCost: Scalars['Long']['output'];
   status: PurchaseStatus;
   student: Student;
-  studentId: Scalars['Long'];
-  totalCost: Scalars['Money'];
+  studentId: Scalars['Long']['output'];
+  totalCost: Scalars['Money']['output'];
 };
 
 export type StudentPurchaseFilterInput = {
@@ -2017,14 +2019,14 @@ export type StudentPurchaseFilterInput = {
 
 export type StudentPurchaseItem = {
   __typename?: 'StudentPurchaseItem';
-  id: Scalars['Long'];
+  id: Scalars['Long']['output'];
   product: Product;
-  productId: Scalars['Long'];
-  purchasePrice: Scalars['Money'];
-  quantity: Scalars['Int'];
-  rawPurchasePrice: Scalars['Long'];
+  productId: Scalars['Long']['output'];
+  purchasePrice: Scalars['Money']['output'];
+  quantity: Scalars['Int']['output'];
+  rawPurchasePrice: Scalars['Long']['output'];
   studentPurchase: StudentPurchase;
-  studentPurchaseId: Scalars['Long'];
+  studentPurchaseId: Scalars['Long']['output'];
 };
 
 export type StudentPurchaseItemFilterInput = {
@@ -2051,8 +2053,8 @@ export type StudentPurchaseSortInput = {
 };
 
 export type StudentRegisterRequestInput = {
-  email: Scalars['String'];
-  password: Scalars['String'];
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
 };
 
 export type StudentSortInput = {
@@ -2072,23 +2074,23 @@ export type StudentSortInput = {
 
 export type StudentStock = {
   __typename?: 'StudentStock';
-  calculatePurchaseAmount: Scalars['Money'];
-  dateCreated: Scalars['DateTime'];
-  dateLastActive: Scalars['DateTime'];
+  calculatePurchaseAmount: Scalars['Money']['output'];
+  dateCreated: Scalars['DateTime']['output'];
+  dateLastActive: Scalars['DateTime']['output'];
   history: Array<StudentStockHistory>;
-  id: Scalars['Long'];
-  netContribution: Scalars['Money'];
-  rawNetContribution: Scalars['Long'];
-  sharesOwned: Scalars['Long'];
+  id: Scalars['Long']['output'];
+  netContribution: Scalars['Money']['output'];
+  rawNetContribution: Scalars['Long']['output'];
+  sharesOwned: Scalars['Long']['output'];
   stock: Stock;
-  stockId: Scalars['Long'];
+  stockId: Scalars['Long']['output'];
   student: Student;
-  studentId: Scalars['Long'];
+  studentId: Scalars['Long']['output'];
 };
 
 
 export type StudentStockCalculatePurchaseAmountArgs = {
-  quantity: Scalars['Int'];
+  quantity: Scalars['Int']['input'];
 };
 
 export type StudentStockFilterInput = {
@@ -2109,15 +2111,15 @@ export type StudentStockFilterInput = {
 
 export type StudentStockHistory = {
   __typename?: 'StudentStockHistory';
-  amount: Scalars['Money'];
-  count: Scalars['Int'];
-  datePosted: Scalars['DateTime'];
-  id: Scalars['Long'];
-  rawAmount: Scalars['Long'];
+  amount: Scalars['Money']['output'];
+  count: Scalars['Int']['output'];
+  datePosted: Scalars['DateTime']['output'];
+  id: Scalars['Long']['output'];
+  rawAmount: Scalars['Long']['output'];
   studentStock: StudentStock;
-  studentStockId: Scalars['Long'];
+  studentStockId: Scalars['Long']['output'];
   transaction: Transaction;
-  transactionId: Scalars['Long'];
+  transactionId: Scalars['Long']['output'];
 };
 
 /** A connection to a list of items. */
@@ -2129,14 +2131,14 @@ export type StudentStockHistoryConnection = {
   nodes?: Maybe<Array<StudentStockHistory>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type StudentStockHistoryEdge = {
   __typename?: 'StudentStockHistoryEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: StudentStockHistory;
 };
@@ -2189,14 +2191,14 @@ export type StudentStocksConnection = {
   nodes?: Maybe<Array<StudentStock>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type StudentStocksEdge = {
   __typename?: 'StudentStocksEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: StudentStock;
 };
@@ -2210,30 +2212,30 @@ export type StudentsConnection = {
   nodes?: Maybe<Array<Student>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type StudentsEdge = {
   __typename?: 'StudentsEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: Student;
 };
 
 export type Transaction = {
   __typename?: 'Transaction';
-  amount: Scalars['Money'];
-  comment?: Maybe<Scalars['String']>;
-  effectiveDate: Scalars['DateTime'];
-  id: Scalars['Long'];
-  newBalance: Scalars['Money'];
-  rawAmount: Scalars['Long'];
-  rawNewBalance: Scalars['Long'];
+  amount: Scalars['Money']['output'];
+  comment?: Maybe<Scalars['String']['output']>;
+  effectiveDate: Scalars['DateTime']['output'];
+  id: Scalars['Long']['output'];
+  newBalance: Scalars['Money']['output'];
+  rawAmount: Scalars['Long']['output'];
+  rawNewBalance: Scalars['Long']['output'];
   targetShare: Share;
-  targetShareId: Scalars['Long'];
-  transactionType: Scalars['String'];
+  targetShareId: Scalars['Long']['output'];
+  transactionType: Scalars['String']['output'];
 };
 
 export type TransactionFilterInput = {
@@ -2252,13 +2254,13 @@ export type TransactionFilterInput = {
 };
 
 export type TransactionRequestInput = {
-  amount: Scalars['Money'];
-  comment?: InputMaybe<Scalars['String']>;
-  effectiveDate?: InputMaybe<Scalars['DateTime']>;
-  shareId: Scalars['Long'];
-  takeNegative?: InputMaybe<Scalars['Boolean']>;
-  type?: InputMaybe<Scalars['String']>;
-  withdrawalLimit?: InputMaybe<Scalars['Boolean']>;
+  amount: Scalars['Money']['input'];
+  comment?: InputMaybe<Scalars['String']['input']>;
+  effectiveDate?: InputMaybe<Scalars['DateTime']['input']>;
+  shareId: Scalars['Long']['input'];
+  takeNegative?: InputMaybe<Scalars['Boolean']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
+  withdrawalLimit?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type TransactionSortInput = {
@@ -2283,14 +2285,14 @@ export type TransactionsConnection = {
   nodes?: Maybe<Array<Transaction>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type TransactionsEdge = {
   __typename?: 'TransactionsEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: Transaction;
 };
@@ -2304,111 +2306,111 @@ export type TupleOfTransactionAndTransaction = {
 /** Request data to update a group. */
 export type UpdateGroupRequestInput = {
   /** Get or set the ID number of the group. */
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
   /** Get or set the Instance ID of the group. */
-  instanceId?: InputMaybe<Scalars['Long']>;
+  instanceId?: InputMaybe<Scalars['Long']['input']>;
   /** Get or set the name of the group. */
-  name?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateInstanceRequestInput = {
   /** Get or set the description of the instance. */
-  description?: InputMaybe<Scalars['String']>;
+  description?: InputMaybe<Scalars['String']['input']>;
   /** Get or set the ID number of the instance. */
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
   /** Get or set if the instance is active. */
-  isActive?: InputMaybe<Scalars['Boolean']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type UpdateProductRequestInput = {
-  cost?: InputMaybe<Scalars['Money']>;
-  description?: InputMaybe<Scalars['String']>;
-  id: Scalars['Long'];
-  isLimitedQuantity?: InputMaybe<Scalars['Boolean']>;
-  name?: InputMaybe<Scalars['String']>;
-  quantity?: InputMaybe<Scalars['Int']>;
+  cost?: InputMaybe<Scalars['Money']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['Long']['input'];
+  isLimitedQuantity?: InputMaybe<Scalars['Boolean']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  quantity?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type UpdateShareRequestInput = {
-  id: Scalars['Long'];
-  shareTypeId: Scalars['Long'];
+  id: Scalars['Long']['input'];
+  shareTypeId: Scalars['Long']['input'];
 };
 
 /** Request data to update a Share Type. */
 export type UpdateShareTypeRequestInput = {
   /** Get or set the dividend rate. */
-  dividendRate?: InputMaybe<Scalars['Rate']>;
+  dividendRate?: InputMaybe<Scalars['Rate']['input']>;
   /** Get or set the ID number of the share type. */
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
   /** Get or set the name of the share type. */
-  name?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']['input']>;
   /** Get or set the number of withdrawals allowed per period.  Use zero to disable. */
-  withdrawalLimitCount?: InputMaybe<Scalars['Int']>;
+  withdrawalLimitCount?: InputMaybe<Scalars['Int']['input']>;
   /** Get or set the amount to fee if WithdrawalLimitShouldFee is true. */
-  withdrawalLimitFee?: InputMaybe<Scalars['Money']>;
+  withdrawalLimitFee?: InputMaybe<Scalars['Money']['input']>;
   /** Get or set the withdrawal limit period to use when resetting the withdrawal limit counters. */
   withdrawalLimitPeriod?: InputMaybe<Period>;
   /** Get or set if withdrawals over the WithdrawalLimitCount should fee instead of being declined. */
-  withdrawalLimitShouldFee?: InputMaybe<Scalars['Boolean']>;
+  withdrawalLimitShouldFee?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type UpdateStockRequestInput = {
   /** The current value of the stock. */
-  currentValue?: InputMaybe<Scalars['Money']>;
+  currentValue?: InputMaybe<Scalars['Money']['input']>;
   /** The ID number of the stock */
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
   /** Name of the company */
-  name?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']['input']>;
   /** Description of the stock. */
-  rawDescription?: InputMaybe<Scalars['String']>;
+  rawDescription?: InputMaybe<Scalars['String']['input']>;
   /** Unique symbol of the stock. */
-  symbol?: InputMaybe<Scalars['String']>;
+  symbol?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Data fields to update a student. */
 export type UpdateStudentRequestInput = {
   /** Get or set the student's account number. */
-  accountNumber?: InputMaybe<Scalars['String']>;
+  accountNumber?: InputMaybe<Scalars['String']['input']>;
   /** Get or set the student's current password. */
-  currentPassword?: InputMaybe<Scalars['String']>;
+  currentPassword?: InputMaybe<Scalars['String']['input']>;
   /** Get or set the student's email address. */
-  email?: InputMaybe<Scalars['String']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   /** Get or set the student's first name. */
-  firstName?: InputMaybe<Scalars['String']>;
+  firstName?: InputMaybe<Scalars['String']['input']>;
   /** Get or set the student's group ID. */
-  groupId?: InputMaybe<Scalars['Long']>;
+  groupId?: InputMaybe<Scalars['Long']['input']>;
   /** Get or set the student ID. Required when updating students. */
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
   /** Get or set the student's last name. */
-  lastName?: InputMaybe<Scalars['String']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
   /** Get or set the student's password. */
-  password?: InputMaybe<Scalars['String']>;
+  password?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Data fields to update a user. */
 export type UpdateUserRequestInput = {
   /** If a password change is requested, then this field must be set to the user's current password. */
-  currentPassword?: InputMaybe<Scalars['String']>;
+  currentPassword?: InputMaybe<Scalars['String']['input']>;
   /** Get or set the user's email address. */
-  email?: InputMaybe<Scalars['String']>;
+  email?: InputMaybe<Scalars['String']['input']>;
   /** Get or set the user's ID. */
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
   /** Get or set the user's password. */
-  password?: InputMaybe<Scalars['String']>;
+  password?: InputMaybe<Scalars['String']['input']>;
   /** Get or set the user's role. */
-  roleId?: InputMaybe<Scalars['Long']>;
+  roleId?: InputMaybe<Scalars['Long']['input']>;
 };
 
 export type User = {
   __typename?: 'User';
-  dateCreated: Scalars['DateTime'];
-  dateDeleted?: Maybe<Scalars['DateTime']>;
-  dateLastLogin?: Maybe<Scalars['DateTime']>;
-  dateRegistered?: Maybe<Scalars['DateTime']>;
-  email: Scalars['String'];
-  id: Scalars['Long'];
+  dateCreated: Scalars['DateTime']['output'];
+  dateDeleted?: Maybe<Scalars['DateTime']['output']>;
+  dateLastLogin?: Maybe<Scalars['DateTime']['output']>;
+  dateRegistered?: Maybe<Scalars['DateTime']['output']>;
+  email: Scalars['String']['output'];
+  id: Scalars['Long']['output'];
   role: Role;
-  roleId: Scalars['Long'];
+  roleId: Scalars['Long']['output'];
 };
 
 export type UserFilterInput = {
@@ -2447,14 +2449,14 @@ export type UsersConnection = {
   nodes?: Maybe<Array<User>>;
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Int']['output'];
 };
 
 /** An edge in a connection. */
 export type UsersEdge = {
   __typename?: 'UsersEdge';
   /** A cursor for use in pagination. */
-  cursor: Scalars['String'];
+  cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: User;
 };
@@ -2494,185 +2496,185 @@ export type TransactionPartsFragment = { __typename?: 'Transaction', id: number,
 export type UserPartsFragment = { __typename?: 'User', id: number, email: string, roleId: number, dateCreated: string, dateRegistered?: string | null, dateLastLogin?: string | null, role: { __typename?: 'Role', id: number, name: string, description?: string | null, isBuiltIn: boolean, rolePrivileges: Array<{ __typename?: 'RolePrivilege', privilegeId: number, roleId: number, privilege: { __typename?: 'Privilege', id: number, name: string, description: string, dateCreated: string } }> } };
 
 export type NewGroupMutationVariables = Exact<{
-  instanceId: Scalars['Long'];
-  name: Scalars['String'];
+  instanceId: Scalars['Long']['input'];
+  name: Scalars['String']['input'];
 }>;
 
 
 export type NewGroupMutation = { __typename?: 'Mutation', newGroup: Array<{ __typename?: 'Group', id: number, instanceId: number, name: string, instance: { __typename?: 'Instance', id: number, description: string } }> };
 
 export type DeleteGroupMutationVariables = Exact<{
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 }>;
 
 
 export type DeleteGroupMutation = { __typename?: 'Mutation', deleteGroup: boolean };
 
 export type UpdateGroupMutationVariables = Exact<{
-  id: Scalars['Long'];
-  name: Scalars['String'];
+  id: Scalars['Long']['input'];
+  name: Scalars['String']['input'];
 }>;
 
 
 export type UpdateGroupMutation = { __typename?: 'Mutation', updateGroup: Array<{ __typename?: 'Group', id: number, instanceId: number, name: string, instance: { __typename?: 'Instance', id: number, description: string } }> };
 
 export type NewInstanceMutationVariables = Exact<{
-  description: Scalars['String'];
+  description: Scalars['String']['input'];
 }>;
 
 
 export type NewInstanceMutation = { __typename?: 'Mutation', newInstance: { __typename?: 'Instance', id: number, description: string, inviteCode: string, isActive: boolean } };
 
 export type DeleteInstanceMutationVariables = Exact<{
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 }>;
 
 
 export type DeleteInstanceMutation = { __typename?: 'Mutation', deleteInstance: boolean };
 
 export type UpdateInstanceMutationVariables = Exact<{
-  id: Scalars['Long'];
-  description?: InputMaybe<Scalars['String']>;
-  isActive?: InputMaybe<Scalars['Boolean']>;
+  id: Scalars['Long']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
 }>;
 
 
 export type UpdateInstanceMutation = { __typename?: 'Mutation', updateInstance: Array<{ __typename?: 'Instance', id: number, description: string, inviteCode: string, isActive: boolean }> };
 
 export type NewStockPurchaseMutationVariables = Exact<{
-  stockId: Scalars['Long'];
-  shareId: Scalars['Long'];
-  quantity: Scalars['Int'];
+  stockId: Scalars['Long']['input'];
+  shareId: Scalars['Long']['input'];
+  quantity: Scalars['Int']['input'];
 }>;
 
 
 export type NewStockPurchaseMutation = { __typename?: 'Mutation', newStockPurchase: Array<{ __typename?: 'StudentStock', id: number, stockId: number, studentId: number, sharesOwned: number, netContribution: number, dateCreated: string, dateLastActive: string, stock: { __typename?: 'Stock', id: number, name: string, symbol: string, currentValue: number, rawDescription: string, formattedDescription: string } }> };
 
 export type NewShareMutationVariables = Exact<{
-  shareTypeId: Scalars['Long'];
-  studentId: Scalars['Long'];
+  shareTypeId: Scalars['Long']['input'];
+  studentId: Scalars['Long']['input'];
 }>;
 
 
 export type NewShareMutation = { __typename?: 'Mutation', newShare: Array<{ __typename?: 'Share', id: number, shareTypeId: number, balance: number, studentId: number, limitedWithdrawalCount: number, shareType: { __typename?: 'ShareType', id: number, name: string, dividendRate: number, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: string, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: number, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: number }> } }> };
 
 export type DeleteShareMutationVariables = Exact<{
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 }>;
 
 
 export type DeleteShareMutation = { __typename?: 'Mutation', deleteShare: boolean };
 
 export type NewShareTypeMutationVariables = Exact<{
-  name: Scalars['String'];
-  dividendRate: Scalars['Rate'];
-  withdrawalLimitCount?: InputMaybe<Scalars['Int']>;
+  name: Scalars['String']['input'];
+  dividendRate: Scalars['Rate']['input'];
+  withdrawalLimitCount?: InputMaybe<Scalars['Int']['input']>;
   withdrawalLimitPeriod?: InputMaybe<Period>;
-  withdrawalLimitShouldFee?: InputMaybe<Scalars['Boolean']>;
-  withdrawalLimitFee?: InputMaybe<Scalars['Money']>;
+  withdrawalLimitShouldFee?: InputMaybe<Scalars['Boolean']['input']>;
+  withdrawalLimitFee?: InputMaybe<Scalars['Money']['input']>;
 }>;
 
 
 export type NewShareTypeMutation = { __typename?: 'Mutation', newShareType: Array<{ __typename?: 'ShareType', id: number, name: string, dividendRate: number, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: string, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: number, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: number }> }> };
 
 export type DeleteShareTypeMutationVariables = Exact<{
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 }>;
 
 
 export type DeleteShareTypeMutation = { __typename?: 'Mutation', deleteShareType: boolean };
 
 export type PostDividendsMutationVariables = Exact<{
-  shareTypeId: Scalars['Long'];
-  instances: Array<Scalars['Long']> | Scalars['Long'];
+  shareTypeId: Scalars['Long']['input'];
+  instances: Array<Scalars['Long']['input']> | Scalars['Long']['input'];
 }>;
 
 
 export type PostDividendsMutation = { __typename?: 'Mutation', postDividends: boolean };
 
 export type LinkShareTypeMutationVariables = Exact<{
-  shareTypeId: Scalars['Long'];
-  instanceId: Scalars['Long'];
+  shareTypeId: Scalars['Long']['input'];
+  instanceId: Scalars['Long']['input'];
 }>;
 
 
 export type LinkShareTypeMutation = { __typename?: 'Mutation', linkShareType: Array<{ __typename?: 'ShareType', id: number, name: string, dividendRate: number, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: string, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: number, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: number }> }> };
 
 export type UnlinkShareTypeMutationVariables = Exact<{
-  shareTypeId: Scalars['Long'];
-  instanceId: Scalars['Long'];
+  shareTypeId: Scalars['Long']['input'];
+  instanceId: Scalars['Long']['input'];
 }>;
 
 
 export type UnlinkShareTypeMutation = { __typename?: 'Mutation', unlinkShareType: Array<{ __typename?: 'ShareType', id: number, name: string, dividendRate: number, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: string, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: number, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: number }> }> };
 
 export type UpdateShareTypeMutationVariables = Exact<{
-  id: Scalars['Long'];
-  name?: InputMaybe<Scalars['String']>;
-  dividendRate?: InputMaybe<Scalars['Rate']>;
-  withdrawalLimitCount?: InputMaybe<Scalars['Int']>;
+  id: Scalars['Long']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  dividendRate?: InputMaybe<Scalars['Rate']['input']>;
+  withdrawalLimitCount?: InputMaybe<Scalars['Int']['input']>;
   withdrawalLimitPeriod?: InputMaybe<Period>;
-  withdrawalLimitShouldFee?: InputMaybe<Scalars['Boolean']>;
-  withdrawalLimitFee?: InputMaybe<Scalars['Money']>;
+  withdrawalLimitShouldFee?: InputMaybe<Scalars['Boolean']['input']>;
+  withdrawalLimitFee?: InputMaybe<Scalars['Money']['input']>;
 }>;
 
 
 export type UpdateShareTypeMutation = { __typename?: 'Mutation', updateShareType: Array<{ __typename?: 'ShareType', id: number, name: string, dividendRate: number, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: string, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: number, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: number }> }> };
 
 export type NewStockMutationVariables = Exact<{
-  name: Scalars['String'];
-  symbol: Scalars['String'];
-  rawDescription?: InputMaybe<Scalars['String']>;
-  currentValue: Scalars['Money'];
+  name: Scalars['String']['input'];
+  symbol: Scalars['String']['input'];
+  rawDescription?: InputMaybe<Scalars['String']['input']>;
+  currentValue: Scalars['Money']['input'];
 }>;
 
 
 export type NewStockMutation = { __typename?: 'Mutation', newStock: Array<{ __typename?: 'Stock', id: number, name: string, symbol: string, currentValue: number, rawDescription: string, formattedDescription: string, stockInstances: Array<{ __typename?: 'StockInstance', instanceId: number, instance: { __typename?: 'Instance', id: number, description: string, inviteCode: string, isActive: boolean } }> }> };
 
 export type DeleteStockMutationVariables = Exact<{
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 }>;
 
 
 export type DeleteStockMutation = { __typename?: 'Mutation', deleteStock: boolean };
 
 export type PurgeStockHistoryMutationVariables = Exact<{
-  stockId: Scalars['Long'];
-  date: Scalars['DateTime'];
+  stockId: Scalars['Long']['input'];
+  date: Scalars['DateTime']['input'];
 }>;
 
 
 export type PurgeStockHistoryMutation = { __typename?: 'Mutation', purgeStockHistory: Array<{ __typename?: 'StockHistory', id: number, stockId: number, dateChanged: string, value: number }> };
 
 export type LinkStockMutationVariables = Exact<{
-  stockId: Scalars['Long'];
-  instanceId: Scalars['Long'];
+  stockId: Scalars['Long']['input'];
+  instanceId: Scalars['Long']['input'];
 }>;
 
 
 export type LinkStockMutation = { __typename?: 'Mutation', linkStock: Array<{ __typename?: 'Stock', id: number, name: string, symbol: string, currentValue: number, rawDescription: string, formattedDescription: string, stockInstances: Array<{ __typename?: 'StockInstance', instanceId: number, instance: { __typename?: 'Instance', id: number, description: string, inviteCode: string, isActive: boolean } }> }> };
 
 export type RestoreStockMutationVariables = Exact<{
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 }>;
 
 
 export type RestoreStockMutation = { __typename?: 'Mutation', restoreStock: Array<{ __typename?: 'Stock', id: number, name: string, symbol: string, currentValue: number, rawDescription: string, formattedDescription: string, stockInstances: Array<{ __typename?: 'StockInstance', instanceId: number, instance: { __typename?: 'Instance', id: number, description: string, inviteCode: string, isActive: boolean } }> }> };
 
 export type UnlinkStockMutationVariables = Exact<{
-  stockId: Scalars['Long'];
-  instanceId: Scalars['Long'];
+  stockId: Scalars['Long']['input'];
+  instanceId: Scalars['Long']['input'];
 }>;
 
 
 export type UnlinkStockMutation = { __typename?: 'Mutation', unlinkStock: Array<{ __typename?: 'Stock', id: number, name: string, symbol: string, currentValue: number, rawDescription: string, formattedDescription: string, stockInstances: Array<{ __typename?: 'StockInstance', instanceId: number, instance: { __typename?: 'Instance', id: number, description: string, inviteCode: string, isActive: boolean } }> }> };
 
 export type UpdateStockMutationVariables = Exact<{
-  id: Scalars['Long'];
-  name?: InputMaybe<Scalars['String']>;
-  symbol?: InputMaybe<Scalars['String']>;
-  rawDescription?: InputMaybe<Scalars['String']>;
-  currentValue?: InputMaybe<Scalars['Money']>;
+  id: Scalars['Long']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  symbol?: InputMaybe<Scalars['String']['input']>;
+  rawDescription?: InputMaybe<Scalars['String']['input']>;
+  currentValue?: InputMaybe<Scalars['Money']['input']>;
 }>;
 
 
@@ -2686,43 +2688,43 @@ export type UpdateBulkStudentMutationVariables = Exact<{
 export type UpdateBulkStudentMutation = { __typename?: 'Mutation', updateBulkStudent: Array<{ __typename?: 'Student', id: number, accountNumber: string, firstName: string, lastName: string, groupId: number, email?: string | null, dateLastLogin?: string | null, dateRegistered?: string | null, shares: Array<{ __typename?: 'Share', id: number, shareTypeId: number, balance: number, studentId: number, limitedWithdrawalCount: number, shareType: { __typename?: 'ShareType', id: number, name: string, dividendRate: number, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: string, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: number, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: number }> } }>, group: { __typename?: 'Group', id: number, instanceId: number, name: string, instance: { __typename?: 'Instance', id: number, description: string } } }> };
 
 export type NewStudentMutationVariables = Exact<{
-  accountNumber: Scalars['String'];
-  groupId: Scalars['Long'];
-  firstName: Scalars['String'];
-  lastName: Scalars['String'];
-  password: Scalars['String'];
-  email?: InputMaybe<Scalars['String']>;
+  accountNumber: Scalars['String']['input'];
+  groupId: Scalars['Long']['input'];
+  firstName: Scalars['String']['input'];
+  lastName: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  email?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
 export type NewStudentMutation = { __typename?: 'Mutation', newStudent: Array<{ __typename?: 'Student', id: number, accountNumber: string, firstName: string, lastName: string, groupId: number, email?: string | null, dateLastLogin?: string | null, dateRegistered?: string | null, shares: Array<{ __typename?: 'Share', id: number, shareTypeId: number, balance: number, studentId: number, limitedWithdrawalCount: number, shareType: { __typename?: 'ShareType', id: number, name: string, dividendRate: number, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: string, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: number, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: number }> } }>, group: { __typename?: 'Group', id: number, instanceId: number, name: string, instance: { __typename?: 'Instance', id: number, description: string } } }> };
 
 export type DeleteStudentMutationVariables = Exact<{
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 }>;
 
 
 export type DeleteStudentMutation = { __typename?: 'Mutation', deleteStudent: boolean };
 
 export type StudentLoginMutationVariables = Exact<{
-  username: Scalars['String'];
-  password: Scalars['String'];
+  username: Scalars['String']['input'];
+  password: Scalars['String']['input'];
 }>;
 
 
 export type StudentLoginMutation = { __typename?: 'Mutation', studentLogin: { __typename?: 'AuthenticateResponse', jwtToken: string } };
 
 export type StudentPreregistrationMutationVariables = Exact<{
-  inviteCode: Scalars['String'];
-  accountNumber: Scalars['String'];
+  inviteCode: Scalars['String']['input'];
+  accountNumber: Scalars['String']['input'];
 }>;
 
 
 export type StudentPreregistrationMutation = { __typename?: 'Mutation', studentPreregistration: string };
 
 export type StudentRegistrationMutationVariables = Exact<{
-  email: Scalars['String'];
-  password: Scalars['String'];
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
 }>;
 
 
@@ -2734,14 +2736,14 @@ export type StudentRevokeRefreshTokenMutationVariables = Exact<{ [key: string]: 
 export type StudentRevokeRefreshTokenMutation = { __typename?: 'Mutation', studentRevokeRefreshToken: boolean };
 
 export type UpdateStudentMutationVariables = Exact<{
-  id: Scalars['Long'];
-  accountNumber?: InputMaybe<Scalars['String']>;
-  firstName?: InputMaybe<Scalars['String']>;
-  lastName?: InputMaybe<Scalars['String']>;
-  email?: InputMaybe<Scalars['String']>;
-  currentPassword?: InputMaybe<Scalars['String']>;
-  password?: InputMaybe<Scalars['String']>;
-  groupId?: InputMaybe<Scalars['Long']>;
+  id: Scalars['Long']['input'];
+  accountNumber?: InputMaybe<Scalars['String']['input']>;
+  firstName?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  currentPassword?: InputMaybe<Scalars['String']['input']>;
+  password?: InputMaybe<Scalars['String']['input']>;
+  groupId?: InputMaybe<Scalars['Long']['input']>;
 }>;
 
 
@@ -2749,35 +2751,35 @@ export type UpdateStudentMutation = { __typename?: 'Mutation', updateStudent: Ar
 
 export type NewBulkTransactionMutationVariables = Exact<{
   shares: Array<NewTransactionRequestInput> | NewTransactionRequestInput;
-  skipNegative: Scalars['Boolean'];
+  skipNegative: Scalars['Boolean']['input'];
 }>;
 
 
 export type NewBulkTransactionMutation = { __typename?: 'Mutation', newBulkTransaction: Array<{ __typename?: 'Transaction', id: number, targetShareId: number, transactionType: string, effectiveDate: string, comment?: string | null, amount: number, newBalance: number }> };
 
 export type NewTransactionMutationVariables = Exact<{
-  shareId: Scalars['Long'];
-  amount: Scalars['Money'];
-  takeNegative?: InputMaybe<Scalars['Boolean']>;
-  comment?: InputMaybe<Scalars['String']>;
+  shareId: Scalars['Long']['input'];
+  amount: Scalars['Money']['input'];
+  takeNegative?: InputMaybe<Scalars['Boolean']['input']>;
+  comment?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
 export type NewTransactionMutation = { __typename?: 'Mutation', newTransaction: { __typename?: 'Transaction', id: number, targetShareId: number, transactionType: string, effectiveDate: string, comment?: string | null, amount: number, newBalance: number } };
 
 export type NewTransferMutationVariables = Exact<{
-  sourceShareId: Scalars['Long'];
-  destinationShareId: Scalars['Long'];
-  amount: Scalars['Money'];
-  comment?: InputMaybe<Scalars['String']>;
+  sourceShareId: Scalars['Long']['input'];
+  destinationShareId: Scalars['Long']['input'];
+  amount: Scalars['Money']['input'];
+  comment?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
 export type NewTransferMutation = { __typename?: 'Mutation', newTransfer: { __typename?: 'TupleOfTransactionAndTransaction', item1: { __typename?: 'Transaction', id: number, targetShareId: number, transactionType: string, effectiveDate: string, comment?: string | null, amount: number, newBalance: number }, item2: { __typename?: 'Transaction', id: number, targetShareId: number, transactionType: string, effectiveDate: string, comment?: string | null, amount: number, newBalance: number } } };
 
 export type UserLoginMutationVariables = Exact<{
-  username: Scalars['String'];
-  password: Scalars['String'];
+  username: Scalars['String']['input'];
+  password: Scalars['String']['input'];
 }>;
 
 
@@ -2789,11 +2791,11 @@ export type UserRevokeRefreshTokenMutationVariables = Exact<{ [key: string]: nev
 export type UserRevokeRefreshTokenMutation = { __typename?: 'Mutation', userRevokeRefreshToken: boolean };
 
 export type UpdateUserMutationVariables = Exact<{
-  id: Scalars['Long'];
-  email?: InputMaybe<Scalars['String']>;
-  currentPassword?: InputMaybe<Scalars['String']>;
-  password?: InputMaybe<Scalars['String']>;
-  roleId?: InputMaybe<Scalars['Long']>;
+  id: Scalars['Long']['input'];
+  email?: InputMaybe<Scalars['String']['input']>;
+  currentPassword?: InputMaybe<Scalars['String']['input']>;
+  password?: InputMaybe<Scalars['String']['input']>;
+  roleId?: InputMaybe<Scalars['Long']['input']>;
 }>;
 
 
@@ -2810,7 +2812,7 @@ export type CurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 export type CurrentUserQuery = { __typename?: 'Query', currentUser: Array<{ __typename?: 'User', id: number, email: string, roleId: number, dateCreated: string, dateRegistered?: string | null, dateLastLogin?: string | null, role: { __typename?: 'Role', id: number, name: string, description?: string | null, isBuiltIn: boolean, rolePrivileges: Array<{ __typename?: 'RolePrivilege', privilegeId: number, roleId: number, privilege: { __typename?: 'Privilege', id: number, name: string, description: string, dateCreated: string } }> } }> };
 
 export type GroupsByInstanceQueryVariables = Exact<{
-  instanceId?: InputMaybe<Scalars['Long']>;
+  instanceId?: InputMaybe<Scalars['Long']['input']>;
 }>;
 
 
@@ -2822,36 +2824,36 @@ export type AllInstancesQueryVariables = Exact<{ [key: string]: never; }>;
 export type AllInstancesQuery = { __typename?: 'Query', instances?: { __typename?: 'InstancesConnection', nodes?: Array<{ __typename?: 'Instance', id: number, description: string, inviteCode: string, isActive: boolean }> | null } | null };
 
 export type ShareTypesQueryVariables = Exact<{
-  instances?: InputMaybe<Array<Scalars['Long']> | Scalars['Long']>;
-  first?: InputMaybe<Scalars['Int']>;
-  after?: InputMaybe<Scalars['String']>;
+  instances?: InputMaybe<Array<Scalars['Long']['input']> | Scalars['Long']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
 export type ShareTypesQuery = { __typename?: 'Query', shareTypes?: { __typename?: 'ShareTypesConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'ShareType', id: number, name: string, dividendRate: number, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: string, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: number, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: number }> }> | null } | null };
 
 export type SharesByStudentIdQueryVariables = Exact<{
-  studentId: Scalars['Long'];
-  first?: InputMaybe<Scalars['Int']>;
-  after?: InputMaybe<Scalars['String']>;
+  studentId: Scalars['Long']['input'];
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
 export type SharesByStudentIdQuery = { __typename?: 'Query', shares?: { __typename?: 'SharesConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Share', id: number, shareTypeId: number, balance: number, studentId: number, limitedWithdrawalCount: number, shareType: { __typename?: 'ShareType', id: number, name: string, dividendRate: number, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: string, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: number, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: number }> } }> | null } | null };
 
 export type StockHistoryQueryVariables = Exact<{
-  stockId: Scalars['Long'];
-  first?: InputMaybe<Scalars['Int']>;
-  after?: InputMaybe<Scalars['String']>;
+  stockId: Scalars['Long']['input'];
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
 export type StockHistoryQuery = { __typename?: 'Query', stockHistory?: { __typename?: 'StockHistoryConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'StockHistory', id: number, stockId: number, dateChanged: string, value: number }> | null } | null };
 
 export type StocksQueryVariables = Exact<{
-  first?: InputMaybe<Scalars['Int']>;
-  after?: InputMaybe<Scalars['String']>;
-  instances?: InputMaybe<Array<Scalars['Long']> | Scalars['Long']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  instances?: InputMaybe<Array<Scalars['Long']['input']> | Scalars['Long']['input']>;
   where?: InputMaybe<StockFilterInput>;
   order?: StockSortInput;
 }>;
@@ -2860,14 +2862,14 @@ export type StocksQueryVariables = Exact<{
 export type StocksQuery = { __typename?: 'Query', stocks?: { __typename?: 'StocksConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Stock', id: number, name: string, symbol: string, currentValue: number, rawDescription: string, formattedDescription: string, stockInstances: Array<{ __typename?: 'StockInstance', instanceId: number, instance: { __typename?: 'Instance', id: number, description: string, inviteCode: string, isActive: boolean } }> }> | null } | null };
 
 export type StudentsByIdQueryVariables = Exact<{
-  id: Scalars['Long'];
+  id: Scalars['Long']['input'];
 }>;
 
 
 export type StudentsByIdQuery = { __typename?: 'Query', students?: { __typename?: 'StudentsConnection', nodes?: Array<{ __typename?: 'Student', id: number, accountNumber: string, firstName: string, lastName: string, groupId: number, email?: string | null, dateLastLogin?: string | null, dateRegistered?: string | null, shares: Array<{ __typename?: 'Share', id: number, shareTypeId: number, balance: number, studentId: number, limitedWithdrawalCount: number, shareType: { __typename?: 'ShareType', id: number, name: string, dividendRate: number, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: string, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: number, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: number }> } }>, group: { __typename?: 'Group', id: number, instanceId: number, name: string, instance: { __typename?: 'Instance', id: number, description: string } } }> | null } | null };
 
 export type StudentsFilterQueryVariables = Exact<{
-  first?: InputMaybe<Scalars['Int']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<StudentFilterInput>;
 }>;
 
@@ -2875,9 +2877,9 @@ export type StudentsFilterQueryVariables = Exact<{
 export type StudentsFilterQuery = { __typename?: 'Query', students?: { __typename?: 'StudentsConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Student', accountNumber: string }> | null } | null };
 
 export type StudentStockHistoryQueryVariables = Exact<{
-  studentStockId: Scalars['Long'];
-  first?: InputMaybe<Scalars['Int']>;
-  after?: InputMaybe<Scalars['String']>;
+  studentStockId: Scalars['Long']['input'];
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
   order?: StudentStockHistorySortInput;
 }>;
 
@@ -2885,57 +2887,57 @@ export type StudentStockHistoryQueryVariables = Exact<{
 export type StudentStockHistoryQuery = { __typename?: 'Query', studentStockHistory?: { __typename?: 'StudentStockHistoryConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'StudentStockHistory', id: number, count: number, amount: number, datePosted: string, transaction: { __typename?: 'Transaction', id: number, targetShareId: number, transactionType: string, effectiveDate: string, comment?: string | null, amount: number, newBalance: number } }> | null } | null };
 
 export type StudentStocksQueryVariables = Exact<{
-  first?: InputMaybe<Scalars['Int']>;
-  after?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
   order?: StudentStockSortInput;
   where?: InputMaybe<StudentStockFilterInput>;
-  studentId: Scalars['Long'];
+  studentId: Scalars['Long']['input'];
 }>;
 
 
 export type StudentStocksQuery = { __typename?: 'Query', studentStocks?: { __typename?: 'StudentStocksConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'StudentStock', id: number, stockId: number, studentId: number, sharesOwned: number, netContribution: number, dateCreated: string, dateLastActive: string, stock: { __typename?: 'Stock', id: number, name: string, symbol: string, currentValue: number, rawDescription: string, formattedDescription: string } }> | null } | null };
 
 export type StudentsByAccountNumberQueryVariables = Exact<{
-  first?: InputMaybe<Scalars['Int']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
   order?: StudentSortInput;
-  accountNumber: Scalars['String'];
+  accountNumber: Scalars['String']['input'];
 }>;
 
 
 export type StudentsByAccountNumberQuery = { __typename?: 'Query', students?: { __typename?: 'StudentsConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Student', id: number, accountNumber: string, firstName: string, lastName: string, groupId: number, email?: string | null, dateLastLogin?: string | null, dateRegistered?: string | null, shares: Array<{ __typename?: 'Share', id: number, shareTypeId: number, balance: number, studentId: number, limitedWithdrawalCount: number, shareType: { __typename?: 'ShareType', id: number, name: string, dividendRate: number, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: string, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: number, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: number }> } }>, group: { __typename?: 'Group', id: number, instanceId: number, name: string, instance: { __typename?: 'Instance', id: number, description: string } } }> | null } | null };
 
 export type StudentsByEmailQueryVariables = Exact<{
-  first?: InputMaybe<Scalars['Int']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
   order?: StudentSortInput;
-  email: Scalars['String'];
+  email: Scalars['String']['input'];
 }>;
 
 
 export type StudentsByEmailQuery = { __typename?: 'Query', students?: { __typename?: 'StudentsConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Student', id: number, accountNumber: string, firstName: string, lastName: string, groupId: number, email?: string | null, dateLastLogin?: string | null, dateRegistered?: string | null, shares: Array<{ __typename?: 'Share', id: number, shareTypeId: number, balance: number, studentId: number, limitedWithdrawalCount: number, shareType: { __typename?: 'ShareType', id: number, name: string, dividendRate: number, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: string, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: number, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: number }> } }>, group: { __typename?: 'Group', id: number, instanceId: number, name: string, instance: { __typename?: 'Instance', id: number, description: string } } }> | null } | null };
 
 export type StudentsByNameQueryVariables = Exact<{
-  first?: InputMaybe<Scalars['Int']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
   order?: StudentSortInput;
-  name: Scalars['String'];
+  name: Scalars['String']['input'];
 }>;
 
 
 export type StudentsByNameQuery = { __typename?: 'Query', students?: { __typename?: 'StudentsConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Student', id: number, accountNumber: string, firstName: string, lastName: string, groupId: number, email?: string | null, dateLastLogin?: string | null, dateRegistered?: string | null, shares: Array<{ __typename?: 'Share', id: number, shareTypeId: number, balance: number, studentId: number, limitedWithdrawalCount: number, shareType: { __typename?: 'ShareType', id: number, name: string, dividendRate: number, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: string, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: number, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: number }> } }>, group: { __typename?: 'Group', id: number, instanceId: number, name: string, instance: { __typename?: 'Instance', id: number, description: string } } }> | null } | null };
 
 export type StudentsWithSharesQueryVariables = Exact<{
-  first?: InputMaybe<Scalars['Int']>;
-  after?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
   order?: StudentSortInput;
-  groupId?: InputMaybe<Scalars['Long']>;
+  groupId?: InputMaybe<Scalars['Long']['input']>;
 }>;
 
 
 export type StudentsWithSharesQuery = { __typename?: 'Query', students?: { __typename?: 'StudentsConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Student', id: number, accountNumber: string, firstName: string, lastName: string, groupId: number, email?: string | null, dateLastLogin?: string | null, dateRegistered?: string | null, shares: Array<{ __typename?: 'Share', id: number, shareTypeId: number, balance: number, studentId: number, limitedWithdrawalCount: number, shareType: { __typename?: 'ShareType', id: number, name: string, dividendRate: number, withdrawalLimitCount: number, withdrawalLimitPeriod: Period, withdrawalLimitLastReset: string, withdrawalLimitShouldFee: boolean, withdrawalLimitFee: number, shareTypeInstances: Array<{ __typename?: 'ShareTypeInstance', instanceId: number }> } }>, group: { __typename?: 'Group', id: number, instanceId: number, name: string, instance: { __typename?: 'Instance', id: number, description: string } } }> | null } | null };
 
 export type TransactionsQueryVariables = Exact<{
-  shareId: Scalars['Long'];
-  first?: InputMaybe<Scalars['Int']>;
-  after?: InputMaybe<Scalars['String']>;
+  shareId: Scalars['Long']['input'];
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
   order?: TransactionSortInput;
 }>;
 
