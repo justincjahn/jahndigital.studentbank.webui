@@ -1,5 +1,15 @@
 .pagination-buttons {
   text-align: center;
+  margin-top: 1em;
+}
+
+.pagination-buttons button {
+  background-color: transparent;
+  border: none;
+}
+
+.pagination-buttons button:enabled:hover {
+  text-decoration: underline;
 }
 
 .scroll-wrapper {

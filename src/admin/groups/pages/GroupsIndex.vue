@@ -18,11 +18,6 @@ const GroupSelector = defineAsyncComponent(
   () => import('@/admin/common/components/GroupSelector.vue')
 );
 
-const ShareTypeSelector = defineAsyncComponent(
-  () =>
-    import('@/admin/common/components/ShareTypeSelector/ShareTypeSelector.vue')
-);
-
 const StudentList = defineAsyncComponent(
   () => import('@/admin/groups/components/StudentList.vue')
 );
@@ -76,13 +71,6 @@ const selectedGroup = computed({
 
 const hasGroup = computed(() => selectedGroup.value !== null);
 
-const selectedShareType = computed({
-  get: () => globalStore.shareType.selected.value,
-  set(value) {
-    globalStore.shareType.selected.value = value;
-  },
-});
-
 function startBulkMove() {
   modalState.value = ModalState.BulkMove;
 }
@@ -92,7 +80,6 @@ async function handleBulkMoveOk(group: Group) {
 
   try {
     const students = await selection.resolve();
-    console.log(group);
     await globalStore.student.bulkMove(group, students);
     modalState.value = ModalState.None;
     selectedGroup.value = group;
@@ -159,13 +146,6 @@ function handleBulkImportCancel() {
     <div>
       <suspense>
         <group-selector v-model="selectedGroup" :store="globalStore" />
-
-        <template #fallback>
-          <button type="button" disabled><loading-label /></button>
-        </template>
-      </suspense>
-      <suspense>
-        <share-type-selector v-model="selectedShareType" :store="globalStore" />
 
         <template #fallback>
           <button type="button" disabled><loading-label /></button>
@@ -256,11 +236,18 @@ function handleBulkImportCancel() {
 <style>
 .student-list {
   /* Make pagination buttons always appear at the bottom. */
-
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   margin-bottom: 1em;
+}
+
+.sub-menu {
+  padding-left: 0.25em;
+}
+
+.sub-menu button {
+  margin: 0.1em;
 }
 </style>
