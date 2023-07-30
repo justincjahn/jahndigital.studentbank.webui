@@ -167,4 +167,8 @@ const {
 .student-list--loading {
   opacity: 0.4;
 }
+
+th .student-list__checkbox {
+  margin-left: 0.25em;
+}
 </style>
