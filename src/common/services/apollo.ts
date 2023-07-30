@@ -46,7 +46,10 @@ const defaultClient = new ApolloClient({
  * @param variables The variables, if any, to send to the server for the provided query.
  * @returns The server result, or a rejected promise.
  */
-export async function query<TReturn, TOptions = OperationVariables>(
+export async function query<
+  TReturn,
+  TOptions extends OperationVariables = OperationVariables
+>(
   qry: DocumentNode,
   variables?: TOptions,
   fetchPolicy?: FetchPolicy
@@ -67,9 +70,10 @@ export async function query<TReturn, TOptions = OperationVariables>(
  * @param options
  * @returns The server result, or a rejected promise.
  */
-export async function mutateCustom<TReturn, TVariables = OperationVariables>(
-  options: MutationOptions<TReturn, TVariables>
-): Promise<TReturn> {
+export async function mutateCustom<
+  TReturn,
+  TVariables extends OperationVariables = OperationVariables
+>(options: MutationOptions<TReturn, TVariables>): Promise<TReturn> {
   const res = await defaultClient.mutate<TReturn, TVariables>(options);
   if (res.data) return res.data;
   throw new Error(ERROR_CODES.UNKNOWN_ERROR);
@@ -82,10 +86,10 @@ export async function mutateCustom<TReturn, TVariables = OperationVariables>(
  * @param variables The variables, if any, to send to the server.
  * @returns An Apollo result object of the TReturn type.
  */
-export async function mutate<TReturn, TOptions = OperationVariables>(
-  mutation: DocumentNode,
-  variables?: TOptions
-): Promise<TReturn> {
+export async function mutate<
+  TReturn,
+  TOptions extends OperationVariables = OperationVariables
+>(mutation: DocumentNode, variables?: TOptions): Promise<TReturn> {
   return mutateCustom<TReturn, TOptions>({ mutation, variables });
 }
 
