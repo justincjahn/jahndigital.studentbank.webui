@@ -170,6 +170,7 @@ onUnmounted(() => {
 dialog {
   margin: 0 auto;
   width: clamp(30rem, 50vw, 40rem);
+  isolation: isolate;
 
   font-size: 1rem;
   color: hsl(var(--clr-primary-400));
@@ -178,10 +179,13 @@ dialog {
   border: none;
   border-bottom-left-radius: var(--border-radius);
   border-bottom-right-radius: var(--border-radius);
+
+  box-shadow: 0 0 2rem 0.25rem hsl(0 0% 0% / 0.3);
 }
 
 dialog::backdrop {
-  background-color: hsl(0 0% 0% / 0.5);
+  background-color: hsl(0 0% 0% / 0.25);
+  backdrop-filter: blur(1px);
 }
 
 @keyframes modal-fade-in {
@@ -242,7 +246,7 @@ dialog.large {
 
   position: sticky;
   top: 0;
-  z-index: 900;
+  z-index: 1;
 
   padding: 0.5em 1em;
 }
@@ -266,7 +270,6 @@ dialog.accent1 .modal__title {
 
   position: sticky;
   bottom: 0;
-  z-index: 900;
 
   display: flex;
   flex-direction: row;

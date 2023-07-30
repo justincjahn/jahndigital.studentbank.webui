@@ -400,7 +400,6 @@ provide(SELECT_API, api);
 }
 
 .select {
-  position: static;
   display: inline-block;
 }
 
@@ -431,7 +430,10 @@ provide(SELECT_API, api);
   width: 0;
   height: 0;
   border: 5px solid transparent;
-  border-color: hsl(var(--clr-primary-400) / 0.9) transparent transparent
+  border-color:
+    hsl(var(--clr-primary-400) / 0.9)
+    transparent
+    transparent
     transparent;
   transition: transform 0.1s ease-in-out, top 0.1s ease-in-out;
   transform-origin: center;
@@ -445,7 +447,7 @@ provide(SELECT_API, api);
 .select__items {
   position: absolute;
   display: none;
-  z-index: 1000;
+  z-index: 1;
   list-style: none;
   margin: 0;
   max-height: clamp(150px, 30vh, 350px);
