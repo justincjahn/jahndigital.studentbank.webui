@@ -10,7 +10,6 @@ import {
 
 // Utils
 import useUniqueId from '@/common/composables/useUniqueId';
-import useDebounce from '@/common/composables/useDebounce';
 import isElementInViewport from '@/common/utils/isElementInViewport';
 import { SELECT_API } from './symbols';
 
@@ -76,6 +75,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   (event: 'update:modelValue', value: unknown | null): void;
   (event: 'update:shouldToggle', value: boolean): void;
+  (event: 'toggle', value: boolean): void;
 }>();
 
 const attrs = useAttrs();
@@ -105,6 +105,9 @@ const open = ref(false);
 // The ID of the node that should be highlighted
 const highlighted = ref<number>(-1);
 
+// Tracks the last key pressed
+const lastKeyPressed = ref('');
+
 // The index of the currently highlighted option
 const highlightedIndex = computed(() =>
   registrations.value.findIndex((x) => x.id === highlighted.value)
@@ -131,9 +134,9 @@ const classes = computed(() => {
 /**
  * Toggle the selector open or closed, if enabled.
  */
-const toggle = useDebounce((e?: Event) => {
+const toggle = (e?: Event) => {
   // @NOTE: Blurring the button allows the 'Enter' keypress to trigger
-  if (e && !open.value) {
+  if (button.value !== null && e && !open.value) {
     (e.target as HTMLButtonElement).blur();
   }
 
@@ -141,13 +144,34 @@ const toggle = useDebounce((e?: Event) => {
 
   if (open.value && button.value !== null) {
     // Focus the button again unless Tab was pressed
-    if ((e as KeyboardEvent | undefined)?.code !== 'Tab' ?? true) {
+    if (lastKeyPressed.value !== 'Tab' ?? true) {
       button.value.focus();
     }
   }
 
   open.value = !open.value;
-}, 10);
+  emit('toggle', open.value);
+  lastKeyPressed.value = '';
+
+  if (open.value) {
+    e?.stopPropagation();
+    e?.preventDefault();
+    highlighted.value = -1;
+    document.addEventListener('keydown', onKeydown);
+    document.addEventListener('keyup', onKeyup);
+
+    // Prevent a click event from firing immediately after the toggle
+    setTimeout(() => {
+      document.addEventListener('click', toggle);
+    }, 150);
+
+    calculateIndices();
+  } else {
+    document.removeEventListener('keydown', onKeydown);
+    document.removeEventListener('keyup', onKeyup);
+    document.removeEventListener('click', toggle);
+  }
+};
 
 // The last ID number issued to an option
 let latestId = 0;
@@ -236,8 +260,8 @@ function onKeyup(e: KeyboardEvent) {
     case 'Enter':
     case 'Tab':
       if (highlighted.value === -1) break;
+      lastKeyPressed.value = e.code;
       registrations.value[highlightedIndex.value].el.click();
-      toggle(e);
       break;
     case 'Escape':
       e.preventDefault();
@@ -277,20 +301,6 @@ function calculateIndices() {
 
   registrations.value.sort((a, b) => a.index - b.index);
 }
-
-watchEffect(() => {
-  if (open.value === true) {
-    highlighted.value = -1;
-    document.addEventListener('keydown', onKeydown);
-    document.addEventListener('keyup', onKeyup);
-    document.addEventListener('click', toggle);
-    calculateIndices();
-  } else {
-    document.removeEventListener('keydown', onKeydown);
-    document.removeEventListener('keyup', onKeyup);
-    document.removeEventListener('click', toggle);
-  }
-});
 
 watchEffect(() => {
   if (props.shouldToggle === true) {
@@ -430,12 +440,21 @@ provide(SELECT_API, api);
   width: 0;
   height: 0;
   border: 5px solid transparent;
+
   border-color:
     hsl(var(--clr-primary-400) / 0.9)
     transparent
     transparent
     transparent;
-  transition: transform 0.1s ease-in-out, top 0.1s ease-in-out;
+
+  transition:
+    transform
+    0.1s
+    ease-in-out,
+    top
+    0.1s
+    ease-in-out;
+
   transform-origin: center;
 }
 
