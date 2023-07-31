@@ -29,6 +29,22 @@ header {
   grid-row: 2;
 }
 
+.sub-nav {
+  display: flex;
+  gap: clamp(1.5em,5vw,3em);
+  margin: 0.75em 0.75em 0.25em 0.75em;
+}
+
+.sub-nav a {
+  font-size: 1.25em;
+  color: hsl(var(--clr-neutral-800));
+  text-decoration: none;
+}
+
+.sub-nav a.router-link-active {
+  color: hsl(var(--clr-accent1-400));
+}
+
 @media screen and (min-width: 50em) {
   header {
     display: flex;

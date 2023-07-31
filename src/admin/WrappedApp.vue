@@ -15,6 +15,9 @@ import { setup as defineGlobalStore } from '@/admin/common/stores/global';
 // Common
 import { GLOBAL_STORE } from '@/admin/symbols';
 
+import GroupRouteNames from '@/admin/groups/routeNames';
+import StudentRouteNames from '@/admin/students/routeNames';
+
 import {
   SITE_NAME,
   SITE_DISABLE_NAME,
@@ -91,6 +94,13 @@ watchEffect(() => {
 
       <div class="main-nav__login"><login-widget /></div>
     </header>
+
+    <nav class="sub-nav">
+      <router-link :to="{ name: StudentRouteNames.index }">
+        Students
+      </router-link>
+      <router-link :to="{ name: GroupRouteNames.index }"> Groups </router-link>
+    </nav>
 
     <main v-if="isLoading"><loading-page /></main>
     <main v-else><router-view /></main>
