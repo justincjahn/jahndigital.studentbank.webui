@@ -202,6 +202,8 @@ watch(error, (newValue) => {
         @input="handleUpdate"
         @focus="($event.target as HTMLInputElement).select()"
       />
+
+      <slot name="after"></slot>
     </slot>
 
     <slot
