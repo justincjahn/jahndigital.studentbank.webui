@@ -32,7 +32,7 @@ header {
 .sub-nav {
   display: flex;
   gap: clamp(1.5em,5vw,3em);
-  margin: 0.75em 0.75em 0.25em 0.75em;
+  margin: 0.75em;
 }
 
 .sub-nav a {
@@ -61,7 +61,6 @@ main {
 }
 
 .sub-menu {
-  margin-top: 1rem;
   padding: 1rem 0;
   background-color: hsl(var(--clr-neutral-400));
   border-top: 1px solid hsl(var(--clr-neutral-500));
