@@ -9,8 +9,21 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: ':studentId?',
-        name: RouteNames.index,
         component: () => import('./pages/StudentsIndex.vue'),
+
+        children: [
+          {
+            path: 'transactions',
+            name: RouteNames.index,
+            component: () => import('./pages/StudentsTransactions.vue'),
+          },
+
+          {
+            path: 'security',
+            name: RouteNames.security,
+            component: () => import('./pages/StudentsSecurity.vue'),
+          },
+        ],
       },
     ],
   },
