@@ -12,14 +12,24 @@ withDefaults(
 </script>
 
 <template>
-  <teleport to="#modal">
-    <div :class="{ 'loading-overlay': overlay, 'loading-inline': !overlay }">
+  <template v-if="overlay">
+    <teleport to="#modal">
+      <div class="loading-overlay">
+        <div class="loading-overlay__container">
+          <dollar-icon class="loading-overlay__container__icon" />
+          <p>Loading...</p>
+        </div>
+      </div>
+    </teleport>
+  </template>
+  <template v-else>
+    <div class="loading-inline">
       <div class="loading-overlay__container">
         <dollar-icon class="loading-overlay__container__icon" />
         <p>Loading...</p>
       </div>
     </div>
-  </teleport>
+  </template>
 </template>
 
 <style>
@@ -33,7 +43,7 @@ withDefaults(
 
 .loading-overlay {
   position: absolute;
-  z-index: 800; /* Important: don't set larger than the lowest modal at 900. */
+  z-index: 500; /* Important: don't set larger than the lowest modal at 900. */
   left: 0;
   top: 0;
   width: 100%;
