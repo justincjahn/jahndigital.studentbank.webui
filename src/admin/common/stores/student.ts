@@ -171,6 +171,22 @@ export function setup() {
   }
 
   /**
+   * Mutate the store by selecting a student by their unique ID.
+   *
+   * @param id The student's unique ID.
+   */
+  async function selectById(id: number): Promise<Student | null> {
+    store.loading = true;
+
+    try {
+      selected.value = await getById(id);
+      return selected.value;
+    } finally {
+      store.loading = false;
+    }
+  }
+
+  /**
    * Fetch one or more students by account number.
    *
    * @param accountNumber The account number to search by.  Does not require leading zeros.
@@ -305,6 +321,7 @@ export function setup() {
     loading,
     students,
     selected,
+    selectById,
     refreshSelected,
     clear,
 
