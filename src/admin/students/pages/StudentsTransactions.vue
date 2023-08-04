@@ -64,11 +64,23 @@ watch(
   }
 );
 
-// When the selected student changes, clear the selected shares.
+// When the selected student changes, clear or update the selected share.
 watch(
   () => selectedStudent.value,
 
   (newValue, oldValue) => {
+    if (newValue !== null && selectedShare.value !== null) {
+      const selectedShareId = selectedShare.value.id;
+
+      const newShare = newValue.shares.find(
+        (share) => share.id === selectedShareId
+      );
+
+      if (newShare) {
+        selectedShare.value = newShare;
+      }
+    }
+
     if (newValue?.id === oldValue?.id) return;
     selectedShare.value = null;
   }

@@ -35,9 +35,9 @@ const emit = defineEmits<{
   (event: 'cancel'): void;
 }>();
 
+const loading = ref(false);
 const amount = ref<IMoney>(Money.fromNumber(0));
 const comment = ref('');
-const loading = ref(false);
 
 const newBalance = computed(() =>
   Money.fromNumber(props.share?.balance ?? 0).add(amount.value as Money)
@@ -54,10 +54,14 @@ const commentError = computed(() => {
 });
 
 const canSubmit = computed(() => {
-  if (commentError.value === '') return true;
-  return loading.value;
+  if (commentError.value.length > 0) return false;
+  if (loading.value) return false;
+  return true;
 });
 
+/**
+ * Fired when the user wants to submit the modal's form.
+ */
 async function handleSubmit() {
   if (props.share === null) return;
 
@@ -81,6 +85,9 @@ async function handleSubmit() {
   emit('submit');
 }
 
+/**
+ * When the form opens, reset it to default.
+ */
 watchEffect(() => {
   if (props.show === true) {
     amount.value = Money.fromNumber(0);
