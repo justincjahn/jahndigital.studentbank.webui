@@ -1,10 +1,18 @@
-import { computed, reactive } from 'vue';
-
+// Types
 import type { Transaction } from '@/common/services/transaction';
 
-import { getTransactions } from '@/common/services/transaction';
+// Core
+import { computed, reactive } from 'vue';
 
+// Services
+import { publish } from '@/common/services/eventBus';
+import { getTransactions, newTransaction } from '@/common/services/transaction';
+
+// Composables
 import usePagination from '@/common/composables/usePagination';
+
+// Events
+import { newTransaction as transactionEventSymbol } from '@/common/events';
 
 /**
  * Stores information about a share's transactions.
@@ -13,6 +21,7 @@ export function setup() {
   const store = reactive({
     loading: false,
     transactions: [] as Transaction[],
+    shareId: -1,
   });
 
   const loading = computed(() => store.loading);
@@ -36,6 +45,7 @@ export function setup() {
         ...options,
       };
 
+      store.shareId = options.shareId;
       store.loading = true;
 
       try {
@@ -114,6 +124,32 @@ export function setup() {
     clearPagination();
   }
 
+  /**
+   * Create a new transaction and refresh the store's data.
+   *
+   * Fires an event to notify listeners a new transaction has been posted.
+   */
+  async function create(input: Parameters<typeof newTransaction>[0]) {
+    const data = await newTransaction(input);
+
+    if (input.shareId === store.shareId) {
+      store.loading = true;
+
+      try {
+        await fetch({
+          shareId: store.shareId,
+          first: pageSize.value,
+          cache: false,
+        });
+      } finally {
+        store.loading = false;
+      }
+    }
+
+    publish(transactionEventSymbol, data.newTransaction);
+    return data.newTransaction;
+  }
+
   return {
     // State
     loading,
@@ -129,6 +165,9 @@ export function setup() {
     fetch,
     fetchNext,
     fetchPrevious,
+
+    // CRUD
+    create,
   };
 }
 
