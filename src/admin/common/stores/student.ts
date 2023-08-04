@@ -162,7 +162,7 @@ export function setup() {
    * @throws {Error} If an error ocurred during the fetch operation.
    */
   async function getById(id: number): Promise<Student | null> {
-    const data = await getStudentById({ id });
+    const data = await getStudentById({ id, cache: false });
 
     if (!data.students || !data.students.nodes) return null;
 
