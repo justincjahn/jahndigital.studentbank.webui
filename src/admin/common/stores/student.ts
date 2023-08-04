@@ -17,6 +17,10 @@ import {
 
 import usePagination from '@/common/composables/usePagination';
 
+// Events
+import { subscribe } from '@/common/services/eventBus';
+import { newTransaction as newTransactionSymbol } from '@/common/events';
+
 /**
  * Stores information about students and the currently selected student.
  */
@@ -316,6 +320,33 @@ export function setup() {
     }
   }
 
+  /**
+   * When a new transaction posts to a share owned by the selected student,
+   * proactively refresh the store.
+   */
+  const onNewTransaction = subscribe(
+    newTransactionSymbol,
+
+    async (transaction) => {
+      if (store.selected === null) return;
+
+      const targetShare = store.selected.shares.find(
+        (share) => share.id === transaction.targetShareId
+      );
+
+      if (!targetShare) return;
+
+      await refreshSelected();
+    }
+  );
+
+  /**
+   * Dispose of any events we're subscribed to
+   */
+  function dispose() {
+    onNewTransaction();
+  }
+
   return {
     // State
     loading,
@@ -324,6 +355,7 @@ export function setup() {
     selectById,
     refreshSelected,
     clear,
+    dispose,
 
     // Pagination
     totalCount,

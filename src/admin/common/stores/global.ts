@@ -13,7 +13,7 @@ export function setup() {
   const shareTypeStore = setupShareTypeStore(instanceStore);
 
   function dispose() {
-    // Ignore
+    studentStore.dispose();
   }
 
   return {
