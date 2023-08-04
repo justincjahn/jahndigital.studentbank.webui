@@ -22,6 +22,10 @@ const TransactionList = defineAsyncComponent(
   () => import('@/admin/students/components/TransactionList.vue')
 );
 
+const NewTransactionModal = defineAsyncComponent(
+  () => import('@/admin/students/components/NewTransactionModal.vue')
+);
+
 const globalStore = injectStrict(GLOBAL_STORE);
 const transactionStore = setupTransactionStore();
 
@@ -36,6 +40,7 @@ const selectedStudent = computed({
 });
 
 const selectedShare = ref<Share | null>(null);
+const modalState = ref(false);
 
 function handleRefresh() {
   if (selectedShare.value === null) return;
@@ -46,10 +51,25 @@ function handleRefresh() {
   });
 }
 
+function handleNewTransaction() {
+  modalState.value = !modalState.value;
+}
+
+// When the instance changes, clear the selected student
+watch(
+  () => globalStore.instance.selected.value,
+
+  () => {
+    selectedStudent.value = null;
+  }
+);
+
 // When the selected student changes, clear the selected shares.
 watch(
   () => selectedStudent.value,
-  () => {
+
+  (newValue, oldValue) => {
+    if (newValue?.id === oldValue?.id) return;
     selectedShare.value = null;
   }
 );
@@ -84,12 +104,30 @@ watchEffect(() => {
       >
         Refresh
       </button>
+
+      <button
+        type="button"
+        :disabled="selectedShare === null"
+        @click="handleNewTransaction"
+      >
+        New Transaction
+      </button>
     </div>
 
     <suspense>
       <transaction-list class="transaction-list" :store="transactionStore" />
     </suspense>
   </div>
+
+  <suspense>
+    <new-transaction-modal
+      :show="modalState"
+      :share="selectedShare"
+      :store="transactionStore"
+      @cancel="handleNewTransaction"
+      @submit="handleNewTransaction"
+    />
+  </suspense>
 </template>
 
 <style scoped>

@@ -98,8 +98,6 @@ watch(
   </section>
 
   <section v-else-if="selectedStudent !== null">
-    <h1>{{ selectedStudent.lastName }}, {{ selectedStudent.firstName }}</h1>
-
     <nav class="sub-nav">
       <router-link
         :to="{
@@ -120,6 +118,8 @@ watch(
       </router-link>
     </nav>
 
+    <h1>{{ selectedStudent.lastName }}, {{ selectedStudent.firstName }}</h1>
+
     <router-view />
   </section>
 </template>
@@ -133,11 +133,8 @@ watch(
   margin-top: 2rem;
 }
 
-section {
-  margin-inline: 1rem;
-}
-
 h1 {
+  margin-inline: 0.5em;
   margin-top: 1em;
 }
 </style>
