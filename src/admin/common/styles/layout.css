@@ -32,7 +32,7 @@ header {
 .sub-nav {
   display: flex;
   gap: clamp(1.5em,5vw,3em);
-  margin: 0.75em;
+  margin: 1rem;
 }
 
 .sub-nav a {
@@ -43,6 +43,10 @@ header {
 
 .sub-nav a.router-link-active {
   color: hsl(var(--clr-accent1-400));
+}
+
+.tool-strip > *:not(:first-child) {
+  margin: 0.1rem;
 }
 
 @media screen and (min-width: 50em) {
@@ -61,7 +65,7 @@ main {
 }
 
 .sub-menu {
-  padding: 1rem 0;
+  padding: 1rem 0.5rem;
   background-color: hsl(var(--clr-neutral-400));
   border-top: 1px solid hsl(var(--clr-neutral-500));
   border-bottom: 1px solid hsl(var(--clr-neutral-500));

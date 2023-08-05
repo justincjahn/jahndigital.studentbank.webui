@@ -167,7 +167,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <form class="form-info" @submit.prevent="handleInfoSubmit">
+  <form @submit.prevent="handleInfoSubmit">
     <h2>Account Info</h2>
 
     <v-input
@@ -206,11 +206,7 @@ watchEffect(() => {
     </button>
   </form>
 
-  <form
-    class="form-password"
-    autocomplete="off"
-    @submit.prevent="handlePasswordSubmit"
-  >
+  <form autocomplete="off" @submit.prevent="handlePasswordSubmit">
     <h2>Change Password</h2>
 
     <v-input
@@ -220,7 +216,6 @@ watchEffect(() => {
       label="Password"
       autocomplete="off"
       :validator="validatePassword()"
-      :immediate="true"
       required
     />
 
@@ -245,16 +240,16 @@ watchEffect(() => {
 </template>
 
 <style scoped>
-.form-info,
-.form-password {
+form {
   display: block;
-  width: 50cqi;
-  margin: 0 auto;
-  margin-block: 1rem;
-
-  padding: 1rem;
-  border: 1px solid hsl(var(--clr-neutral-600));
+  padding: 1.5rem;
+  background-color: hsl(var(--clr-neutral-300));
+  border: 1px solid hsl(var(--clr-neutral-400));
   border-radius: var(--border-radius);
+}
+
+form + form {
+  margin-top: 1rem;
 }
 
 h2 {
@@ -263,6 +258,7 @@ h2 {
 
 button[type='submit'] {
   width: 100%;
-  margin-top: 1rem;
+  margin-top: 2rem;
+  height: 3em;
 }
 </style>

@@ -99,7 +99,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div v-if="selectedStudent !== null" class="wrapper">
+  <div v-if="selectedStudent !== null" class="main-content">
     <div class="tool-strip">
       <suspense>
         <share-selector
@@ -126,9 +126,11 @@ watchEffect(() => {
       </button>
     </div>
 
-    <suspense>
-      <transaction-list class="transaction-list" :store="transactionStore" />
-    </suspense>
+    <template v-if="selectedShare !== null">
+      <suspense>
+        <transaction-list class="transaction-list" :store="transactionStore" />
+      </suspense>
+    </template>
   </div>
 
   <suspense>
@@ -143,11 +145,16 @@ watchEffect(() => {
 </template>
 
 <style scoped>
-.wrapper {
-  margin-inline: 1rem;
+.tool-strip {
+  margin-bottom: 1em;
 }
 
-.tool-strip {
-  margin-block: 1rem;
+.transaction-list {
+  /* Make pagination buttons always appear at the bottom. */
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 1em;
 }
 </style>

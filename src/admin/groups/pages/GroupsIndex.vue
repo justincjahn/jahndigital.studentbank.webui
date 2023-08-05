@@ -153,7 +153,7 @@ function handleBulkImportCancel() {
       </suspense>
     </div>
 
-    <div class="sub-menu__bulk-buttons">
+    <div class="tool-strip">
       <button
         type="button"
         :disabled="!hasSelection"
@@ -241,13 +241,5 @@ function handleBulkImportCancel() {
   flex-direction: column;
   justify-content: space-between;
   margin-bottom: 1em;
-}
-
-.sub-menu {
-  padding-left: 0.25em;
-}
-
-.sub-menu button {
-  margin: 0.1em;
 }
 </style>

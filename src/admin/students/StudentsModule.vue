@@ -87,11 +87,11 @@ watch(
 </script>
 
 <template>
-  <div class="sub-menu">
+  <section class="sub-menu">
     <suspense>
       <student-selector v-model="selectedStudent" :store="globalStore" />
     </suspense>
-  </div>
+  </section>
 
   <loading-page v-if="isLoading" class="loading-page" />
 
@@ -101,7 +101,7 @@ watch(
     </p>
   </section>
 
-  <section v-else-if="selectedStudent !== null">
+  <template v-else-if="selectedStudent !== null">
     <nav class="sub-nav">
       <router-link
         :to="{
@@ -122,23 +122,19 @@ watch(
       </router-link>
     </nav>
 
-    <h1>{{ selectedStudent.lastName }}, {{ selectedStudent.firstName }}</h1>
-
-    <router-view />
-  </section>
+    <section class="main-content">
+      <h1>{{ selectedStudent.lastName }}, {{ selectedStudent.firstName }}</h1>
+      <router-view />
+    </section>
+  </template>
 </template>
 
 <style scoped>
-.sub-menu {
-  padding-left: 1em;
+section {
+  padding-inline: 1rem;
 }
 
 .loading-page {
   margin-top: 2rem;
-}
-
-h1 {
-  margin-inline: 0.5em;
-  margin-top: 1em;
 }
 </style>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 // Types
 import type { Student } from '@/common/services/student';
@@ -72,6 +72,12 @@ const shouldToggle = ref(false);
 const isOpen = ref(false);
 const isLoading = ref(false);
 
+const noCriteria = computed(() => searchCriteria.value.trim().length === 0);
+
+const noResults = computed(
+  () => !noCriteria.value && searchResults.value.length === 0
+);
+
 function filterOptions(students: Student[]) {
   const instanceId = props.store.instance.selected.value?.id ?? -1;
 
@@ -83,9 +89,10 @@ function filterOptions(students: Student[]) {
 const startSearch = useDebounce(async () => {
   const criteria = searchCriteria.value.trim();
 
-  if (criteria === props.modelValue?.accountNumber ?? false) {
-    return;
-  }
+  const currentAccountNumber = (props.modelValue?.accountNumber ?? '').padStart(
+    10,
+    '0'
+  );
 
   searchResults.value = [];
 
@@ -95,7 +102,7 @@ const startSearch = useDebounce(async () => {
 
   isLoading.value = true;
 
-  if (!isOpen.value) {
+  if (!isOpen.value && currentAccountNumber !== criteria.padStart(10, '0')) {
     shouldToggle.value = true;
   }
 
@@ -210,7 +217,12 @@ watch(
         :style="{ width }"
         :placeholder="prompt"
         class="student-selector__input"
-        @focus="activate"
+        @focus="
+          () => {
+            startSearch();
+            activate();
+          }
+        "
         @keydown="onKeydown"
       >
         <template #after>
@@ -225,17 +237,12 @@ watch(
       </v-input>
     </template>
 
-    <v-option v-if="searchCriteria.trim().length === 0" disabled>
+    <v-option v-if="noCriteria" disabled>
       Please enter your search criteria.
     </v-option>
 
-    <v-option v-if="searchCriteria.trim().length > 0" disabled>
-      <template v-if="isLoading">Loading...</template>
-
-      <template v-else-if="searchResults.length === 0">
-        No results found...
-      </template>
-    </v-option>
+    <v-option v-if="isLoading" disabled>Loading...</v-option>
+    <v-option v-if="noResults" disabled>No results found...</v-option>
 
     <v-option
       v-for="student of searchResults"
@@ -265,6 +272,7 @@ watch(
   top: calc(50% - 1ch);
   right: 1ch;
   font-size: 0.8em;
+  font-weight: lighter;
   cursor: pointer;
   color: hsl(var(--clr-neutral-900) / 0.5);
 }
