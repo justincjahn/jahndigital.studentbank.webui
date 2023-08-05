@@ -419,7 +419,7 @@ provide(SELECT_API, api);
   margin: 0;
   width: var(--width);
   text-align: left;
-  vertical-align: middle;
+  vertical-align: baseline;
   padding-right: 2em;
 
   user-select: none;
