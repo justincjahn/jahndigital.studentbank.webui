@@ -3,27 +3,21 @@ import RouteNames from './routeNames';
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/students',
+    path: '/students/:studentId?',
+    name: RouteNames.index,
     component: () => import('./StudentsModule.vue'),
 
     children: [
       {
-        path: ':studentId?',
-        component: () => import('./pages/StudentsIndex.vue'),
+        path: 'transactions',
+        name: RouteNames.transactions,
+        component: () => import('./pages/StudentsTransactions.vue'),
+      },
 
-        children: [
-          {
-            path: 'transactions',
-            name: RouteNames.index,
-            component: () => import('./pages/StudentsTransactions.vue'),
-          },
-
-          {
-            path: 'security',
-            name: RouteNames.security,
-            component: () => import('./pages/StudentsSecurity.vue'),
-          },
-        ],
+      {
+        path: 'profile',
+        name: RouteNames.profile,
+        component: () => import('./pages/StudentsProfile.vue'),
       },
     ],
   },

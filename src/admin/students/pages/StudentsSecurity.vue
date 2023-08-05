@@ -1,1 +1,0 @@
-<template>Student Security</template>

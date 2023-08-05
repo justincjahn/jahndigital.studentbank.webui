@@ -1,5 +1,5 @@
 export default {
-  index: 'student',
-  transactions: 'student',
-  security: 'student-security',
+  index: 'students',
+  transactions: 'students-transactions',
+  profile: 'students-profile',
 };
