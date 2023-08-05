@@ -5,12 +5,14 @@ import { setup as setupInstanceStore } from '@/admin/common/stores/instance';
 import { setup as setupGroupStore } from '@/admin/common/stores/group';
 import { setup as setupStudentStore } from '@/admin/common/stores/student';
 import { setup as setupShareTypeStore } from '@/admin/common/stores/shareType';
+import { setup as setupStockStore } from '@/admin/common/stores/stock';
 
 export function setup() {
   const instanceStore = setupInstanceStore();
   const groupStore = setupGroupStore(instanceStore);
   const studentStore = setupStudentStore();
   const shareTypeStore = setupShareTypeStore(instanceStore);
+  const stockStore = setupStockStore(instanceStore);
 
   function dispose() {
     studentStore.dispose();
@@ -24,6 +26,7 @@ export function setup() {
     group: groupStore,
     student: studentStore,
     shareType: shareTypeStore,
+    stock: stockStore,
     dispose,
   };
 }
