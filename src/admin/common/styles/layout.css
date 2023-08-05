@@ -45,8 +45,12 @@ header {
   color: hsl(var(--clr-accent1-400));
 }
 
-.tool-strip > *:not(:first-child) {
+.tool-strip > * {
   margin: 0.1rem;
+}
+
+.tool-strip :first-child {
+  margin-left: 0;
 }
 
 @media screen and (min-width: 50em) {
