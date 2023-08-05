@@ -93,6 +93,7 @@ watchEffect(() => {
   } else {
     transactionStore.fetch({
       shareId: selectedShare.value.id,
+      cache: false,
     });
   }
 });
