@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Core
-import { defineAsyncComponent, computed, watch } from 'vue';
+import { defineAsyncComponent, computed, watch, onUnmounted } from 'vue';
 
 // Utils
 import injectStrict from '@/common/utils/injectStrict';
@@ -53,6 +53,8 @@ watch(
     const routeName =
       router.currentRoute.value.name?.toString() ?? RouteNames.index;
 
+    // If a student is selected but we're still in the index, route to transaction
+    /// otherwise, just update the studentId in the URL
     router.replace({
       name:
         routeName === RouteNames.index ? RouteNames.transactions : routeName,
@@ -84,6 +86,19 @@ watch(
     immediate: true,
   }
 );
+
+// If the user navigates to the index while still on the page, clear the student
+const routerAfter = router.afterEach(() => {
+  if (router.currentRoute.value.name === RouteNames.index) {
+    selectedStudent.value = null;
+  }
+});
+
+// When the user leaves the module, clear the student
+onUnmounted(() => {
+  selectedStudent.value = null;
+  routerAfter();
+});
 </script>
 
 <template>
@@ -101,7 +116,7 @@ watch(
     </p>
   </section>
 
-  <template v-else-if="selectedStudent !== null">
+  <template v-else>
     <nav class="sub-nav">
       <router-link
         :to="{
