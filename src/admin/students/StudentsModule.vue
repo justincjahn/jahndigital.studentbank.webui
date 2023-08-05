@@ -102,17 +102,18 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section class="sub-menu">
+  <div class="sub-menu">
     <suspense>
       <student-selector v-model="selectedStudent" :store="globalStore" />
     </suspense>
-  </section>
+  </div>
 
   <loading-page v-if="isLoading" class="loading-page" />
 
   <section v-else-if="selectedStudent === null">
     <p class="help-text">
-      Please search for a student using the box above to begin...
+      No student is selected. Please search for a student using the control
+      above to begin...
     </p>
   </section>
 
@@ -145,7 +146,11 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-section {
+.help-text {
+  padding-inline: 0.5rem;
+}
+
+.main-content {
   padding-inline: 1rem;
 }
 
