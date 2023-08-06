@@ -45,7 +45,7 @@ export type Stock = StockNodes[number];
  * @returns
  * @throws {Error} If an error occurred during the network call.
  */
-export function getStocks(options: FetchOptions): Promise<StocksQuery> {
+export function getStocks(options?: FetchOptions): Promise<StocksQuery> {
   const opts = {
     cache: true,
     ...options,
