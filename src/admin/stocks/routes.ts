@@ -4,9 +4,15 @@ import RouteNames from './routeNames';
 const routes: RouteRecordRaw[] = [
   {
     path: '/stocks',
-    name: RouteNames.index,
     component: () => import('./StocksModule.vue'),
-    children: [],
+
+    children: [
+      {
+        path: '',
+        name: RouteNames.index,
+        component: () => import('./pages/StocksIndex.vue'),
+      },
+    ],
   },
 ];
 
