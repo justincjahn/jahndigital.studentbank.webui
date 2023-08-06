@@ -16,6 +16,7 @@ table tr:last-child th {
 
 table tr th {
   padding-top: 0.5em;
+  padding-left: 0.25em;
 }
 
 table tr td {

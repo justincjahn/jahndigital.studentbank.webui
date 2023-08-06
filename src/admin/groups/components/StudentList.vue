@@ -126,7 +126,6 @@ const {
             >
               <td>
                 <v-checkbox
-                  class="student-list__checkbox"
                   :name="`student-${student.id}`"
                   :model-value="selection.hasStudent(student)"
                 />
@@ -166,9 +165,5 @@ const {
 
 .student-list--loading {
   opacity: 0.4;
-}
-
-th .student-list__checkbox {
-  margin-left: 0.25em;
 }
 </style>
