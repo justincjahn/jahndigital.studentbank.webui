@@ -21,8 +21,18 @@ import gqlLinkStock from '@/common/graphql/mutations/stockLink.gql';
 import gqlUnlinkStock from '@/common/graphql/mutations/stockUnlink.gql';
 import gqlDeleteStock from '@/common/graphql/mutations/stockDelete.gql';
 
-export interface FetchOptions extends StocksQueryVariables {
+type QueryBaseOptions = Omit<StocksQueryVariables, 'instances'>;
+
+export interface FetchOptionsBase extends QueryBaseOptions {
   cache?: boolean;
+}
+
+export interface GetByInstanceFetchOptions extends StocksQueryVariables {
+  cache?: boolean;
+}
+
+export interface GetBySymbolOptions extends FetchOptionsBase {
+  symbol: string;
 }
 
 export type StockResponse = Extract<
@@ -45,7 +55,9 @@ export type Stock = StockNodes[number];
  * @returns
  * @throws {Error} If an error occurred during the network call.
  */
-export function getStocks(options?: FetchOptions): Promise<StocksQuery> {
+export function getStocks(
+  options?: GetByInstanceFetchOptions
+): Promise<StocksQuery> {
   const opts = {
     cache: true,
     ...options,
@@ -56,6 +68,40 @@ export function getStocks(options?: FetchOptions): Promise<StocksQuery> {
     opts,
     opts.cache ? 'cache-first' : 'network-only'
   );
+}
+
+/**
+ * Get a stock by it's symbol.
+ *
+ * @param options
+ * @returns
+ * @throws {Error} If an error occurred during the network call.
+ */
+export async function getStockBySymbol(
+  options: GetBySymbolOptions
+): Promise<Stock | null> {
+  const opts = {
+    cache: true,
+    ...options,
+  };
+
+  opts.where = {
+    symbol: {
+      eq: options.symbol,
+    },
+  };
+
+  const data = await query<StocksQuery>(
+    gqlStocks,
+    opts,
+    opts.cache ? 'cache-first' : 'network-only'
+  );
+
+  if (!data.stocks?.nodes) {
+    throw new Error('An unknown error ocurred during fetch.');
+  }
+
+  return data.stocks?.nodes[0] ?? null;
 }
 
 /**

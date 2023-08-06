@@ -210,6 +210,7 @@ export function setup(instanceStore?: InstanceStore) {
       store.stocks = newStocks;
     } else if (store.instances.includes(input.instanceId)) {
       const newStocks = [...store.stocks, ...data.linkStock];
+      sort(newStocks);
       store.stocks = newStocks;
     }
 
@@ -227,7 +228,13 @@ export function setup(instanceStore?: InstanceStore) {
     const data = await unlinkStock(input);
     const isListed = store.stocks.findIndex((x) => x.id === input.stockId);
 
-    if (isListed >= 0) {
+    if (store.instances.includes(input.instanceId)) {
+      const newStocks = [
+        ...store.stocks.filter((x) => x.id !== data.unlinkStock[0].id),
+      ];
+
+      store.stocks = newStocks;
+    } else if (isListed >= 0) {
       const newStocks = [...store.stocks];
       [newStocks[isListed]] = data.unlinkStock;
       store.stocks = newStocks;
