@@ -75,6 +75,9 @@ async function handleChangePassword() {
       currentPassword: data.data.currentPassword,
       password: data.data.password,
     });
+
+    await globalStore.user.logout();
+    window.location.reload();
   } catch (e) {
     if (e instanceof Error) {
       globalStore.error.setCurrentError(e.message);
