@@ -12,17 +12,26 @@ import type {
   DeleteStockMutation,
   PurgeStockHistoryMutation,
   PurgeStockHistoryMutationVariables,
+  StockHistoryQuery,
+  StockHistoryQueryVariables,
+  StudentStocksQuery,
+  StudentStocksQueryVariables,
+  StudentStockHistoryQuery,
+  StudentStockHistoryQueryVariables,
 } from '@/generated/graphql';
 
 import { query, mutate, mutateCustom } from '@/common/services/apollo';
 
 import gqlStocks from '@/common/graphql/queries/stocks.gql';
+import gqlStockHistory from '@/common/graphql/queries/stockHistory.gql';
 import gqlNewStock from '@/common/graphql/mutations/stockCreate.gql';
 import gqlUpdateStock from '@/common/graphql/mutations/stockUpdate.gql';
 import gqlLinkStock from '@/common/graphql/mutations/stockLink.gql';
 import gqlUnlinkStock from '@/common/graphql/mutations/stockUnlink.gql';
 import gqlDeleteStock from '@/common/graphql/mutations/stockDelete.gql';
 import gqlPurgeHistory from '@/common/graphql/mutations/stockHistoryPurge.gql';
+import gqlStudentStocks from '@/common/graphql/queries/studentStocks.gql';
+import gqlStudentStockHistory from '@/common/graphql/queries/studentStockHistory.gql';
 
 type QueryBaseOptions = Omit<StocksQueryVariables, 'instances'>;
 
@@ -38,6 +47,19 @@ export interface GetBySymbolOptions extends FetchOptionsBase {
   symbol: string;
 }
 
+export interface GetHistoryOptions extends StockHistoryQueryVariables {
+  cache?: boolean;
+}
+
+export interface GetStudentStocksOptions extends StudentStocksQueryVariables {
+  cache?: boolean;
+}
+
+export interface GetStudentStockHistoryOptions
+  extends StudentStockHistoryQueryVariables {
+  cache?: boolean;
+}
+
 export type StockResponse = Extract<
   StocksQuery['stocks'],
   { __typename?: 'StocksConnection' }
@@ -49,6 +71,42 @@ export type StockNodes = Extract<
 >;
 
 export type Stock = StockNodes[number];
+
+export type StockHistoryResponse = Extract<
+  StockHistoryQuery['stockHistory'],
+  { __typename?: 'StockHistoryConnection' }
+>;
+
+export type StockHistoryNodes = Extract<
+  StockHistoryResponse['nodes'],
+  Array<{ __typename?: 'StockHistory' }>
+>;
+
+export type StockHistory = StockHistoryNodes[number];
+
+export type StudentStockResponse = Extract<
+  StudentStocksQuery['studentStocks'],
+  { __typename?: 'StudentStocksConnection' }
+>;
+
+export type StudentStockNodes = Extract<
+  StudentStockResponse['nodes'],
+  Array<{ __typename?: 'StudentStock' }>
+>;
+
+export type StudentStock = StudentStockNodes[number];
+
+export type StudentStockHistoryResponse = Extract<
+  StudentStockHistoryQuery['studentStockHistory'],
+  { __typename?: 'StudentStockHistoryConnection' }
+>;
+
+export type StudentStockHistoryNodes = Extract<
+  StudentStockHistoryResponse['nodes'],
+  Array<{ __typename?: 'StudentStockHistory' }>
+>;
+
+export type StudentStockHistory = StudentStockHistoryNodes[number];
 
 /**
  * Get a list of stocks available or associated with one or more instances,
@@ -105,6 +163,72 @@ export async function getStockBySymbol(
   }
 
   return data.stocks?.nodes[0] ?? null;
+}
+
+/**
+ * Get a stock's history.
+ *
+ * @param options
+ * @returns
+ * @throws {Error} If an error occurred during the network call.
+ */
+export async function getStockHistory(
+  options: GetHistoryOptions
+): Promise<StockHistoryQuery> {
+  const opts = {
+    cache: true,
+    ...options,
+  };
+
+  return query<StockHistoryQuery>(
+    gqlStockHistory,
+    opts,
+    opts.cache ? 'cache-first' : 'network-only'
+  );
+}
+
+/**
+ * Get all stocks owned by the specified student.
+ *
+ * @param options
+ * @returns
+ * @throws {Error} If an error occurred during the network call.
+ */
+export async function getStudentStocks(
+  options: GetStudentStocksOptions
+): Promise<StudentStocksQuery> {
+  const opts = {
+    cache: true,
+    ...options,
+  };
+
+  return query<StudentStocksQuery>(
+    gqlStudentStocks,
+    opts,
+    opts.cache ? 'cache-first' : 'network-only'
+  );
+}
+
+/**
+ * Get the specified stock's history.
+ *
+ * @param options
+ * @returns
+ * @throws {Error} If an error occurred during the network call.
+ */
+export async function getStudentStockHistory(
+  options: GetStudentStockHistoryOptions
+): Promise<StudentStockHistoryQuery> {
+  const opts = {
+    cache: true,
+    ...options,
+  };
+
+  return query<StudentStockHistoryQuery>(
+    gqlStudentStockHistory,
+    opts,
+    opts.cache ? 'cache-first' : 'network-only'
+  );
 }
 
 /**
