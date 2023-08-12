@@ -17,6 +17,10 @@ const StockList = defineAsyncComponent(
   () => import('@/admin/stocks/components/StockList.vue')
 );
 
+const StockHistoryList = defineAsyncComponent(
+  () => import('@/admin/stocks/components/StockHistoryList.vue')
+);
+
 const ManageStocksModal = defineAsyncComponent(
   () => import('@/admin/stocks/components/ManageStocksModal.vue')
 );
@@ -106,7 +110,7 @@ globalStore.stock.fetch({
 
   <section class="main-content">
     <div class="main-panel">
-      <h1>Linked Stocks</h1>
+      <h2>Linked</h2>
 
       <suspense>
         <stock-list
@@ -118,7 +122,7 @@ globalStore.stock.fetch({
     </div>
 
     <div class="sidebar">
-      <h1>Update Stock</h1>
+      <h2>Update</h2>
 
       <form class="edit-form" @submit.prevent="handleEdit">
         <stock-add-edit-form
@@ -138,6 +142,14 @@ globalStore.stock.fetch({
           </loading-label>
         </button>
       </form>
+
+      <div class="stock-history">
+        <h2>History</h2>
+
+        <suspense>
+          <stock-history-list :store="globalStore" />
+        </suspense>
+      </div>
     </div>
   </section>
 
@@ -160,10 +172,6 @@ globalStore.stock.fetch({
 </template>
 
 <style scoped>
-.loading {
-  opacity: 0.4;
-}
-
 .main-content {
   display: flex;
 }
@@ -179,6 +187,11 @@ globalStore.stock.fetch({
 }
 
 .edit-form {
+  margin-bottom: 1rem;
+}
+
+.edit-form,
+.stock-history {
   display: block;
   padding: 1rem;
   border: 1px solid hsl(var(--clr-neutral-500));

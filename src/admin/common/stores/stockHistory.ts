@@ -140,6 +140,7 @@ export function setup(stockStore?: StockStore) {
     } else {
       fetch({
         stockId: stockStore.selected.value.id,
+        cache: false,
       });
     }
   });
