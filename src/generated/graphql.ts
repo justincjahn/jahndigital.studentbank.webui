@@ -2777,6 +2777,15 @@ export type NewTransferMutationVariables = Exact<{
 
 export type NewTransferMutation = { __typename?: 'Mutation', newTransfer: { __typename?: 'TupleOfTransactionAndTransaction', item1: { __typename?: 'Transaction', id: number, targetShareId: number, transactionType: string, effectiveDate: string, comment?: string | null, amount: number, newBalance: number }, item2: { __typename?: 'Transaction', id: number, targetShareId: number, transactionType: string, effectiveDate: string, comment?: string | null, amount: number, newBalance: number } } };
 
+export type NewUserMutationVariables = Exact<{
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  roleId: Scalars['Long']['input'];
+}>;
+
+
+export type NewUserMutation = { __typename?: 'Mutation', newUser: Array<{ __typename?: 'User', id: number, email: string, roleId: number, dateCreated: string, dateRegistered?: string | null, dateLastLogin?: string | null, role: { __typename?: 'Role', id: number, name: string, description?: string | null, isBuiltIn: boolean, rolePrivileges: Array<{ __typename?: 'RolePrivilege', privilegeId: number, roleId: number, privilege: { __typename?: 'Privilege', id: number, name: string, description: string, dateCreated: string } }> } }> };
+
 export type UserLoginMutationVariables = Exact<{
   username: Scalars['String']['input'];
   password: Scalars['String']['input'];
@@ -2943,6 +2952,16 @@ export type TransactionsQueryVariables = Exact<{
 
 
 export type TransactionsQuery = { __typename?: 'Query', transactions?: { __typename?: 'TransactionsConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Transaction', id: number, targetShareId: number, transactionType: string, effectiveDate: string, comment?: string | null, amount: number, newBalance: number }> | null } | null };
+
+export type UsersQueryVariables = Exact<{
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  where?: InputMaybe<UserFilterInput>;
+  order?: UserSortInput;
+}>;
+
+
+export type UsersQuery = { __typename?: 'Query', users?: { __typename?: 'UsersConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null }, nodes?: Array<{ __typename?: 'User', id: number, email: string, roleId: number, dateCreated: string, dateRegistered?: string | null, dateLastLogin?: string | null, role: { __typename?: 'Role', id: number, name: string, description?: string | null, isBuiltIn: boolean, rolePrivileges: Array<{ __typename?: 'RolePrivilege', privilegeId: number, roleId: number, privilege: { __typename?: 'Privilege', id: number, name: string, description: string, dateCreated: string } }> } }> | null } | null };
 
 
       export interface PossibleTypesResultData {

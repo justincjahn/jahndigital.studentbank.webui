@@ -1,0 +1,15 @@
+#import "../fragments/user.gql"
+
+mutation newUser(
+  $email: String!,
+  $password: String!,
+  $roleId: Long!,
+) {
+  newUser(input: {
+    email: $email,
+    password: $password,
+    roleId: $roleId,
+  }) {
+    ...UserParts
+  }
+}

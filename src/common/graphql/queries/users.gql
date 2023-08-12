@@ -1,0 +1,24 @@
+#import "../fragments/pageInfo.gql"
+#import "../fragments/user.gql"
+
+query users (
+  $first: Int = 25,
+  $after: String,
+  $where: UserFilterInput,
+  $order: UserSortInput! = { email: ASC },
+) {
+  users(
+    first: $first,
+    after: $after,
+    where: $where,
+    order: [$order]
+  ) {
+    pageInfo {
+      ...PageInfoParts
+    }
+    totalCount
+    nodes {
+      ...UserParts
+    }
+  }
+}
