@@ -128,6 +128,33 @@ export function setup() {
   }
 
   /**
+   * Refresh user information from the API.
+   */
+  async function refreshInfo() {
+    store.loading = true;
+
+    try {
+      let info: StudentInfo | UserInfo | undefined;
+
+      if (tokenStore.isStudent.value) {
+        const { studentInfo } = await import('@/common/services/auth');
+        info = await studentInfo();
+      } else {
+        const { userInfo } = await import('@/common/services/auth');
+        info = await userInfo();
+      }
+
+      store.info = info;
+      store.email = info?.email ?? '';
+      store.id = info.id;
+      store.username =
+        (info as StudentInfo).accountNumber ?? (info as UserInfo).email;
+    } finally {
+      store.loading = false;
+    }
+  }
+
+  /**
    * Log a user or student in or throw an error if the login failed.
    *
    * @param username
@@ -225,6 +252,7 @@ export function setup() {
     isPreauthorized,
     isStudent,
     expiration,
+    refreshInfo,
     login,
     logout,
   };
