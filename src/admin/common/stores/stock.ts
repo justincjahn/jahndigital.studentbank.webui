@@ -15,7 +15,6 @@ import {
   linkStock,
   unlinkStock,
   deleteStock,
-  purgeStockHistory,
 } from '@/common/services/stock';
 
 /**
@@ -269,22 +268,6 @@ export function setup(instanceStore?: InstanceStore) {
     }
   }
 
-  /**
-   * Purge the history of a Stock up to a given date.
-   *
-   * @param stock The stock whose history to purge.
-   * @param date The date in yyyy-mm-dd format to use as a cutoff.
-   */
-  async function purgeHistory(stock: Stock, date: string) {
-    const data = await purgeStockHistory(stock, date);
-
-    if (!data.purgeStockHistory) {
-      throw new Error('Unable to purge stock history: Unknown reason.');
-    }
-
-    return data;
-  }
-
   watch(
     () => instanceStore?.selected.value,
     (newValue, oldValue) => {
@@ -318,7 +301,6 @@ export function setup(instanceStore?: InstanceStore) {
     link,
     unlink,
     remove,
-    purgeHistory,
   };
 }
 

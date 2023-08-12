@@ -89,7 +89,9 @@ async function handleSubmit() {
       const res = await Promise.all(
         stocksToPurge
           .splice(0, API_MAX_CONCURRENCY)
-          .map((stock) => props.store.stock.purgeHistory(stock, date.value))
+          .map((stock) =>
+            props.store.stockHistory.purgeHistory(stock, date.value)
+          )
       );
 
       res.forEach((stock) => {

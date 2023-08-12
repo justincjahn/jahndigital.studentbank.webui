@@ -1,11 +1,11 @@
 import type { StockStore } from '@/admin/common/stores/stock';
-import type { StockHistory } from '@/common/services/stock';
+import type { Stock, StockHistory } from '@/common/services/stock';
 
 import { reactive, computed, watchEffect } from 'vue';
 
 import usePagination from '@/common/composables/usePagination';
 
-import { getStockHistory } from '@/common/services/stock';
+import { getStockHistory, purgeStockHistory } from '@/common/services/stock';
 
 export function setup(stockStore?: StockStore) {
   const store = reactive({
@@ -105,6 +105,29 @@ export function setup(stockStore?: StockStore) {
     },
   });
 
+  /**
+   * Purge the history of a Stock up to a given date.
+   *
+   * @param stock The stock whose history to purge.
+   * @param date The date in yyyy-mm-dd format to use as a cutoff.
+   */
+  async function purgeHistory(stock: Stock, date: string) {
+    const data = await purgeStockHistory(stock, date);
+
+    if (!data.purgeStockHistory) {
+      throw new Error('Unable to purge stock history: Unknown reason.');
+    }
+
+    if (stock.id === store.stockId) {
+      fetch({
+        stockId: store.stockId,
+        cache: false,
+      });
+    }
+
+    return data;
+  }
+
   watchEffect(() => {
     if (!stockStore) return;
 
@@ -131,6 +154,9 @@ export function setup(stockStore?: StockStore) {
     fetch,
     fetchNext,
     fetchPrevious,
+
+    // CRUD
+    purgeHistory,
   };
 }
 
