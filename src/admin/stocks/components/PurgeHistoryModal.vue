@@ -2,7 +2,7 @@
 import type { GlobalStore } from '@/admin/common/stores/global';
 import type { Stock } from '@/common/services/stock';
 
-import { defineAsyncComponent, computed, ref } from 'vue';
+import { defineAsyncComponent, computed, ref, watchEffect } from 'vue';
 
 import { API_MAX_CONCURRENCY } from '@/common/constants';
 
@@ -38,7 +38,7 @@ const selected = ref<Stock[]>([]);
 
 const step = ref<STEP>(STEP.SELECT_STOCKS);
 
-const date = ref(new Date().toISOString().slice(0, 10));
+const date = ref('');
 
 const hasNextStep = computed(() => step.value < Object.values(STEP).length / 2);
 
@@ -120,6 +120,14 @@ function handleCancel() {
 
   emit('cancel');
 }
+
+watchEffect(() => {
+  if (props.show) {
+    selected.value = [];
+    step.value = STEP.SELECT_STOCKS;
+    date.value = new Date().toISOString().slice(0, 10);
+  }
+});
 </script>
 
 <template>
@@ -168,7 +176,8 @@ function handleCancel() {
     <template v-if="step === STEP.CONFIRM">
       <h2>Are you sure?</h2>
       <p>
-        You are purging history for {{ selected.length }} stock(s) up to
+        You are purging history for
+        <strong>{{ selected.length }}</strong> stock(s) up to
         {{ new Date(date).toLocaleDateString() }}. This action cannot be undone.
       </p>
     </template>
