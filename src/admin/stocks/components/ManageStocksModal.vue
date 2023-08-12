@@ -265,8 +265,4 @@ watchEffect(() => {
   height: 2.5em;
   margin-top: 1.5em;
 }
-
-.loading {
-  opacity: 0.4;
-}
 </style>
