@@ -28,6 +28,8 @@ export function setup(stockStore?: StockStore) {
     fetchNext,
     fetchPrevious,
   } = usePagination<Parameters<typeof getStockHistory>[0]>({
+    pageSize: 10,
+
     async fetch(options, size) {
       const opts = {
         first: size,
@@ -94,6 +96,8 @@ export function setup(stockStore?: StockStore) {
         if (!data.stockHistory) {
           throw new Error('No data returned.');
         }
+
+        store.history = data.stockHistory.nodes ?? [];
 
         return {
           pageInfo: data.stockHistory.pageInfo,
