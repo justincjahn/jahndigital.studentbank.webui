@@ -18,6 +18,7 @@ import { GLOBAL_STORE } from '@/admin/symbols';
 import GroupRouteNames from '@/admin/groups/routeNames';
 import StudentRouteNames from '@/admin/students/routeNames';
 import StockRouteNames from '@/admin/stocks/routeNames';
+import ProfileRouteNames from '@/admin/profile/routeNames';
 
 import {
   SITE_NAME,
@@ -102,6 +103,7 @@ watchEffect(() => {
       </router-link>
       <router-link :to="{ name: GroupRouteNames.index }">Groups</router-link>
       <router-link :to="{ name: StockRouteNames.index }">Stocks</router-link>
+      <router-link :to="{ name: ProfileRouteNames.index }">Profile</router-link>
     </nav>
 
     <main v-if="isLoading"><loading-page /></main>
