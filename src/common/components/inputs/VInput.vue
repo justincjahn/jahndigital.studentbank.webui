@@ -88,11 +88,17 @@ const inputClasses = computed(() => ({
   required: props.required,
 }));
 
-const inputAttrs = computed(() => ({
-  'aria-labelledby': (props.label?.length ?? 0) > 0 ? inputId.value : undefined,
-  'aria-label': (props.label?.length ?? 0) > 0 ? undefined : props.name,
-  ...attrs,
-}));
+const inputAttrs = computed(() => {
+  const newAttrs: typeof attrs = {
+    'aria-labelledby':
+      (props.label?.length ?? 0) > 0 ? inputId.value : undefined,
+    'aria-label': (props.label?.length ?? 0) > 0 ? undefined : props.name,
+    ...attrs,
+  };
+
+  if (newAttrs.class) delete newAttrs.class;
+  return newAttrs;
+});
 
 async function handleUpdate(e: Event, v?: (e: Event) => string | boolean) {
   if (!e.target) return;
