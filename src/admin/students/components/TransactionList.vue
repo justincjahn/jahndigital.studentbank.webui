@@ -23,10 +23,7 @@ const {
 </script>
 
 <template>
-  <div
-    class="transaction-list"
-    :class="{ 'transaction-list--loading': loading }"
-  >
+  <div class="transaction-list" :class="{ loading }">
     <div class="scroll-wrapper">
       <table>
         <thead>
@@ -79,9 +76,3 @@ const {
     </div>
   </div>
 </template>
-
-<style scoped>
-.transaction-list--loading {
-  opacity: 0.4;
-}
-</style>

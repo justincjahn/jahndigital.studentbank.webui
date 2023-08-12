@@ -26,3 +26,7 @@
 .error {
   color: hsl(var(--clr-destructive-500));
 }
+
+.loading {
+  opacity: 0.4;
+}

@@ -89,7 +89,7 @@ const {
 
 <template>
   <!-- eslint-disable vuejs-accessibility/form-control-has-label -->
-  <div class="student-list" :class="{ 'student-list--loading': loading }">
+  <div class="student-list" :class="{ loading }">
     <div class="scroll-wrapper">
       <table class="student-list__list selectable">
         <thead>
@@ -161,9 +161,5 @@ const {
   max-width: 100%;
   overflow-x: auto;
   display: block;
-}
-
-.student-list--loading {
-  opacity: 0.4;
 }
 </style>
