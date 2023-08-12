@@ -10,6 +10,8 @@ import type {
   UnlinkStockMutation,
   UnlinkStockMutationVariables,
   DeleteStockMutation,
+  PurgeStockHistoryMutation,
+  PurgeStockHistoryMutationVariables,
 } from '@/generated/graphql';
 
 import { query, mutate, mutateCustom } from '@/common/services/apollo';
@@ -20,6 +22,7 @@ import gqlUpdateStock from '@/common/graphql/mutations/stockUpdate.gql';
 import gqlLinkStock from '@/common/graphql/mutations/stockLink.gql';
 import gqlUnlinkStock from '@/common/graphql/mutations/stockUnlink.gql';
 import gqlDeleteStock from '@/common/graphql/mutations/stockDelete.gql';
+import gqlPurgeHistory from '@/common/graphql/mutations/stockHistoryPurge.gql';
 
 type QueryBaseOptions = Omit<StocksQueryVariables, 'instances'>;
 
@@ -195,4 +198,24 @@ export function deleteStock(stock: Stock): Promise<DeleteStockMutation> {
       });
     },
   });
+}
+
+/**
+ * Purge a stock's history up to the provided date.
+ *
+ * @param stock The stock whose history to purge.
+ * @param date A date in yyyy-mm-dd format.
+ * @returns
+ */
+export function purgeStockHistory(
+  stock: Stock,
+  date: string
+): Promise<PurgeStockHistoryMutation> {
+  return mutate<PurgeStockHistoryMutation, PurgeStockHistoryMutationVariables>(
+    gqlPurgeHistory,
+    {
+      stockId: stock.id,
+      date,
+    }
+  );
 }

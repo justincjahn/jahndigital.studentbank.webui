@@ -21,8 +21,13 @@ const ManageStocksModal = defineAsyncComponent(
   () => import('@/admin/stocks/components/ManageStocksModal.vue')
 );
 
+const PurgeHistoryModal = defineAsyncComponent(
+  () => import('@/admin/stocks/components/PurgeHistoryModal.vue')
+);
+
 enum ModalState {
   ADD,
+  PURGE,
 }
 
 const globalStore = injectStrict(GLOBAL_STORE);
@@ -90,6 +95,10 @@ globalStore.stock.fetch({
       Manage Stocks
     </button>
 
+    <button type="button" @click="modalState = ModalState.PURGE">
+      Purge History
+    </button>
+
     <button type="button" :disabled="selected === null" @click="handleUnlink">
       Unlink
     </button>
@@ -136,6 +145,15 @@ globalStore.stock.fetch({
     <manage-stocks-modal
       :show="modalState === ModalState.ADD"
       :store="globalStore"
+      @submit="modalState = null"
+    />
+  </suspense>
+
+  <suspense>
+    <purge-history-modal
+      :show="modalState === ModalState.PURGE"
+      :store="globalStore"
+      @cancel="modalState = null"
       @submit="modalState = null"
     />
   </suspense>
