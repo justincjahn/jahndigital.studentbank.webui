@@ -8,6 +8,7 @@ on:
     types: [opened, synchronize, reopened, closed]
     branches:
       - master
+      - feature_vite_rewrite
 
 jobs:
   build_and_deploy_job:
@@ -27,6 +28,11 @@ jobs:
           VUE_APP_SITE_DISABLE_NAME: "${{ secrets.VUE_APP_SITE_DISABLE_NAME }}"
           VUE_APP_SITE_LOGO: "${{ secrets.VUE_APP_SITE_LOGO }}"
           VUE_APP_THEME: "${{ secrets.VUE_APP_THEME }}"
+          VITE_APP_API_URL: "${{ secrets.VUE_APP_API_URL }}"
+          VITE_APP_SITE_NAME: "${{ secrets.VUE_APP_SITE_NAME }}"
+          VITE_APP_SITE_DISABLE_NAME: "${{ secrets.VUE_APP_SITE_DISABLE_NAME }}"
+          VITE_APP_SITE_LOGO: "${{ secrets.VUE_APP_SITE_LOGO }}"
+          
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_NICE_MOSS_0F3FFAB1E }}
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
@@ -37,6 +43,7 @@ jobs:
           api_location: "" # Api source code path - optional
           output_location: "dist" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
+          production_branch: "master"
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
