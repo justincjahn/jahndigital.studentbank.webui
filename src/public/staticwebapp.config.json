@@ -2,11 +2,11 @@
   "routes": [
     {
       "route": "/admin/*",
-      "rewrite": "admin.html"
+      "rewrite": "/admin/index.html"
     },
     {
       "route": "/register/*",
-      "rewrite": "register.html"
+      "rewrite": "/register/index.html"
     },
     {
       "route": "/bulk-import-template.csv",
