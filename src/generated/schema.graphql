@@ -152,6 +152,16 @@ type Group @authorize(policy: "DataOwner<P_MANAGE_GROUPS>", apply: BEFORE_RESOLV
   dateCreated: DateTime!
 }
 
+type GroupStatisticsResponse {
+  groupId: Long!
+  averageShares: Money!
+  totalShares: Money!
+  averageSharesOwned: Float!
+  totalSharesOwned: Long!
+  averageStocks: Money!
+  totalStocks: Money!
+}
+
 "A connection to a list of items."
 type GroupsConnection {
   "Information to aid in pagination."
@@ -409,6 +419,8 @@ type Query {
   groups("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: GroupFilterInput order: [GroupSortInput!]): GroupsConnection @authorize(policy: "P_MANAGE_GROUPS", apply: BEFORE_RESOLVER)
   "Get deleted groups if authorized (Manage Groups)."
   deletedGroups("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: GroupFilterInput order: [GroupSortInput!]): DeletedGroupsConnection @authorize(policy: "P_MANAGE_GROUPS", apply: BEFORE_RESOLVER)
+  "Gets totals for the groups, if authorized (Manage Groups)."
+  groupStatistics("One or more Group Ids to fetch statistics for." groupId: [Long!]!): [GroupStatisticsResponse!]! @authorize(policy: "P_MANAGE_GROUPS", apply: BEFORE_RESOLVER)
   "Get instances if authorized (Manage Instances)"
   instances("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: InstanceFilterInput order: [InstanceSortInput!]): InstancesConnection @authorize(policy: "P_MANAGE_INSTANCES", apply: BEFORE_RESOLVER)
   "Get instances if authorized (Manage Instances)"
@@ -624,6 +636,7 @@ type Student @authorize(policy: "DataOwner<P_MANAGE_STUDENTS>", apply: BEFORE_RE
   groupId: Long!
   shares: [Share!]!
   purchases: [StudentPurchase!]!
+  stocks: [StudentStock!]!
   dateLastLogin: DateTime
   dateRegistered: DateTime
   dateDeleted: DateTime
@@ -1496,6 +1509,7 @@ input StudentFilterInput {
   shares: ListFilterInputTypeOfShareFilterInput
   refreshTokens: ListFilterInputTypeOfRefreshTokenFilterInput
   purchases: ListFilterInputTypeOfStudentPurchaseFilterInput
+  stocks: ListFilterInputTypeOfStudentStockFilterInput
   dateLastLogin: ComparableNullableOfDateTimeOperationFilterInput
   dateRegistered: ComparableNullableOfDateTimeOperationFilterInput
   dateDeleted: ComparableNullableOfDateTimeOperationFilterInput

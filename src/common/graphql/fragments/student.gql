@@ -1,9 +1,13 @@
 #import "../fragments/studentBase.gql"
 #import "../fragments/share.gql"
+#import "../fragments/studentStock.gql"
 
 fragment StudentParts on Student {
   ...StudentBaseParts
   shares {
     ...ShareParts
+  }
+  stocks {
+    ...StudentStockParts
   }
 }
