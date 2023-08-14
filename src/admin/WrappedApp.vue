@@ -79,20 +79,13 @@ watchEffect(() => {
 <template>
   <template v-if="isAuthenticated">
     <header>
-      <h1>
-        <template v-if="SITE_LOGO">
-          <img :src="SITE_LOGO" :alt="`${SITE_NAME} Admin`" />
-        </template>
-        <template v-if="!SITE_DISABLE_NAME">
-          {{ SITE_NAME }}
-        </template>
-      </h1>
+      <img v-if="SITE_LOGO" :src="SITE_LOGO" :alt="`${SITE_NAME} Admin`" />
+      <h1 v-if="!SITE_DISABLE_NAME">{{ SITE_NAME }}</h1>
 
-      <div class="main-nav__instances">
-        <suspense>
-          <instance-selector v-model="currentInstance" :store="globalStore" />
-        </suspense>
-      </div>
+      <suspense>
+        <instance-selector v-model="currentInstance" :store="globalStore" />
+        <template #fallback>Loading...</template>
+      </suspense>
 
       <div class="main-nav__login"><login-widget /></div>
     </header>
@@ -106,7 +99,7 @@ watchEffect(() => {
       <router-link :to="{ name: ProfileRouteNames.index }">Profile</router-link>
     </nav>
 
-    <main v-if="isLoading"><loading-page /></main>
+    <main v-if="isLoading" class="router-loading"><loading-page /></main>
     <main v-else><router-view /></main>
 
     <footer>&copy; 2022 Jahn Digital v{{ VERSION }}</footer>
@@ -121,7 +114,7 @@ watchEffect(() => {
     </modal-dialog>
   </template>
   <template v-else-if="!isHydrated">
-    <loading-page />
+    <loading-page :overlay="true" />
   </template>
   <template v-else>
     <login-dialog />

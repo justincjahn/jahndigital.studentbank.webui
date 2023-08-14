@@ -25,6 +25,11 @@ header {
   padding: 0 0.5em;
 }
 
+header img {
+  max-width: 10rem;
+  margin-bottom: 0.5rem;
+}
+
 .main-nav__login {
   grid-row: 2;
 }
@@ -53,11 +58,19 @@ header {
   margin-left: 0;
 }
 
+.router-loading {
+  margin: 2rem;
+}
+
 @media screen and (min-width: 50em) {
   header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+  }
+
+  header img {
+    margin-bottom: 0;
   }
 }
 
