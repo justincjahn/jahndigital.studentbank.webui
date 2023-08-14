@@ -20,12 +20,12 @@ body {
   align-items: stretch;
 }
 
-header {
+#app > header {
   display: grid;
   padding: 0 0.5em;
 }
 
-header img {
+#app > header img {
   max-width: 10rem;
   margin-bottom: 0.5rem;
 }
@@ -63,13 +63,13 @@ header img {
 }
 
 @media screen and (min-width: 50em) {
-  header {
+  #app > header {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
 
-  header img {
+  #app > header img {
     margin-bottom: 0;
   }
 }
@@ -94,7 +94,7 @@ main {
   flex-direction: column;
 }
 
-footer {
+#app > footer {
   text-align: center;
   font-size: 0.7em;
   color: hsl(var(--clr-primary-400) / 0.7)
