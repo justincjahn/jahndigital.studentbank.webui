@@ -6,12 +6,18 @@ import type {
   UpdateGroupMutation,
   UpdateGroupMutationVariables,
   DeleteGroupMutation,
+  GroupStatisticsQuery,
+  GroupStatisticsQueryVariables,
+  StudentsByGroupsQuery,
+  StudentsByGroupsQueryVariables,
 } from '@/generated/graphql';
 
 import gqlGroups from '@/common/graphql/queries/groupsByInstance.gql';
 import gqlNewGroup from '@/common/graphql/mutations/groupCreate.gql';
 import gqlUpdateGroup from '@/common/graphql/mutations/groupUpdate.gql';
 import gqlDeleteGroup from '@/common/graphql/mutations/groupDelete.gql';
+import gqlGroupStatistics from '@/common/graphql/queries/groupStatistics.gql';
+import gqlStudentsByGroups from '@/common/graphql/queries/studentsByGroups.gql';
 import { query, mutateCustom } from '@/common/services/apollo';
 
 /**
@@ -147,4 +153,30 @@ export async function deleteGroup(group: Group): Promise<DeleteGroupMutation> {
       },
     ],
   });
+}
+
+/**
+ * Fetch statistics for the provided groups.
+ *
+ * @param input
+ * @returns
+ * @throws {Error} If an error occurred during the network call.
+ */
+export async function groupStatistics(
+  input: GroupStatisticsQueryVariables
+): Promise<GroupStatisticsQuery> {
+  return query<GroupStatisticsQuery>(gqlGroupStatistics, input, 'no-cache');
+}
+
+/**
+ * Fetch student details for the provided groups.
+ *
+ * @param input
+ * @returns
+ * @throws {Error} If an error occurred during the network call.
+ */
+export async function studentsByGroups(
+  input: StudentsByGroupsQueryVariables
+): Promise<StudentsByGroupsQuery> {
+  return query<StudentsByGroupsQuery>(gqlStudentsByGroups, input, 'no-cache');
 }

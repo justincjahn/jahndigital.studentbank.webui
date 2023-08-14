@@ -1,0 +1,48 @@
+#import "../fragments/pageInfo.gql"
+
+query studentsByGroups(
+  $groupId: [Long!]!
+) {
+  students(
+    first: 10000,
+    where: {
+      groupId: {
+        in: $groupId
+      }
+    }
+  ) {
+    pageInfo {
+      ...PageInfoParts
+    }
+    totalCount
+    nodes {
+      accountNumber
+      lastName
+      firstName
+
+      group {
+        id
+        name
+      }
+
+      shares {
+        id
+        balance
+        shareType {
+          name
+        }
+      }
+
+      stocks {
+        sharesOwned
+
+        stock {
+          id
+          symbol
+          name
+          currentValue
+        }
+      }
+    }
+  }
+}

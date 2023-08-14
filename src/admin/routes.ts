@@ -9,6 +9,7 @@ import GroupRoutes from '@/admin/groups/routes';
 import StudentRoutes from '@/admin/students/routes';
 import StockRoutes from '@/admin/stocks/routes';
 import ProfileRoutes from '@/admin/profile/routes';
+import ReportRoutes from '@/admin/reports/routes';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -21,6 +22,7 @@ const routes: RouteRecordRaw[] = [
   ...StudentRoutes,
   ...StockRoutes,
   ...ProfileRoutes,
+  ...ReportRoutes,
 ];
 
 const router = createRouter({

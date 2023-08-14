@@ -1,0 +1,13 @@
+query groupStatistics(
+  $groupId: [Long!]!,
+) {
+  groupStatistics(groupId: $groupId) {
+    groupId
+    averageShares
+    totalShares
+    averageSharesOwned
+    totalSharesOwned
+    averageStocks
+    totalStocks
+  }
+}
