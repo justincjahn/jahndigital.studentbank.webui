@@ -71,9 +71,10 @@ const tableData = computed(() => {
 
     const medianShares = median(shareBalances);
 
-    const stockBalances = student.stocks.map(
-      (x) => x.sharesOwned + x.stock.currentValue
-    );
+    // Remove stocks w/o shares for accurate average.
+    const stockBalances = student.stocks
+      .filter((x) => x.sharesOwned > 0)
+      .map((x) => x.sharesOwned + x.stock.currentValue);
 
     const totalStocks = stockBalances.reduce((x, y) => x + y, 0);
 
