@@ -74,7 +74,7 @@ const tableData = computed(() => {
     // Remove stocks w/o shares for accurate average.
     const stockBalances = student.stocks
       .filter((x) => x.sharesOwned > 0)
-      .map((x) => x.sharesOwned + x.stock.currentValue);
+      .map((x) => x.sharesOwned * x.stock.currentValue);
 
     const totalStocks = stockBalances.reduce((x, y) => x + y, 0);
 
@@ -83,7 +83,11 @@ const tableData = computed(() => {
 
     const medianStocks = median(stockBalances);
 
-    const stockShares = student.stocks.map((x) => x.sharesOwned);
+    // Remove stocks w/o shares for accurate average.
+    const stockShares = student.stocks
+      .filter((x) => x.sharesOwned > 0)
+      .map((x) => x.sharesOwned);
+
     const totalStockShares = stockShares.reduce((x, y) => x + y, 0);
 
     const averageStockShares =
