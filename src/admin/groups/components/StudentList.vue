@@ -1,7 +1,9 @@
 <script lang="ts" setup>
-import { ref, computed, watchEffect, watch } from 'vue';
-
+// Types
 import type { Student } from '@/common/services/student';
+
+// Core
+import { ref, computed, watchEffect, watch } from 'vue';
 
 // Routing
 import { useRouter } from 'vue-router';

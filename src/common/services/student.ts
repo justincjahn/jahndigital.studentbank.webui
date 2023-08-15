@@ -1,4 +1,5 @@
 import type {
+  StudentSortInput,
   StudentsByNameQuery,
   StudentsByNameQueryVariables,
   StudentsByEmailQuery,
@@ -62,6 +63,7 @@ export interface GetByNameOptions extends FetchOptionsBase {
 
 export interface GetByGroupOptions extends FetchOptionsBase {
   groupId: number;
+  order?: StudentSortInput;
 }
 
 export type StudentResponse = Extract<

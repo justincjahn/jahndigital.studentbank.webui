@@ -4,7 +4,7 @@
 query studentsWithShares(
   $first: Int,
   $after: String,
-  $order: StudentSortInput! = {accountNumber: ASC},
+  $order: StudentSortInput! = {lastName: ASC},
   $groupId: Long,
 ) {
   students(

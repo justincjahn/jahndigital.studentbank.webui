@@ -1,7 +1,8 @@
-import { computed, reactive } from 'vue';
-
+import type { StudentSortInput } from '@/generated/graphql';
 import type { Group } from '@/admin/common/services/group';
 import type { Student } from '@/common/services/student';
+
+import { computed, reactive } from 'vue';
 
 import {
   getStudentsByGroup,
@@ -29,6 +30,7 @@ export function setup() {
     loading: false,
     students: [] as Student[],
     selected: null as Student | null,
+    order: undefined as StudentSortInput | undefined,
   });
 
   const loading = computed(() => store.loading);
@@ -54,6 +56,8 @@ export function setup() {
     fetchPrevious,
   } = usePagination<Parameters<typeof getStudentsByGroup>[0]>({
     async fetch(options, size) {
+      store.order = options.order;
+
       const opts = {
         first: size,
         ...options,
@@ -88,6 +92,7 @@ export function setup() {
           groupId,
           first: size,
           after: cursor,
+          order: store.order,
         });
 
         if (!data.students) {
@@ -114,6 +119,7 @@ export function setup() {
           groupId,
           first: size,
           after: cursor,
+          order: store.order,
         });
 
         if (!data.students) {
