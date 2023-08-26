@@ -104,7 +104,9 @@ watchEffect(() => {
     <main v-if="isLoading" class="router-loading"><loading-page /></main>
     <main v-else><router-view /></main>
 
-    <footer>&copy; 2022 Jahn Digital v{{ VERSION }}</footer>
+    <footer>
+      &copy; 2019-{{ new Date().getFullYear() }} Jahn Digital v{{ VERSION }}
+    </footer>
 
     <modal-dialog
       :show="error !== null && error.length > 0"
