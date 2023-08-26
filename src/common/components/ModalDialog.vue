@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, watchEffect, onUnmounted } from 'vue';
+import { ref, computed, watchEffect } from 'vue';
 
 const props = withDefaults(
   defineProps<{
@@ -49,53 +49,34 @@ const dialogClass = computed(() => [
   },
 ]);
 
-// Handle the dialog's close event
-function handleDialogClose(e?: Event) {
-  e?.preventDefault();
-
-  // This will get fired again when the parent closes us and may trigger an infinite loop
-  if (dialogElement.value?.returnValue === 'parent') return;
-
-  if (!props.canSubmit) return;
-  emit('submit');
-}
-
 // Handle the dialog's cancel event (Esc key) or a cancel button press
-function handleDialogCancel(e?: Event) {
-  e?.preventDefault();
+function handleDialogCancel(e: Event) {
+  e.preventDefault();
 
   if (props.cancelLabel) {
     if (!props.canCancel) return;
     emit('cancel');
   } else {
     // No cancel button exists, try to submit the form
-    if (!formElement.value) return;
-    formElement.value.requestSubmit();
+    formElement.value?.requestSubmit();
   }
 }
 
 // Handle the form's submit event
-function handleFormSubmit(e: SubmitEvent) {
-  e?.preventDefault();
-
+function handleFormSubmit(e: Event) {
+  e.preventDefault();
   if (!dialogElement.value) return;
-
-  dialogElement.value.returnValue =
-    (e.submitter as HTMLButtonElement)?.value ?? 'submit';
-
-  dialogElement.value.dispatchEvent(new Event('close'));
+  emit('submit');
 }
 
 // Close the dialog after the animation completes
 function handleDialogAnimation() {
-  if (!dialogElement.value) return;
-
-  dialogElement.value.removeEventListener(
+  dialogElement.value?.removeEventListener(
     'animationend',
     handleDialogAnimation
   );
 
-  dialogElement.value.close('parent');
+  dialogElement.value?.close();
 }
 
 watchEffect(() => {
@@ -107,33 +88,19 @@ watchEffect(() => {
     dialogElement.value.addEventListener('animationend', handleDialogAnimation);
   }
 });
-
-onUnmounted(() => {
-  if (!dialogElement.value) return;
-
-  dialogElement.value.removeEventListener(
-    'animationend',
-    handleDialogAnimation
-  );
-});
 </script>
 
 <template>
-  <dialog
-    ref="dialogElement"
-    :class="dialogClass"
-    @close="handleDialogClose"
-    @cancel="handleDialogCancel"
-  >
+  <dialog ref="dialogElement" :class="dialogClass" @cancel="handleDialogCancel">
     <form
       ref="formElement"
       method="dialog"
       class="modal__form"
-      @submit="(e) => handleFormSubmit(e as SubmitEvent)"
+      @submit="handleFormSubmit"
     >
       <div v-if="title" class="modal__title">
         <slot name="title">
-          <h1>{{ title }}</h1>
+          <h2>{{ title }}</h2>
         </slot>
       </div>
 
@@ -219,13 +186,13 @@ dialog.closing::backdrop {
 @media screen and (min-height: 40rem) {
   dialog {
     margin-top: 20vh;
+    border-radius: var(--border-radius);
   }
 }
 
-@media screen and (min-height: 40rem) {
-  dialog {
-    border-radius: var(--border-radius);
-  }
+h2 {
+  font-size: 2rem;
+  line-height: 1.5;
 }
 
 dialog.large {
