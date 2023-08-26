@@ -15,7 +15,7 @@ label span.required {
 input[type=text],
 input[type=password]
 {
-  padding: 0.5em 2em 0.5em 0.5em;
+  padding: 0.5em;
   outline-color: hsl(var(--clr-accent1-400));
   border: 1px solid hsl(var(--clr-accent1-300));
   border-radius: var(--border-radius);

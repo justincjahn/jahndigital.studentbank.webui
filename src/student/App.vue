@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import '@/common/styles/common.css';
 import { defineAsyncComponent } from 'vue';
-import LoadingPage from '@/common/components/LoadingPage.vue';
+import LoadingPage from '@/common/pages/LoadingPage.vue';
 
 const WrappedApp = defineAsyncComponent(
   () => import('@/student/WrappedApp.vue')

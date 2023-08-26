@@ -10,7 +10,7 @@ import { GLOBAL_STORE } from '@/admin/symbols';
 import { useRouter } from 'vue-router';
 
 // Components
-import LoadingPage from '@/common/components/LoadingPage.vue';
+import LoadingPage from '@/common/pages/LoadingPage.vue';
 
 // Routes
 import RouteNames from './routeNames';

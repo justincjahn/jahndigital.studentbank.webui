@@ -20,8 +20,8 @@ import {
 } from '@/common/constants';
 
 // Components
-import LoadingPage from '@/common/components/LoadingPage.vue';
-import LoginDialog from '@/common/components/LoginDialog.vue';
+import LoadingPage from '@/common/pages/LoadingPage.vue';
+import LoginPage from '@/common/pages/LoginPage.vue';
 
 const globalStore = defineGlobalStore();
 provide(GLOBAL_STORE, globalStore);
@@ -57,6 +57,6 @@ if (!globalStore.user.isAnonymous.value && !globalStore.user.isStudent.value) {
     <loading-page :overlay="true" />
   </template>
   <template v-else>
-    <login-dialog :store="globalStore.user" :admin="false" />
+    <login-page :store="globalStore.user" :admin="false" />
   </template>
 </template>

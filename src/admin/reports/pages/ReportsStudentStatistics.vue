@@ -12,7 +12,7 @@ import Money from '@/common/utils/Money';
 import median from '@/common/utils/median';
 
 // Components
-import LoadingPage from '@/common/components/LoadingPage.vue';
+import LoadingPage from '@/common/pages/LoadingPage.vue';
 
 interface TableData {
   date: string;

@@ -10,7 +10,7 @@ import injectStrict from '@/common/utils/injectStrict';
 import Money, { IMoney } from '@/common/utils/Money';
 
 // Components
-import LoadingPage from '@/common/components/LoadingPage.vue';
+import LoadingPage from '@/common/pages/LoadingPage.vue';
 
 interface TableData {
   date: string;
