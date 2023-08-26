@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import { defineAsyncComponent, ref, computed } from 'vue';
+import type { UserStore } from '@/common/stores/user';
 
-// Common
-import injectStrict from '@/common/utils/injectStrict';
-import { GLOBAL_STORE } from '@/admin/symbols';
+// Core
+import { defineAsyncComponent, ref, computed } from 'vue';
 
 // Components
 import LoadingLabel from '@/common/components/LoadingLabel.vue';
@@ -13,12 +12,25 @@ const ModalDialog = defineAsyncComponent(
   () => import('@/common/components/ModalDialog.vue')
 );
 
-const globalStore = injectStrict(GLOBAL_STORE);
+const props = withDefaults(
+  defineProps<{
+    store: UserStore;
+    admin?: boolean;
+  }>(),
+  {
+    admin: false,
+  }
+);
+
 const username = ref('');
 const password = ref('');
 const error = ref('');
 
-const isLoading = computed(() => globalStore.user.loading.value);
+const isLoading = computed(() => props.store.loading.value);
+
+const usernameLabel = computed(() =>
+  props.admin ? 'Email Address' : 'Account Number'
+);
 
 const canSubmit = computed(() => {
   if (isLoading.value) return false;
@@ -33,7 +45,7 @@ async function login() {
   error.value = '';
 
   try {
-    await globalStore.user.login(username.value, password.value, false);
+    await props.store.login(username.value, password.value, !props.admin);
   } catch (e: unknown) {
     if (!(e instanceof Error)) {
       error.value = 'An unknown error occurred.  Please try again.';
@@ -56,7 +68,7 @@ async function login() {
     <v-input
       v-model="username"
       name="username"
-      label="Email Address"
+      :label="usernameLabel"
       autocomplete="username"
       required
     />

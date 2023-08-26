@@ -31,7 +31,7 @@ import {
 // Components
 import LoadingPage from '@/common/components/LoadingPage.vue';
 import ModalDialog from '@/common/components/ModalDialog.vue';
-import LoginDialog from '@/admin/common/components/LoginDialog.vue';
+import LoginDialog from '@/common/components/LoginDialog.vue';
 
 const LoginWidget = defineAsyncComponent(
   () => import('@/admin/common/components/LoginWidget.vue')
@@ -119,6 +119,6 @@ watchEffect(() => {
     <loading-page :overlay="true" />
   </template>
   <template v-else>
-    <login-dialog />
+    <login-dialog :store="globalStore.user" :admin="true" />
   </template>
 </template>
