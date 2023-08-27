@@ -2,6 +2,7 @@ table {
   width: 100%;
   border-spacing: 0;
   border-collapse: collapse;
+  position: relative;
 }
 
 table td,
@@ -10,7 +11,12 @@ table th {
 }
 
 table tr:last-child th {
+  position: sticky;
+  top: 0;
+
   padding-bottom: 0.25em;
+
+  background-color: hsl(var(--clr-neutral-100));
   border-bottom: 1px solid hsl(var(--clr-neutral-400));
 }
 
