@@ -3,7 +3,7 @@
 import '@/student/common/styles/layout.css';
 
 // Core
-import { provide, onUnmounted, computed } from 'vue';
+import { defineAsyncComponent, provide, onUnmounted, computed } from 'vue';
 
 // Stores
 import { setup as defineGlobalStore } from '@/student/common/stores/global';
@@ -19,9 +19,15 @@ import {
   BASE_URLS,
 } from '@/common/constants';
 
+import AccountsRouteNames from '@/student/accounts/routeNames';
+
 // Components
 import LoadingPage from '@/common/pages/LoadingPage.vue';
 import LoginPage from '@/common/pages/LoginPage.vue';
+
+const LoginWidget = defineAsyncComponent(
+  () => import('@/common/components/LoginWidget.vue')
+);
 
 const globalStore = defineGlobalStore();
 provide(GLOBAL_STORE, globalStore);
@@ -44,9 +50,19 @@ if (!globalStore.user.isAnonymous.value && !globalStore.user.isStudent.value) {
     <header>
       <img v-if="SITE_LOGO" :src="SITE_LOGO" :alt="`${SITE_NAME} Admin`" />
       <h1 v-if="!SITE_DISABLE_NAME">{{ SITE_NAME }}</h1>
+
+      <div class="main-nav__login">
+        <login-widget :store="globalStore.user" />
+      </div>
     </header>
 
-    <main v-if="isLoading" class="router-loading"><loading-page /></main>
+    <nav class="sub-nav">
+      <router-link :to="{ name: AccountsRouteNames.index }">
+        Accounts
+      </router-link>
+    </nav>
+
+    <main v-if="isLoading"><loading-page /></main>
     <main v-else><router-view /></main>
 
     <footer>

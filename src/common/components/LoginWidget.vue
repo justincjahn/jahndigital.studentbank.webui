@@ -6,7 +6,10 @@ const props = defineProps<{
   store: UserStore;
 }>();
 
-const username = computed(() => props.store.username.value);
+const username = computed(() =>
+  props.store.email.value ? props.store.email.value : props.store.username.value
+);
+
 const isAuthenticated = computed(() => props.store.isAuthenticated.value);
 const logout = () => props.store.logout();
 </script>
