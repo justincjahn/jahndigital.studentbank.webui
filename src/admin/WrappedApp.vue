@@ -34,7 +34,7 @@ import LoadingPage from '@/common/pages/LoadingPage.vue';
 import ModalDialog from '@/common/components/ModalDialog.vue';
 
 const LoginWidget = defineAsyncComponent(
-  () => import('@/admin/common/components/LoginWidget.vue')
+  () => import('@/common/components/LoginWidget.vue')
 );
 
 const InstanceSelector = defineAsyncComponent(
@@ -88,7 +88,9 @@ watchEffect(() => {
         <template #fallback>Loading...</template>
       </suspense>
 
-      <div class="main-nav__login"><login-widget /></div>
+      <div class="main-nav__login">
+        <login-widget :store="globalStore.user" />
+      </div>
     </header>
 
     <nav class="sub-nav">
