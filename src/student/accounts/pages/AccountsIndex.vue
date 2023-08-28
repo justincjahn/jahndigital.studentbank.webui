@@ -44,7 +44,7 @@ watch(
     </template>
   </suspense>
 
-  <div v-if="globalStore.share.selected.value">
+  <div v-if="globalStore.share.selected.value" class="section">
     <h2>Recent Transactions</h2>
 
     <suspense>
@@ -56,9 +56,3 @@ watch(
     </suspense>
   </div>
 </template>
-
-<style scoped>
-h2 {
-  margin-top: 1rem;
-}
-</style>

@@ -13,6 +13,7 @@ import injectStrict from '@/common/utils/injectStrict';
 
 // Components
 import LoadingLabel from '@/common/components/LoadingLabel.vue';
+import LoadingPage from '@/common/pages/LoadingPage.vue';
 
 const GroupSelector = defineAsyncComponent(
   () => import('@/admin/common/components/GroupSelector.vue')
@@ -143,7 +144,7 @@ function handleBulkImportCancel() {
 
 <template>
   <div class="sub-menu">
-    <div>
+    <div class="container">
       <suspense>
         <group-selector v-model="selectedGroup" :store="globalStore" />
 
@@ -151,40 +152,41 @@ function handleBulkImportCancel() {
           <button type="button" disabled><loading-label /></button>
         </template>
       </suspense>
-    </div>
 
-    <div class="tool-strip">
-      <button
-        type="button"
-        :disabled="!hasSelection"
-        @click="selection.clear()"
-      >
-        Clear Selection
-      </button>
+      <div class="tool-strip">
+        <button
+          type="button"
+          :disabled="!hasSelection"
+          @click="selection.clear()"
+        >
+          Clear Selection
+        </button>
 
-      <button type="button" :disabled="!hasSelection" @click="startBulkMove">
-        Move Selected
-      </button>
+        <button type="button" :disabled="!hasSelection" @click="startBulkMove">
+          Move Selected
+        </button>
 
-      <button type="button" :disabled="!hasSelection" @click="startBulkPost">
-        New Transaction
-      </button>
+        <button type="button" :disabled="!hasSelection" @click="startBulkPost">
+          New Transaction
+        </button>
 
-      <button type="button" :disabled="!hasSelection" @click="startBulkShare">
-        New Share
-      </button>
+        <button type="button" :disabled="!hasSelection" @click="startBulkShare">
+          New Share
+        </button>
 
-      <button type="button" :disabled="!hasGroup" @click="startNewStudent">
-        New Student
-      </button>
+        <button type="button" :disabled="!hasGroup" @click="startNewStudent">
+          New Student
+        </button>
 
-      <button type="button" @click="startBulkImport">Bulk Import</button>
+        <button type="button" @click="startBulkImport">Bulk Import</button>
+      </div>
     </div>
   </div>
 
-  <div class="main-content">
+  <div class="container section width-100">
     <suspense>
-      <student-list class="student-list" />
+      <student-list />
+      <template #fallback><loading-page /></template>
     </suspense>
   </div>
 
@@ -232,14 +234,3 @@ function handleBulkImportCancel() {
     />
   </suspense>
 </template>
-
-<style>
-.student-list {
-  /* Make pagination buttons always appear at the bottom. */
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  margin-bottom: 1em;
-}
-</style>

@@ -27,6 +27,7 @@
   --clr-destructive-900: 0 0% 0%;
 
   --border-radius: 0.25em;
+  --content-width: 80rem;
 }
 
 /* @media (prefers-color-scheme: dark) {

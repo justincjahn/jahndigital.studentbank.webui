@@ -101,9 +101,8 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div class="main-content">
+  <div class="container flow">
     <h2>Account Info</h2>
-
     <form @submit.prevent="handleSave">
       <v-input
         v-model="data.data.email"
@@ -156,20 +155,12 @@ watchEffect(() => {
 </template>
 
 <style scoped>
-.main-content {
-  padding-inline: 1rem;
-}
-
 form {
   display: block;
   padding: 1.5rem;
   background-color: hsl(var(--clr-neutral-300));
   border: 1px solid hsl(var(--clr-neutral-400));
   border-radius: var(--border-radius);
-}
-
-form + h2 {
-  margin-top: 1rem;
 }
 
 button[type='submit'] {

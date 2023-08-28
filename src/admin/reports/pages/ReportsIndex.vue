@@ -3,7 +3,7 @@ import ReportRouteNames from '../routeNames';
 </script>
 
 <template>
-  <section>
+  <section class="container flow">
     <header>
       <h1>Available Reports</h1>
     </header>
@@ -22,13 +22,3 @@ import ReportRouteNames from '../routeNames';
     </ul>
   </section>
 </template>
-
-<style scoped>
-section {
-  margin-inline: 0.5rem;
-}
-
-section ul {
-  margin-inline-start: 1.5rem;
-}
-</style>

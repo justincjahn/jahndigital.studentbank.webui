@@ -30,3 +30,131 @@
 .loading {
   opacity: 0.4;
 }
+
+/* LAYOUT HELPERS */
+
+.section {
+  margin-block: var(--section-spacer, 1rem);
+}
+
+.container {
+  padding-inline: clamp(1rem, 5cqi, 10rem);
+  width: 100%;
+  max-width: var(--content-width, 80rem);
+  margin-inline: auto;
+}
+
+.flex-group {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  gap: var(--flex-group-gap, 1rem);
+}
+
+@media screen and (min-width: 500px) {
+  .flex-group {
+    flex-direction: row;
+  }
+}
+
+.flex-group[data-flex-type='start'] {
+  justify-content: flex-start;
+}
+
+.flex-group[data-flex-type='end'] {
+  justify-content: flex-end;
+}
+
+.flex-group[data-flex-direction='row'] {
+  flex-direction: row;
+}
+
+.flex-group[data-flex-direction='column'] {
+  flex-direction: column;
+}
+
+.flex-group[data-flex-align='baseline'] {
+  align-items: baseline;
+}
+
+.flow > *:where(:not(:first-child)) {
+  margin-top: var(--flow-spacer, 1em);
+}
+
+.main-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
+}
+
+.main-wrapper > .main-content,
+.main-content .main-content {
+  flex: 1 100%;
+}
+
+.main-header {
+  background-color: hsl(var(--clr-neutral-300));
+}
+
+.main-header img {
+  max-width: 15rem;
+  max-height: clamp(50px,7vw,90px);
+  margin-block: 0.15rem;
+}
+
+.main-header .flex-group {
+  align-items: center;
+}
+
+.sub-nav a {
+  font-size: 1.25em;
+  color: hsl(var(--clr-neutral-800));
+  text-decoration: none;
+
+  background:
+    linear-gradient(currentColor 0 0)
+    bottom
+    left / var(--underline-width, 0%) 0.1em
+    no-repeat;
+
+  transition: .25s;
+}
+
+.sub-nav a:where(:hover, :active, :focus) {
+  --underline-width: 100%;
+  color: hsl(var(--clr-accent1-600));
+  outline: 0;
+}
+
+.sub-nav a.router-link-active {
+  color: hsl(var(--clr-accent1-400));
+}
+
+.sub-menu {
+  padding-block: 0.5rem;
+  background-color: hsl(var(--clr-neutral-400));
+  border-top: 1px solid hsl(var(--clr-neutral-500));
+  border-bottom: 1px solid hsl(var(--clr-neutral-500));
+}
+
+.tool-strip {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.1rem;
+  margin-block: 0.1rem;
+}
+
+.main-footer {
+  font-size: 0.8em;
+  text-align: center;
+  opacity: 0.5;
+  user-select: none;
+}

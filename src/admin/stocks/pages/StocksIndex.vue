@@ -94,21 +94,23 @@ globalStore.stock.fetch({
 </script>
 
 <template>
-  <div class="sub-menu tool-strip">
-    <button type="button" @click="modalState = ModalState.ADD">
-      Manage Stocks
-    </button>
+  <div class="sub-menu">
+    <div class="tool-strip container">
+      <button type="button" @click="modalState = ModalState.ADD">
+        Manage Stocks
+      </button>
 
-    <button type="button" @click="modalState = ModalState.PURGE">
-      Purge History
-    </button>
+      <button type="button" @click="modalState = ModalState.PURGE">
+        Purge History
+      </button>
 
-    <button type="button" :disabled="selected === null" @click="handleUnlink">
-      Unlink
-    </button>
+      <button type="button" :disabled="selected === null" @click="handleUnlink">
+        Unlink
+      </button>
+    </div>
   </div>
 
-  <section class="main-content">
+  <section class="container section flex-group">
     <div class="main-panel">
       <h2>Linked</h2>
 
@@ -176,13 +178,12 @@ globalStore.stock.fetch({
   display: flex;
 }
 
+/* @TODO: Use utility classes */
 .main-panel {
-  padding: 1rem;
   width: 100%;
 }
 
 .sidebar {
-  padding: 1rem;
   flex-grow: 1;
 }
 

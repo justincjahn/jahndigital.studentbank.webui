@@ -121,8 +121,12 @@ onMounted(async () => {
 </script>
 
 <template>
-  <section>
-    <header>
+  <section class="container">
+    <header
+      class="flex-group"
+      data-flex-type="start"
+      data-flex-align="baseline"
+    >
       <h1>Group Statistics</h1>
 
       <p>
@@ -166,15 +170,3 @@ onMounted(async () => {
     </div>
   </section>
 </template>
-
-<style scoped>
-section {
-  margin-inline: 0.5rem;
-}
-
-section header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-}
-</style>

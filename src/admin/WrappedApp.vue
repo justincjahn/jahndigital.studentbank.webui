@@ -79,50 +79,70 @@ watchEffect(() => {
 
 <template>
   <template v-if="isAuthenticated">
-    <header>
-      <img v-if="SITE_LOGO" :src="SITE_LOGO" :alt="`${SITE_NAME} Admin`" />
-      <h1 v-if="!SITE_DISABLE_NAME">{{ SITE_NAME }}</h1>
+    <header class="main-header">
+      <div class="container flex-group">
+        <div class="flex-group">
+          <img v-if="SITE_LOGO" :src="SITE_LOGO" :alt="`${SITE_NAME} Admin`" />
+          <h1 v-if="!SITE_DISABLE_NAME">{{ SITE_NAME }}</h1>
 
-      <suspense>
-        <instance-selector v-model="currentInstance" :store="globalStore" />
-        <template #fallback>Loading...</template>
-      </suspense>
+          <suspense>
+            <instance-selector v-model="currentInstance" :store="globalStore" />
+            <template #fallback>Loading...</template>
+          </suspense>
+        </div>
 
-      <div class="main-nav__login">
-        <login-widget :store="globalStore.user" />
+        <div class="login-widget">
+          <login-widget :store="globalStore.user" />
+        </div>
       </div>
     </header>
 
-    <nav class="sub-nav">
-      <router-link :to="{ name: StudentRouteNames.index }">
-        Students
-      </router-link>
-      <router-link :to="{ name: GroupRouteNames.index }">Groups</router-link>
-      <router-link :to="{ name: StockRouteNames.index }">Stocks</router-link>
-      <router-link :to="{ name: ProfileRouteNames.index }">Profile</router-link>
-      <router-link :to="{ name: ReportRouteNames.index }">Reports</router-link>
+    <nav class="sub-nav | section">
+      <div class="container flex-group" data-flex-type="start">
+        <router-link :to="{ name: StudentRouteNames.index }">
+          Students
+        </router-link>
+
+        <router-link :to="{ name: GroupRouteNames.index }">
+          Groups
+        </router-link>
+
+        <router-link :to="{ name: StockRouteNames.index }">
+          Stocks
+        </router-link>
+
+        <router-link :to="{ name: ProfileRouteNames.index }">
+          Profile
+        </router-link>
+
+        <router-link :to="{ name: ReportRouteNames.index }">
+          Reports
+        </router-link>
+      </div>
     </nav>
 
-    <main v-if="isLoading" class="router-loading"><loading-page /></main>
-    <main v-else><router-view /></main>
+    <main v-if="isLoading" class="main-content"><loading-page /></main>
+    <main v-else class="main-content"><router-view /></main>
 
-    <footer>
+    <footer class="main-footer">
       &copy; 2019-{{ new Date().getFullYear() }} Jahn Digital v{{ VERSION }}
     </footer>
-
-    <modal-dialog
-      :show="error !== null && error.length > 0"
-      class="destructive"
-      title="Error"
-      @submit="() => (error = null)"
-    >
-      {{ error }}
-    </modal-dialog>
   </template>
+
   <template v-else-if="!isHydrated">
     <loading-page :overlay="true" />
   </template>
+
   <template v-else>
     <login-page :store="globalStore.user" :admin="true" />
   </template>
+
+  <modal-dialog
+    :show="error !== null && error.length > 0"
+    class="destructive"
+    title="Error"
+    @submit="() => (error = null)"
+  >
+    {{ error }}
+  </modal-dialog>
 </template>

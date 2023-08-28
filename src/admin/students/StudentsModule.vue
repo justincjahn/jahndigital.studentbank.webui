@@ -103,58 +103,50 @@ onUnmounted(() => {
 
 <template>
   <div class="sub-menu">
-    <suspense>
-      <student-selector v-model="selectedStudent" :store="globalStore" />
-    </suspense>
+    <div class="container">
+      <suspense>
+        <student-selector v-model="selectedStudent" :store="globalStore" />
+      </suspense>
+    </div>
   </div>
 
-  <loading-page v-if="isLoading" class="loading-page" />
+  <loading-page v-if="isLoading" />
 
-  <section v-else-if="selectedStudent === null">
-    <p class="help-text">
-      No student is selected. Please search for a student using the control
-      above to begin...
-    </p>
-  </section>
+  <div class="container" v-else-if="selectedStudent === null">
+    <section class="width-100">
+      <p class="help-text width-100">
+        No student is selected. Please search for a student using the control
+        above to begin...
+      </p>
+    </section>
+  </div>
 
   <template v-else>
-    <nav class="sub-nav">
-      <router-link
-        :to="{
-          name: RouteNames.transactions,
-          params: { studentId: selectedStudent.id },
-        }"
-      >
-        Transactions
-      </router-link>
+    <div class="sub-nav | section">
+      <nav class="container flex-group" data-flex-type="start">
+        <router-link
+          :to="{
+            name: RouteNames.transactions,
+            params: { studentId: selectedStudent.id },
+          }"
+        >
+          Transactions
+        </router-link>
 
-      <router-link
-        :to="{
-          name: RouteNames.profile,
-          params: { studentId: selectedStudent.id },
-        }"
-      >
-        Profile
-      </router-link>
-    </nav>
+        <router-link
+          :to="{
+            name: RouteNames.profile,
+            params: { studentId: selectedStudent.id },
+          }"
+        >
+          Profile
+        </router-link>
+      </nav>
+    </div>
 
-    <section class="main-content">
+    <section class="main-content | container width-100">
       <h1>{{ selectedStudent.lastName }}, {{ selectedStudent.firstName }}</h1>
       <router-view />
     </section>
   </template>
 </template>
-
-<style scoped>
-.help-text {
-  padding-inline: 0.5rem;
-}
-
-.main-content {
-  padding-inline: 1rem;
-}
-
-.loading-page {
-  margin-top: 2rem;
-}
-</style>

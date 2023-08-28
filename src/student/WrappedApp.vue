@@ -46,33 +46,47 @@ if (!globalStore.user.isAnonymous.value && !globalStore.user.isStudent.value) {
 </script>
 
 <template>
-  <template v-if="isAuthenticated">
-    <header>
-      <img v-if="SITE_LOGO" :src="SITE_LOGO" :alt="`${SITE_NAME} Admin`" />
-      <h1 v-if="!SITE_DISABLE_NAME">{{ SITE_NAME }}</h1>
+  <div class="main-wrapper">
+    <template v-if="isAuthenticated">
+      <header class="main-header">
+        <div class="container">
+          <div class="inner flex-group">
+            <div class="flex-group">
+              <img v-if="SITE_LOGO" :src="SITE_LOGO" :alt="`${SITE_NAME}`" />
+              <h1 v-if="!SITE_DISABLE_NAME">{{ SITE_NAME }}</h1>
+            </div>
 
-      <div class="main-nav__login">
-        <login-widget :store="globalStore.user" />
+            <div class="login-widget">
+              <login-widget :store="globalStore.user" />
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <nav class="sub-nav | container section" data-flex-type="start">
+        <div class="inner flex-group" data-flex-type="start">
+          <router-link :to="{ name: AccountsRouteNames.index }">
+            Accounts
+          </router-link>
+        </div>
+      </nav>
+
+      <div class="container flex-grow-1">
+        <main v-if="isLoading" class="inner"><loading-page /></main>
+        <main v-else class="inner"><router-view /></main>
       </div>
-    </header>
 
-    <nav class="sub-nav">
-      <router-link :to="{ name: AccountsRouteNames.index }">
-        Accounts
-      </router-link>
-    </nav>
+      <footer class="main-footer | inner">
+        &copy; 2019-{{ new Date().getFullYear() }} Jahn Digital v{{ VERSION }}
+      </footer>
+    </template>
 
-    <main v-if="isLoading"><loading-page /></main>
-    <main v-else><router-view /></main>
+    <template v-else-if="!isHydrated">
+      <loading-page :overlay="true" />
+    </template>
 
-    <footer>
-      &copy; 2019-{{ new Date().getFullYear() }} Jahn Digital v{{ VERSION }}
-    </footer>
-  </template>
-  <template v-else-if="!isHydrated">
-    <loading-page :overlay="true" />
-  </template>
-  <template v-else>
-    <login-page :store="globalStore.user" :admin="false" />
-  </template>
+    <template v-else>
+      <login-page :store="globalStore.user" :admin="false" />
+    </template>
+  </div>
 </template>
