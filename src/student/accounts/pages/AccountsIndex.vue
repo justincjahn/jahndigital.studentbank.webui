@@ -5,7 +5,7 @@ import { setup as setupTransactionStore } from '@/common/stores/transaction';
 
 // NOTE: We want to preload this page because it's the default no async components
 import ShareList from '@/student/accounts/components/ShareList.vue';
-import TransactionList from '@/admin/students/components/TransactionList.vue';
+import TransactionList from '@/student/accounts/components/TransactionList.vue';
 
 const globalStore = useGlobalStore();
 const transactionStore = setupTransactionStore();
