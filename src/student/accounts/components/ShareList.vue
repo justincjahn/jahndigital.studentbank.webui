@@ -24,7 +24,7 @@ defineEmits<{
   </div>
 </template>
 
-<style>
+<style scoped>
 .share-list {
   display: flex;
   gap: 1rem;

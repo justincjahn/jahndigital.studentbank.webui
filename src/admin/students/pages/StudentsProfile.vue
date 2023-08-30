@@ -167,98 +167,87 @@ watchEffect(() => {
 </script>
 
 <template>
-  <form @submit.prevent="handleInfoSubmit">
-    <h2>Account Info</h2>
+  <div class="section flow">
+    <form class="card | flow" data-card-full @submit.prevent="handleInfoSubmit">
+      <h2 class="size-l">Account Info</h2>
 
-    <v-input
-      v-model="data.student.accountNumber"
-      v-model:error="data.errors.accountNumber"
-      label="Account Number"
-      required
-      :validator="validateAccount"
-    />
+      <v-input
+        v-model="data.student.accountNumber"
+        v-model:error="data.errors.accountNumber"
+        label="Account Number"
+        required
+        :validator="validateAccount"
+      />
 
-    <v-input
-      v-model="data.student.firstName"
-      v-model:error="data.errors.firstName"
-      label="First Name"
-      required
-    />
+      <v-input
+        v-model="data.student.firstName"
+        v-model:error="data.errors.firstName"
+        label="First Name"
+        required
+      />
 
-    <v-input
-      v-model="data.student.lastName"
-      v-model:error="data.errors.lastName"
-      label="Last Name"
-      required
-    />
+      <v-input
+        v-model="data.student.lastName"
+        v-model:error="data.errors.lastName"
+        label="Last Name"
+        required
+      />
 
-    <v-input
-      v-model="data.student.email"
-      v-model:error="data.errors.email"
-      label="Email"
-      :validator="validateEmailOptional"
-    />
+      <v-input
+        v-model="data.student.email"
+        v-model:error="data.errors.email"
+        label="Email"
+        :validator="validateEmailOptional"
+      />
 
-    <button type="submit" class="primary" :disabled="!isInfoValid || loading">
-      <loading-label :show="loading">
-        {{ loading ? 'Loading...' : 'Save' }}
-      </loading-label>
-    </button>
-  </form>
+      <button
+        type="submit"
+        class="primary | width-100"
+        data-button-type="chonky"
+        :disabled="!isInfoValid || loading"
+      >
+        <loading-label :show="loading">
+          {{ loading ? 'Loading...' : 'Save' }}
+        </loading-label>
+      </button>
+    </form>
 
-  <form autocomplete="off" @submit.prevent="handlePasswordSubmit">
-    <h2>Change Password</h2>
-
-    <v-input
-      v-model="data.student.password"
-      v-model:error="data.passwordErrors.password"
-      type="password"
-      label="Password"
+    <form
+      class="card | flow"
+      data-card-full
       autocomplete="off"
-      :validator="validatePassword()"
-      required
-    />
-
-    <v-input
-      v-model="data.student.repeatPassword"
-      :error="data.passwordErrors.repeatPassword"
-      type="password"
-      label="Repeat Password"
-      autocomplete="off"
-    />
-
-    <button
-      type="submit"
-      class="primary"
-      :disabled="!isPasswordValid || loading"
+      @submit.prevent="handlePasswordSubmit"
     >
-      <loading-label :show="loading">
-        {{ loading ? 'Loading...' : 'Change' }}
-      </loading-label>
-    </button>
-  </form>
+      <h2 class="size-l">Change Password</h2>
+
+      <v-input
+        v-model="data.student.password"
+        v-model:error="data.passwordErrors.password"
+        type="password"
+        label="Password"
+        autocomplete="off"
+        :validator="validatePassword()"
+        required
+      />
+
+      <v-input
+        v-model="data.student.repeatPassword"
+        :error="data.passwordErrors.repeatPassword"
+        type="password"
+        label="Repeat Password"
+        autocomplete="off"
+      />
+
+      <button
+        type="submit"
+        class="primary | width-100"
+        data-button-type="chonky"
+        :disabled="!isPasswordValid || loading"
+      >
+        <loading-label :show="loading">
+          {{ loading ? 'Loading...' : 'Change' }}
+        </loading-label>
+      </button>
+    </form>
+  </div>
 </template>
-
-<style scoped>
-form {
-  display: block;
-  padding: 1.5rem;
-  background-color: hsl(var(--clr-neutral-300));
-  border: 1px solid hsl(var(--clr-neutral-400));
-  border-radius: var(--border-radius);
-}
-
-form + form {
-  margin-top: 1rem;
-}
-
-h2 {
-  margin-bottom: 0.5em;
-}
-
-button[type='submit'] {
-  width: 100%;
-  margin-top: 2rem;
-  height: 3em;
-}
-</style>

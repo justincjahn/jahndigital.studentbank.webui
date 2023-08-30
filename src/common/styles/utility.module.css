@@ -1,43 +1,20 @@
-.pagination-buttons {
-  text-align: center;
-  margin-top: 1em;
-}
-
-.pagination-buttons button {
-  background-color: transparent;
-  border: none;
-}
-
-.pagination-buttons button:enabled:hover {
-  text-decoration: underline;
-}
-
-.scroll-wrapper {
-  max-width: 100%;
-  overflow-y: auto;
-}
-
-.help-text {
-  font-size: 0.85em;
-  font-style: italic;
-  line-height: 2;
-}
-
-.error {
-  color: hsl(var(--clr-destructive-500));
-}
-
-.loading {
-  opacity: 0.4;
-}
-
 /* LAYOUT HELPERS */
 
 .section {
-  margin-block: var(--section-spacer, 1rem);
+  /* Introduces block spacing around the element itself */
+
+  margin-block: var(--section-spacer, var(--margin-400));
+}
+
+.flow > *:where(:not(:first-child)) {
+  /* Introduces spacing between elements again. */
+
+  margin-top: var(--flow-spacer, var(--margin-400));
 }
 
 .container {
+  /* Indents a section */
+
   padding-inline: clamp(1rem, 5cqi, 10rem);
   width: 100%;
   max-width: var(--content-width, 80rem);
@@ -45,13 +22,15 @@
 }
 
 .flex-group {
+  /* Turns the element into a responsive flex container. */
+
   display: flex;
   justify-content: space-between;
   flex-direction: column;
   gap: var(--flex-group-gap, 1rem);
 }
 
-@media screen and (min-width: 500px) {
+@media screen and (min-width: 47rem) {
   .flex-group {
     flex-direction: row;
   }
@@ -77,26 +56,12 @@
   align-items: baseline;
 }
 
-.flow > *:where(:not(:first-child)) {
-  margin-top: var(--flow-spacer, 1em);
-}
-
 .main-wrapper {
+  /* Should be applied to the main div #app of the application. */
+
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-}
-
-.main-content {
-  display: flex;
-  flex-direction: column;
-  justify-content: stretch;
-  align-items: stretch;
-}
-
-.main-wrapper > .main-content,
-.main-content .main-content {
-  flex: 1 100%;
 }
 
 .main-header {
@@ -113,10 +78,45 @@
   align-items: center;
 }
 
+.main-content {
+  /* Place this on elements that you want to "drill down" the main height to. */
+
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
+}
+
+.main-wrapper > .main-content,
+.main-content .main-content,
+.flex-100 {
+  /* Forces subsequent .main-content elements to take up the most space.*/
+
+  flex: 1 100%;
+}
+
+.width-100 {
+  width: 100%;
+}
+
+.main-footer {
+  /* The site has a very small footer with version information. */
+
+  font-size: 0.8em;
+  text-align: center;
+  opacity: 0.5;
+  user-select: none;
+}
+
+/* STYLE HELPERS */
+
 .sub-nav a {
+  /* Nice styling for primary groups of links. */
+
   font-size: 1.25em;
   color: hsl(var(--clr-neutral-800));
   text-decoration: none;
+  width: fit-content;
 
   background:
     linear-gradient(currentColor 0 0)
@@ -145,16 +145,109 @@
 }
 
 .tool-strip {
+  /* Used for groups of buttons that automatically wrap on small screens. */
+
   display: flex;
-  flex-direction: row;
   flex-wrap: wrap;
   gap: 0.1rem;
-  margin-block: 0.1rem;
+  padding-block: 0.1rem;
 }
 
-.main-footer {
-  font-size: 0.8em;
+.pagination-buttons {
+  /* Remove styling and center buttons on the page. */
+
   text-align: center;
-  opacity: 0.5;
+  margin-top: var(--margin-400);
+}
+
+.pagination-buttons button {
+  background-color: transparent;
+  border: none;
+}
+
+.pagination-buttons button:enabled:hover {
+  text-decoration: underline;
+}
+
+.scroll-wrapper {
+  /* Wrap a table element with this class to enable horizontal scrolling. */
+
+  max-width: 100%;
+  overflow-y: auto;
+}
+
+.help-text {
+  /* Add this to an element to emphasize or provide help context. */
+
+  font-size: var(--font-size-200);
+  font-style: italic;
+  line-height: 2;
+}
+
+.error {
+  /* Add this to an element to emphasize the element's content as an error */
+
+  color: hsl(var(--clr-destructive-500));
+}
+
+.loading {
+  /* Add this to a component that's still loading data. */
+
+  opacity: 0.4;
+}
+
+.split-data {
+  /** Splits an element's contents in two and places dots in the space between. */
+
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.split-data :nth-child(1) {
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.split-data :nth-child(1)::after {
+  content: '......................................................................................................................................................................................................'
+}
+
+/* FONT HELPERS */
+
+.emphasis {
+  font-weight: bold;
+}
+
+.no-select {
   user-select: none;
+}
+
+.size-xxl {
+  font-size: var(--font-size-900);
+}
+
+.size-xl {
+  font-size: var(--font-size-800);
+}
+
+.size-l {
+  font-size: var(--font-size-700);
+}
+
+.size-m {
+  font-size: var(--font-size-400);
+}
+
+.size-s {
+  font-size: var(--font-size-300);
+}
+
+.size-xs {
+  font-size: var(--font-size-200)
+}
+
+.size-xxs {
+  font-size: var(--font-size-100);
 }

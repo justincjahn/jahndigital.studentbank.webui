@@ -101,71 +101,71 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div class="container flow">
-    <h2>Account Info</h2>
-    <form @submit.prevent="handleSave">
-      <v-input
-        v-model="data.data.email"
-        v-model:error="data.errors.email"
-        label="Email"
-        help-text="Your email address is also your username."
-        :validator="validateEmail"
-      />
+  <div class="container | flow">
+    <div class="card | flow" data-card-full>
+      <h2 class="size-l">Account Info</h2>
 
-      <button type="submit" class="primary" :disabled="!isDataValid">
-        Update
-      </button>
-    </form>
+      <form class="flow" @submit.prevent="handleSave">
+        <v-input
+          v-model="data.data.email"
+          v-model:error="data.errors.email"
+          label="Email"
+          help-text="Your email address is also your username."
+          :validator="validateEmail"
+        />
 
-    <h2>Change Password</h2>
-    <form @submit.prevent="handleChangePassword">
-      <v-input
-        v-model="data.data.currentPassword"
-        v-model:error="data.passwordErrors.currentPassword"
-        type="password"
-        name="current-password"
-        label="Current Password"
-        required
-      />
+        <button
+          type="submit"
+          class="primary | width-100"
+          data-button-type="chonky"
+          :disabled="!isDataValid"
+        >
+          Update
+        </button>
+      </form>
+    </div>
 
-      <v-input
-        v-model="data.data.password"
-        v-model:error="data.passwordErrors.password"
-        type="password"
-        name="new-password"
-        label="Password"
-        :validator="validatePassword()"
-        required
-      />
+    <div class="card | flow" data-card-full>
+      <h2 class="size-l">Change Password</h2>
 
-      <v-input
-        v-model="data.data.passwordRepeat"
-        v-model:error="data.passwordErrors.passwordRepeat"
-        type="password"
-        name="repeat-password"
-        label="Repeat Password"
-        required
-      />
+      <form class="flow" @submit.prevent="handleChangePassword">
+        <v-input
+          v-model="data.data.currentPassword"
+          v-model:error="data.passwordErrors.currentPassword"
+          type="password"
+          name="current-password"
+          label="Current Password"
+          required
+        />
 
-      <button type="submit" class="primary" :disabled="!isPasswordValid">
-        Change Password
-      </button>
-    </form>
+        <v-input
+          v-model="data.data.password"
+          v-model:error="data.passwordErrors.password"
+          type="password"
+          name="new-password"
+          label="Password"
+          :validator="validatePassword()"
+          required
+        />
+
+        <v-input
+          v-model="data.data.passwordRepeat"
+          v-model:error="data.passwordErrors.passwordRepeat"
+          type="password"
+          name="repeat-password"
+          label="Repeat Password"
+          required
+        />
+
+        <button
+          type="submit"
+          class="primary | width-100"
+          data-button-type="chonky"
+          :disabled="!isPasswordValid"
+        >
+          Change Password
+        </button>
+      </form>
+    </div>
   </div>
 </template>
-
-<style scoped>
-form {
-  display: block;
-  padding: 1.5rem;
-  background-color: hsl(var(--clr-neutral-300));
-  border: 1px solid hsl(var(--clr-neutral-400));
-  border-radius: var(--border-radius);
-}
-
-button[type='submit'] {
-  width: 100%;
-  margin-top: 2rem;
-  height: 3em;
-}
-</style>

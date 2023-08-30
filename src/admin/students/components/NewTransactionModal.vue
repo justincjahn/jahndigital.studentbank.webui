@@ -110,12 +110,12 @@ watchEffect(() => {
     <template v-if="share !== null">
       <h1>{{ share.shareType.name }} (S{{ share.id }})</h1>
 
-      <div class="balance">
+      <div class="split-data">
         <span>Available Balance</span>
         <span>{{ Money.fromNumber(share.balance) }}</span>
       </div>
 
-      <div class="balance">
+      <div class="split-data">
         <span>New Balance</span>
 
         <span :class="{ error: newBalance.compare(0) < 0 }">
@@ -123,21 +123,23 @@ watchEffect(() => {
         </span>
       </div>
 
-      <v-currency
-        v-model="amount"
-        label="Amount"
-        :allow-negative="true"
-        :allow-zero="true"
-        :validator="validateAmount"
-        required
-      />
+      <div class="section">
+        <v-currency
+          v-model="amount"
+          label="Amount"
+          :allow-negative="true"
+          :allow-zero="true"
+          :validator="validateAmount"
+          required
+        />
 
-      <v-input
-        v-model="comment"
-        label="Comment"
-        :required="amount.compare(0) === 0"
-        :error="commentError"
-      />
+        <v-input
+          v-model="comment"
+          label="Comment"
+          :required="amount.compare(0) === 0"
+          :error="commentError"
+        />
+      </div>
     </template>
 
     <template #submitLabel="{ label }">
@@ -148,26 +150,3 @@ watchEffect(() => {
     </template>
   </modal-dialog>
 </template>
-
-<style scoped>
-.balance {
-  font-size: 1em;
-  font-weight: 400;
-  display: flex;
-  justify-content: space-between;
-}
-
-.balance + .balance {
-  margin-bottom: 1em;
-}
-
-.balance :nth-child(1) {
-  overflow: hidden;
-  text-overflow: clip;
-  white-space: nowrap;
-}
-
-.balance :nth-child(1)::after {
-  content: '...........................................................................';
-}
-</style>

@@ -3,12 +3,15 @@
 @import url('./tables.module.css');
 @import url('./forms.module.css');
 @import url('./utility.module.css');
+@import url('./card.module.css');
 
 body {
-  font-size:               12pt;
+  font-size:               var(--font-size-default, 12pt);
   line-height:             1.5;
+  min-height:              100vh;
   color:                   hsl(var(--clr-primary-400));
-  font-family:             Avenir, Helvetica, Arial, sans-serif;
+  font-family:             var(--font-family-default);
+  text-rendering:          optimizeSpeed;
   -webkit-font-smoothing:  antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

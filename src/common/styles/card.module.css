@@ -1,0 +1,50 @@
+.card {
+  padding: var(--card-padding, 1rem);
+  background-color: var(--card-bg, hsl(var(--clr-neutral-400) / 25%));
+  border-radius: var(--border-radius, 0.5rem);
+
+  transition:
+    box-shadow var(--card-transition, 0.25s),
+    color var(--card-transition, 0.25s),
+    background-color var(--card-transition, 0.25s);
+}
+
+.card[data-card-type="flat"] {
+  border: 1px solid var(--card-bdr-normal-1, hsl(var(--clr-neutral-600)));
+}
+
+.card:not([data-card-type]),
+.card[data-card-type="floating"] {
+  box-shadow:
+    var(--card-bdr-normal-1, hsl(var(--clr-neutral-900) / 15%)) 0px 1px 2px 0px,
+    var(--card-bdr-normal-2, hsl(var(--clr-neutral-600) / 30%)) 0px 1px 3px 1px;
+}
+
+.card:not([data-card-full]) {
+  width: var(--card-width, 20rem);
+  min-height: var(--card-min-height, 12rem);
+}
+
+.card[data-card-clickable] {
+  color: var(--card-color-inactive, hsl(var(--clr-neutral-900) / 60%));
+}
+
+.card[data-card-clickable]:hover {
+  --card-bg: var(--card-bg-hover, hsl(var(--clr-neutral-100)));
+
+  cursor: pointer;
+  color: inherit;
+
+  box-shadow:
+    var(--card-bdr-hover-1, hsl(var(--clr-neutral-600) / 15%)) 0px 3px 6px,
+    var(--card-bdr-hover-2, hsl(var(--clr-neutral-900) / 25%)) 0px 3px 6px;
+}
+
+.card.selected {
+  color: inherit;
+  background-color: var(--card-bg-selected, hsl(var(--clr-neutral-100)));
+
+  box-shadow:
+    var(--card-bdr-selected-1, hsl(var(--clr-accent1-700) / 30%)) 0px 1px 2px 0px,
+    var(--card-bdr-selected-2, hsl(var(--clr-accent1-400) / 25%)) 0px 1px 3px 1px;
+}

@@ -112,13 +112,11 @@ onUnmounted(() => {
 
   <loading-page v-if="isLoading" />
 
-  <div class="container" v-else-if="selectedStudent === null">
-    <section class="width-100">
-      <p class="help-text width-100">
-        No student is selected. Please search for a student using the control
-        above to begin...
-      </p>
-    </section>
+  <div v-else-if="selectedStudent === null" class="container section">
+    <p class="help-text">
+      No student is selected. Please search for a student using the control
+      above to begin...
+    </p>
   </div>
 
   <template v-else>
@@ -144,8 +142,11 @@ onUnmounted(() => {
       </nav>
     </div>
 
-    <section class="main-content | container width-100">
-      <h1>{{ selectedStudent.lastName }}, {{ selectedStudent.firstName }}</h1>
+    <section class="main-content | container">
+      <h2 class="size-xl">
+        {{ selectedStudent.lastName }}, {{ selectedStudent.firstName }}
+      </h2>
+
       <router-view />
     </section>
   </template>

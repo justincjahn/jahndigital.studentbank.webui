@@ -146,10 +146,6 @@ watchEffect(() => {
 </template>
 
 <style scoped>
-.tool-strip {
-  margin-bottom: 1em;
-}
-
 .transaction-list {
   /* Make pagination buttons always appear at the bottom. */
   flex-grow: 1;

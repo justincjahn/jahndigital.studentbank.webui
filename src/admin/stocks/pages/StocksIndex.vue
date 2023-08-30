@@ -111,9 +111,7 @@ globalStore.stock.fetch({
   </div>
 
   <section class="container section flex-group">
-    <div class="main-panel">
-      <h2>Linked</h2>
-
+    <div class="flow flex-100">
       <suspense>
         <stock-list
           v-model="selected"
@@ -123,10 +121,14 @@ globalStore.stock.fetch({
       </suspense>
     </div>
 
-    <div class="sidebar">
-      <h2>Update</h2>
+    <div class="flow flex-100">
+      <form
+        class="edit-form | card flow"
+        data-card-full
+        @submit.prevent="handleEdit"
+      >
+        <h2 class="size-l">Update</h2>
 
-      <form class="edit-form" @submit.prevent="handleEdit">
         <stock-add-edit-form
           v-model="formData"
           v-model:valid="formValid"
@@ -136,7 +138,8 @@ globalStore.stock.fetch({
 
         <button
           type="submit"
-          class="primary"
+          class="primary | width-100"
+          data-button-type="chonky"
           :disabled="!formValid || !formDirty"
         >
           <loading-label :show="loading">
@@ -145,8 +148,8 @@ globalStore.stock.fetch({
         </button>
       </form>
 
-      <div class="stock-history">
-        <h2>History</h2>
+      <div class="card | flow" data-card-full>
+        <h2 class="size-l">History</h2>
 
         <suspense>
           <stock-history-list :store="globalStore" />
@@ -172,46 +175,3 @@ globalStore.stock.fetch({
     />
   </suspense>
 </template>
-
-<style scoped>
-.main-content {
-  display: flex;
-}
-
-/* @TODO: Use utility classes */
-.main-panel {
-  width: 100%;
-}
-
-.sidebar {
-  flex-grow: 1;
-}
-
-.edit-form {
-  margin-bottom: 1rem;
-}
-
-.edit-form,
-.stock-history {
-  display: block;
-  padding: 1rem;
-  border: 1px solid hsl(var(--clr-neutral-500));
-  border-radius: var(--border-radius);
-}
-
-.edit-form button[type='submit'] {
-  width: 100%;
-  margin-top: 1em;
-  height: 2.5em;
-}
-
-@media screen and (min-width: 50em) {
-  .main-content {
-    flex-direction: row;
-  }
-
-  .main-panel {
-    max-width: clamp(15rem, 30rem, 60cqi);
-  }
-}
-</style>

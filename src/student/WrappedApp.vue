@@ -2,6 +2,9 @@
 // Styles
 import '@/student/common/styles/layout.css';
 
+// Components
+import ModalDialog from '@/common/components/ModalDialog.vue';
+
 // Core
 import { defineAsyncComponent, provide, onUnmounted, computed } from 'vue';
 
@@ -39,6 +42,15 @@ const isHydrated = computed(() => globalStore.user.isHydrated.value);
 
 const isAuthenticated = computed(() => globalStore.user.isAuthenticated.value);
 
+const error = computed({
+  get() {
+    return globalStore.error.error.value;
+  },
+  set(value) {
+    globalStore.error.setCurrentError(value);
+  },
+});
+
 if (!globalStore.user.isAnonymous.value && !globalStore.user.isStudent.value) {
   const baseUrl = `${import.meta.env.BASE_URL}/`.replace('//', '/');
   window.location.href = `${baseUrl}${BASE_URLS.ADMIN}/`;
@@ -46,47 +58,50 @@ if (!globalStore.user.isAnonymous.value && !globalStore.user.isStudent.value) {
 </script>
 
 <template>
-  <div class="main-wrapper">
-    <template v-if="isAuthenticated">
-      <header class="main-header">
-        <div class="container">
-          <div class="inner flex-group">
-            <div class="flex-group">
-              <img v-if="SITE_LOGO" :src="SITE_LOGO" :alt="`${SITE_NAME}`" />
-              <h1 v-if="!SITE_DISABLE_NAME">{{ SITE_NAME }}</h1>
-            </div>
-
-            <div class="login-widget">
-              <login-widget :store="globalStore.user" />
-            </div>
-          </div>
+  <template v-if="isAuthenticated">
+    <header class="main-header">
+      <div class="container flex-group">
+        <div class="flex-group">
+          <img v-if="SITE_LOGO" :src="SITE_LOGO" :alt="`${SITE_NAME}`" />
+          <h1 v-if="!SITE_DISABLE_NAME">{{ SITE_NAME }}</h1>
         </div>
-      </header>
 
-      <nav class="sub-nav | container section" data-flex-type="start">
-        <div class="inner flex-group" data-flex-type="start">
-          <router-link :to="{ name: AccountsRouteNames.index }">
-            Accounts
-          </router-link>
+        <div class="login-widget">
+          <login-widget :store="globalStore.user" />
         </div>
-      </nav>
-
-      <div class="container flex-grow-1">
-        <main v-if="isLoading" class="inner"><loading-page /></main>
-        <main v-else class="inner"><router-view /></main>
       </div>
+    </header>
 
-      <footer class="main-footer | inner">
-        &copy; 2019-{{ new Date().getFullYear() }} Jahn Digital v{{ VERSION }}
-      </footer>
-    </template>
+    <nav class="sub-nav | section">
+      <div class="container flex-group" data-flex-type="start">
+        <router-link :to="{ name: AccountsRouteNames.index }">
+          Accounts
+        </router-link>
+      </div>
+    </nav>
 
-    <template v-else-if="!isHydrated">
-      <loading-page :overlay="true" />
-    </template>
+    <main v-if="isLoading" class="main-content"><loading-page /></main>
+    <main v-else class="main-content"><router-view /></main>
 
-    <template v-else>
-      <login-page :store="globalStore.user" :admin="false" />
-    </template>
-  </div>
+    <footer class="main-footer">
+      &copy; 2019-{{ new Date().getFullYear() }} Jahn Digital v{{ VERSION }}
+    </footer>
+  </template>
+
+  <template v-else-if="!isHydrated">
+    <loading-page :overlay="true" />
+  </template>
+
+  <template v-else>
+    <login-page :store="globalStore.user" :admin="false" />
+  </template>
+
+  <modal-dialog
+    :show="error !== null && error.length > 0"
+    class="destructive"
+    title="Error"
+    @submit="() => (error = null)"
+  >
+    {{ error }}
+  </modal-dialog>
 </template>

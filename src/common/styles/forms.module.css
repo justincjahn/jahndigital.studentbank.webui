@@ -12,6 +12,10 @@ label span.required {
   vertical-align: super;
 }
 
+input {
+  font-size: var(--font-size-300);
+}
+
 input[type=text],
 input[type=password]
 {
@@ -49,9 +53,12 @@ input[type=submit]
 
   outline: 0;
   padding: 0.5em;
-  min-width: 100px;
+  min-width: 7rem;
   user-select: none;
   cursor: pointer;
+
+  font-size: var(--font-size-200);
+  line-height: 1.2;
 
   color: hsl(var(--clr-font));
   background-color: hsl(var(--clr-bg));
@@ -60,7 +67,6 @@ input[type=submit]
 
   transition-property: filter, background-color;
   transition-duration: 0.15s;
-  transition-delay: 0;
 }
 
 button:hover:enabled,
@@ -85,9 +91,16 @@ input[type=submit]:focus:enabled
 button:disabled,
 input[type=submit]:disabled
 {
-  --clr-font: var(--clr-primary-400) / 0.75;
+  --clr-font: var(--clr-neutral-600);
+  --clr-bg: var(--clr-neutral-300);
+  --clr-border: var(--clr-neutral-500) / 0.75;
+  font-weight: 100;
   font-style: italic;
   cursor: inherit;
+}
+
+button[data-button-type="chonky"] {
+  height: 2.5em;
 }
 
 /*
@@ -107,7 +120,9 @@ button.destructive:disabled,
 input[type=submit].destructive:disabled,
 .modal.destructive button.primary:disabled
 {
-  --clr-font: var(--clr-destructive-100) / 0.75;
+  --clr-font: var(--clr-destructive-100) / 0.85;
+  --clr-bg: var(--clr-destructive-300);
+  --clr-border: var(--clr-destructive-300);
 }
 
 button.destructive:focus,
@@ -133,6 +148,8 @@ button.primary:disabled,
 input[type=submit].primary:disabled
 {
   --clr-font: var(--clr-accent1-100) / 0.75;
+  --clr-bg: var(--clr-accent1-300);
+  --clr-border: var(--clr-accent1-300)
 }
 
 button.primary:focus,

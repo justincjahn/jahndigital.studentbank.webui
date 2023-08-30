@@ -4,4 +4,30 @@
   margin: 0;
 }
 
-ul, blockquote { margin-left: 1em; }
+html:focus-within {
+  scroll-behavior: smooth;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: var(--font-size-default, 1rem);
+}
+
+h1 {
+  font-size: var(--font-size-800, 1.75em);
+}
+
+ul[role='list'],
+ol[role='list'] {
+  list-style: none;
+}
+
+ul, ol {
+  margin-left: var(--margin-600, 2rem);
+}
