@@ -6,7 +6,12 @@ import { computed, reactive } from 'vue';
 
 // Services
 import { publish } from '@/common/services/eventBus';
-import { getTransactions, newTransaction } from '@/common/services/transaction';
+
+import {
+  getTransactions,
+  newTransaction,
+  newTransfer,
+} from '@/common/services/transaction';
 
 // Composables
 import usePagination from '@/common/composables/usePagination';
@@ -150,6 +155,36 @@ export function setup() {
     return data.newTransaction;
   }
 
+  /**
+   * Create a new transfer and refresh the store's data.
+   *
+   * Fires an event to notify listeners a new transaction has been posted.
+   */
+  async function transfer(input: Parameters<typeof newTransfer>[0]) {
+    const data = await newTransfer(input);
+
+    if (
+      input.sourceShareId === store.shareId ||
+      input.destinationShareId === store.shareId
+    ) {
+      store.loading = true;
+
+      try {
+        await fetch({
+          shareId: store.shareId,
+          first: pageSize.value,
+          cache: false,
+        });
+      } finally {
+        store.loading = false;
+      }
+    }
+
+    publish(transactionEventSymbol, data.newTransfer.item1);
+    publish(transactionEventSymbol, data.newTransfer.item2);
+    return data.newTransfer;
+  }
+
   return {
     // State
     loading,
@@ -168,6 +203,7 @@ export function setup() {
 
     // CRUD
     create,
+    transfer,
   };
 }
 
