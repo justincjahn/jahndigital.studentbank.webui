@@ -6,6 +6,10 @@
   margin-block: var(--section-spacer, var(--margin-400));
 }
 
+.section[data-section-type="bottomless"] {
+  margin-bottom: 0;
+}
+
 .flow > *:where(:not(:first-child)) {
   /* Introduces spacing between elements again. */
 
@@ -97,6 +101,10 @@
 
 .width-100 {
   width: 100%;
+}
+
+.height-100 {
+  height: 100%;
 }
 
 .main-footer {
