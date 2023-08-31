@@ -20,7 +20,11 @@ defineEmits<{
       :share="share"
       :selected="share.id === store.share.selected.value?.id"
       @click="$emit('select', share)"
-    />
+    >
+      <template #default>
+        <slot :share="share" />
+      </template>
+    </share-card>
   </div>
 </template>
 

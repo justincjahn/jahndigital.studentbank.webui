@@ -38,33 +38,41 @@ const withdrawalPeriod = computed(() => {
 
 <template>
   <div :class="classes" data-card-clickable>
-    <h2 class="size-l">{{ description }}</h2>
+    <div class="flex-group height-100" data-flex-direction="column">
+      <div>
+        <h2 class="size-l">{{ description }}</h2>
 
-    <div class="split-data emphasis">
-      <span>Available Balance</span>
-      <span :class="{ error: balance.getAmount() < 0 }">{{ balance }}</span>
+        <div class="split-data emphasis">
+          <span>Available Balance</span>
+          <span :class="{ error: balance.getAmount() < 0 }">{{ balance }}</span>
+        </div>
+
+        <div v-if="rate.getRate() > 0" class="split-data">
+          <span>Dividend Rate</span>
+          <span>{{ rate }}</span>
+        </div>
+
+        <template v-if="withdrawalLimit">
+          <div class="split-data">
+            <span>Withdrawal Limit</span>
+            <span>{{ withdrawalLimit }}</span>
+          </div>
+
+          <div class="split-data">
+            <span>Withdrawal Period</span>
+            <span>{{ withdrawalPeriod }}</span>
+          </div>
+
+          <div class="split-data">
+            <span>Withdrawals this Period</span>
+            <span>{{ withdrawalCount }}</span>
+          </div>
+        </template>
+      </div>
+
+      <div v-if="$slots.default">
+        <slot />
+      </div>
     </div>
-
-    <div v-if="rate.getRate() > 0" class="split-data">
-      <span>Dividend Rate</span>
-      <span>{{ rate }}</span>
-    </div>
-
-    <template v-if="withdrawalLimit">
-      <div class="split-data">
-        <span>Withdrawal Limit</span>
-        <span>{{ withdrawalLimit }}</span>
-      </div>
-
-      <div class="split-data">
-        <span>Withdrawal Period</span>
-        <span>{{ withdrawalPeriod }}</span>
-      </div>
-
-      <div class="split-data">
-        <span>Withdrawals this Period</span>
-        <span>{{ withdrawalCount }}</span>
-      </div>
-    </template>
   </div>
 </template>
