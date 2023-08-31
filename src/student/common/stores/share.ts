@@ -2,6 +2,8 @@ import type { UserStore } from '@/common/stores/user';
 import type { Share } from '@/common/services/share';
 import { reactive, computed, watchEffect } from 'vue';
 import { getSharesByStudentId } from '@/common/services/share';
+import { subscribe } from '@/common/services/eventBus';
+import { newTransaction } from '@/common/events';
 
 export function setup(userStore: UserStore) {
   const store = reactive({
@@ -32,7 +34,19 @@ export function setup(userStore: UserStore) {
     store.shares = [...res.shares.nodes];
   }
 
-  function dispose() {}
+  const onTransactionDispose = subscribe(newTransaction, (payload) => {
+    const idx = store.shares.findIndex((x) => x.id === payload.targetShareId);
+    if (idx === -1) return;
+
+    store.shares.splice(idx, 1, {
+      ...store.shares[idx],
+      balance: payload.newBalance,
+    });
+  });
+
+  function dispose() {
+    onTransactionDispose();
+  }
 
   watchEffect(() => {
     if (userStore.isAuthenticated.value) {
