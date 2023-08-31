@@ -1,7 +1,7 @@
 {
   "name": "jahndigital.studentbank.webui",
   "private": true,
-  "version": "0.0.20-alpha.202308292227",
+  "version": "0.0.20-alpha.202308302234",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build --emptyOutDir",
