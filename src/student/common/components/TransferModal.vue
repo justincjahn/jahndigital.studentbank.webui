@@ -105,17 +105,15 @@ watch(
 
   () => {
     handleAmountError(amountError.value);
-  },
-
-  { immediate: true }
+  }
 );
 
 // Clear the form when it's shown
 watchEffect(() => {
   if (props.show) {
     destination.value = null;
-    amountError.value = '';
-    amount.value = Money.fromNumber(0);
+    amount.value = Money.fromNumber(0.0);
+    handleAmountError('Amount cannot be zero.');
     comment.value = '';
   }
 });
