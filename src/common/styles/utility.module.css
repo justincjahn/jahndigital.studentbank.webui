@@ -184,6 +184,12 @@
   overflow-y: auto;
 }
 
+.nowrap {
+  /* Force an element not to wrap. */
+
+  white-space: nowrap;
+}
+
 .help-text {
   /* Add this to an element to emphasize or provide help context. */
 
