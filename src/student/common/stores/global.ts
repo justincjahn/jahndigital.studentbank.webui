@@ -2,12 +2,15 @@ import userStore from '@/common/stores/user';
 import routerStore from '@/common/stores/router';
 import errorStore from '@/common/stores/error';
 import { setup as setupShareStore } from '@/student/common/stores/share';
+import { setup as setupStockStore } from '@/student/common/stores/stock';
 
 export function setup() {
   const shareStore = setupShareStore(userStore);
+  const stockStore = setupStockStore();
 
   function dispose() {
     shareStore.dispose();
+    stockStore.dispose();
   }
 
   return {
@@ -15,6 +18,7 @@ export function setup() {
     router: routerStore,
     error: errorStore,
     share: shareStore,
+    stock: stockStore,
     dispose,
   };
 }
