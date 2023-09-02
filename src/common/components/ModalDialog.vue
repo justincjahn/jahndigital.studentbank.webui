@@ -183,7 +183,7 @@ dialog.closing::backdrop {
   animation: modal-fade-out 0.2s;
 }
 
-@media screen and (min-height: 40rem) {
+@media screen and (min-height: 55rem) {
   dialog {
     margin-top: 20vh;
     border-radius: var(--border-radius);
