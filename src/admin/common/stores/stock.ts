@@ -131,6 +131,8 @@ export function setup(instanceStore?: InstanceStore) {
           throw new Error('No data returned');
         }
 
+        store.stocks = data.stocks.nodes ?? [];
+
         return {
           pageInfo: data.stocks.pageInfo,
           totalCount: data.stocks.totalCount,
