@@ -23,6 +23,7 @@ import {
 } from '@/common/constants';
 
 import AccountsRouteNames from '@/student/accounts/routeNames';
+import StocksRouteNames from '@/student/stocks/routeNames';
 
 // Components
 import LoadingPage from '@/common/pages/LoadingPage.vue';
@@ -76,6 +77,10 @@ if (!globalStore.user.isAnonymous.value && !globalStore.user.isStudent.value) {
       <div class="container flex-group" data-flex-type="start">
         <router-link :to="{ name: AccountsRouteNames.index }">
           Accounts
+        </router-link>
+
+        <router-link :to="{ name: StocksRouteNames.index }">
+          Stocks
         </router-link>
       </div>
     </nav>
