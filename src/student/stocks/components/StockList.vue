@@ -1,11 +1,22 @@
 <script setup lang="ts">
 import type { StockStore } from '@/student/common/stores/stock';
 import type { Stock } from '@/common/services/stock';
-import { ref, toRef } from 'vue';
+
+// Core
+import { defineAsyncComponent, ref, toRef } from 'vue';
+
+// Utils
 import Money from '@/common/utils/Money';
-import StockRouteNames from '@/student/stocks/routeNames';
+
+// Composables
 import useGlobalStore from '@/student/common/composables/useGlobalStore';
-import StockTransactionModal from './StockTransactionModal.vue';
+
+// Routes
+import StockRouteNames from '@/student/stocks/routeNames';
+
+const StockTransactionModal = defineAsyncComponent(
+  () => import('@/student/stocks/components/StockTransactionModal.vue')
+);
 
 const props = defineProps<{
   store: StockStore;

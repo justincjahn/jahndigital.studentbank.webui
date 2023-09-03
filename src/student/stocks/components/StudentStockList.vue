@@ -1,11 +1,22 @@
 <script setup lang="ts">
 import type { StudentStock } from '@/common/services/stock';
 import type { StudentStockStore } from '@/student/common/stores/studentStock';
-import { ref, toRef } from 'vue';
+
+// Core
+import { defineAsyncComponent, ref, toRef } from 'vue';
+
+// Composables
 import useGlobalStore from '@/student/common/composables/useGlobalStore';
+
+// Utils
 import Money from '@/common/utils/Money';
+
+// Routes
 import StockRouteNames from '@/student/stocks/routeNames';
-import StockTransactionModal from '@/student/stocks/components/StockTransactionModal.vue';
+
+const StockTransactionModal = defineAsyncComponent(
+  () => import('@/student/stocks/components/StockTransactionModal.vue')
+);
 
 const props = defineProps<{
   store: StudentStockStore;
@@ -95,16 +106,18 @@ function handleStockPurchase(stock: StudentStock, buy: boolean) {
     </table>
   </div>
 
-  <stock-transaction-modal
-    :show="showStockModal"
-    :loading="loadingStockModal"
-    :buy="buyStock"
-    :shares="shares"
-    :holdings="selectedStock?.sharesOwned ?? -1"
-    :stock="selectedStock?.stock ?? null"
-    @cancel="showStockModal = false"
-    @submit="showStockModal = false"
-  />
+  <suspense>
+    <stock-transaction-modal
+      :show="showStockModal"
+      :loading="loadingStockModal"
+      :buy="buyStock"
+      :shares="shares"
+      :holdings="selectedStock?.sharesOwned ?? -1"
+      :stock="selectedStock?.stock ?? null"
+      @cancel="showStockModal = false"
+      @submit="showStockModal = false"
+    />
+  </suspense>
 </template>
 
 <style scoped>
