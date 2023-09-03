@@ -226,12 +226,16 @@ watchEffect(() => {
 
     <div class="split-data">
       <span>Current Market Value</span>
-      <span>{{ Money.fromNumber(stock?.currentValue ?? 0) }}</span>
+      <span class="nowrap">
+        {{ Money.fromNumber(stock?.currentValue ?? 0) }}
+      </span>
     </div>
 
     <div class="split-data">
       <span>Current Holdings</span>
-      <span :class="{ loading: loadingHoldings }">{{ holdings }}</span>
+      <span class="nowrap" :class="{ loading: loadingHoldings }">
+        {{ holdings }}
+      </span>
     </div>
 
     <div class="section">
@@ -253,24 +257,27 @@ watchEffect(() => {
 
     <div class="split-data">
       <span>Total</span>
-      <span>{{ totalAmount }}</span>
+      <span class="nowrap">{{ totalAmount }}</span>
     </div>
 
     <div class="split-data">
       <span>Current Balance</span>
-      <span :class="{ error: currentBalance.compare(0) === -1 }">
+      <span class="nowrap" :class="{ error: currentBalance.compare(0) === -1 }">
         {{ currentBalance }}
       </span>
     </div>
 
     <div v-if="fee.compare(0) > 0" class="split-data">
       <span>Transaction Fee</span>
-      <span>{{ fee }}</span>
+      <span class="nowrap">{{ fee }}</span>
     </div>
 
     <div class="split-data">
       <span>New Balance</span>
-      <span :class="{ error: remainingBalance.compare(0) === -1 }">
+      <span
+        class="nowrap"
+        :class="{ error: remainingBalance.compare(0) === -1 }"
+      >
         {{ remainingBalance }}
       </span>
     </div>

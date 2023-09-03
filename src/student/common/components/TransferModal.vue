@@ -134,7 +134,7 @@ watchEffect(() => {
 
     <p class="emphasis split-data">
       <span>Available Balance</span>
-      <span :class="{ error: currentBalance.compare(0) === -1 }">
+      <span class="nowrap" :class="{ error: currentBalance.compare(0) === -1 }">
         {{ currentBalance }}
       </span>
     </p>
@@ -162,19 +162,22 @@ watchEffect(() => {
 
     <p v-if="fee.compare(0) > 0" class="split-data">
       <span>Transaction Fee</span>
-      <span>{{ fee }}</span>
+      <span class="nowrap">{{ fee }}</span>
     </p>
 
     <p class="split-data">
       <span>Remaining Balance</span>
-      <span :class="{ error: negativeError }">
+      <span class="nowrap" :class="{ error: negativeError }">
         {{ remainingBalance }}
       </span>
     </p>
 
     <p class="split-data">
       <span>Destination Balance</span>
-      <span :class="{ error: destinationBalance.compare(0) === -1 }">
+      <span
+        class="nowrap"
+        :class="{ error: destinationBalance.compare(0) === -1 }"
+      >
         {{ destinationBalance }}
       </span>
     </p>
