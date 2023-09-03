@@ -61,6 +61,7 @@ export function setup(userStore: UserStore) {
     shares,
     selected,
     dispose,
+    fetch,
   };
 }
 
