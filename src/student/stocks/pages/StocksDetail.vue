@@ -13,7 +13,7 @@ import useGlobalStore from '@/student/common/composables/useGlobalStore';
 
 // Components
 import LoadingPage from '@/common/pages/LoadingPage.vue';
-import StockHistoryList from '../components/StockHistoryList.vue';
+import StockHistoryList from '@/student/stocks/components/StockHistoryList.vue';
 
 const router = useRoute();
 
