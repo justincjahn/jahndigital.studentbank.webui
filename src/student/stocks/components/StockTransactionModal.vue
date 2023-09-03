@@ -109,9 +109,7 @@ const totalAmount = computed(() => {
   return Money.fromNumber(stock.value.currentValue * adjustedQuantity.value);
 });
 
-const remainingShares = computed(
-  () => holdings.value - Math.abs(adjustedQuantity.value)
-);
+const remainingShares = computed(() => holdings.value + adjustedQuantity.value);
 
 const canSubmit = computed(() => {
   if (loading.value) return false;
@@ -128,7 +126,7 @@ function validate(value: string): string | boolean {
   if (isValid !== true) return isValid;
 
   const qty = +value;
-  const remaining = holdings.value - qty;
+  const remaining = holdings.value - (props.buy ? qty * -1 : qty);
 
   if (remaining < 0) {
     return 'You cannot sell more shares than you own.';
