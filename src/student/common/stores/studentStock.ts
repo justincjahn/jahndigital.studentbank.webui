@@ -143,11 +143,13 @@ export function setup() {
       return null;
     }
 
-    const studentStock = data.studentStocks.nodes[0];
-    const idx = store.stocks.findIndex((x) => x.id === studentStock.id);
+    const [studentStock] = data.studentStocks.nodes;
+    const newStocks = [...store.stocks];
+    const idx = newStocks.findIndex((x) => x.id === studentStock.id);
 
     if (idx >= 0) {
-      store.stocks.splice(idx, 1, { ...studentStock });
+      newStocks.splice(idx, 1, studentStock);
+      store.stocks = newStocks;
     }
 
     return studentStock;
