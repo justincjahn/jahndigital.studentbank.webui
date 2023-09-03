@@ -1,7 +1,7 @@
-import { computed, reactive } from 'vue';
-
-// Types
 import type { Stock } from '@/common/services/stock';
+
+// Core
+import { computed, reactive } from 'vue';
 
 // Composables
 import usePagination from '@/common/composables/usePagination';
@@ -9,11 +9,11 @@ import usePagination from '@/common/composables/usePagination';
 // GraphQL
 import { getStocks, getStudentStockHistory } from '@/common/services/stock';
 import { newStockPurchase } from '@/common/services/transaction';
+import { SortEnumType } from '@/generated/graphql';
 
 // Events
 import { publish } from '@/common/services/eventBus';
 import { newTransaction, newStockTransaction } from '@/common/events';
-import { SortEnumType } from '@/generated/graphql';
 
 /**
  * Stores information about stocks in the system.
@@ -116,6 +116,44 @@ export function setup() {
     },
   });
 
+  /**
+   * Attempt to find a StudentStock by ID.
+   *
+   * @param studentId The Student's ID
+   * @param stockId The Stock's ID
+   * @returns A StudentStock record, or null if nothing was found.
+   */
+  async function findById(stockId: number) {
+    const data = await getStocks({
+      first: 1,
+      cache: false,
+      where: {
+        id: {
+          eq: stockId,
+        },
+      },
+    });
+
+    if (!data.stocks || !data.stocks.nodes) {
+      throw new Error('No data returned.');
+    }
+
+    if (data.stocks.nodes.length === 0) {
+      return null;
+    }
+
+    const [stock] = data.stocks.nodes;
+    const newStocks = [...store.stocks];
+    const idx = newStocks.findIndex((x) => x.id === stock.id);
+
+    if (idx >= 0) {
+      newStocks.splice(idx, 1, stock);
+      store.stocks = newStocks;
+    }
+
+    return stock;
+  }
+
   async function purchase(input: Parameters<typeof newStockPurchase>[0]) {
     store.loading = true;
 
@@ -166,6 +204,7 @@ export function setup() {
     fetchNext,
     fetchPrevious,
 
+    findById,
     purchase,
     dispose,
   };

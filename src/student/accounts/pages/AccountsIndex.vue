@@ -52,6 +52,7 @@ watchEffect(() => {
   }
 });
 
+// Always make sure transactions are loaded.
 watch(
   () => globalStore.share.selected.value,
   (newValue) => {
@@ -63,7 +64,8 @@ watch(
         cache: false,
       });
     }
-  }
+  },
+  { immediate: true }
 );
 </script>
 

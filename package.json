@@ -1,7 +1,7 @@
 {
   "name": "jahndigital.studentbank.webui",
   "private": true,
-  "version": "0.0.20-alpha.202308302234",
+  "version": "0.0.20-alpha.202309022320",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build --emptyOutDir",
@@ -15,6 +15,9 @@
   },
   "dependencies": {
     "@apollo/client": "^3.6.9",
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/vue-fontawesome": "^3.0.3",
     "graphql": "^16.7.1",
     "graphql-tag": "^2.12.6",
     "vue": "^3.2.37",
