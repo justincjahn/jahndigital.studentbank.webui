@@ -147,7 +147,7 @@ export function setup() {
     const idx = store.stocks.findIndex((x) => x.id === studentStock.id);
 
     if (idx >= -1) {
-      store.stocks.splice(idx, 1, { ...studentStock });
+      // store.stocks.splice(idx, 1, { ...studentStock });
     }
 
     return studentStock;
