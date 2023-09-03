@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { StudentStock } from '@/common/services/stock';
-import type { StudentStockStore } from '@/student/stocks/stores/studentStock';
+import type { StudentStockStore } from '@/student/common/stores/studentStock';
 import { ref, toRef } from 'vue';
 import useGlobalStore from '@/student/common/composables/useGlobalStore';
 import Money from '@/common/utils/Money';
