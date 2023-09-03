@@ -116,10 +116,47 @@ export function setup() {
     },
   });
 
+  /**
+   * Attempt to find a StudentStock by ID.
+   *
+   * @param studentId The Student's ID
+   * @param stockId The Stock's ID
+   * @returns A StudentStock record, or null if nothing was found.
+   */
+  async function findById(studentId: number, stockId: number) {
+    const data = await getStudentStocks({
+      first: 1,
+      studentId,
+      cache: false,
+      where: {
+        stockId: {
+          eq: stockId,
+        },
+      },
+    });
+
+    if (!data.studentStocks || !data.studentStocks.nodes) {
+      throw new Error('No data returned.');
+    }
+
+    if (data.studentStocks.nodes.length === 0) {
+      return null;
+    }
+
+    const studentStock = data.studentStocks.nodes[0];
+    const idx = store.stocks.findIndex((x) => x.id === studentStock.id);
+
+    if (idx >= -1) {
+      store.stocks.splice(idx, 1, { ...studentStock });
+    }
+
+    return studentStock;
+  }
+
   const disposeNewStockTransaction = subscribe(newStockTransaction, (stock) => {
     const idx = store.stocks.findIndex((x) => x.id === stock.id);
-    if (idx < 1) return;
-    store.stocks.splice(idx, 1, stock);
+    if (idx < 0) return;
+    store.stocks.splice(idx, 1, { ...stock });
   });
 
   function dispose() {
@@ -141,6 +178,7 @@ export function setup() {
     fetchNext,
     fetchPrevious,
 
+    findById,
     dispose,
   };
 }

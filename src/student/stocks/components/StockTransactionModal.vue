@@ -17,6 +17,7 @@ import useTransactionCalculations from '@/student/common/composables/useTransact
 import { VInput } from '@/common/components/inputs';
 import ModalDialog from '@/common/components/ModalDialog.vue';
 import ShareSelector from '@/common/components/ShareSelector.vue';
+import LoadingLabel from '@/common/components/LoadingLabel.vue';
 
 type StockSubset = Pick<Stock, 'id' | 'currentValue' | 'symbol' | 'name'>;
 
@@ -48,32 +49,35 @@ const stock = toRef(() => {
   };
 });
 
-const verb = computed(() => (props.buy ? 'Purchase' : 'Sell'));
+const verb = computed(() => (props.buy ? 'Buy' : 'Sell'));
 
 const title = computed(() => `${verb.value} ${stock.value.symbol}`);
 
 const globalStore = useGlobalStore();
 
-const holdings = computed(() => {
-  if (stock.value.id === -1) return 0;
-  const studentStocks = globalStore.studentStock.stocks.value;
-  const studentStock = studentStocks.find((x) => x.id === stock.value.id);
-  return studentStock?.sharesOwned ?? 0;
-});
+const holdings = ref(0);
 
 const shares = toRef(() => globalStore.share.shares.value);
 
 const purchasing = ref(false);
 
+const loadingHoldings = ref(false);
+
+const studentStocksLoading = toRef(
+  () => globalStore.studentStock.loading.value
+);
+
 const loading = toRef(
   () =>
     globalStore.stock.loading.value ||
-    globalStore.studentStock.loading.value ||
+    studentStocksLoading.value ||
     globalStore.share.loading.value ||
-    purchasing.value
+    purchasing.value ||
+    loadingHoldings.value
 );
 
-// Form values
+const submitLabel = computed(() => (loading.value ? 'Loading...' : verb.value));
+
 const selectedShare = ref<Share | null>(null);
 
 const {
@@ -87,15 +91,18 @@ const {
 } = useTransactionCalculations(() => selectedShare.value);
 
 const quantity = ref('0');
+
 const quantityError = ref('');
 
 // If the user is trying to sell stocks, the quantity is negative
-const adjustedQuantity = computed(() =>
-  props.buy ? +quantity.value : +quantity.value * -1
-);
+const adjustedQuantity = computed(() => {
+  const qty = +quantity.value;
+  if (Number.isNaN(qty)) return 0;
+  return props.buy ? qty : qty * -1;
+});
 
 const totalAmount = computed(() => {
-  if (Number.isNaN(adjustedQuantity.value) || adjustedQuantity.value < 0) {
+  if (adjustedQuantity.value < 0 && props.buy) {
     return Money.fromNumber(0);
   }
 
@@ -103,6 +110,10 @@ const totalAmount = computed(() => {
     (stock.value.currentValue ?? 0) * adjustedQuantity.value
   );
 });
+
+const remainingShares = computed(
+  () => holdings.value - Math.abs(adjustedQuantity.value)
+);
 
 const canSubmit = computed(() => {
   if (loading.value) return false;
@@ -113,6 +124,42 @@ const canSubmit = computed(() => {
   if (withdrawalLimitFeeError.value) return false;
   return true;
 });
+
+function validate(value: string): string | boolean {
+  const isValid = validatePositiveNumberWhole(value);
+  if (isValid !== true) return isValid;
+
+  const qty = +value;
+  const remaining = holdings.value - qty;
+  if (remaining < 0) {
+    return 'You cannot sell more shares than you own.';
+  }
+
+  return true;
+}
+
+async function findById() {
+  if (stock.value.id === -1) return;
+
+  loadingHoldings.value = true;
+
+  try {
+    const data = await globalStore.studentStock.findById(
+      globalStore.user.id.value,
+      stock.value.id
+    );
+
+    holdings.value = data?.sharesOwned ?? 0;
+  } catch (e) {
+    if (e instanceof Error) {
+      globalStore.error.setCurrentError(e.message);
+    } else {
+      globalStore.error.setCurrentError('An unknown error occurred.');
+    }
+  } finally {
+    loadingHoldings.value = false;
+  }
+}
 
 async function handleSubmit() {
   if (!canSubmit.value) return;
@@ -125,6 +172,12 @@ async function handleSubmit() {
       shareId: selectedShare.value?.id ?? -1,
       quantity: adjustedQuantity.value,
     });
+  } catch (e) {
+    if (e instanceof Error) {
+      globalStore.error.setCurrentError(e.message);
+    } else {
+      globalStore.error.setCurrentError('An unknown error has occurred.');
+    }
   } finally {
     purchasing.value = false;
   }
@@ -142,14 +195,9 @@ watch(
 watchEffect(() => {
   if (props.show) {
     quantity.value = '0';
+    quantityError.value = '';
     selectedShare.value = null;
-
-    // Make sure everything is up to date
-    globalStore.share.fetch();
-    globalStore.studentStock.fetch({
-      studentId: globalStore.user.id.value,
-      cache: false,
-    });
+    findById();
   }
 });
 </script>
@@ -159,7 +207,7 @@ watchEffect(() => {
     :show="show"
     :title="title"
     cancel-label="Cancel"
-    :submit-label="verb"
+    :submit-label="submitLabel"
     :can-cancel="!purchasing"
     :can-submit="canSubmit"
     @cancel="$emit('cancel')"
@@ -172,7 +220,7 @@ watchEffect(() => {
 
     <div class="split-data">
       <span>Symbol</span>
-      <span>{{ stock?.symbol }}</span>
+      <span>{{ stock.symbol }}</span>
     </div>
 
     <div class="split-data">
@@ -182,7 +230,7 @@ watchEffect(() => {
 
     <div class="split-data">
       <span>Current Holdings</span>
-      <span>{{ holdings }}</span>
+      <span :class="{ loading: loadingHoldings }">{{ holdings }}</span>
     </div>
 
     <div class="section">
@@ -197,7 +245,7 @@ watchEffect(() => {
         v-model="quantity"
         v-model:error="quantityError"
         :label="`Quantity to ${verb}`"
-        :validator="validatePositiveNumberWhole"
+        :validator="validate"
         required
       />
     </div>
@@ -225,5 +273,14 @@ watchEffect(() => {
         {{ remainingBalance }}
       </span>
     </div>
+
+    <div class="split-data">
+      <span>Remaining Shares</span>
+      <span>{{ remainingShares }}</span>
+    </div>
+
+    <template #submitLabel="{ label }">
+      <loading-label :show="loading">{{ label }}</loading-label>
+    </template>
   </modal-dialog>
 </template>

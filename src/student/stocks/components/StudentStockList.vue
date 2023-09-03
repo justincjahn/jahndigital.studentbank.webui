@@ -46,9 +46,9 @@ function handleStockPurchase(stock: StudentStock, buy: boolean) {
           <th>Symbol</th>
           <th>Company</th>
           <th>Last Transaction</th>
-          <th>Holdings</th>
           <th>Share Value</th>
-          <th>Total</th>
+          <th>Shares Held</th>
+          <th>Total Value</th>
           <th>Net Contributions</th>
           <th>Position</th>
           <th></th>
@@ -71,6 +71,7 @@ function handleStockPurchase(stock: StudentStock, buy: boolean) {
             {{ new Date(stock.dateLastActive).toLocaleDateString() }}
             {{ new Date(stock.dateLastActive).toLocaleTimeString() }}
           </td>
+          <td>{{ Money.fromNumber(stock.stock.currentValue) }}</td>
           <td>
             {{
               stock.sharesOwned.toLocaleString('en-US', {
@@ -78,7 +79,6 @@ function handleStockPurchase(stock: StudentStock, buy: boolean) {
               })
             }}
           </td>
-          <td>{{ Money.fromNumber(stock.stock.currentValue) }}</td>
           <td>{{ worth(stock) }}</td>
           <td>{{ Money.fromNumber(stock.netContribution) }}</td>
           <td>{{ position(stock) }}</td>
@@ -102,5 +102,30 @@ function handleStockPurchase(stock: StudentStock, buy: boolean) {
     :shares="shares"
     :holdings="selectedStock?.sharesOwned ?? -1"
     :stock="selectedStock?.stock ?? null"
+    @cancel="showStockModal = false"
+    @submit="showStockModal = false"
   />
 </template>
+
+<style scoped>
+th,
+td {
+  padding-inline: 1rem;
+}
+
+td:nth-child(1) {
+  min-width: 12ch;
+}
+
+td:nth-child(2) {
+  width: 100%;
+}
+
+td:where(:nth-child(3), :nth-child(7)) {
+  min-width: 14ch;
+}
+
+td:where(:nth-child(4), :nth-child(5), :nth-child(6), :nth-child(8)) {
+  min-width: 10ch;
+}
+</style>
