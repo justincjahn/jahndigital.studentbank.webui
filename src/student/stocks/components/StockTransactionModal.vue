@@ -55,9 +55,9 @@ const title = computed(() => `${verb.value} ${stock.value.symbol}`);
 
 const globalStore = useGlobalStore();
 
-const holdings = ref(0);
-
 const shares = toRef(() => globalStore.share.shares.value);
+
+const holdings = ref(0);
 
 const purchasing = ref(false);
 
@@ -106,9 +106,7 @@ const totalAmount = computed(() => {
     return Money.fromNumber(0);
   }
 
-  return Money.fromNumber(
-    (stock.value.currentValue ?? 0) * adjustedQuantity.value
-  );
+  return Money.fromNumber(stock.value.currentValue * adjustedQuantity.value);
 });
 
 const remainingShares = computed(
@@ -131,6 +129,7 @@ function validate(value: string): string | boolean {
 
   const qty = +value;
   const remaining = holdings.value - qty;
+
   if (remaining < 0) {
     return 'You cannot sell more shares than you own.';
   }
@@ -152,7 +151,9 @@ async function findById() {
     holdings.value = data?.sharesOwned ?? 0;
   } catch (e) {
     if (e instanceof Error) {
-      globalStore.error.setCurrentError(e.message);
+      globalStore.error.setCurrentError(
+        `Unable to determine stock holdings: ${e.message}`
+      );
     } else {
       globalStore.error.setCurrentError('An unknown error occurred.');
     }
