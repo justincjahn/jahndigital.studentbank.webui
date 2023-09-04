@@ -53,13 +53,15 @@ async function fetchById() {
       stockLoading.value = false;
     }
 
-    try {
-      await stockHistoryStore.fetch({
-        stockId: stockId.value,
-      });
-    } catch (e) {
-      if (e instanceof Error) {
-        globalStore.error.setCurrentError(e.message);
+    if (stock.value !== null) {
+      try {
+        await stockHistoryStore.fetch({
+          stockId: stock.value.id,
+        });
+      } catch (e) {
+        if (e instanceof Error) {
+          globalStore.error.setCurrentError(e.message);
+        }
       }
     }
   }
