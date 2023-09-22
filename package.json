@@ -15,13 +15,15 @@
   },
   "dependencies": {
     "@apollo/client": "^3.6.9",
-    "@fortawesome/fontawesome-svg-core": "^1.2.36",
-    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/fontawesome-svg-core": "^6.4.2",
+    "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "@fortawesome/vue-fontawesome": "^3.0.3",
+    "apexcharts": "^3.42.0",
     "graphql": "^16.7.1",
     "graphql-tag": "^2.12.6",
     "vue": "^3.2.37",
-    "vue-router": "^4.1.5"
+    "vue-router": "^4.1.5",
+    "vue3-apexcharts": "^1.4.4"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.0",
