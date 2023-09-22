@@ -26,6 +26,10 @@ export default function validatePassword(
       return 'Password must contain at least one uppercase letter.';
     }
 
+    if (!/[^a-zA-Z\d]/.test(value)) {
+      return 'Password must contain at least one special character.';
+    }
+
     // Magic happens here whereby the input of repeat triggers this to run again!
     if (!repeat) return true;
     if (!repeat.value || value !== repeat.value) {
