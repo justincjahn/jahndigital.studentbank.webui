@@ -44,6 +44,10 @@
   justify-content: flex-start;
 }
 
+.flex-group[data-flex-type='center'] {
+  justify-content: center;
+}
+
 .flex-group[data-flex-type='end'] {
   justify-content: flex-end;
 }
