@@ -24,6 +24,7 @@ import {
 
 import AccountsRouteNames from '@/student/accounts/routeNames';
 import StocksRouteNames from '@/student/stocks/routeNames';
+import ProfileRouteNames from '@/student/profile/routeNames';
 
 // Components
 import LoadingPage from '@/common/pages/LoadingPage.vue';
@@ -81,6 +82,10 @@ if (!globalStore.user.isAnonymous.value && !globalStore.user.isStudent.value) {
 
         <router-link :to="{ name: StocksRouteNames.index }">
           Stocks
+        </router-link>
+
+        <router-link :to="{ name: ProfileRouteNames.index }">
+          Profile
         </router-link>
       </div>
     </nav>
