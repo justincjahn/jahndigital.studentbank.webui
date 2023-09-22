@@ -7,6 +7,8 @@
     "vue"
   ],
   "cSpell.words": [
+    "apexchart",
+    "apexcharts",
     "Avenir",
     "certgen",
     "chonky",
@@ -20,7 +22,9 @@
     "Preauthorized",
     "Textbox",
     "utyp",
-    "VITE"
+    "VITE",
+    "xaxis",
+    "yaxis"
   ],
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.suggest.paths": false,
