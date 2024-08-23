@@ -229,11 +229,9 @@ export function setup() {
   watch(
     tokenStore.state,
 
-    (newValue, oldValue) => {
+    async (newValue, oldValue) => {
       if (newValue === oldValue) return;
-      getInfo().catch(() => {
-        // Don't need to do anything- the auth manager will clear the store
-      });
+      await getInfo();
     },
 
     {
