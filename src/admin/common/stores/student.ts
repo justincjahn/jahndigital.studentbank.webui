@@ -268,7 +268,7 @@ export function setup() {
 
       const index = store.students.findIndex((x) => x.id === student.id);
       if (index >= 0) {
-        store.students = store.students.splice(index, 1, student);
+        store.students.splice(index, 1, student);
       }
     }
 
