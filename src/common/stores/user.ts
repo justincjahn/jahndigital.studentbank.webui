@@ -187,6 +187,31 @@ export function setup() {
   }
 
   /**
+   * Obtain a preregistration token for the student.
+   *
+   * @param inviteCode
+   * @param accountNumber
+   */
+  async function preregister(inviteCode: string, accountNumber: string) {
+    store.loading = true;
+
+    try {
+      let data: string | null = null;
+
+      const { studentPreregistration } = await import('@/common/services/auth');
+      data = await studentPreregistration({ inviteCode, accountNumber });
+
+      if (data == null) {
+        throw new Error(ERROR_CODES.NOT_AUTHORIZED);
+      }
+
+      tokenStore.token.value = data;
+    } finally {
+      store.loading = false;
+    }
+  }
+
+  /**
    * Log a user or student out.
    */
   async function logout() {
@@ -252,6 +277,7 @@ export function setup() {
     expiration,
     refreshInfo,
     login,
+    preregister,
     logout,
   };
 }
