@@ -1,4 +1,4 @@
-import { Ref } from 'vue';
+import { ComputedRef, Ref, computed, unref } from 'vue';
 
 /**
  * Ensure that the provided value is a valid password, and optionally matches the provided field.
@@ -31,8 +31,9 @@ export default function validatePassword(
     }
 
     // Magic happens here whereby the input of repeat triggers this to run again!
-    if (!repeat) return true;
-    if (!repeat.value || value !== repeat.value) {
+    if (typeof unref(repeat) === 'undefined') return true;
+
+    if (!unref(repeat) || value !== unref(repeat)) {
       return 'Passwords do not match.';
     }
 

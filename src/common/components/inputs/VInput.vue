@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, watch, ref, useAttrs } from 'vue';
+import { computed, watch, ref, unref, useAttrs } from 'vue';
 import useUniqueId from '@/common/composables/useUniqueId';
 import type { ValidationFunc } from './types';
 
@@ -110,7 +110,7 @@ async function handleUpdate(e: Event, v?: (e: Event) => string | boolean) {
 
   if (props.validator) {
     const validationError = await Promise.resolve(
-      props.validator(value.toString())
+      unref(props.validator(value.toString()))
     );
 
     if (validationError === true) {

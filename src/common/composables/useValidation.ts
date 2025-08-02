@@ -1,4 +1,4 @@
-import { ref, Ref, unref, watchEffect } from 'vue';
+import { ref, Ref, unref, MaybeRef, watchEffect } from 'vue';
 import useDebounce from './useDebounce';
 
 /**
@@ -31,7 +31,7 @@ export interface UseValidationOptions {
  * @param options
  */
 export default function useValidation(
-  validator: ValidationFunc | Ref<ValidationFunc>,
+  validator: MaybeRef<ValidationFunc>,
   options?: UseValidationOptions
 ): {
   value: Ref<string>;
