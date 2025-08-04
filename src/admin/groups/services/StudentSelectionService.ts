@@ -111,7 +111,7 @@ export class StudentSelection extends Array<IStudentSelection> {
         item.object.id === student.id
     )[0];
 
-    const excluded = studentList?.excluded === true ?? false;
+    const excluded = studentList?.excluded === true;
 
     if (excluded) {
       return false;

@@ -37,9 +37,11 @@ function formatDividend(value: number) {
 <template>
   <table class="stms selectable">
     <thead>
-      <th></th>
-      <th>Name</th>
-      <th>Rate</th>
+      <tr>
+        <th></th>
+        <th>Name</th>
+        <th>Rate</th>
+      </tr>
     </thead>
     <tbody v-if="props.options.length > 0">
       <tr

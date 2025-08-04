@@ -131,8 +131,7 @@ export function setup(instanceStore: InstanceStore) {
       }
 
       if (
-        instanceStore.selected.value?.id !== store.selected?.instanceId ??
-        false
+        instanceStore.selected.value?.id !== store.selected?.instanceId
       ) {
         store.selected = null;
       }

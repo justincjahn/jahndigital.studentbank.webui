@@ -165,7 +165,7 @@ export function setup() {
    *
    * @param id The ID number of the student.
    * @returns {Student|null} A Student object, or null if no student was found.
-   * @throws {Error} If an error ocurred during the fetch operation.
+   * @throws {Error} If an error occurred during the fetch operation.
    */
   async function getById(id: number): Promise<Student | null> {
     const data = await getStudentById({ id, cache: false });
@@ -240,7 +240,7 @@ export function setup() {
     const data = await newStudent(input);
     const [student] = data.newStudent;
 
-    if (store.students[0]?.groupId === input.groupId ?? true) {
+    if (store.students[0]?.groupId === input.groupId) {
       store.students = [...store.students, student];
     }
 
@@ -268,7 +268,7 @@ export function setup() {
 
       const index = store.students.findIndex((x) => x.id === student.id);
       if (index >= 0) {
-        store.students.splice(index, 1, student);
+        store.students[index] = student;
       }
     }
 
