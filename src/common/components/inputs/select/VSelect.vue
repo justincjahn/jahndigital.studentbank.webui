@@ -144,7 +144,7 @@ const toggle = (e?: Event) => {
 
   if (open.value && button.value !== null) {
     // Focus the button again unless Tab was pressed
-    if (lastKeyPressed.value !== 'Tab' ?? true) {
+    if (lastKeyPressed.value !== 'Tab') {
       button.value.focus();
     }
   }

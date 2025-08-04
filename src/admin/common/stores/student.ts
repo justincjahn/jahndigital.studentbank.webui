@@ -266,9 +266,14 @@ export function setup() {
     if (store.selected && store.selected.id === student.id) {
       [store.selected] = data.updateStudent;
 
+      // @note This was originally a .splice but I kept getting an error that
+      /// a read only property was being modified.  Couldn't find any articles
+      /// about it.
       const index = store.students.findIndex((x) => x.id === student.id);
       if (index >= 0) {
-        store.students[index] = student;
+        const studentList = [...store.students];
+        studentList.splice(index, 1, student);
+        store.students = studentList;
       }
     }
 

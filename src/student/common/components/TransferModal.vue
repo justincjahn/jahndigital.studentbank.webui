@@ -65,7 +65,7 @@ const canSubmit = computed(() => {
 const { name } = useShareName(() => props.source);
 
 const availableShares = computed(() =>
-  globalStore.share.shares.value.filter((x) => x.id !== props.source?.id ?? -1)
+  globalStore.share.shares.value.filter((x) => x.id !== props.source?.id)
 );
 
 const destinationBalance = computed(() =>

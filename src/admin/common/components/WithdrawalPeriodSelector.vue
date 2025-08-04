@@ -58,7 +58,7 @@ defineEmits<{
 <template>
   <v-select
     v-bind="props"
-    @update:model-value="(x) => $emit('update:modelValue', x)"
+    @update:model-value="(x) => $emit('update:modelValue', x as string)"
   >
     <template #activatorLabel="{ prompt: promptText }">
       {{ labelValue ?? promptText }}

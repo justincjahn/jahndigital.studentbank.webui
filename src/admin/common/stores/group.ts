@@ -130,9 +130,7 @@ export function setup(instanceStore: InstanceStore) {
         }
       }
 
-      if (
-        instanceStore.selected.value?.id !== store.selected?.instanceId
-      ) {
+      if (instanceStore.selected.value?.id !== store.selected?.instanceId) {
         store.selected = null;
       }
     },

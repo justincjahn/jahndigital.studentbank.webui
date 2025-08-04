@@ -60,7 +60,7 @@ defineEmits<{
   <v-select
     v-bind="{ ...props, ...$attrs }"
     :model-value="modelValue"
-    @update:model-value="(value) => $emit('update:modelValue', value)"
+    @update:model-value="(value) => $emit('update:modelValue', value as Share)"
   >
     <template #activatorLabel="{ prompt: activatorPrompt }">
       <template v-if="modelValue !== null">

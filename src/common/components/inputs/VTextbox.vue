@@ -49,7 +49,9 @@ function handleInput(e: Event, callback: (e: Event) => void) {
 <template>
   <v-input
     v-bind="{ ...props, ...attrs }"
-    @update:model-value="(value: string | boolean) => $emit('update:modelValue', value)"
+    @update:model-value="
+      (value: string | boolean) => $emit('update:modelValue', value as boolean)
+    "
     @update:error="(value: string | false) => $emit('update:error', value)"
   >
     <template v-for="slotName in Object.keys($slots)" #[slotName]="slotData">
