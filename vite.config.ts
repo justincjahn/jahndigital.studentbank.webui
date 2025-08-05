@@ -7,13 +7,14 @@ import graphql from '@rollup/plugin-graphql';
 import handlebars from 'vite-plugin-handlebars';
 import vue from '@vitejs/plugin-vue';
 import { version } from './package.json';
+import type { ServerOptions } from 'node:https';
 
 export default defineConfig(({ mode }): UserConfig => {
   const env = loadEnv(mode, __dirname, 'VITE_');
 
   process.env.VITE_APP_VERSION = version || '0.0.0';
 
-  let https: boolean | Object = true;
+  let https: boolean | ServerOptions = true;
   if (existsSync('./localhost.key') && existsSync('./localhost.crt')) {
     https = {
       key: readFileSync('./localhost.key'),

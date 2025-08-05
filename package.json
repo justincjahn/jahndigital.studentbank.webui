@@ -1,7 +1,7 @@
 {
   "name": "jahndigital.studentbank.webui",
   "private": true,
-  "version": "0.0.20-alpha.202508012345",
+  "version": "0.0.20-alpha.202508041700",
   "engines": {
     "node": "^22.0.0"
   },
