@@ -1,6 +1,0 @@
-fragment PrivilegeParts on Privilege {
-  id
-  name
-  description
-  dateCreated
-}

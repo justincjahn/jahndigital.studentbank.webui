@@ -1,3 +1,0 @@
-mutation deleteStudent($id: Long!) {
-  deleteStudent(id: $id)
-}

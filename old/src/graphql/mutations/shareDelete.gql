@@ -1,3 +1,0 @@
-mutation deleteShare($id: Long!) {
-  deleteShare(id: $id)
-}

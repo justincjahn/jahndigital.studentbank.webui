@@ -1,7 +1,0 @@
-#import "../fragments/studentBase.gql"
-
-query currentStudent {
-  currentStudent {
-    ...StudentBaseParts
-  }
-}

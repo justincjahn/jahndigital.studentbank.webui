@@ -1,9 +1,0 @@
-mutation studentPreregistration(
-  $inviteCode: String!,
-  $accountNumber: String!
-) {
-  studentPreregistration(input: {
-    inviteCode: $inviteCode,
-    accountNumber: $accountNumber
-  })
-}

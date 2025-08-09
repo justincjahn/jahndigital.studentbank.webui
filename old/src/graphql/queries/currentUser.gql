@@ -1,7 +1,0 @@
-#import "../fragments/user.gql"
-
-query currentUser {
-  currentUser {
-    ...UserParts
-  }
-}
