@@ -9,20 +9,23 @@ import vue from '@vitejs/plugin-vue';
 import { version } from './package.json';
 import type { ServerOptions } from 'node:https';
 
-export default defineConfig(({ mode }): UserConfig => {
-  if (!existsSync('./localhost.key') || !existsSync('./localhost.crt')) {
-    throw new Error(
-      'No SSL certificate found! `npm run certgen` or `npm run certgen:win32`.'
-    );
-  }
-
+export default defineConfig(({ command, mode }): UserConfig => {
   const env = loadEnv(mode, __dirname, 'VITE_');
   process.env.VITE_APP_VERSION = version || '0.0.0';
 
-  const https: ServerOptions = {
-    key: readFileSync('./localhost.key'),
-    cert: readFileSync('./localhost.crt'),
-  };
+  let https: ServerOptions;
+  if (command == 'serve') {
+    if (!existsSync('./localhost.key') || !existsSync('./localhost.crt')) {
+      throw new Error(
+        'No SSL certificate found! `npm run certgen` or `npm run certgen:win32`.'
+      );
+    }
+
+    https = {
+      key: readFileSync('./localhost.key'),
+      cert: readFileSync('./localhost.crt'),
+    };
+  }
 
   return {
     root: 'src',
