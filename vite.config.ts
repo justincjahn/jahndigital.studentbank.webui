@@ -10,17 +10,19 @@ import { version } from './package.json';
 import type { ServerOptions } from 'node:https';
 
 export default defineConfig(({ mode }): UserConfig => {
-  const env = loadEnv(mode, __dirname, 'VITE_');
+  if (!existsSync('./localhost.key') || !existsSync('./localhost.crt')) {
+    throw new Error(
+      'No SSL certificate found! `npm run certgen` or `npm run certgen:win32`.'
+    );
+  }
 
+  const env = loadEnv(mode, __dirname, 'VITE_');
   process.env.VITE_APP_VERSION = version || '0.0.0';
 
-  let https: boolean | ServerOptions = true;
-  if (existsSync('./localhost.key') && existsSync('./localhost.crt')) {
-    https = {
-      key: readFileSync('./localhost.key'),
-      cert: readFileSync('./localhost.crt'),
-    };
-  }
+  const https: ServerOptions = {
+    key: readFileSync('./localhost.key'),
+    cert: readFileSync('./localhost.crt'),
+  };
 
   return {
     root: 'src',
@@ -50,7 +52,7 @@ export default defineConfig(({ mode }): UserConfig => {
       exclude: ['@apollo/client'],
     },
     server: {
-      https,
+      https: https,
       port: 8443,
     },
     preview: {
@@ -64,7 +66,7 @@ export default defineConfig(({ mode }): UserConfig => {
         context: {
           ...env,
         },
-      }) as Plugin,
+      }),
     ],
   };
 });
