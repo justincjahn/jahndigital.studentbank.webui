@@ -1,16 +1,12 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import '@/common/styles/common.css';
+import confetti from 'canvas-confetti';
 
 import { computed, onMounted, reactive, watchEffect } from 'vue';
 
-import {
-  SITE_NAME,
-  SITE_DISABLE_NAME,
-  SITE_LOGO,
-  VERSION,
-  BASE_URLS
-} from '@/common/constants';
+import { VERSION, BASE_URLS } from '@/common/constants';
 
+// Stores
 import userStore from '@/common/stores/user';
 import errorStore from '@/common/stores/error';
 
@@ -19,11 +15,13 @@ import LoadingLabel from '@/common/components/LoadingLabel.vue';
 import { VInput } from '@/common/components/inputs';
 import ModalDialog from '@/common/components/ModalDialog.vue';
 
+// Validations
 import validateAccount from '@/common/validators/validateAccount';
 import validateInviteCode from '@/common/validators/validateInviteCode';
 import validatePassword from '@/common/validators/validatePassword';
 import validateEmail from '@/common/validators/validateEmail';
 
+// Services
 import { registerStudent } from '@/common/services/student';
 
 const error = computed({
@@ -61,8 +59,8 @@ const data = reactive({
   },
 });
 
-const isDataValid = computed(
-  () => Object.values({ ...data.errors }).every((x) => x.length === 0)
+const isDataValid = computed(() =>
+  Object.values({ ...data.errors }).every((x) => x.length === 0)
 );
 
 const isPasswordValid = computed(
@@ -73,7 +71,9 @@ const isPasswordValid = computed(
 
 const submitLabel = computed(() => {
   if (data.loading) return 'Please Wait...';
-  return data.currentStep === 0 ? 'Next' : 'Register'
+  if (data.currentStep == 0) return 'Next';
+  if (data.currentStep == 1) return 'Register';
+  return 'Log In';
 });
 
 const canSubmit = computed(() => {
@@ -88,37 +88,22 @@ const canSubmit = computed(() => {
   if (data.currentStep === 1) {
     return isPasswordValid.value && isDataValid.value;
   }
+
+  return true;
 });
 
-async function preregister()
-{
-  try {
-    await userStore.preregister(
-      data.data.inviteCode,
-      data.data.accountNumber
-    );
-  } catch (e) {
-    if (e instanceof Error) {
-      console.error('[Preregistration] ' + (e?.message ?? e));
-    }
-
-    throw new Error(
-      'Unable to find account.'
-    )
-  }
+async function preregister() {
+  await userStore.preregister(data.data.inviteCode, data.data.accountNumber);
 
   if (userStore.isPreauthorized.value !== true) {
-    throw new Error(
-      'An unknown error occurred validating your registration. Please try again later.'
-    );
+    throw new Error('isPreauthorized should be true.');
   }
 }
 
-async function register()
-{
+async function register() {
   const res = await registerStudent({
     email: data.data.email,
-    password: data.data.password
+    password: data.data.password,
   });
 
   if (!res) {
@@ -126,12 +111,11 @@ async function register()
   }
 
   if (res.studentRegistration !== true) {
-    throw new Error('Unable to complete registration.');
+    throw new Error('Unable to complete registration, unknown error.');
   }
 }
 
-async function handleSubmit()
-{
+async function handleSubmit() {
   data.loading = true;
 
   if (data.currentStep == 0) {
@@ -142,8 +126,10 @@ async function handleSubmit()
       data.currentStep = 1;
     } catch (e) {
       if (e instanceof Error) {
-        console.error('[Preregistration] ' + (e?.message ?? e));
-        error.value = "Unable to locate your registration using the provided information. Please review your invite code, and account number and try again."
+        console.error(`[Preregistration] ${e.message}`);
+
+        error.value =
+          'Unable to locate your registration using the provided information. Please review your invite code and account number.';
       }
     } finally {
       data.loading = false;
@@ -153,27 +139,35 @@ async function handleSubmit()
   }
 
   if (data.currentStep === 1) {
-    if (!isDataValid.value) return;
-    if (!isPasswordValid.value) return;
+    if (!isDataValid.value || !isPasswordValid.value) return;
 
     try {
       await register();
-
-      try {
-        await userStore.logout();
-      } catch {
-        // ignore
-      }
-
-      window.location.href = `/${BASE_URLS.STUDENT}`;
+      data.currentStep = 2;
     } catch (e) {
       if (e instanceof Error) {
-        console.error('[Registration] ' + (e?.message ?? e));
-        error.value = "Unable to complete registration.  Please contact your advisor."
+        console.error(`[Preregistration] ${e.message}`);
+
+        error.value =
+          'Unable to complete registration.  Please contact your instructor.';
       }
     } finally {
       data.loading = false;
     }
+
+    return;
+  }
+
+  if (data.currentStep === 2) {
+    try {
+      await userStore.logout();
+    } catch {
+      // ignore
+    } finally {
+      data.loading = false;
+    }
+
+    window.location.href = `/${BASE_URLS.STUDENT}`;
   }
 }
 
@@ -183,6 +177,16 @@ watchEffect(() => {
     data.passwordErrors.passwordRepeat = 'Passwords do not match.';
   } else {
     data.passwordErrors.passwordRepeat = '';
+  }
+});
+
+watchEffect(() => {
+  if (data.currentStep === 2) {
+    confetti({
+      particleCount: 100,
+      spread: window.innerWidth > 750 ? 200 : 80,
+      origin: { y: window.innerWidth > 750 ? 0.6 : 0.4 },
+    });
   }
 });
 
@@ -198,92 +202,103 @@ onMounted(() => {
 </script>
 
 <template>
-  <header class='main-header'>
-    <div class='container | flex-group'>
-      <h1>
-        <template v-if='SITE_LOGO'>
-          <img
-            :src='SITE_LOGO'
-            :alt='`${SITE_NAME} Registration`'
-          />
-        </template>
-        <template v-if='!SITE_DISABLE_NAME'>
-          {{ SITE_NAME }}
-        </template>
+  <main class="main-content">
+    <form class="container card" @submit.prevent="handleSubmit">
+      <h1 class="size-xl">Registration</h1>
 
-        Registration
-      </h1>
-    </div>
-  </header>
+      <template v-if="data.currentStep === 0">
+        <v-input
+          v-model="data.data.inviteCode"
+          v-model:error="data.errors.inviteCode"
+          :validator="validateInviteCode"
+          label="Invite Code"
+          required
+        />
 
-  <main class='main-content'>
-    <div class='container'>
-      <form @submit.prevent='handleSubmit'>
-        <template v-if='data.currentStep === 0'>
-          <v-input
-            v-model='data.data.inviteCode'
-            v-model:error='data.errors.inviteCode'
-            :validator='validateInviteCode'
-            label='Invite Code'
-            required
-           />
+        <v-input
+          v-model="data.data.accountNumber"
+          v-model:error="data.errors.accountNumber"
+          label="Account Number (Student ID Number)"
+          :validator="validateAccount"
+          required
+        />
+      </template>
 
-          <v-input
-            v-model='data.data.accountNumber'
-            v-model:error='data.errors.accountNumber'
-            label='Account Number (Student ID Number)'
-            :validator='validateAccount'
-            required
-          />
-        </template>
+      <template v-if="data.currentStep === 1">
+        <v-input
+          v-model="data.data.email"
+          v-model:error="data.errors.email"
+          name="email"
+          label="Email Address"
+          :validator="validateEmail"
+          required
+        />
 
-        <template v-if='data.currentStep === 1'>
-          <v-input
-            v-model='data.data.email'
-            v-model:error='data.errors.email'
-            name='email'
-            label='Email Address'
-            :validator='validateEmail'
-            required
-          />
+        <v-input
+          v-model="data.data.password"
+          v-model:error="data.passwordErrors.password"
+          type="password"
+          name="new-password"
+          label="Password"
+          :validator="validatePassword()"
+          required
+        />
 
-          <v-input
-            v-model='data.data.password'
-            v-model:error='data.passwordErrors.password'
-            type='password'
-            name='new-password'
-            label='Password'
-            :validator='validatePassword()'
-            required
-          />
+        <v-input
+          v-model="data.data.passwordRepeat"
+          v-model:error="data.passwordErrors.passwordRepeat"
+          type="password"
+          name="repeat-password"
+          label="Repeat Password"
+          required
+        />
+      </template>
 
-          <v-input
-            v-model='data.data.passwordRepeat'
-            v-model:error='data.passwordErrors.passwordRepeat'
-            type='password'
-            name='repeat-password'
-            label='Repeat Password'
-            required
-          />
-        </template>
+      <template v-if="data.currentStep === 2">
+        <p class="fieldset">
+          Congratulations, your account has been registered! Log In and get
+          started!
+        </p>
+      </template>
 
-        <button type='submit' class='primary' :disabled='!canSubmit'>
-          <loading-label :show='data.loading'> {{ submitLabel }} </loading-label>
+      <div class="fieldset flex-group" data-flex-type="end">
+        <button type="submit" class="primary" :disabled="!canSubmit">
+          <loading-label :show="data.loading">
+            {{ submitLabel }}
+          </loading-label>
         </button>
-      </form>
-    </div>
+      </div>
+    </form>
   </main>
 
-  <footer class='main-footer'>
+  <footer class="main-footer">
     &copy; 2019-{{ new Date().getFullYear() }} Jahn Digital v{{ VERSION }}
   </footer>
 
   <modal-dialog
-    :show='error !== null && error.length > 0'
-    class='destructive'
-    title='Error'
-    @submit='() => (error = null)'
+    :show="error !== null && error.length > 0"
+    class="destructive"
+    title="Error"
+    @submit="() => (error = null)"
   >
     {{ error }}
   </modal-dialog>
 </template>
+
+<style lang="css" scoped>
+form {
+  --card-width: clamp(22rem, 30vw, 40rem);
+  margin-top: 3rem;
+}
+
+h1 {
+  margin-bottom: 1rem;
+}
+
+@media screen and (min-width: 47rem) {
+  .main-content {
+    margin-top: 0;
+    justify-content: center;
+  }
+}
+</style>
